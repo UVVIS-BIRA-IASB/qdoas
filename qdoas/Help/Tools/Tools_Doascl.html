@@ -1,0 +1,87 @@
+<html>
+<head>
+<title>QDOAS Command Line Tool</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta NAME="description" CONTENT="QDOAS help">
+<meta NAME="keywords" CONTENT="QDOAS, tools, command line, doas_cl, batch">
+<link rel="stylesheet" href="../uvvis.css" type="text/css">
+<style type="text/css">
+<!--
+.style4 {font-family: "Courier New", Courier, monospace; font-weight: bold; font-size: small;}
+-->
+</style>
+</head>
+
+<body>
+<table width="100%" border="0" cellpadding="10" cellspacing="0">
+
+  <tr>
+    <td width="200" valign="top" bgcolor="#F3F3F3">
+<p align="center"><a href="../index.html"><img src="../qdoas_atmospheric_toolbox_small.png" alt="QDOAS_logo" width="80" height="80"></a></p>
+<p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../GUI/GUI.html" style="text-decoration: none; color: #336699">&nbsp;The&nbsp;user&nbsp;interface</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Project/Project.html" style="text-decoration: none; color: #336699">&nbsp;Projects Properties</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Analysis/Analysis.html" style="text-decoration: none; color: #336699">&nbsp;Analysis&nbsp;windows&nbsp;properties</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Tools/Tools.html" style="text-decoration: none; color: #336699">&nbsp;QDOAS Tools</a></p>
+    <p class="menu-left" align="right"><a href="Tools_Convolution.html" style="text-decoration: none; color: #336699">Convolution/Filtering</a></p>
+    <p class="menu-left" align="right"><a href="Tools_Ring.html" style="text-decoration: none; color: #336699">Ring</a></p>
+    <p class="menu-left" align="right"><a href="Tools_Usamp.html" style="text-decoration: none; color: #336699">Undersampling</a></p>
+    <p class="menu-left" align="right"><a href="Tools_Doascl.html" style="text-decoration: none; color: #336699">Command-line</a></p></td>
+    <td width="2">&nbsp;</td>
+    <td id="maincontent">
+    <p class="head-title-page">QDOAS Command Line Tool (doas_cl)</p>
+    <p align="justify" >The QDOAS package  includes a very powerful command line tool : doas_cl.&nbsp; It consists in a  separate module to load from the command line with a xml configuration file (a  QDOAS application or the configuration file built from the convolution/filtering,  ring or undersampling tool).
+<p align="justify" >To see the syntax, just run doas_cl without arguments :&nbsp; </p>
+<table width="100%" border="0" cellpadding="5">
+  <tr>
+   <td width="5%">&nbsp;</td>
+   <td width="95%"><span class="style4">doas_cl -c &lt;config file&gt; [-a/-k &lt;project name&gt;] [-o &lt;output&gt;] [-f &lt;file&gt;]...</span></td>
+  </tr>
+  <tr valign="top">
+    <td width="5%">&nbsp;</td>
+    <td width="95%"><p class="style4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-c &lt;config file&gt;   : A QDoas, convolution, [Ring or usamp] config file.<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The tool to invoke is determined from the type of<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;configuration file specified;</p>
+      <p class="style4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-a &lt;project name&gt;  : for QDoas, run analysis on the specified project<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-k &lt;project name&gt;  : for QDoas, run calibration on the specified project</p>
+      <p class="style4">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-v                 : verbose on (default is off)<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-xml &lt;path=value&gt;  : advanced option to replace the values of some options<br>
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in the configuration file by new ones.</p>
+      </td>
+  </tr>
+   <td width="5%">&nbsp;</td>
+   <td width="95%"><span class="style4">------------------------------------------------------------------------------<br>
+doas_cl is a tool of QDoas, a  product jointly developed by BIRA-IASB and S[&amp;]T<br>
+Last version : Qdoas version  2.1 - 20 December 2012</span></td>
+</table>
+<p align="justify" ><strong>doas_cl </strong>is useful to  process large amount of files (for example satellite data).&nbsp; It applies on spectra and directories.&nbsp;  An output file name different from the one given in the <a href="../Project/Project_Output.html"><strong>Output page</strong></a> of <strong>Projects Properties </strong>can  be specified.&nbsp; The xml input configuration file can  be modified by  the calling batch for  specific needs.</p>
+<p align="justify">      Example of doas_cl command included in a bash file :</p>
+    <table width="100%" border="0">
+      <tr valign="top">
+        <td width="5%">&nbsp;</td>
+        <td width="20%" class="style4"><span class="style14">/usr/local/bin/doas_cl</span></td>
+        <td width="75%" class="style4"><span class="style14">-c &quot;$HA_pathAnalysis/QDOAS_Harestua.xml&quot; \<br>
+-a &quot;Harestua&quot; -o  &quot;$HA_pathAnalysisOutput/$year/automatic&quot; \<br>
+-f &quot;$HA_fileToProcess&quot;</span></td>
+      </tr>
+    </table>
+    <p align="justify">This command uses the QDOAS_Harestua.xml file previously generated  by QDOAS.&nbsp; It loads the project  &ldquo;Harestua&rdquo; (important to specify if several projects exist in the  application).&nbsp; The output file name is generated  automatically (see the output page of projects properties).&nbsp; </p>
+    <p align="justify"><em><strong>Important  : always use slash as path separator for doas_cl file arguments (input and  output) even if you work under Windows.</strong> </em></p>
+    <p align="justify">For the convolution  tool, the switch &ndash;f applies only to one file but the command can be called  several times from a batch. &nbsp;For the ring  tool, the switch &ndash;f modifies the final calibration grid.&nbsp; To change other parameters, it is better to  write a piece of code to modify the xml file. </p>
+    <p align="justify">About the -xml switch, see the<strong> QDOAS S/W user manual.</strong></p>
+    <p align="justify" >&nbsp;</p>
+  </tr>
+</table>
+<div id="footcontainer" >
+
+	  <div class="maincol" >
+	    <span class="update" >Copyright BIRA-IASB - Last update :
+<script language="JavaScript">
+  var lastModif=document.lastModified;
+  document.write(lastModif[3]+lastModif[4]+"/"+lastModif[0]+lastModif[1]+"/"+lastModif[6]+lastModif[7]+lastModif[8]+lastModif[9]);
+</script>
+	    </span>
+	  </div>
+	</div>
+    <p>&nbsp;</p>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<html>
+<head>
+<title>QDOAS Convolution/Filtering Tool : Slit page</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta NAME="description" CONTENT="QDOAS help">
+<meta NAME="keywords" CONTENT="QDOAS, tools, convolution, line shape, slit function, filtering, calibration, shift, slant column density, I0 correction">
+<link rel="stylesheet" href="../uvvis.css" type="text/css">
+</head>
+
+<body>
+<table width="100%" border="0" cellpadding="10" cellspacing="0">
+
+  <tr>
+    <td width="200" valign="top" bgcolor="#F3F3F3">
+<p align="center"><a href="../index.html"><img src="../qdoas_atmospheric_toolbox_small.png" alt="QDOAS_logo" width="80" height="80"></a></p>
+<p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../GUI/GUI.html" style="text-decoration: none; color: #336699">&nbsp;The&nbsp;user&nbsp;interface</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Project/Project.html" style="text-decoration: none; color: #336699">&nbsp;Projects Properties</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Analysis/Analysis.html" style="text-decoration: none; color: #336699">&nbsp;Analysis&nbsp;windows&nbsp;properties</a>&nbsp;</p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Tools/Tools.html" style="text-decoration: none; color: #336699">&nbsp;QDOAS Tools</a></p>
+    <p class="menu-left" align="right"><a href="Tools_Convolution.html" style="text-decoration: none; color: #336699">Convolution/Filtering</a></p>
+    <p class="menu-left" align="right"><a href="Tools_Ring.html" style="text-decoration: none; color: #336699">Ring</a></p>
+    <p class="menu-left" align="right"><a href="Tools_Usamp.html" style="text-decoration: none; color: #336699">Undersampling</a></p>
+    <p class="menu-left" align="right"><a href="Tools_Doascl.html" style="text-decoration: none; color: #336699">Command-line</a></p>
+    </td>
+    <td width="2">&nbsp;</td>
+    <td id="maincontent">
+    <p class="head-title-page">QDOAS Convolution/Filtering Tool : Slit page</p>
+    <p align="center"><img src="Tools_Convolution_Slit.jpg" width="684" height="449" border="0" usemap="#Map"></p>
+    <p align="justify">This page is  dedicated to the selection and the parameterisation of the convolution slit  function.&nbsp; This page is dedicated to the selection and the parameterisation of the convolution slit function.  User-defined slit functions and different analytical line shapes (Gaussian, Lorentzian, Voigt, error functions, asymmetric gaussian) are accepted.  The wavelength dependency of the slit function parameters characterized by the wavelength calibration procedure can be saved from the plot page in order to be accounted for the convolution.  Check the <strong>Wavelength dependent</strong> button to enter file instead of numbers.  It is also possible to use <strong>File</strong> option and enter a look up table of slit functions defined at specific wavelengths.</p>
+    <p align="justify">Refer to the <strong>Description of Algorithms </strong>part of the <strong>QDOAS Software User manual </strong>for  further information on the supported analytical line shapes.&nbsp;</p>
+    <p align="justify" class="orangelarge">Deconvolution<a name="I0"></a></p>
+    <p align="justify">A deconvolution  slit function can also be defined.&nbsp; In  this case, the high resolution cross-section is convolved using an effective  slit function obtained from the FT of convolution and deconvolution slit  functions.&nbsp; This feature doesn&rsquo;t work if  a wavelength dependent slit function is selected.&nbsp; By default, no deconvolution is applied.</p>
+    <p align="justify">&nbsp;</p>
+    </tr>
+</table>
+<div id="footcontainer" >
+
+	  <div class="maincol" >
+	    <span class="update" >Copyright BIRA-IASB - Last update :
+<script language="JavaScript">
+  var lastModif=document.lastModified;
+  document.write(lastModif[3]+lastModif[4]+"/"+lastModif[0]+lastModif[1]+"/"+lastModif[6]+lastModif[7]+lastModif[8]+lastModif[9]);
+</script>
+	    </span>
+	  </div>
+	</div>
+    <p>&nbsp;</p>
+
+<map name="Map"><area shape="rect" coords="66,51,100,71" href="Tools_Convolution_Slit.html">
+<area shape="rect" coords="3,51,65,71" href="Tools_Convolution_General.html">
+<area shape="rect" coords="101,51,162,71" href="Tools_Convolution_Filtering.html">
+</map></body>
+</html>

@@ -1,0 +1,138 @@
+<html>
+<head>
+<title>QDOAS Projects Properties : Instrumental page</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta NAME="description" CONTENT="QDOAS help">
+<meta NAME="keywords" CONTENT="QDOAS, project, format, ASCII, SAOZ, DOASIS, MFC, GOME, SCIAMACHY, GOME2, ground-based, line, column, size of the detector, MKZY, NOVAC">
+<link rel="stylesheet" href="../uvvis.css" type="text/css">
+</head>
+
+<body>
+<table width="100%" border="0" cellpadding="10" cellspacing="0">
+
+  <tr>
+    <td width="200" valign="top" bgcolor="#F3F3F3">
+<p align="center"><a href="../index.html"><img src="../qdoas_atmospheric_toolbox_small.png" alt="QDOAS_logo" width="80" height="80"></a></p>
+<p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../GUI/GUI.html" style="text-decoration: none; color: #336699">&nbsp;The&nbsp;user&nbsp;interface</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="Project.html" style="text-decoration: none; color: #336699">&nbsp;Projects Properties</a></p>
+    <p class="menu-left" align="right"><a href="Project_Display.html" style="text-decoration: none; color: #336699">Display</a></p>
+    <p class="menu-left" align="right"><a href="Project_Selection.html" style="text-decoration: none; color: #336699">Selection</a></p>
+    <p class="menu-left" align="right"><a href="Project_Analysis.html" style="text-decoration: none; color: #336699">Analysis</a></p>
+    <p class="menu-left" align="right"><a href="Project_Filtering.html" style="text-decoration: none; color: #336699">Filtering</a></p>
+    <p class="menu-left" align="right"><a href="Project_Calibration.html" style="text-decoration: none; color: #336699">Calibration</a></p>
+    <p class="menu-left" align="right"><a href="Project_Undersampling.html" style="text-decoration: none; color: #336699">Undersampling</a></p>
+    <p class="menu-left" align="right"><a href="Project_Instrumental.html" style="text-decoration: none; color: #336699">Instrumental</a></p>
+    <p class="menu-left" align="right"><a href="Project_Slit.html" style="text-decoration: none; color: #336699">Slit</a></p>
+    <p class="menu-left" align="right"><a href="Project_Output.html" style="text-decoration: none; color: #336699">Output</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Analysis/Analysis.html" style="text-decoration: none; color: #336699">&nbsp;Analysis&nbsp;windows&nbsp;properties</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Tools/Tools.html" style="text-decoration: none; color: #336699">&nbsp;QDOAS&nbsp;Tools</a></p>
+    <td width="2">&nbsp;</td>
+    <td id="maincontent">
+    <p class="head-title-page">QDOAS Projects Properties : Instrumental page</p>
+    <p align="center" ><img src="Project_InstrumentalAscii.jpg" alt="" width="722" height="481" border="0" usemap="#Map">
+<map name="Map">
+      <area shape="rect" coords="48,50,104,70" href="Project_Display.html">
+            <area shape="rect" coords="106,50,170,70" href="Project_Selection.html">
+          <area shape="rect" coords="171,50,232,70" href="Project_Analysis.html">
+          <area shape="rect" coords="233,50,293,70" href="Project_Filtering.html">
+            <area shape="rect" coords="294,50,367,70" href="Project_Calibration.html">
+            <area shape="rect" coords="368,50,460,70" href="Project_Undersampling.html">
+            <area shape="rect" coords="545,50,581,70" href="Project_Slit.html">
+            <area shape="rect" coords="582,50,638,70" href="Project_Output.html">
+<area shape="rect" coords="52,90,665,132" href="#Site">
+<area shape="rect" coords="52,138,400,268" href="#ASCII">
+<area shape="rect" coords="52,269,665,324" href="#Options"><area shape="rect" coords="401,138,657,246" href="#straylight"></map>
+    </p>
+    <p align="justify" ><a name="Options"></a>Except the observation <strong>Site</strong>, the <strong>Calibration File</strong> and the <strong>Transmission file</strong>, the fields that appear in this page depend strictly on the  format of spectra files to process. </p>
+    <strong><p align="justify" class="orangelarge">Calibration file and instrumental corrections</p></strong>
+    <p align="justify" >A preliminary wavelength calibration is necessary to browse spectra. If the wavelength calibration is  coded in the spectra file, it is recommended to use it by keeping the field <strong>Calibration File</strong> empty. </p>
+    <p align="justify"><em><strong>For the analysis of spectra, the wavelength calibration of the reference spectrum always has the priority over the spectra ones. It is important to select this  file very carefully mainly when browsing spectra to save a new reference  spectrum.</strong></em></p>
+    <p align="justify">Some instrumental corrections can be applied on spectra. For example, a  transmission function previously determined in laboratory with calibrated sources can be specified in the <strong>Transmission file</strong> field. A two columns ASCII file is expected (wavelength calibration and transmission function) and spectra will be divided by this curve before the wavelength calibration procedure.</p>
+    <p align="justify">Dark current correction is also possible according to the file format. The selected file format determines how dark currents are provided and how spectra are corrected. </p>
+    <p align="justify">For the <strong><u>MFC STD file format</u></strong>, spectra can be corrected by dark current and offset. For the <strong><u>MFC BIRA-IASB binary format</u></strong>, spectra are corrected after averaging the dark currents and the offsets present in the file.  The dark current should be a spectrum measured with a large integration time (typically 30 sec) and the offset should be the average of a large number of spectra measured with a very small integration time (typically 1000 x 3 ms). Note that QDOAS corrects dark current by offset. See details in the <strong>Description of Algorithms</strong> section of the <strong>QDOAS Software User Manual.</strong></p>
+    <p align="justify" class="orangelarge">Satellite measurements<a name="Satellites"></a></p>
+    <p align="justify">Spectra measured by the following satellite instruments can be processed by QDOAS : </p>
+    <table width="80%" border="0" align="center" cellpadding="5" cellspacing="10" >
+      <tr valign="top">
+        <td width="150" id="table"><strong>GOME (ERS-2)</strong></td>
+        <td id="table"><div align="justify">QDOAS supports the original ASCII file format but it is recommended to use the more suitable binary file format created by a modified version of the GDP (GOME Data Processor) extractor  implemented at BIRA-IASB mainly for the automatic selection of the reference spectrum.. </div></td>
+      </tr>
+      <tr valign="top">
+        <td width="150" id="table"><strong>SCIAMACHY (ENVISAT)</strong></td>
+        <td id="table"><div align="justify">routines to read the SCIAMACHY PDS file format have been kindly provided by IFE/IUP Uni Bremen;</div></td>
+      </tr>
+      <tr valign="top">
+        <td width="150" id="table"><strong>GOME2 (MetOp)</strong></td>
+        <td id="table"><p align="justify">QDOAS uses BEAT library to read spectra from GOME2. BEAT (Basic Envisat Atmospheric Toolbox) provides functions to read atmospheric remote sensing data from different instruments : SCIAMACHY (ENVISAT), GOME (ERS-2), OMI, TES and MLS (Aura), and GOME-2 and IASI (MetOp). The package can be downloaded from the <a href="http://www.stcorp.eu/beat/download/download.html"><strong>S[&amp;]T</strong></a> web site. Before using QDOAS on GOME2 spectra, BEAT should be installed and the CODA_DEFINITION environment variable should be defined (see the <strong>Installation section</strong> of the <strong>QDOAS Software User Manual</strong>). </p>
+          </td>
+      </tr>
+      <tr valign="top">
+        <td width="150" id="table"><strong>OMI (AURA)</strong></td>
+        <td id="table"><p align="justify">OMI spectra are read using the HDF-EOS2 library, which is based on HDF4.</p>
+          </td>
+      </tr>
+    </table>
+    <p align="justify">The wavelength calibration of earthshine spectra and irradiances is provided in the files and no transmission file is needed. Both fields should then be kept empty. The only information to provide should be the spectral region to process : the band type (for GOME and GOME2) or the channel and the clusters (for SCIAMACHY).</p>
+    <p align="justify" class="orangelarge">Ground-based  measurements<a name="Satellites"></a></p>
+    <p align="justify">The most popular file formats supported by QDOAS for ground-based measurements are :</p>
+    <table width="80%" border="0" align="center" cellpadding="5" cellspacing="10" >
+      <tr valign="top">
+        <td width="150" id="table"><strong>SAOZ</strong></td>
+        <td id="table"><div align="justify">Syst&egrave;me d'Analyse par Observation Z&eacute;nitale developed by the aeronomy lab of the CNRS (JP Pommereau, F Goutail,...), France, and largely used in the NDACC network (Network for the Detection of Atmospheric Composition Change) for stratospheric total ozon and NO<sub>2</sub> monitoring;</div></td>
+      </tr>
+      <tr valign="top">
+        <td width="150" id="table"><strong>MFC STD</strong></td>
+        <td id="table"><div align="justify">ASCII format produced by  the well-known DOASIS program designed in Java by the atmospheric research group at IUP Heidelberg, Germany (Stefan Kraus,...) and largely used in the DOAS community. QDOAS requires the size of the detector and the format of the date (for example : MM.DD.YYYY). </div></td>
+      </tr>
+      <tr valign="top">
+        <td width="150" id="table"><strong>MFC Binary (BIRA-IASB)</strong></td>
+        <td id="table"><div align="justify">The MFC binary format generated by DOASIS is not supported by QDOAS.  With DOASIS, it is easy to run scripts that convert the MFC binary files in MFC STD format.
+Because spectra are saved in individual files with automatic numbering, MFC STD format is not very suitable to browse spectra and for efficient automatic reference selection (zenith of the scan for MAXDOAS data). That's
+why, BIRA-IASB has developed its own MFC binary format in which all spectra of a same day including dark currents and offsets measured the night are saved in a unique file.  It is possible to convert MFC STD files in this BIRA-IASB binary format using the
+converter MFC_Std2Bin.  See further details in the <b>Supported spectra file formats</b> section of the <b>QDOAS overview</b> chapter of the QDOAS Software User Manual.       </tr>
+      <tr valign="top">
+        <td width="150" id="table"><strong>MKZY PAK</strong></td>
+        <td id="table"><p align="justify">developed at the Chalmers University of Technology, Goteborg, Sweden (MANNE Kihlman and ZHANG Yan) and used in the NOVAC network</p>          </td>
+      </tr>
+  <tr valign="top">
+        <td width="150" id="table"><strong>Ocean Optics</strong></td>
+        <td id="table"><p align="justify">very simple ASCII file format developed by the spectrometers manufacturer</p>          </td>
+      </tr>
+    </table>
+    <p align="justify" class="orangelarge">The ASCII file format<a name="ASCII"></a></p>
+    <p align="justify">Other formats are specific to the different Institutes that developed them. If a format is not supported by QDOAS, it should be possible to convert the files in ASCII. When the ASCII format is selected, spectra can be provided in the file one record per line <strong>(line format)</strong>, one spectral value per line  <strong>(column format)</strong> or several spectra in columns (from version 2.107). According to the checked flags in the <strong>Read from file</strong> group box, the following information are expected strictly in the given order&nbsp;:</p>
+    <ol>
+      <li>Solar Zenith Angle</li>
+      <li>Azimuth Viewing Angle</li>
+      <li>Elevation Viewing Angle</li>
+      <li>Date in the DD/MM/YYYY (day/month/year) format</li>
+      <li>Fractional time</li>
+    </ol>
+  <p align="justify">In the column format, angles had to be given on the same line until version 2.106. From version 2.107, the column format accepts also matrices of spectra and angles have to be given in separate
+lines.  With column format, a wavelength calibration can be provided with spectra. It should be given in first column of each data set.</p>
+  <p align="justify">Some examples of ASCII files supported by QDOAS are given in annex of the <strong>QDOAS Software User Manual.</strong></p>
+  <p align="justify" class="orangelarge">The observation site<a name="Site"></a></p>
+  <p align="justify">The information on the observation <strong>Site</strong> is used to  (re&#8209;)calculate solar zenith angle from geolocation coordinates given for this site in the <strong><a href="../GUI/GUI_Sites.html">Sites</a> </strong>sheet. This can be useful for example if the solar zenith angles saved in the files are not reliable enough. The abbreviation of the observation site is also used to build  automatic output file names (see the<strong> <a href="Project_Output.html#AutomaticFile">Output Page</a></strong>).
+The longitude is particularly useful to select reference spectra of the day
+using the local time instead of Universal Time in case fractional days and
+times given in UT are distributed in two days (for example, measurements
+in China).</p>
+  <p align="justify" class="orangelarge">Straylight bias<a name="straylight"></a></p>
+  <p align="justify">Requested for some spectra files format, this option allows subtracting from a spectrum the signal averaged on the specified range of wavelengths.
+This is useful for example, to retrieve SO<sub>2</sub> in the UV region where the signal is very poor and where the straylight is problematic.  Even if the straylight can be attenuated by subtracting from the spectra, the average of the signal measured in the UV region (below 300 nm if possible), it is recommended to characterize it in laboratory.</p>
+  <p align="justify">&nbsp;</p>    </tr>
+</table>
+<div id="footcontainer" >
+
+	  <div class="maincol" >
+	    <span class="update" >Copyright BIRA-IASB - Last update :
+<script language="JavaScript">
+  var lastModif=document.lastModified;
+  document.write(lastModif[3]+lastModif[4]+"/"+lastModif[0]+lastModif[1]+"/"+lastModif[6]+lastModif[7]+lastModif[8]+lastModif[9]);
+</script>
+	    </span>
+	  </div>
+	</div>
+    <p>&nbsp;</p>
+</body>
+</html>

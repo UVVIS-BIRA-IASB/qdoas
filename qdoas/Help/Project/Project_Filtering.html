@@ -1,0 +1,103 @@
+<html>
+<head>
+<title>QDOAS Projects Properties : Filtering page</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta NAME="description" CONTENT="QDOAS help">
+<meta NAME="keywords" CONTENT="QDOAS, project, Filtering, filter, Kaiser, boxcar, gaussian, triangular, Savitzky-Golay, odd-even correction, binomial, cut-off frequency, tolerance, pass band, low pass, high pass, iterations, width, FWHM, pixels">
+<link rel="stylesheet" href="../uvvis.css" type="text/css">
+</head>
+
+<body>
+<table width="100%" border="0" cellpadding="10" cellspacing="0">
+
+  <tr>
+    <td width="200" valign="top" bgcolor="#F3F3F3">
+<p align="center"><a href="../index.html"><img src="../qdoas_atmospheric_toolbox_small.png" alt="QDOAS_logo" width="80" height="80"></a></p>
+<p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../GUI/GUI.html" style="text-decoration: none; color: #336699">&nbsp;The&nbsp;user&nbsp;interface</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="Project.html" style="text-decoration: none; color: #336699">&nbsp;Projects Properties</a></p>
+    <p class="menu-left" align="right"><a href="Project_Display.html" style="text-decoration: none; color: #336699">Display</a></p>
+    <p class="menu-left" align="right"><a href="Project_Selection.html" style="text-decoration: none; color: #336699">Selection</a></p>
+    <p class="menu-left" align="right"><a href="Project_Analysis.html" style="text-decoration: none; color: #336699">Analysis</a></p>
+    <p class="menu-left" align="right"><a href="Project_Filtering.html" style="text-decoration: none; color: #336699">Filtering</a></p>
+    <p class="menu-left" align="right"><a href="Project_Calibration.html" style="text-decoration: none; color: #336699">Calibration</a></p>
+    <p class="menu-left" align="right"><a href="Project_Undersampling.html" style="text-decoration: none; color: #336699">Undersampling</a></p>
+    <p class="menu-left" align="right"><a href="Project_Instrumental.html" style="text-decoration: none; color: #336699">Instrumental</a></p>
+    <p class="menu-left" align="right"><a href="Project_Slit.html" style="text-decoration: none; color: #336699">Slit</a></p>
+    <p class="menu-left" align="right"><a href="Project_Output.html" style="text-decoration: none; color: #336699">Output</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Analysis/Analysis.html" style="text-decoration: none; color: #336699">&nbsp;Analysis&nbsp;windows&nbsp;properties</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Tools/Tools.html" style="text-decoration: none; color: #336699">&nbsp;QDOAS&nbsp;Tools</a></p>
+    </td>
+    <td width="2">&nbsp;</td>
+    <td id="maincontent">
+    <p class="head-title-page">QDOAS Projects Properties : Filtering page</p>
+    <p align="center" ><img src="Project_Filtering.jpg" alt="" width="722" height="481" border="0" usemap="#Map">
+<map name="Map">
+      <area shape="rect" coords="48,50,104,70" href="Project_Display.html">
+            <area shape="rect" coords="106,50,170,70" href="Project_Selection.html">
+          <area shape="rect" coords="171,50,232,70" href="Project_Analysis.html">
+            <area shape="rect" coords="294,50,367,70" href="Project_Calibration.html">
+            <area shape="rect" coords="368,50,460,70" href="Project_Undersampling.html">
+            <area shape="rect" coords="461,50,544,70" href="Project_Instrumental.html">
+            <area shape="rect" coords="545,50,581,70" href="Project_Slit.html">
+            <area shape="rect" coords="582,50,638,70" href="Project_Output.html">
+<area shape="rect" coords="60,265,662,443" href="#Highpass">
+<area shape="rect" coords="58,80,661,261" href="#Lowpass">
+</map>
+    </p>
+    <p align="justify" ><a name="Options"></a>Filtering attenuates components in the spectra with frequencies higher (low-pass filtering) or lower (high-pass filtering) than a given cut-off frequency. This simple method can improve the analysis of noisy spectra but may lead in the other hand to a loss of spectral information and should be used very carefully. Filtering corresponds to a convolution <u>in the pixels domain</u>. The most common filter functions are implemented :</p>
+    <table width="80%" border="0" align="center" cellpadding="5" cellspacing="10" >
+      <tr valign="top">
+        <td width="150" id="table"><strong>Kaiser</strong></td>
+        <td id="table"><div align="justify"> the algorithm is described in the paper  Kaiser  and Reed, 1977;</div></td>
+      </tr>
+      <tr valign="top">
+        <td width="150" id="table"><strong>Boxcar</strong></td>
+        <td id="table"><div align="justify">convolution with a rectangle function; this  filter consists in averaging the spectrum over several spectral points;</div></td>
+      </tr>
+      <tr valign="top">
+        <td width="150" id="table"><strong>Gaussian</strong></td>
+        <td id="table"><div align="justify">convolution with a Gaussian function;</div></td>
+      </tr>
+      <tr valign="top">
+        <td width="150" id="table"><strong>Triangular</strong></td>
+        <td id="table"><div align="justify">convolution with a triangle  function;</div></td>
+      </tr>
+      <tr valign="top">
+        <td width="150" id="table"><strong>Savitzky-Golay</strong></td>
+        <td id="table"><div align="justify">this  filter uses a  least-square linear regression fit of a polynomial of degree<em> k </em>over at least <em>k+1 </em>data points around each point in the spectrum;</div></td>
+      </tr>
+      <tr valign="top">
+        <td width="150" id="table"><strong>Binomial</strong></td>
+        <td id="table"><div align="justify">convolution with a filter function formed with  the binomial coefficients calculated using the recursive Pascal's triangle  algorithm;</div></td>
+      </tr>
+      <tr valign="top">
+        <td width="150" id="table"><strong>Odd-even correction</strong></td>
+        <td id="table"><div align="justify">smoothing obtained by averaging spectra interpolated on odd and even pixels.</div></td>
+      </tr>
+    </table>
+    <p>Further details on these filters can be found in the literature.<br>
+    According to the selected filter, different fields have to be completed.<br>
+      Select filter type <strong>No Filter</strong> if you want to disable spectra and cross-sections filtering.</p>
+    <p align="justify" class="orangelarge">Low-pass filtering<a name="Lowpass"></a></p>
+    <p align="justify">Low-pass filtering is applied to the spectra and to the cross-sections.  Nevertheless, the filtering of cross-sections could be  disabled individually  in the <strong><a href="../Analysis/Analysis.html">Analysis windows properties</a> </strong>dialog box. <br>
+    </p>
+    <p align="justify" class="orangelarge">High-pass filtering<a name="Highpass"></a></p>
+    <p align="justify" >Cross-sections are filtered by subtracting  (optical density fitting) or dividing (intensity fitting) a fitted polynomial or  a smooth spectrum calculated by filtering the original cross-sections a high  number of times.&nbsp; This can be an alternative to the Gram-Schmidt algorithm to calculate differential cross  sections.&nbsp;</p>
+    <p align="justify" >For the moment, high-pass filtering is supported only in optical  density fitting mode. It can be applied during the phase of calibration and/or during the analysis of spectra.</p>
+     <p align="justify">&nbsp;</p>
+    </tr>
+</table>
+<div id="footcontainer" >
+
+	  <div class="maincol" >
+	    <span class="update" >Copyright BIRA-IASB - Last update :
+<script language="JavaScript">
+  var lastModif=document.lastModified;
+  document.write(lastModif[3]+lastModif[4]+"/"+lastModif[0]+lastModif[1]+"/"+lastModif[6]+lastModif[7]+lastModif[8]+lastModif[9]);
+</script>
+	    </span>
+	  </div>
+	</div>
+    <p>&nbsp;</p>
+</body>
+</html>

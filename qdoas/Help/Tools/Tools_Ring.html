@@ -1,0 +1,70 @@
+<html>
+<head>
+<title>QDOAS Ring Tool</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta NAME="description" CONTENT="QDOAS help">
+<meta NAME="keywords" CONTENT="QDOAS, tools, convolution, ring, Chance, Spurr, Vountas, slit function, cross-section, Rotational Raman Scattering, RRS">
+<link rel="stylesheet" href="../uvvis.css" type="text/css">
+</head>
+
+<body>
+<table width="100%" border="0" cellpadding="10" cellspacing="0">
+
+  <tr>
+    <td width="200" valign="top" bgcolor="#F3F3F3">
+<p align="center"><a href="../index.html"><img src="../qdoas_atmospheric_toolbox_small.png" alt="QDOAS_logo" width="80" height="80"></a></p>
+<p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../GUI/GUI.html" style="text-decoration: none; color: #336699">&nbsp;The&nbsp;user&nbsp;interface</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Project/Project.html" style="text-decoration: none; color: #336699">&nbsp;Projects Properties</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Analysis/Analysis.html" style="text-decoration: none; color: #336699">&nbsp;Analysis&nbsp;windows&nbsp;properties</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Tools/Tools.html" style="text-decoration: none; color: #336699">&nbsp;QDOAS Tools</a></p>
+    <p class="menu-left" align="right"><a href="Tools_Convolution.html" style="text-decoration: none; color: #336699">Convolution/Filtering</a></p>
+    <p class="menu-left" align="right"><a href="Tools_Ring.html" style="text-decoration: none; color: #336699">Ring</a></p>
+    <p class="menu-left" align="right"><a href="Tools_Usamp.html" style="text-decoration: none; color: #336699">Undersampling</a></p>
+    <p class="menu-left" align="right"><a href="Tools_Doascl.html" style="text-decoration: none; color: #336699">Command-line</a></p></td>
+    <td width="2">&nbsp;</td>
+    <td id="maincontent">
+    <p class="head-title-page">QDOAS Ring Tool (ring)</p>
+    <p align="justify">The so-called Ring  effect arises in the atmosphere due to inelastic scattering processes (mainly  Rotational Raman Scattering - RRS by molecular <em>O<sub>2</sub></em> and <em>N<sub>2</sub></em>).&nbsp; Roughly speaking, it manifests itself by a   broadening of the solar and atmospheric spectral features present in measured  spectra.&nbsp; This broadening typically  reduces the depth of thin solar and atmospheric absorption features by several  percents.&nbsp; Hence, it has a strong impact  on spectroscopic measurements using the DOAS method and requires appropriate  correction to be implemented in retrieval algorithms.&nbsp; This is especially true for minor absorbers  like <em>BrO</em> or <em>OClO</em>, for which weak absorption features can be completely masked by  Ring structures. </p>
+<p align="justify">In DOAS, the Ring effect is usually accounted for as an  absorber.&nbsp; The QDOAS Ring tool calculates Ring cross-sections using a simple method [Chance and Spurr, 1997]. &nbsp;See the <strong>Description of Algorithms </strong>part of the <strong>QDOAS Software User manual</strong> for further information on the Ring effect.</p>
+<p align="justify" class="orangelarge">Example of configuration of the ring tool<a name="Example"></a></p>
+<table width="1206" align="center" border="0">
+  <tr>
+    <td><div align="center"><img src="Tools_Ring_General.jpg" width="593" height="439"></div></td>
+    <td><div align="center"><img src="Tools_Ring_Plot.jpg" width="593" height="439"></div></td>
+  </tr>
+</table>
+    <p align="justify" class="orangelarge">Input<a name="Input"></a></p>
+    <p>QDOAS requires :</p>
+    <ul type="disc">
+      <li><div align="justify">the final grid on which the ring cross-section must be calculated</div></li>
+      <li><div align="justify">a high-resolution solar spectrum;</div></li>
+      <li><div align="justify">the slit function to  use for the convolution : user-defined slit functions and analytical line  shapes (Gaussian, Lorentzian, Voigt and error functions) are accepted.&nbsp;The  wavelength dependency of the line shape (Gaussian or error function)  characterized by the wavelength calibration procedure can be saved from the  plot page in order to be accounted for the convolution.</div></li>
+      </ul>
+      <p>The effect of a change in temperature is small. Generally 250K is a good approximation for the atmospheric temperature at which most of the RRS is taking place.  The normalization of the Raman spectrum is optional (Wagner et al., 2010).</p>
+    <p align="justify" class="orangelarge">Output<a name="Output"></a></p>
+    <p align="justify">As the calculated  ring cross-section is accounted as an absorber, it is recommended to give the  name of the output file in the format imposed by QDOAS : <strong><em>cross-section files names must  imperatively start with the symbol name as prefix followed by the underscore  character !&nbsp;</em></strong></p>
+<p align="justify">The ring cross-section is calculated as the ratio of the rotational  Raman spectrum by the solar spectrum (R/S). &nbsp;The output file is an ASCII file with four  columns :</p>
+    <ol>
+      <li>the input wavelength  calibration;</li>
+      <li>the calculated ring cross-section;</li>
+      <li>the interpolated Raman  spectrum;</li>
+      <li>the convolved solar spectrum.</li>
+    </ol>
+    <p align="justify">When this file is  used as cross-section for spectra analysis, QDOAS loads only the two first  columns except if the <strong>Convolve Ring</strong> action is  requested (see the <a href="../Analysis/Analysis_Molecules.html"><strong>Molecules page</strong></a> of <a href="../Analysis/Analysis.html"><strong>Analysis windows properties</strong></a>).&nbsp; In this case, the program  uses the information on the slit function retrieved from the wavelength calibration procedure or from the slit function page to convolve separately the Raman and the solar spectra then the calculated ratio is introduced in the fit.</p>
+    <p align="justify">&nbsp;</p>
+    </tr>
+</table>
+<div id="footcontainer" >
+
+	  <div class="maincol" >
+	    <span class="update" >Copyright BIRA-IASB - Last update :
+<script language="JavaScript">
+  var lastModif=document.lastModified;
+  document.write(lastModif[3]+lastModif[4]+"/"+lastModif[0]+lastModif[1]+"/"+lastModif[6]+lastModif[7]+lastModif[8]+lastModif[9]);
+</script>
+	    </span>
+	  </div>
+	</div>
+    <p>&nbsp;</p>
+</body>
+</html>

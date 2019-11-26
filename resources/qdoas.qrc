@@ -1,0 +1,47 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+<qresource>
+    <file>icons/qdoas_atmospheric_toolbox_ico.png</file>
+    <file>images/qdoas_atmospheric_toolbox.png</file>
+    <file>images/qdoas_atmospheric_toolbox_small.png</file>
+    <file>images/about_logo.png</file>
+
+    <file>icons/project_directory_16.png</file>
+    <file>icons/project_file_16.png</file>
+    <file>icons/project_folder_16.png</file>
+    <file>icons/project_window_16.png</file>
+
+    <file>icons/file_open_16.png</file>
+    <file>icons/file_new_16.png</file>
+    <file>icons/file_save_16.png</file>
+    <file>icons/file_saveas_16.png</file>
+    <file>icons/file_exit_16.png</file>
+
+    <file>icons/edit_cut_16.png</file>
+    <file>icons/edit_copy_16.png</file>
+    <file>icons/edit_paste_16.png</file>
+    <file>icons/edit_delete_16.png</file>
+
+    <file>icons/nav_first_22.png</file>
+    <file>icons/nav_prev_22.png</file>
+    <file>icons/nav_next_22.png</file>
+    <file>icons/nav_last_22.png</file>
+    <file>icons/nav_stop_22.png</file>
+    <file>icons/nav_play_22.png</file>
+    <file>icons/nav_pause_22.png</file>
+    <file>icons/nav_timer_16.png</file>
+
+    <file>icons/plot_prop_22.png</file>
+    <file>icons/plot_print_22.png</file>
+    <file>icons/plot_export_22.png</file>
+
+    <file>icons/to_arrow.png</file>
+    <file>icons/from_arrow.png</file>
+
+    <file>icons/help_back_32.png</file>
+    <file>icons/help_forward_32.png</file>
+    <file>icons/help_home_32.png</file>
+    <file>icons/help_exit_32.png</file>
+
+</qresource>
+</RCC>

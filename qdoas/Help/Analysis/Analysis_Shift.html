@@ -1,0 +1,72 @@
+<html>
+<head>
+<title>QDOAS Analysis Windows properties : Shift and Stretch page</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta NAME="description" CONTENT="QDOAS help">
+<meta NAME="keywords" CONTENT="QDOAS, analysis, molecules, cross-sections, spectrum, reference, shift, stretch, scale">
+<link rel="stylesheet" href="../uvvis.css" type="text/css">
+</head>
+
+<body>
+<table width="100%" border="0" cellpadding="10" cellspacing="0">
+
+  <tr>
+    <td width="200" valign="top" bgcolor="#F3F3F3">
+<p align="center"><a href="../index.html"><img src="../qdoas_atmospheric_toolbox_small.png" alt="QDOAS_logo" width="80" height="80"></a></p>
+<p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../GUI/GUI.html" style="text-decoration: none; color: #336699">&nbsp;The&nbsp;user&nbsp;interface</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Project/Project.html" style="text-decoration: none; color: #336699">&nbsp;Projects Properties</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="Analysis.html" style="text-decoration: none; color: #336699">&nbsp;Analysis&nbsp;windows&nbsp;properties</a></p>
+    <p class="menu-left" align="right"><a href="Analysis_Molecules.html" style="text-decoration: none; color: #336699">Molecules</a></p>
+    <p class="menu-left" align="right"><a href="Analysis_Polynomial.html" style="text-decoration: none; color: #336699">Polynomial</a></p>
+    <p class="menu-left" align="right"><a href="Analysis_Predefined.html" style="text-decoration: none; color: #336699">Predefined Parameters</a></p>
+    <p class="menu-left" align="right"><a href="Analysis_Shift.html" style="text-decoration: none; color: #336699">Shift and Stretch</a></p>
+    <p class="menu-left" align="right"><a href="Analysis_Gaps.html" style="text-decoration: none; color: #336699">Gaps</a></p>
+    <p class="menu-left" align="right"><a href="Analysis_Output.html" style="text-decoration: none; color: #336699">Output</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Tools/Tools.html" style="text-decoration: none; color: #336699">&nbsp;QDOAS&nbsp;Tools</a></p>
+           </td>
+    <td width="2">&nbsp;</td>
+    <td id="maincontent">
+    <p class="head-title-page">QDOAS Analysis Windows properties : Shift and Stretch page</p>
+    <p align="center" ><img src="Analysis_Shift2.jpg" width="998" height="529" border="0" usemap="#Map">
+    <p align="justify"><a name="Shift"></a>Shift and  stretch parameters allow correcting for possible misalignment between the  various spectral items involved in the data evaluation (i.e. measured and  reference spectra as well as absorption cross-sections). The equation below gives the wavelength transformation to apply when a shift and a stretch order 2 are fitted :<br>
+    </p>
+    <div align="center"><img src="Analysis_Shift_equation.jpg" alt="" width="190" height="29">
+    </div>
+    <p align="justify" >Less used, the scaling parameter consists in a wavelength dependent scaling factor to apply to a cross-section. It can also be order 1 or order 2.</p>
+    <p align="justify" >To  add an item to shift, stretch or scale, right-click the <strong>Insert</strong> option  to open a dialog box with the list of available symbols (all   cross-sections defined in the <strong>Molecules</strong> page and completed with <strong>Spectrum</strong> and <strong>Ref</strong> symbols). It is possible to select only one or several symbols. In the latter case, the same shift and stretch parameters  will be applied to all items of the selection (in the example above, the same shift and stretch will be applied on both NO<sub>2</sub> cross-sections).&nbsp;
+      After the validation of the selection, QDOAS automatically updates the  list of available symbols so that a symbol can not be selected twice.&nbsp; </p>
+    <p><em>Note that a symbol can not be removed from the <strong>Molecules </strong>page as long as it is used in the <strong>Shift and Stretch</strong> page.</em>    </p>
+    <p class="orangelarge">Output<a name="Output"></a></p>
+    <p align="justify">Buttons in the <strong>Sh store</strong>, <strong>St store</strong> and<strong> Sc store</strong>  columns are enabled only if the <strong>Analysis</strong> button is checked in the <a href="../Project/Project_Output.html"><strong>Output page</strong></a> of <strong>Projects Properties</strong>. They allow saving respectively the fitted values for the shift, the stretch and the scale. If buttons in the <strong>Err store </strong>column are checked, the standard deviations of the fitted parameters are also saved in the output file.</p>
+    <p class="orangelarge">Initial and delta values<a name="Init"></a></p>
+    <p align="justify">The shift, stretch and scale parameters are fitted non linearly<em></em> by the Marquardt-Levenberg non-linear  least-squares (NLLS) algorithm.&nbsp; This iterative method needs to start from an initial solution given by <strong>Init</strong> values of parameters to fit. The convergence parameters <strong>Delta </strong>are used by the algorithm to numerically calculate partial derivatives of the fitting function and to determine the direction of the steepest descent to approach the solution. There is one <strong>Init</strong> column and one <strong>Delta</strong> column for each parameter to fit (shift, stretch order 1, stretch order 2, scaling order 1 and scaling order 2).</p>
+    <p align="justify">&nbsp;</p>
+    </tr>
+</table>
+<div id="footcontainer" >
+
+	  <div class="maincol" >
+	    <span class="update" >Copyright BIRA-IASB - Last update :
+<script language="JavaScript">
+  var lastModif=document.lastModified;
+  document.write(lastModif[3]+lastModif[4]+"/"+lastModif[0]+lastModif[1]+"/"+lastModif[6]+lastModif[7]+lastModif[8]+lastModif[9]);
+</script>
+	    </span>
+	  </div>
+	</div>
+    <p>&nbsp;</p>
+<map name="Map">
+  <area shape="rect" coords="10,174,80,196" href="Analysis_Molecules.html">
+<area shape="rect" coords="80,173,152,195" href="Analysis_Polynomial.html">
+<area shape="rect" coords="152,174,286,196" href="Analysis_Predefined.html">
+<area shape="rect" coords="390,174,437,196" href="Analysis_Gaps.html">
+<area shape="rect" coords="437,174,492,196" href="Analysis_Output.html">
+<area shape="rect" coords="8,4,990,171" href="Analysis.html">
+<area shape="rect" coords="26,196,447,245" href="#Shift">
+<area shape="rect" coords="192,249,479,529" href="#Shift">
+<area shape="rect" coords="107,270,192,330" href="#Shift">
+<area shape="rect" coords="447,196,687,245" href="#Output">
+<area shape="rect" coords="687,196,986,245" href="#Init">
+</map>
+</body>
+</html>

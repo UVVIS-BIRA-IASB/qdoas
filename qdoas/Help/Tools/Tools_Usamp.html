@@ -1,0 +1,76 @@
+<html>
+<head>
+<title>QDOAS Undersampling Tool</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta NAME="description" CONTENT="QDOAS help">
+<meta NAME="keywords" CONTENT="QDOAS, tools, convolution, ring, undersampling, slit function, filtering, command line, batch">
+<link rel="stylesheet" href="../uvvis.css" type="text/css">
+</head>
+
+<body>
+<table width="100%" border="0" cellpadding="10" cellspacing="0">
+
+  <tr>
+    <td width="200" valign="top" bgcolor="#F3F3F3">
+<p align="center"><a href="../index.html"><img src="../qdoas_atmospheric_toolbox_small.png" alt="QDOAS_logo" width="80" height="80"></a></p>
+<p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../GUI/GUI.html" style="text-decoration: none; color: #336699">&nbsp;The&nbsp;user&nbsp;interface</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Project/Project.html" style="text-decoration: none; color: #336699">&nbsp;Projects Properties</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Analysis/Analysis.html" style="text-decoration: none; color: #336699">&nbsp;Analysis&nbsp;windows&nbsp;properties</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Tools/Tools.html" style="text-decoration: none; color: #336699">&nbsp;QDOAS Tools</a></p>
+    <p class="menu-left" align="right"><a href="Tools_Convolution.html" style="text-decoration: none; color: #336699">Convolution/Filtering</a></p>
+    <p class="menu-left" align="right"><a href="Tools_Ring.html" style="text-decoration: none; color: #336699">Ring</a></p>
+    <p class="menu-left" align="right"><a href="Tools_Usamp.html" style="text-decoration: none; color: #336699">Undersampling</a></p>
+    <p class="menu-left" align="right"><a href="Tools_Doascl.html" style="text-decoration: none; color: #336699">Command-line</a></p></td>
+    <td width="2">&nbsp;</td>
+    <td id="maincontent">
+    <p class="head-title-page">QDOAS Undersampling Tool (usamp)</p>
+    <p align="justify" >The undersampling is a well-known problem of GOME onboard the satellite ERS-2. It arises
+      from the poor sampling ratio of the GOME instrument (2 to 3 pixels/FWHM of
+      the resolution of the spectrometer) which results in a lost of spectral information
+      when interpolating earthshine spectra during the DOAS fitting process.
+      The problem can be corrected using ad-hoc cross-sections
+      obtained by simulating the effect from a high-resolution solar reference [Chance K., 1998].</p>
+    <p align="justify" >The approach consists in building two spectra (an oversampled one and an undersampled one) from the high resolution solar spectrum and according to the selected analysis method, to calculate the ratio (DOAS fitting) or the difference (Intensity fitting) in order to simulate the interpolation error. Two undersampling cross-sections are generated (the first one using the instrument grid and the second one using the instrument grid with a small shift applied).</p>
+    <p align="justify" >See the <strong>Description  of Algorithms</strong> part of the <strong>QDOAS Software User Manual </strong>for further information on the undersampling. </p>
+    <p align="justify" class="orangelarge">Example of configuration of the undersampling tool<a name="Example"></a></p>
+    <table align="center" width="1280" border="0">
+      <tr>
+        <td><div align="center"><img src="Tools_Usamp_General.jpg" width="630" height="524"></div></td>
+        <td><div align="center"><img src="Tools_Usamp_Plot.jpg" width="630" height="524"></div></td>
+      </tr>
+    </table>
+    <p align="justify" class="orangelarge">Input<a name="Input"></a></p>
+    <p>QDOAS requires :</p>
+    <ul type="disc">
+      <li>
+        <div align="justify">the final grid on which the undersampling cross-sections must be calculated</div>
+      </li>
+      <li>
+        <div align="justify">a high-resolution solar spectrum;</div>
+      </li>
+      <li>
+        <div align="justify">the slit function to  use for the convolution : user-defined slit functions and analytical line  shapes (Gaussian, Lorentzian, Voigt and error functions) are accepted.&nbsp;The  wavelength dependency of the line shape (Gaussian or error function)  characterized by the wavelength calibration procedure can be saved from the  plot page in order to be accounted for the convolution.</div>
+      </li>
+      <li><div align="justify">the shift to apply to oversampled and undersampled spectra in the calculation of  undersampling;</div></li>
+      <li><div align="justify">the analysis method
+        that determines the relation  between oversampled and undersampled spectra;</div></li>
+    </ul>
+    <p align="justify" class="orangelarge">Output<a name="Output"></a></p>
+    <p align="justify">Two undersampling cross-sections are generated by the procedure. It is recommended to give the  name of the output files in the format imposed by QDOAS : <strong><em>cross-section files names must  imperatively start with the symbol name as prefix followed by the underscore  character !&nbsp;</em></strong></p>
+    <p align="justify" >&nbsp;</p>
+    </tr>
+</table>
+<div id="footcontainer" >
+
+	  <div class="maincol" >
+	    <span class="update" >Copyright BIRA-IASB - Last update :
+<script language="JavaScript">
+  var lastModif=document.lastModified;
+  document.write(lastModif[3]+lastModif[4]+"/"+lastModif[0]+lastModif[1]+"/"+lastModif[6]+lastModif[7]+lastModif[8]+lastModif[9]);
+</script>
+	    </span>
+	  </div>
+	</div>
+    <p>&nbsp;</p>
+</body>
+</html>

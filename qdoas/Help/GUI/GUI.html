@@ -1,0 +1,83 @@
+<html>
+<head>
+<title>QDOAS User Interface Components </title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta NAME="description" CONTENT="QDOAS help">
+<meta NAME="keywords" CONTENT="QDOAS, graphics user interface, toolbar, menubar, status bar, tab pages">
+<link rel="stylesheet" href="../uvvis.css" type="text/css">
+</head>
+
+<body>
+<table width="100%" border="0" cellpadding="10" cellspacing="0">
+
+  <tr>
+    <td width="200" valign="top" bgcolor="#F3F3F3">
+<p align="center"><a href="../index.html"><img src="../qdoas_atmospheric_toolbox_small.png" alt="QDOAS_logo" width="80" height="80"></a></p>
+<p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="GUI.html" style="text-decoration: none; color: #336699">&nbsp;The&nbsp;user&nbsp;interface</a></p>
+    <p class="menu-left" align="right"><a href="GUI_Projects.html" style="text-decoration: none; color: #336699">Projects Tree</a></p>
+    <p class="menu-left" align="right"><a href="GUI_Sites.html" style="text-decoration: none; color: #336699">Sites</a></p>
+    <p class="menu-left" align="right"><a href="GUI_Symbols.html" style="text-decoration: none; color: #336699">Symbols</a></p>
+    <p class="menu-left" align="right"><a href="GUI_Plot.html" style="text-decoration: none; color: #336699">Plot Properties</a></p>
+ <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Analysis/Analysis.html" style="text-decoration: none; color: #336699">&nbsp;</a><a href="../Project/Project.html" style="text-decoration: none; color: #336699">Projects Properties</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Analysis/Analysis.html" style="text-decoration: none; color: #336699">&nbsp;Analysis&nbsp;windows&nbsp;properties</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Tools/Tools.html" style="text-decoration: none; color: #336699">&nbsp;QDOAS&nbsp;Tools</a></p></td>
+    <td width="2">&nbsp;</td>
+    <td id="maincontent">
+    <p class="head-title-page">QDOAS User Interface Components</p>
+    <p align="center" ><img src="QDOAS_UI.jpg" width="1180" height="787" border="0" usemap="#Map">
+    <p>QDOAS is based on  the notion of &laquo; projects &raquo;.&nbsp; A project is &nbsp;as a set of files sharing the same  configuration of analysis i.e. the definition of spectral windows and the list  of files to analyse with this configuration. QDOAS allows defining  several projects in a session, giving users the possibility to handle several  analysis configurations.&nbsp;
+</p>
+    <p align="justify">QDOAS user interface and dialog boxes are very similar to WinDOAS  but  now, the main components are distributed into three resizable panels with a fixed arrangement :</p>
+    <div align="justify">
+      <ol start="1" type="1">
+        <li>the elements  of the application organized in tree structures presented in three tab pages (<strong>Projects</strong>, <strong>Sites</strong> and <strong>Symbols</strong>) in  the upper-left one;</li>
+        <li>dialog  boxes for the configuration of the elements of the application and the plot of  spectra and results in the upper-right one; all the spectral windows are processed  in one shot; right and bottom tab-switched access possible between all these  pages;</li>
+        <li>the available  information on the current spectrum and analysis results are displayed in the  third one.</li>
+        </ol>
+      </div>
+    <p align="justify" class="orangelarge">The Menu Bar</p>
+    <table width="95%" border="0" align="center" cellpadding="0" cellspacing="0" >
+      <tr valign="top">
+        <td width="100" id="table"><strong>Files</strong></td>
+        <td id="table"><div align="justify">Usual option to create a new application, open an existing one or save the current settings.  QDOAS configuration files are in XML format. WinDOAS configuration files (*.wds) are not compatible with  QDOAS. </div></td>
+      </tr>
+      <tr valign="top">
+        <td width="100" id="table"><strong>Plot</strong></td>
+        <td id="table"><div align="justify">New option to organize the plots on the page (see below), to print the plot page or to save it in a png file;</div></td>
+      </tr>
+      <tr valign="top">
+        <td width="100" id="table"><strong><a href="../Tools/Tools.html">Tools</a></strong></td>
+        <td id="table"><div align="justify">The convolution, ring and undersampling tools, already present in WinDOAS, are now modules completely independent from the QDOAS application but they can still be called from the user interface;</div></td>
+      </tr>
+      <tr valign="top">
+        <td width="100" id="table"><strong>Help</strong></td>
+        <td id="table"><div align="justify">Access to the current on-line help</div></td>
+      </tr>
+    </table>
+    <p align="justify" class="orangelarge">The Toolbar</p>
+    <p align="center"><img src="QDOAS_Toolbar.jpg" width="771" height="34" border="0" usemap="#Map2"></p>
+    <p align="justify">The  toolbar gives access to the same <strong>File</strong> and <strong>Plot</strong> options of the menu  bar.&nbsp; It contains also buttons to move  easily in the current file or to use another file in the case a multiple file  selection has been performed.</p>
+    <p align="justify">&nbsp;</p>
+  </tr>
+</table>
+<div id="footcontainer" >
+
+	  <div class="maincol" >
+	    <span class="update" >Copyright BIRA-IASB - Last update :
+<script language="JavaScript">
+  var lastModif=document.lastModified;
+  document.write(lastModif[3]+lastModif[4]+"/"+lastModif[0]+lastModif[1]+"/"+lastModif[6]+lastModif[7]+lastModif[8]+lastModif[9]);
+</script>
+	    </span>
+	  </div>
+	</div>
+    <p>&nbsp;</p>
+
+
+<map name="Map"><area shape="rect" coords="61,76,100,95" href="GUI_Sites.html">
+<area shape="rect" coords="102,76,158,95" href="GUI_Symbols.html"><area shape="rect" coords="3,76,59,96" href="GUI_Projects.html">
+<area shape="rect" coords="609,44,699,74" href="GUI_Plot.html">
+</map>
+<map name="Map2"><area shape="rect" coords="675,2,771,38" href="GUI_Plot.html">
+</map></body>
+</html>

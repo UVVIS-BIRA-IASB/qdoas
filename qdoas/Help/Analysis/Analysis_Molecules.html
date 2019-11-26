@@ -1,0 +1,157 @@
+<html>
+<head>
+<title>QDOAS Analysis Windows properties : Molecules page</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta NAME="description" CONTENT="QDOAS help">
+<meta NAME="keywords" CONTENT="QDOAS, analysis, molecules, cross-sections, differential, orthogonalization, interpolation, convolution, AMF, display, filtering, constrain, concentration, NLLS, delta, I0">
+<link rel="stylesheet" href="../uvvis.css" type="text/css">
+<style type="text/css">
+<!--
+.style4 {
+	font-style: italic;
+	font-weight: bold;
+}
+-->
+</style>
+</head>
+
+<body>
+<table width="100%" border="0" cellpadding="10" cellspacing="0">
+
+  <tr>
+    <td width="200" valign="top" bgcolor="#F3F3F3">
+<p align="center"><a href="../index.html"><img src="../qdoas_atmospheric_toolbox_small.png" alt="QDOAS_logo" width="80" height="80"></a></p>
+<p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../GUI/GUI.html" style="text-decoration: none; color: #336699">&nbsp;The&nbsp;user&nbsp;interface</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Project/Project.html" style="text-decoration: none; color: #336699">&nbsp;Projects Properties</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="Analysis.html" style="text-decoration: none; color: #336699">&nbsp;Analysis&nbsp;windows&nbsp;properties</a></p>
+    <p class="menu-left" align="right"><a href="Analysis_Molecules.html" style="text-decoration: none; color: #336699">Molecules</a></p>
+    <p class="menu-left" align="right"><a href="Analysis_Polynomial.html" style="text-decoration: none; color: #336699">Polynomial</a></p>
+    <p class="menu-left" align="right"><a href="Analysis_Predefined.html" style="text-decoration: none; color: #336699">Predefined Parameters</a></p>
+    <p class="menu-left" align="right"><a href="Analysis_Shift.html" style="text-decoration: none; color: #336699">Shift and Stretch</a></p>
+    <p class="menu-left" align="right"><a href="Analysis_Gaps.html" style="text-decoration: none; color: #336699">Gaps</a></p>
+    <p class="menu-left" align="right"><a href="Analysis_Output.html" style="text-decoration: none; color: #336699">Output</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Tools/Tools.html" style="text-decoration: none; color: #336699">&nbsp;QDOAS&nbsp;Tools</a></p>
+           </td>
+    <td width="2">&nbsp;</td>
+    <td id="maincontent">
+    <p class="head-title-page">QDOAS Analysis Windows properties : Molecules page</p>
+    <p align="center" ><img src="Analysis_Molecules.jpg" width="998" height="447" border="0" usemap="#Map">
+    <p align="justify"><a name="Molecules"></a>Molecules are  characterized by their cross-section.&nbsp;  They are represented by symbols previously defined in the <strong><a href="../GUI/GUI_Symbols.html">Symbol</a> </strong>page of the user interface.&nbsp; QDOAS needs these symbols for internal use : to create lists of available molecules for specific options (for example : in the <a href="#Differential"><strong>Differential cross-sections column</strong></a> or in the <a href="Analysis_Shift.html"><strong>Shift and stretch</strong></a> page) and  to build cross-section files filters. </p>
+    <ul>
+      <li>For internal needs of the program, <strong>cross-section files names must imperatively start  with the symbol name as prefix followed by the underscore character !</strong>&nbsp; </li>
+      <li>There is no  constraint on the cross-section file extension; the default one used by QDOAS  for creating cross-sections files filters starts with <strong>&ldquo;xs&rdquo;.</strong></li>
+      </ul>
+
+    <p align="justify">Right-click and select <strong>Insert</strong>, <strong>Remove</strong> or <strong>XS Filename</strong> options in the contextual menu respectively to  insert a new molecule in the list, to delete an existing one or to modify  the file associated to a cross-section. The <strong>Remove</strong> option is disabled for a symbol if another  cross-section is orthogonalised to the selected one or if the selected symbol  is used in the <strong>Shift and Stretch</strong> pages.</p>
+    <p align="justify" class="orangelarge">Differential cross-sections<a name="Differential"></a></p>
+    <p align="justify" >Differential cross    sections can be generated  by orthogonalisation according to the definition of an orthogonal base formed with the    component vectors (generally, a base of order 2) of the polynomial defined in    the <a href="Analysis_Polynomial.html"><strong>Polynomial</strong></a> page.
+Further details can be found in the <strong>Description of Algorithms</strong> of the <strong>QDOAS Software User Manual</strong>. Three options are available :</p>
+    <table width="80%" border="0" align="center" cellpadding="5" cellspacing="10" >
+      <tr valign="top">
+        <td width="150" id="table"><strong>None</strong></td>
+        <td id="table"><div align="justify">the original cross-section is used;</div></td>
+      </tr>
+      <tr valign="top">
+        <td width="150" id="table"><strong>Differential XS</strong></td>
+        <td id="table"><div align="justify">a differential cross-section is generated either :
+          <ul>
+            <li>by orthogonalisation if an    orthogonal base is defined in the <a href="Analysis_Polynomial.html"><strong>Polynomial</strong></a> page (Gram-Schmitt  algorithm); </li>
+            <li>using high-pass filtering    options defined in the <strong><a href="../Project/Project_Filtering.html">Filter</a></strong> tab page of <strong>Projects properties</strong> otherwise.</li>
+          </ul>
+        </div></td>
+      </tr>
+      <tr valign="top">
+        <td width="150" id="table"><strong>A cross-section in the proposed list</strong></td>
+        <td id="table"><div align="justify">the selected cross-section is orthogonalised to the orthogonal base (if defined) and to another cross-section defined in the list (orthogonalisation in cascade is allowed). </div></td>
+      </tr>
+    </table>
+    <p align="justify">The  latter case prevents from possible correlation between two cross-sections (for  example, two O<sub>3</sub> cross-sections measured at different temperatures  typically to separation contributions from the stratosphere and the troposphere troposphere  or two cross sections with absorption structures strongly correlated, eg. BrO  and HCHO).&nbsp;The list of available cross-sections  includes all cross-sections symbols defined in this page except the one  selected.&nbsp;It is updated as cross-sections symbols are added in or removed  from this page.</p>
+    <p align="justify" class="orangelarge">Interpolation/convolution<a name="Interpolation"></a></p>
+    <p align="justify" >Cross-sections should be defined on the grid of the control spectrum before the analysis. This  column describes the action to perform on the selected cross-section :</p>
+    <table width="80%" border="0" align="center" cellpadding="5" cellspacing="10" >
+      <tr valign="top">
+        <td width="150" id="table"><strong>None</strong></td>
+        <td id="table"><div align="justify">the selected cross-section is assumed to be correctly aligned on the  reference spectrum grid; so, no action will be performed on the cross-section (for example, a user-defined undersampling cross-section in optical density  fitting);</div></td>
+      </tr>
+      <tr valign="top">
+        <td width="150" id="table"><strong>Interpolate</strong></td>
+        <td id="table"><div align="justify"> the selected cross-section will be interpolated on the grid of the reference  spectrum; a cross-section already pre-convolved at the resolution of the instrument is expected in input. </div></td>
+      </tr>
+      <tr valign="top">
+        <td width="150" id="table"><strong>Convolve Std</strong></td>
+        <td id="table"><div align="justify">this option gives the possibility to convolve a cross-section in  real-time using either the information on the calibration and the slit function  provided by <a href="../Project/Project_Calibration.html"><strong>the wavelength calibration procedure</strong></a> or the user-defined slit  function specified in the <strong><a href="../Project/Project_Slit.html">Slit Function</a></strong> page of <strong>Projects Properties</strong>. If the  wavelength calibration procedure is applied on both the control  spectrum and spectra to analyse, the cross-section is convolved with the poorest resolution;</div></td>
+      </tr>
+      <tr valign="top">
+        <td width="150" id="table"><strong>Convolve I0</strong></td>
+        <td id="table"><div align="justify">the cross-section is convolved with <em>I<sub>0</sub></em> correction using the concentration defined in the column <strong>SCD I0</strong> (this  is the slant column density of the cross-section used to calculate the theoretical optical depth in convolution with <em>I<sub>0</sub></em> correction);</div></td>
+      </tr>
+      <tr valign="top">
+        <td width="150" id="table"><strong>Convolve Ring</strong></td>
+        <td id="table"><div align="justify">in the same way, the program can generate a Ring cross-section; the expected input file must be a Ring cross-section pre-calculated by the <strong>QDOAS Ring tool</strong> on a high-resoluted grid; </div></td>
+      </tr>
+    </table>
+    <p align="justify">Convolving cross-sections in real time is a comfortable option that avoid the pre-convolution of all cross-sections with respect to the selected reference spectrum and the calibration options.</p>
+    <p align="justify" class="orangelarge">Air mass factors (AMF)<a name="AMF"></a></p>
+    <p align="justify" >Usually,  it is better to calculate  vertical columns out of QDOAS using appropriate  radiative transfer model (e.g. LIDORT, DISORT). Nevertheless, QDOAS gives the  possibility to calculate vertical columns or to correct a cross-section using pre-calculated  AMF through options proposed in the <strong>AMF</strong> column&nbsp;:</p>
+    <table width="80%" border="0" align="center" cellpadding="5" cellspacing="10" >
+      <tr valign="top">
+        <td width="150" id="table"><strong>SZA</strong></td>
+        <td id="table"><div align="justify">vertical columns are calculated using AMF depending only on the    solar zenith angle;</div></td>
+      </tr>
+      <tr valign="top">
+        <td width="150" id="table"><strong>Climatology</strong></td>
+        <td id="table"><div align="justify">vertical columns are calculated using climatological air mass factors;&nbsp; the AMF depends on the solar zenith angle and the calendar    day;</div></td>
+      </tr>
+      <tr valign="top">
+        <td width="150" id="table"><strong>Wavelength</strong></td>
+        <td id="table"><div align="justify">before the analysis, the selected cross-section is corrected using wavelength dependent AMF    (modified DOAS).</div></td>
+      </tr>
+    </table>
+    <p align="justify">Additional option <strong>AMF Filename </strong>is proposed in the contextual menu to complete with the name of the file containing the AMF (see the requested file format according to the selected AMF option in the <strong>QDOAS Software User Manual</strong>).</p>
+    <p class="orangelarge">Control of the  parameters to fit<a name="NLLS"></a></p>
+    <p align="justify">QDOAS minimises  residuals of the DOAS equation using a Marquardt-Levenberg non-linear  least-squares (NLLS) algorithm.&nbsp;The method implements a gradient-expansion  algorithm, which is based on the iterative combination of a steepest-descent  method (suitable for approaching the minimum from far away) and a linearisation  of the fitting function.&nbsp;</p>
+    <ul><li>
+      <div align="justify">In &laquo; optical density fitting &raquo;,  slant column densities of the molecules are fitted linearly and the <strong>SCD Init</strong>, <strong>SCD Delta</strong>, <strong>SCD min</strong> and <strong>SCD max</strong> buttons are ignored. Nevertheless, if the <strong>SCD Fit</strong> button is unchecked, the weight  of the selected cross-section in the optical density is fixed at the  concentration value given in the <strong>SCD  Init</strong> column.</div>
+    </li><br>
+    <li><div align="justify">In &laquo; intensity fitting &raquo;, the slant  column densities of the molecules are non linear parameters. The initial  concentration value and the initial delta value used by the non-linear  algorithm to calculate numerically partial derivatives of the fitting function  are respectively given by <strong>SCD Init</strong> and <strong>SCD Delta</strong>. The <strong>SCD Delta</strong> default value shouldn't be  modified except if the system seems not to converge.  <strong>SCD min</strong> and <strong>SCD max</strong> can be used to constrain the concentration of the molecules within a given interval even if it is not recommended to do that.</div>
+    </li></ul>
+    <p align="justify">The selection of the analysis method is made in the <a href="../Project/Project_Analysis.html"><strong>Analysis page</strong></a> of<strong> Projects Properties</strong>. Further details on the retrieval algorithms can be found in the <strong>Description of Algorithms section</strong> of the <strong>QDOAS Software User Manual</strong></p>
+    <p align="justify" class="style4">For advanced users : it is possible to constrain the slant column density of a molecule to the value calculated in the previous analysis window :</p>
+    <p align="justify"><em>If the <strong>Cons SCD</strong> button is checked, <strong>the SCD Fit</strong> button is unchecked and the <strong>SCD Init</strong> value is 0., the slant  column density of the selected molecule is not fitted but initialized to the  value calculated in the previous analysis window if any.    </em></p>
+    <p align="justify" class="orangelarge">Fit display<a name="Display"></a></p>
+    <p align="justify" >This column is    active only if the <strong>Fits</strong> button is    checked in the <strong>Display</strong> frame of    the current dialog box.&nbsp; It allows    selecting which cross-sections fits will be displayed. Note that the display of the fits of all spectral analysis windows could be disabled from the <a href="../Project/Project_Display.html"><strong>Display page</strong></a> of <strong>Projects Properties</strong>. </p>
+    <p align="justify" class="orangelarge">Filtering<a name="Filter"></a></p>
+    <p align="justify" >This  column is active only if a low-pass filter has been selected in the <strong><a href="../Project/Project_Filtering.html">Filtering</a></strong> tab page of <strong>Projects Properties</strong>.&nbsp;  It allows defining individually which cross-sections are to be filtered.</p>
+  <p align="justify">&nbsp;</p>
+  </tr>
+</table>
+<div id="footcontainer" >
+
+	  <div class="maincol" >
+	    <span class="update" >Copyright BIRA-IASB - Last update :
+<script language="JavaScript">
+  var lastModif=document.lastModified;
+  document.write(lastModif[3]+lastModif[4]+"/"+lastModif[0]+lastModif[1]+"/"+lastModif[6]+lastModif[7]+lastModif[8]+lastModif[9]);
+</script>
+	    </span>
+	  </div>
+	</div>
+    <p>&nbsp;</p>
+<map name="Map">
+<area shape="rect" coords="80,173,152,195" href="Analysis_Polynomial.html">
+<area shape="rect" coords="152,174,286,196" href="Analysis_Predefined.html">
+<area shape="rect" coords="286,174,390,196" href="Analysis_Shift.html">
+<area shape="rect" coords="390,174,437,196" href="Analysis_Gaps.html">
+<area shape="rect" coords="437,174,492,196" href="Analysis_Output.html">
+<area shape="rect" coords="146,194,267,386" href="#Differential">
+<area shape="rect" coords="267,194,387,386" href="#Interpolation">
+<area shape="rect" coords="387,194,506,386" href="#AMF">
+<area shape="rect" coords="506,194,567,386" href="#Display">
+<area shape="rect" coords="567,194,628,386" href="#Filtering">
+<area shape="rect" coords="628,194,908,386" href="#NLLS">
+<area shape="rect" coords="908,194,987,386" href="#Interpolation">
+<area shape="rect" coords="28,194,146,387" href="#Molecules">
+<area shape="rect" coords="8,4,990,171" href="Analysis.html">
+</map>
+</body>
+</html>

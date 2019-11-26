@@ -1,0 +1,112 @@
+<html>
+<head>
+<title>QDOAS Projects Properties : Calibration page</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta NAME="description" CONTENT="QDOAS help">
+<meta NAME="keywords" CONTENT="QDOAS, project, wavelength calibration, line shape, solar, high-resolution, gaussian, lorentz, voigt, error function, shift, polynomial degree, analysis method, sub-windows, FWHM">
+<link rel="stylesheet" href="../uvvis.css" type="text/css">
+</head>
+
+<body>
+<table width="100%" border="0" cellpadding="10" cellspacing="0">
+
+  <tr>
+    <td width="200" valign="top" bgcolor="#F3F3F3">
+<p align="center"><a href="../index.html"><img src="../qdoas_atmospheric_toolbox_small.png" alt="QDOAS_logo" width="80" height="80"></a></p>
+<p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../GUI/GUI.html" style="text-decoration: none; color: #336699">&nbsp;The&nbsp;user&nbsp;interface</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="Project.html" style="text-decoration: none; color: #336699">&nbsp;Projects Properties</a></p>
+    <p class="menu-left" align="right"><a href="Project_Display.html" style="text-decoration: none; color: #336699">Display</a></p>
+    <p class="menu-left" align="right"><a href="Project_Selection.html" style="text-decoration: none; color: #336699">Selection</a></p>
+    <p class="menu-left" align="right"><a href="Project_Analysis.html" style="text-decoration: none; color: #336699">Analysis</a></p>
+    <p class="menu-left" align="right"><a href="Project_Filtering.html" style="text-decoration: none; color: #336699">Filtering</a></p>
+    <p class="menu-left" align="right"><a href="Project_Calibration.html" style="text-decoration: none; color: #336699">Calibration</a></p>
+    <p class="menu-left" align="right"><a href="Project_Undersampling.html" style="text-decoration: none; color: #336699">Undersampling</a></p>
+    <p class="menu-left" align="right"><a href="Project_Instrumental.html" style="text-decoration: none; color: #336699">Instrumental</a></p>
+    <p class="menu-left" align="right"><a href="Project_Slit.html" style="text-decoration: none; color: #336699">Slit</a></p>
+    <p class="menu-left" align="right"><a href="Project_Output.html" style="text-decoration: none; color: #336699">Output</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Analysis/Analysis.html" style="text-decoration: none; color: #336699">&nbsp;Analysis&nbsp;windows&nbsp;properties</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Tools/Tools.html" style="text-decoration: none; color: #336699">&nbsp;QDOAS&nbsp;Tools</a></p>
+    </td>
+    <td width="2">&nbsp;</td>
+    <td id="maincontent">
+    <p class="head-title-page">QDOAS Projects Properties : Calibration page</p>
+    <p align="center" ><img src="Project_Calibration.jpg" alt="" width="722" height="481" border="0" usemap="#Map">
+<map name="Map">
+      <area shape="rect" coords="48,50,104,70" href="Project_Display.html">
+            <area shape="rect" coords="106,50,170,70" href="Project_Selection.html">
+          <area shape="rect" coords="171,50,232,70" href="Project_Analysis.html">
+          <area shape="rect" coords="233,50,293,70" href="Project_Filtering.html">
+            <area shape="rect" coords="368,50,460,70" href="Project_Undersampling.html">
+            <area shape="rect" coords="461,50,544,70" href="Project_Instrumental.html">
+            <area shape="rect" coords="545,50,581,70" href="Project_Slit.html">
+            <area shape="rect" coords="582,50,638,70" href="Project_Output.html">
+<area shape="rect" coords="55,112,662,160" href="#Options">
+<area shape="rect" coords="55,82,662,110" href="#Solar">
+<area shape="rect" coords="239,166,347,258" href="#Polynomial">
+<area shape="rect" coords="352,166,661,258" href="#Limits">
+<area shape="rect" coords="59,268,660,442" href="#Fitting">
+<area shape="rect" coords="59,166,233,258" href="#Display">
+</map>
+    </p>
+    <p align="justify"><a name="Options"></a>
+The wavelength calibration procedure developed in QDOAS is based on a non-linear least-squares (NLLS) fitting approach where the shift between the spectrum to
+calibrate and a high-resolution solar atlas spectrum degraded to the resolution of the instrument is determined on a series of equally spaced short intervals.&nbsp;
+The <b>Analysis Method</b> (optical density fitting or intensity fitting) can be different from the one selected for the analysis of spectra in the <a href="Project_Analysis.html"><strong>Analysis page</strong></a>.</p>
+
+<p align="justify">The procedure also allows characterising the instrumental slit function, through fitting of user-defined Slit Function Parameters (<strong>SFP</strong>), either the the full-width at half maximum (FWHM) of a analytical line shape or two different stretch factors applied on the grid of a user-defined function (option <b>File</b>).
+If the slit function is not fitted during the wavelength calibration procedure, the solar spectrum and the instrumental line shape to use for convolutions are defined in the <b><a href="Project_Slit.html">Slit page</a></b>.
+
+    <p align="justify">Further details on the wavelength calibration procedure and examples of configuration of this page can be found in the <strong>QDOAS Software User Manual</strong>.</p>
+    <p align="justify" class="orangelarge">Window Limits<a name="Limits"></a></p>
+    <p align="justify" >The wavelength  interval used for the calibration must be specified in the <strong>Window limits (nm) </strong>frame.&nbsp; It should cover all the spectral analysis windows defined under the <strong>Analysis Windows </strong>node of the project tree. This calibration interval is divided in a number of  equally spaced <strong>sub-windows</strong> and, the shift and the slit function parameters (SFP) are  fitted using the NLLS approach in each interval.&nbsp;</p>
+    <p align="justify" class="orangelarge">Polynomial degree<a name="Polynomial"></a></p>
+<p align="justify">The shift values determined in all  sub-windows are then used to reconstruct an accurate wavelength calibration.  Similarly, the wavelength dependent slit function is determined by polynomial  fitting through individual SFP values.&nbsp;  A different <strong>polynomial degree</strong> can be specified  for the shift and for the slit function. The two information (wavelength calibration and variation of the slit  function) are subsequently used e.g. to convolve high resolution cross  sections before  the analysis of spectra and to build undersampling cross-sections.</p>
+    <p align="justify" class="orangelarge">Solar reference file<a name="Solar"></a></p>
+    <p>There are two cases  to consider :</p>
+    <ol>
+      <li>
+        <div align="justify">the slit function of the instrument is known and there is no need to characterise it once again (<b>line shape</b> not fitted).  Then the <b>Solar Ref. File</b> in this page is disabled; it should be given in the <b><a href="Project_Slit.html">Slit page</a></b> with the instrumental line shape.<br>
+        <br></div></li>
+<li><div align="justify" >the slit function of the instrument need to be characterized (selection  of a analytical <strong>Line Shape</strong>); then the <strong>Solar Ref. File</strong> should contain a  high-resolution solar spectrum.&nbsp; Because QDOAS  uses Fourier transform (FT) in order to make the NLLS algorithm fast enough, a high-resolution solar  spectrum sampled on a constant grid is expected. </div></li>
+    </ol>
+    <p align="justify" class="orangelarge">Fitting Parameters<a name="Fitting"></a></p>
+    <p align="justify">The  wavelength calibration uses the same property sheet as the  <strong>Analysis windows properties.&nbsp; </strong>The configuration of these pages is usually limited to the specification of the degree of the polynomial to use in the DOAS equation (different from the polynomial used to build the final grid from the individual values of the shift resulting from the fit as described above), the slit function parameters to fit according to the selection of the line shape and the shift between the spectrum to calibrate and the solar spectrum. But the algorithm can take also atmospheric absorption, Ring effect and offset correction into account.</p>
+    <p align="justify">See also the <strong>QDOAS Software User Manual</strong> for further details.</p>
+<p align="justify" class="orangelarge">Display<a name="Display"></a></p>
+    <p align="justify">When the calibration procedure is applied, a page named <strong>&laquo; Kurucz &raquo;</strong> appears in the plot area of the program. This page includes four kinds of plot :</p>
+    <table width="80%" border="0" align="center" cellpadding="5" cellspacing="10" >
+      <tr valign="top">
+        <td width="150" id="table"><strong>Spectra</strong></td>
+        <td id="table"><div align="justify">  the complete fit between the observed and the calculated spectra;</div></td>
+      </tr>
+      <tr valign="top">
+        <td width="150" id="table"><strong>Residual</strong></td>
+        <td id="table"><div align="justify"> the residual of the fit</div></td>
+      </tr>
+      <tr valign="top">
+        <td width="150" id="table"><strong>Fits</strong></td>
+        <td id="table"><div align="justify">fit of the Ring effect and/or atmospheric absorptions if any;</div></td>
+      </tr>
+      <tr valign="top">
+        <td width="150" id="table"><strong>Shift/SFP</strong></td>
+        <td id="table"><div align="justify">the wavelength dependency of the shift and the slit function parameters over the whole detector.</div></td>
+      </tr>
+    </table>
+    <p align="justify">It could be interesting to uncheck these plot when large amount of data are analyzed in one shot with output production although the use of the <strong>doas_cl</strong> command line tool is recommended in this case.</p>
+    <p align="justify">&nbsp;</p>
+    </tr>
+</table>
+<div id="footcontainer" >
+
+	  <div class="maincol" >
+	    <span class="update" >Copyright BIRA-IASB - Last update :
+<script language="JavaScript">
+  var lastModif=document.lastModified;
+  document.write(lastModif[3]+lastModif[4]+"/"+lastModif[0]+lastModif[1]+"/"+lastModif[6]+lastModif[7]+lastModif[8]+lastModif[9]);
+</script>
+	    </span>
+	  </div>
+	</div>
+    <p>&nbsp;</p>
+</body>
+</html>

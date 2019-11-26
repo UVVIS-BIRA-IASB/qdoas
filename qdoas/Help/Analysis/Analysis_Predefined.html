@@ -1,0 +1,73 @@
+<html>
+<head>
+<title>QDOAS Analysis Windows properties : Predefined Parameters page</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta NAME="description" CONTENT="QDOAS help">
+<meta NAME="keywords" CONTENT="QDOAS, analysis, non-linear, parameters, sol, offset, common residual, undersampling">
+<link rel="stylesheet" href="../uvvis.css" type="text/css">
+</head>
+
+<body>
+<table width="100%" border="0" cellpadding="10" cellspacing="0">
+
+  <tr>
+    <td width="200" valign="top" bgcolor="#F3F3F3">
+<p align="center"><a href="../index.html"><img src="../qdoas_atmospheric_toolbox_small.png" alt="QDOAS_logo" width="80" height="80"></a></p>
+<p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../GUI/GUI.html" style="text-decoration: none; color: #336699">&nbsp;The&nbsp;user&nbsp;interface</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Project/Project.html" style="text-decoration: none; color: #336699">&nbsp;Projects Properties</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="Analysis.html" style="text-decoration: none; color: #336699">&nbsp;Analysis&nbsp;windows&nbsp;properties</a></p>
+    <p class="menu-left" align="right"><a href="Analysis_Molecules.html" style="text-decoration: none; color: #336699">Molecules</a></p>
+    <p class="menu-left" align="right"><a href="Analysis_Polynomial.html" style="text-decoration: none; color: #336699">Polynomial</a></p>
+    <p class="menu-left" align="right"><a href="Analysis_Predefined.html" style="text-decoration: none; color: #336699">Predefined Parameters</a></p>
+    <p class="menu-left" align="right"><a href="Analysis_Shift.html" style="text-decoration: none; color: #336699">Shift and Stretch</a></p>
+    <p class="menu-left" align="right"><a href="Analysis_Gaps.html" style="text-decoration: none; color: #336699">Gaps</a></p>
+    <p class="menu-left" align="right"><a href="Analysis_Output.html" style="text-decoration: none; color: #336699">Output</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Tools/Tools.html" style="text-decoration: none; color: #336699">&nbsp;QDOAS&nbsp;Tools</a></p>
+           </td>
+    <td width="2">&nbsp;</td>
+    <td id="maincontent">
+    <p class="head-title-page">QDOAS Analysis Windows properties : Predefined Parameters page</p>
+    <p align="center" ><img src="Analysis_Predefined.jpg" width="998" height="447" border="0" usemap="#Map">
+    <p align="justify" >This page proposes different  parameters that can be fitted linearly or non linearly according to the fitting method :</p>
+    <ul><li>scaling factor for the control spectrum (<strong>Sol</strong>)</li>
+    <li>offset</li>
+    <li>common residuals (<strong>Com</strong>)</li>
+    <li>undersampling (<strong>Usamp1</strong> and <strong>Usamp2</strong>)</li>
+    <li>synthetic cross section to fit very small differences in the resolution between the spectrum and the reference (<strong>Resol</strong>)
+    </ul>
+    <p align="justify">A cross-section file is always expected for <strong>Com</strong> parameter. A cross-section file is expected for <strong>Usamp1</strong> and <strong>Usamp2</strong> parameters if the method <strong>&laquo; File &raquo; </strong> has been selected in the <a href="../Project/Project_Undersampling.html"><strong>Undersampling</strong></a> page of <strong>Project  properties</strong>. To specify the name of the cross-section file, right-click the <strong>&laquo; Select File  &raquo; </strong>option  from the parameter line.</p>
+    <p align="justify"><strong>Val init</strong> and <strong>Val delta</strong> are  respectively the initial value and  convergence factor, two parameters used by  the Non-Linear Least-Squares (NLLS) algorithm. In general, the default values should not be modified, except in  case of convergence problems.&nbsp; <strong>Fit store</strong> and <strong>Err  store</strong> columns are enabled only if the <strong>Analysis </strong>button is checked in the <strong><a href="../Project/Project_Output.html">Output</a></strong> tab page of <strong>Project  properties</strong>. </p>
+    <p class="orangelarge">Offset</p>
+    <p align="justify" >An ideal spectrometer in an ideal atmosphere  would measure the part of the sunlight that has been elastically scattered by  air molecules and particles in the zenith direction.&nbsp; In a real experiment however a number of  possible additional sources of signal may add up to the ideal Rayleigh/Mie  contribution leading to &ldquo;offset&rdquo; the measured intensity by a certain  amount.&nbsp; In addition to the Ring effect,  which is to a first approximation a natural source of offset, instrumental  sources of offset also need to be considered like stray light in the  spectrometer and dark current of the detector. This is the purpose of the  offset parameter which is better described in the <strong>Description of Algorithms </strong>chapter of the <strong>QDOAS Software User Manual</strong>. The offset is normalized w.r.t. the  intensity of the spectrum. </p>
+    <p align="justify" >In some specific cases (typically, in the near UV, around 300 nm), the signal of the spectrum is very low and in order to avoid systematic logarithm errors when resolving the DOAS equation, the fit of a linearized offset is preferred (see the <a href="Analysis_Polynomial.html"><strong>Polynomial</strong></a> page). Note  that a linear offset and a non linear offset should not be fitted in the same  spectral analysis window.</p>
+    <p class="orangelarge">Common residual</p>
+    <p align="justify">When systematic structures appear in the residuals, it is sometimes useful  to eliminate them using a synthetic cross-section obtained by averaging some of such residuals (cfr the <strong><a href="Analysis.html#Residuals">&laquo; Residual &raquo;</a></strong> field in the <strong>Files </strong>frame of this dialog box). In DOAS fitting, this cross-section can be introduced either in the <strong><a href="Analysis_Molecules.html">Molecules</a></strong> page with a user-defined symbol or in this page with the predefined symbol <strong><a href="Analysis.html#Residuals">&laquo; Com &raquo;</a></strong>. In intensity fitting, it is recommended to use the predefined symbol <strong>Com</strong> that is always fitted linearly whatever the analysis method.</p>
+    <p class="orangelarge">Undersampling</p>
+    <p align="justify">The undersampling is  a well-known problem of GOME onboard the satellite ERS-2. It arises from the  poor sampling ratio of the GOME instrument (2 to 3 pixels/FWHM of the  resolution of the spectrometer) which results in a lost of spectral information  when interpolating earthshine spectra during the DOAS fitting process. The  problem can be corrected using ad-hoc cross-sections obtained by simulating the  effect from a high-resolution solar reference. Undersampling cross-sections can  be pre-calculated using the <strong>QDOAS  undersampling tool</strong>.    </p>
+    <p class="orangelarge">Resol synthetic cross section</p>
+    <p align="justify">This cross section is built automatically by dividing the selected reference spectrum with itself but convolved with a gaussian with a FWHM of 0.05 nm.  It allows accounting for very small differences in the resolution of the reference spectrum and the spectrum to analyze.</p>
+    <p align="justify" >&nbsp;</p>
+    </tr>
+</table>
+<div id="footcontainer" >
+
+	  <div class="maincol" >
+	    <span class="update" >Copyright BIRA-IASB - Last update :
+<script language="JavaScript">
+  var lastModif=document.lastModified;
+  document.write(lastModif[3]+lastModif[4]+"/"+lastModif[0]+lastModif[1]+"/"+lastModif[6]+lastModif[7]+lastModif[8]+lastModif[9]);
+</script>
+	    </span>
+	  </div>
+	</div>
+    <p>&nbsp;</p>
+<map name="Map">
+  <area shape="rect" coords="10,174,80,196" href="Analysis_Molecules.html">
+<area shape="rect" coords="80,173,152,195" href="Analysis_Polynomial.html">
+<area shape="rect" coords="286,174,390,196" href="Analysis_Shift.html">
+<area shape="rect" coords="390,174,437,196" href="Analysis_Gaps.html">
+<area shape="rect" coords="437,174,492,196" href="Analysis_Output.html">
+<area shape="rect" coords="7,6,991,171" href="Analysis.html">
+</map>
+</body>
+</html>

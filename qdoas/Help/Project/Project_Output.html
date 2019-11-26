@@ -1,0 +1,97 @@
+<html>
+<head>
+<title>QDOAS Projects Properties : Output page</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta NAME="description" CONTENT="QDOAS help">
+<meta NAME="keywords" CONTENT="QDOAS, project, output, color index, flux">
+<link rel="stylesheet" href="../uvvis.css" type="text/css">
+</head>
+
+<body>
+<table width="100%" border="0" cellpadding="10" cellspacing="0">
+
+  <tr>
+    <td width="200" valign="top" bgcolor="#F3F3F3">
+<p align="center"><a href="../index.html"><img src="../qdoas_atmospheric_toolbox_small.png" alt="QDOAS_logo" width="80" height="80"></a></p>
+<p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../GUI/GUI.html" style="text-decoration: none; color: #336699">&nbsp;The&nbsp;user&nbsp;interface</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="Project.html" style="text-decoration: none; color: #336699">&nbsp;Projects Properties</a></p>
+    <p class="menu-left" align="right"><a href="Project_Display.html" style="text-decoration: none; color: #336699">Display</a></p>
+    <p class="menu-left" align="right"><a href="Project_Selection.html" style="text-decoration: none; color: #336699">Selection</a></p>
+    <p class="menu-left" align="right"><a href="Project_Analysis.html" style="text-decoration: none; color: #336699">Analysis</a></p>
+    <p class="menu-left" align="right"><a href="Project_Filtering.html" style="text-decoration: none; color: #336699">Filtering</a></p>
+    <p class="menu-left" align="right"><a href="Project_Calibration.html" style="text-decoration: none; color: #336699">Calibration</a></p>
+    <p class="menu-left" align="right"><a href="Project_Undersampling.html" style="text-decoration: none; color: #336699">Undersampling</a></p>
+    <p class="menu-left" align="right"><a href="Project_Instrumental.html" style="text-decoration: none; color: #336699">Instrumental</a></p>
+    <p class="menu-left" align="right"><a href="Project_Slit.html" style="text-decoration: none; color: #336699">Slit</a></p>
+    <p class="menu-left" align="right"><a href="Project_Output.html" style="text-decoration: none; color: #336699">Output</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Analysis/Analysis.html" style="text-decoration: none; color: #336699">&nbsp;Analysis&nbsp;windows&nbsp;properties</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Tools/Tools.html" style="text-decoration: none; color: #336699">&nbsp;QDOAS&nbsp;Tools</a></p>
+    </td>
+    <td width="2">&nbsp;</td>
+    <td id="maincontent">
+    <p class="head-title-page">QDOAS Projects Properties : Output page</p>
+    <p align="center" ><img src="Project_Output.jpg" alt="" width="722" height="481" border="0" usemap="#Map">
+<map name="Map">
+            <area shape="rect" coords="48,50,104,70" href="Project_Display.html">
+            <area shape="rect" coords="106,50,170,70" href="Project_Selection.html">
+            <area shape="rect" coords="171,50,232,70" href="Project_Analysis.html">
+            <area shape="rect" coords="233,50,293,70" href="Project_Filtering.html">
+            <area shape="rect" coords="294,50,367,70" href="Project_Calibration.html">
+            <area shape="rect" coords="368,50,460,70" href="Project_Undersampling.html">
+            <area shape="rect" coords="461,50,544,70" href="Project_Instrumental.html">
+            <area shape="rect" coords="545,50,581,70" href="Project_Slit.html">
+          <area shape="rect" coords="270,157,662,237" href="#Fluxes">
+      <area shape="rect" coords="59,89,663,146" href="#AutomaticFile">
+  <area shape="rect" coords="59,157,263,236" href="#Options">
+<area shape="rect" coords="59,255,662,440" href="#Selection"></map>
+    </p>
+    <p align="justify" ><a name="Options"></a>This page is dedicated to the selection of  information on analyzed records to write in the output file after calibration and/or analysis of spectra. When the <strong>Analysis button</strong> is checked, all the fields in this page are enabled and it is also possible to  make a fine selection of the results of the fit to save in the <strong><a href="../Analysis/Analysis.html">Analysis windows properties</a></strong> pages.</p>
+    <p align="justify" >When the user selects chooses <b>&laquo; .asc &raquo;</b> as the file format, the program produces ASCII files with tab-separated columns for all selected output fields.  These files may be loaded in spreadsheets such as Excel.  The first line of the analysis output starts with a hash (#) character and is used to print the column titles.  </p>
+    <p align="justify" >When the <b>Calibration button</b> is checked, wavelength calibration results are saved before the analysis results. Lines with calibration output start with a semicolon (;).  <b>If an ASCII output file already exists at the specified location, QDOAS appends the new results to the existing file.</b> In this case, column titles and calibration information are not repeated.  Therefore, it is best to avoid writing to existing files, unless exactly the same analysis and output configuration is used to produce the new data.  To replace the content of an existing output file, the file must first be deleted manually.</p>
+    <p align="justify" >When the user selects the file format <b>&laquo; .he5 &raquo;</b>, QDOAS produces HDF-EOS5 (a binary output format based on the HDF5 format) output files.  The resulting files can be used in programming environments such as Matlab or IDL, or using the application hdfview.   In HDF-EOS5 Output mode, each field is saved as a different data field in the resulting HDF5 file.  Depending on the kind of information contained in the field, QDOAS automatically saves the data as a geolocation field or a data field.  In HDF-EOS5 mode, QDOAS reports an error if a file already exists at the chosen output location, and the results will not be saved.</p>
+    <p align="justify" >QDOAS always saves all the output from a single input file in one shot, either when it has processed the last spectrum of an input file, or when the analysis is stopped using the <b>stop button</b> <img src="../Button_Stop.gif" alt="Stop button" width="13" height="13">.</p>
+    <p align="justify" >By default, QDOAS only saves records successfully analyzed.  If the button <strong>Successful records only</strong> is kept unchecked, all records including reference spectra and records for which the analysis fails (e.g. log error on the spectrum) are saved.
+The filling value for bad records is 9.9990e+003.  Such a situation can be useful for example to retrieve information on the reference spectra or to compare the whole file without a preliminary coincident entries filtering.</p>
+    <p align="justify" >Examples of output files can be found in annex of the <strong>QDOAS Software User Manual</strong>.</p>
+    <p align="justify" class="orangelarge">Automatic creation of the output file name<a name="AutomaticFile">&nbsp;</a></p>
+    <p align="justify" >The path and the name of the output file can be specified in the <strong>Output Path</strong> field.  If <strong>&laquo; automatic &raquo;</strong> is used as a file name, QDOAS will generate the name of the output file automatically, using the user-defined output path as a base.</p>
+    <p align="justify" >For ground-based measurements, the <strong>Directories</strong> and <strong>Automatic reference</strong> buttons have no effect. The original file name is always used (but the file extension is changed in <strong>&laquo; .ASC &raquo;</strong>) except if the <strong>Use file name button</strong> is unchecked and an observation site has been specified in the <strong><a href="Project_Instrumental.html">Instrumental page</a></strong>. In this case, the output file name is built as follows :</p>
+    <p align="center" >&lt;output path&gt;/XXYYYYMM.ASC</p>
+    <p>where :</p>
+  <table width="80%" border="0" align="center">
+    <tr>
+      <td width="20%" id="table">output path</td>
+      <td id="table">is the user-defined output path;</td>
+    </tr>
+    <tr>
+      <td width="20%" id="table">XX</td>
+      <td id="table">is the abbreviation of the observation site selected in the <a href="Project_Instrumental.html"><strong>Instrumental tab page</strong></a>; if no observation site is specified, the original file name is used;</td>
+    </tr>
+    <tr>
+      <td width="20%" id="table">YYYYMM</td>
+      <td id="table">is the year and the month (zeros padded) of  measurements</td>
+    </tr>
+  </table>
+  <p align="justify">For satellite measurements, the <strong>Use file name button</strong> has no effect. If overpasses calculation is requested (option <strong>Sites</strong> in the <strong>Geolocation</strong> frame of the <a href="Project_Selection.html"><strong>Selection</strong></a> page), then the output file name is determined as above (&lt;output path&gt;/XXYYYYMM.ASC where XX is the abbreviation of the station). Otherwise, for SCIAMACHY files, the output file name automatically created has the syntax SCIA_YYYYMMDD_NNNN.ASC where YYYYMMDD is the date of measurement (year, month, day) and NNNN the orbit number. For other satellite formats, the original file name is used (but with the file extension <strong>&laquo; .ASC &raquo;</strong>). Files are distributed in a year/month/day folder structure if the <strong>Directories</strong> button is checked. </p>
+  <p class="orangelarge">Fluxes<a name="Fluxes">&nbsp;</a></p>
+      <p align="justify"><strong>The flux</strong> is the value of the signal averaged over pixels within a bandwith around the specified wavelength.  Divided by the exposure time, this can be used to check a relative intensity. To calculate and save fluxes in the output file, specify the central wavelengths separated by the semicolon (;) character.  For example, to get fluxes at 330 nm, 350 nm and 380 nm, enter :</p>
+      <p align="center">330; 350; 380;</p>
+      <p align="justify">From version 2.107, the <strong>averaging bandwidth</strong> in nm is also requested (for example a bandwidth of 1 nm means that pixels within the central wavelength +/- 0.5 nm will be averaged).
+But it is not possible to output colour indexes anymore.  The colour index is the ratio between two fluxes; the calculation outside QDOAS is easy if both fluxes are output.    </p>
+    <p align="justify" class="orangelarge">Selection of fields to output<a name="Selection">&nbsp;</a></p>
+    <p align="justify">The  content of this frame is similar to the one in the <a href="Project_Display.html"><strong>Display</strong></a> page. &nbsp;In QDOAS, the output is fully configurable.  Information related to the measurements (e.g. date and time, viewing angles, geolocation coordinates, ...) can be selected in this page. The selection of analysis results (e.g. slant column densities, fitted non-linear parameters,...) is made individually in the <a href="../Analysis/Analysis.html"><strong>Analysis windows properties</strong></a> pages. The selected instrument or file format determines the list of fields available for output. For example, information on cloud fraction and cloud top pressure is   available only for satellite instruments. A non-exhaustive list of fields available for ground-based  and satellite measurements  is given in annex of the <strong>QDOAS Software User Manual</strong>.</p>
+    <p align="justify">&nbsp;</p>	  </td>
+  </tr>
+</table>
+<div id="footcontainer" >
+
+	  <div class="maincol" >
+	    <span class="update" >Copyright BIRA-IASB - Last update : <script language="JavaScript">
+  var lastModif=document.lastModified;
+  document.write(lastModif[3]+lastModif[4]+"/"+lastModif[0]+lastModif[1]+"/"+lastModif[6]+lastModif[7]+lastModif[8]+lastModif[9]);
+</script>
+	    </span>
+	  </div>
+	</div>
+</body>
+</html>

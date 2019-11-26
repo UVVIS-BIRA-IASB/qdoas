@@ -1,0 +1,127 @@
+<html>
+<head>
+<title>QDOAS Analysis Windows properties </title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta NAME="description" CONTENT="QDOAS help">
+<meta NAME="keywords" CONTENT="QDOAS, analysis, molecules, cross-sections, linear, parameters, shift, stretch, squeeze, gaps, output, reference, wavelength calibration, fitting interval">
+<link rel="stylesheet" href="../uvvis.css" type="text/css"></head>
+
+<body>
+<table width="100%" border="0" cellpadding="10" cellspacing="0">
+
+  <tr>
+    <td width="200" valign="top" bgcolor="#F3F3F3">
+<p align="center"><a href="../index.html"><img src="../qdoas_atmospheric_toolbox_small.png" alt="QDOAS_logo" width="80" height="80"></a></p>
+<p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../GUI/GUI.html" style="text-decoration: none; color: #336699">&nbsp;The&nbsp;user&nbsp;interface</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Project/Project.html" style="text-decoration: none; color: #336699">&nbsp;Projects Properties</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="Analysis.html" style="text-decoration: none; color: #336699">&nbsp;Analysis&nbsp;windows&nbsp;properties</a></p>
+    <p class="menu-left" align="right"><a href="Analysis_Molecules.html" style="text-decoration: none; color: #336699">Molecules</a></p>
+    <p class="menu-left" align="right"><a href="Analysis_Polynomial.html" style="text-decoration: none; color: #336699">Polynomial</a></p>
+    <p class="menu-left" align="right"><a href="Analysis_Predefined.html" style="text-decoration: none; color: #336699">Predefined Parameters</a></p>
+    <p class="menu-left" align="right"><a href="Analysis_Shift.html" style="text-decoration: none; color: #336699">Shift and Stretch</a></p>
+    <p class="menu-left" align="right"><a href="Analysis_Gaps.html" style="text-decoration: none; color: #336699">Gaps</a></p>
+    <p class="menu-left" align="right"><a href="Analysis_Output.html" style="text-decoration: none; color: #336699">Output</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Tools/Tools.html" style="text-decoration: none; color: #336699">&nbsp;QDOAS&nbsp;Tools</a></p>
+           </td>
+    <td width="2">&nbsp;</td>
+    <td id="maincontent">
+    <p class="head-title-page">QDOAS Analysis Windows properties</p>
+    <p align="center" ><img src="Analysis_MoleculesMenu.jpg" width="998" height="447" border="0" usemap="#Map">
+    <p align="justify" >This  dialog box completes the <a href="../Project/Project.html"><strong>Projects properties</strong></a> for the configuration of the analysis of spectra. Several analysis windows can be defined under a same project.</p>
+    <strong><p align="justify" class="orangelarge">Fitting interval<a name="FittingInterval"></a></p></strong>
+    <p align="justify" >The fitting interval is the first option to specify when a new analysis window is created. It depends on the region covered by the spectrometer and the trace gases to retrieve. According to the molecules to focus on, some baseline recommendations can be found in the literature.<strong></strong></p>
+    <strong>
+    <p align="justify" class="orangelarge">Reference spectra<a name="ReferenceSpectra"></a></p>
+    </strong>
+    <p align="justify">In the DOAS technique, spectra are always analyzed with respect to a reference spectrum (also called, control spectrum). This could be the irradiance spectrum of the current satellite file, any other reference spectrum provided in an ASCII file or a daily reference spectrum selected on a solar zenith angle criterion. The <strong>Ref. Selection</strong> box proposes to choose between the modes <strong>File</strong> (irradiance of the file for satellites measurements or an external reference spectrum) and <strong>Automatic</strong> (daily reference spectrum).</p>
+    <p align="justify">In addition, QDOAS gives the possibility to define two  reference spectra (<strong>Reference 1 </strong>and <strong>Reference 2</strong>).&nbsp;<strong>Reference 1</strong> is always a file; according to the <strong>Ref. Selection</strong> mode, <strong>Reference 2 </strong>can be the name of an ASCII file or a spectrum automatically selected by the program. These options determines on which reference spectrum the wavelength calibration procedure is applied :</p>
+    <ol>
+      <li><div align="justify">If only one reference spectrum is specified (<strong>Reference 1 </strong>or <strong>Reference 2</strong>),  it is used as control spectrum i.e. the <em>I<sub>0</sub></em> spectrum in the Beer&#8209;Lambert law.&nbsp; The wavelength calibration procedure is applied on this spectrum and the cross-sections are re-interpolated on the new calculated grid before the analysis of spectra.</div><br>
+      </li>
+      <li><div align="justify">If two reference spectra are given, the wavelength calibration is  applied only on the first one (<strong>Reference&nbsp;1</strong>);  the shift between both reference spectra is then determined (using a NLLS  fitting approach) in order to align cross-sections on the second reference  spectrum (<strong>Reference 2</strong>)  and spectra are analysed w.r.t. <strong>Reference  2</strong>.</div>
+      </li>
+    </ol>
+    <strong><p align="justify" class="orangelarge">Automatic reference selection<a name="AutomaticSelection"></a></p></strong>
+    <p align="justify">The information on the solar zenith angle is present in most ground-based file formats. According to the SZA range, a reference spectrum with the SZA the closest to the given value is selected for each twilight or the spectrum with the minimum SZA of the day is selected (both values initialized to 0 or the SZA range below all SZA values of the file).</p>
+    <p align="justify">For <strong>MAXDOAS measurements</strong>, it is also possible to select the zenith spectrum of the scan.  Currently, <strong>Scans/SZA radio buttons</strong> appear to make this selection possible with the CCD EEV, MFC STD, MFC BIRA and ASCII formats.  If this option is necessary for other file formats, please, contact authors.</p>
+    <p align="justify">For satellite measurements, if no <strong>Reference 1</strong> is specified (field kept empty),  the irradiance of the current file is always implicitely used. This means that if a <strong>Reference 2</strong> is provided, the wavelength calibration is  applied on the irradiance spectrum (<strong>Reference 1</strong>) of the file and the control spectrum (<strong>Reference 2</strong>) will be aligned on the irradiance before the analysis of earthshine spectra. For satellite measurements, the <strong>Reference 2</strong> spectrum could be an average of spectra selected in a specific region given by its minimum and maximum latitudes and longitudes. Other information such as  the cloud fraction (GOME2) could also be used to refine the reference selection.</p>
+<strong>
+<p align="justify" class="orangelarge">Wavelength calibration<a name="WavelengthCalibration"></a></p>
+</strong>
+    <p align="justify">The quality of the fit results largely relies on a  very accurate determination of the wavelength calibration of the reference spectrum. The wavelength  calibration procedure developed in QDOAS allows correcting the preliminary grid of the reference spectrum using a high-resolution solar atlas   spectrum degraded to the resolution  of the instrument (see the <strong><a href="../Project/Project_Calibration.html">Calibration page</a></strong> of <strong>Projects Properties</strong>).  The information on the shift and eventually the slit function retrieved from this procedure are used to convolve/interpolate the cross-sections before the analysis. The wavelength calibration is always applied in priority on the <strong>Reference 1</strong> (the irradiance spectrum for satellite measurements). If two reference spectra are provided, <strong>Reference 2</strong> is aligned on <strong>Reference 1</strong> using the same non linear least-square algorithm as the one used for the analysis of spectra w.r.t. the control spectrum.</p>
+    <p align="justify">If the  wavelength calibration of the reference spectrum is assumed to be accurate enough, the option <strong>None</strong> can be used instead of <strong>Ref Only</strong>. The option <strong>Spectra    only</strong> is useful for some particular applications (for example, long paths measurements for which the reference spectrum is a lamp measurement). </p>
+    <p align="justify">The option <strong>Ref+spectra</strong> allows applying a calibration correction on both reference spectrum and spectra    to analyze.&nbsp; This option has been    designed to handle spectra recorded with unstable (unthermostated)    instruments where the spectral resolution can vary a lot from one spectrum to    another.&nbsp; In this case, the resolutions    of both spectra are matched to the resolution of the less resolved spectrum,    and the absorption cross-sections can be convolved in real-time to the same    effective resolution. This option is time consuming and should be used carefully.</p>
+    <p align="justify" class="orangelarge">Display<a name="Display"></a></p>
+    <p>After the processing of a spectrum, QDOAS can plot for each spectral analysis window :</p>
+    <ul align="justify">
+      <li>the spectrum and the reference in the fitting interval;</li>
+      <li>the residual of the fit (the difference between the observed and the calculated);</li>
+      <li>the continuum part of the spectrum fitted by a  polynomial;</li>
+      <li>the fit obtained for each  species </li>
+      <li>the predefined parameters (offset, undersampling);</li>
+      <li>in the case two reference spectra have been selected, these two spectra after the alignment correction<strong></strong></li>
+    </ul>
+    <p align="justify">The appropriate  buttons are checked according to the graphs to plot.&nbsp; An individual selection of the cross-sections and  the predefined parameters can still be performed in the dedicated tab pages.</p>
+    <p align="justify" class="orangelarge">Residuals<a name="Residuals"></a></p>
+    <p align="justify">In  the tips and trick box, it is possible to save some residuals to realize  further studies or to create a synthetic cross-section that could be introduced  carefully in the fit in case systematic structures are identified.  If a <strong>&laquo; Residual  &raquo;</strong> file name is given, the calculated residuals will be saved in an ASCII file. There is one line per processed record and the three first numbers starting a line are respectively the record number, the solar zenith angle and the decimal time. The first line of the file should be the wavelength calibration. As the fits are always appended, the size of the file could increase significantly and it is recommended to disable this option by emptying the <strong>&laquo; Residual  &raquo;</strong> file name field when it is not necessary anymore.</p>
+    <p align="justify" class="orangelarge">Fitting parameters<a name="FittingParameters"></a></p>
+    <p align="justify">The  user must define the fitting parameters in the appropriate pages of the  property sheet at the bottom of the<strong> </strong>dialog box.&nbsp; The  different pages are :</p>
+    <table width="80%" border="0" align="center" cellpadding="5" cellspacing="10" >
+      <tr valign="top">
+        <td width="150" id="table"><strong><a href="Analysis_Molecules.html">Molecules</a></strong></td>
+        <td id="table"><div align="justify">definition and configuration of the list of cross-sections to fit;</div></td>
+      </tr>
+      <tr valign="top">
+        <td width="150" id="table"><strong><a href="Analysis_Polynomial.html">Polynomial</a></strong></td>
+        <td id="table"><div align="justify">specification of the degree of the polynomial fitting the continuous  component of the absorbance;</div></td>
+      </tr>
+      <tr valign="top">
+        <td width="150" id="table"><strong><a href="Analysis_Predefined.html">Predefined Parameters</a></strong></td>
+        <td id="table"><div align="justify">this page proposes several predefined parameters such as offset,  undersampling &hellip;</div></td>
+      </tr>
+      <tr valign="top">
+        <td width="150" id="table"><strong><a href="Analysis_Shift.html">Shift and Stretch</a></strong></td>
+        <td id="table"><div align="justify">shift and stretch can be applied to any spectral item;</div></td>
+      </tr>
+      <tr valign="top">
+        <td width="150" id="table"><strong><a href="Analysis_Gaps.html">Gaps</a></strong></td>
+        <td id="table"><div align="justify">gaps can be introduced in the fitting window (e.g. to eliminate bad  pixels);</div></td>
+      </tr>
+      <tr valign="top">
+        <td width="150" id="table"><strong><a href="Analysis_Output.html">Output</a></strong></td>
+        <td id="table"><div align="justify">selection  of the calculated columns densities and associated errors to save in the output file.</div></td>
+      </tr>
+    </table>
+  <p align="justify" >According  to the associated type of parameters, the selected page proposes several  columns of options to fill in, to check or to select from a multiple  choice.&nbsp; The conviviality of the analysis  parameterisation is enhanced by the use of right-click shortcut menus to handle  the lists of items in the different tab pages.&nbsp;</p>
+  <p align="justify" >&nbsp;</p>
+    </tr>
+</table>
+<div id="footcontainer" >
+
+	  <div class="maincol" >
+	    <span class="update" >Copyright BIRA-IASB - Last update :
+<script language="JavaScript">
+  var lastModif=document.lastModified;
+  document.write(lastModif[3]+lastModif[4]+"/"+lastModif[0]+lastModif[1]+"/"+lastModif[6]+lastModif[7]+lastModif[8]+lastModif[9]);
+</script>
+	    </span>
+	  </div>
+	</div>
+    <p>&nbsp;</p>
+
+<map name="Map">
+  <area shape="rect" coords="10,174,80,196" href="Analysis_Molecules.html">
+<area shape="rect" coords="80,173,152,195" href="Analysis_Polynomial.html">
+<area shape="rect" coords="152,174,286,196" href="Analysis_Predefined.html">
+<area shape="rect" coords="286,174,390,196" href="Analysis_Shift.html">
+<area shape="rect" coords="390,174,437,196" href="Analysis_Gaps.html">
+<area shape="rect" coords="437,174,492,196" href="Analysis_Output.html">
+<area shape="rect" coords="247,12,361,73" href="#FittingInterval">
+<area shape="rect" coords="364,11,818,73" href="#Display">
+<area shape="rect" coords="146,10,242,72" href="#ReferenceSpectra">
+<area shape="rect" coords="10,9,141,73" href="#WavelengthCalibration">
+<area shape="rect" coords="11,94,986,139" href="#ReferenceSpectra">
+<area shape="rect" coords="10,140,985,167" href="#Residuals">
+<area shape="rect" coords="10,196,987,434" href="#FittingParameters">
+</map></body>
+</html>

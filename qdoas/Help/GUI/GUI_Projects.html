@@ -1,0 +1,87 @@
+<html>
+<head>
+<title>QDOAS Projects Tree</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta NAME="description" CONTENT="QDOAS help">
+<meta NAME="keywords" CONTENT="QDOAS, Projects tree">
+<link rel="stylesheet" href="../uvvis.css" type="text/css"></head>
+
+<body>
+<table width="100%" border="0" cellpadding="10" cellspacing="0">
+
+  <tr>
+    <td width="200" valign="top" bgcolor="#F3F3F3">
+<p align="center"><a href="../index.html"><img src="../qdoas_atmospheric_toolbox_small.png" alt="QDOAS_logo" width="80" height="80"></a></p>
+<p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="GUI.html" style="text-decoration: none; color: #336699">&nbsp;The&nbsp;user&nbsp;interface</a></p>
+    <p class="menu-left" align="right"><a href="GUI_Projects.html" style="text-decoration: none; color: #336699">Projects Tree</a></p>
+    <p class="menu-left" align="right"><a href="GUI_Sites.html" style="text-decoration: none; color: #336699">Sites</a></p>
+    <p class="menu-left" align="right"><a href="GUI_Symbols.html" style="text-decoration: none; color: #336699">Symbols</a></p>
+    <p class="menu-left" align="right"><a href="GUI_Plot.html" style="text-decoration: none; color: #336699">Plot Properties</a></p>
+ <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Analysis/Analysis.html" style="text-decoration: none; color: #336699">&nbsp;</a><a href="../Project/Project.html" style="text-decoration: none; color: #336699">Projects Properties</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Analysis/Analysis.html" style="text-decoration: none; color: #336699">&nbsp;Analysis&nbsp;windows&nbsp;properties</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Tools/Tools.html" style="text-decoration: none; color: #336699">&nbsp;QDOAS&nbsp;Tools</a></p></td>
+    <td width="2">&nbsp;</td>
+    <td id="maincontent">
+    <p class="head-title-page">QDOAS Projects Tree</p>
+    <p align="center" ><img src="QDOAS_ProjectsTree.jpg" width="617" height="457" border="0" usemap="#Map" href="GUI_Sites.html">
+    <p align="justify">The  organisation of projects, analysis windows, spectra files and directories in a  tree structure completed with the definition of right-click  shortcut menus at each level of the tree makes the access, manipulation  and configuration of all these objects very easy. </p>
+    <p align="justify" class="orangelarge">Raw Spectra</p>
+    <p align="justify">Spectra  to analyze have to be inserted under this project tree node. &nbsp;Individual files and complete directories  structures are accepted.&nbsp; The &ldquo;New Folder&rdquo;  option allows organizing spectra files and directories within a user-defined catalog  (folder that is not physically present on the disk). &nbsp;The following actions can be performed from any  node :</p>
+    <table width="95%" border="0" align="center" cellpadding="0" cellspacing="0" >
+      <tr valign="top">
+        <td width="139" id="table"><strong>Browse Spectra</strong></td>
+        <td width="894" id="table"><div align="justify">Browses spectra in the selected file;</div></td>
+      </tr>
+      <tr valign="top">
+        <td width="139" id="table"><strong>Run Analysis</strong></td>
+        <td id="table"><div align="justify">
+          <p>analyses spectra using the configuration of the project and analysis  windows; this step includes the correction of the wavelength calibration of the  reference spectrum if it has been requested in the configuration of the analysis  windows;</p>
+        </div></td>
+      </tr>
+      <tr valign="top">
+        <td width="139" id="table"><strong>Run Spectra</strong></td>
+        <td id="table"><div align="justify">uses  the options defined in the <a href="../Project/Project_Calibration.html"><strong>Calibration  page</strong></a> of &nbsp;<strong>Projects Properties </strong>to apply it on spectra.&nbsp; </div></td>
+      </tr>
+    </table>
+    <p>To  move from one record to the other or from one file to the other (in case of  multiple files selection), use the adequate buttons in the toolbar : </p>
+    <p align="center"><img src="QDOAS_ToolbarSelection.jpg" width="771" height="78"></p>
+    <p align="justify">Other options : </p>
+    <table width="95%" border="0" align="center" cellpadding="0" cellspacing="0" >
+      <tr valign="top">
+        <td width="100" id="table"><strong>Disable/Enable</strong></td>
+        <td id="table"><div align="justify">
+          <p>Disables the selected file or directory from the list of files to  browse/analyze.&nbsp; Enable option re-enables  previously disabled files.</p>
+        </div></td>
+      </tr>
+      <tr valign="top">
+        <td width="100" id="table"><strong>Refresh</strong></td>
+        <td id="table"><div align="justify"><p>Refreshes the list of files in the selected directory;</p></div></td>
+      </tr>
+      <tr valign="top">
+        <td width="100" id="table"><strong>Show/Hide details</strong></td>
+        <td id="table"><div align="justify">Shows/hides  file information (last modification date and time, size). &nbsp;The file size information is useful to  indicate if the selected file is empty or not.</div></td>
+      </tr>
+    </table>
+    <p align="justify" class="orangelarge">Analysis windows</p>
+    <p align="justify">A  project can include several spectral analysis windows.&nbsp; A specific analysis window can be disabled in  order not to process it without removing it from the list. &nbsp;The <strong>View  Cross Sections</strong> option is useful to check that the requested cross-sections files  exist.</p>
+    <p align="justify">&nbsp;</p>    </tr>
+</table>
+<div id="footcontainer" >
+
+	  <div class="maincol" >
+	    <span class="update" >Copyright BIRA-IASB - Last update :
+<script language="JavaScript">
+  var lastModif=document.lastModified;
+  document.write(lastModif[3]+lastModif[4]+"/"+lastModif[0]+lastModif[1]+"/"+lastModif[6]+lastModif[7]+lastModif[8]+lastModif[9]);
+</script>
+	    </span>
+	  </div>
+	</div>
+    <p>&nbsp;</p>
+
+
+
+<map name="Map"><area shape="rect" coords="57,1,98,20" href="GUI_Sites.html">
+<area shape="rect" coords="100,1,153,20" href="GUI_Symbols.html">
+</map></body>
+</html>

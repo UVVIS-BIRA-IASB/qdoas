@@ -1,0 +1,88 @@
+<html>
+<head>
+<title>QDOAS Projects Properties : Analysis page</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta NAME="description" CONTENT="QDOAS help">
+<meta NAME="keywords" CONTENT="QDOAS, project, Analysis, Optical Density fitting, Marquardt-Levenberg, Intensity fitting, Interpolation, non linear least-square algorithm, NLLS, iteration, security gap, convergence, chi square, DOAS, retrieval, spline">
+<link rel="stylesheet" href="../uvvis.css" type="text/css">
+</head>
+
+<body>
+<table width="100%" border="0" cellpadding="10" cellspacing="0">
+
+  <tr>
+    <td width="200" valign="top" bgcolor="#F3F3F3">
+    <p align="center"><a href="../index.html"><img src="../qdoas_atmospheric_toolbox_small.png" alt="QDOAS_logo" width="80" height="80"></a></p>
+<p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../GUI/GUI.html" style="text-decoration: none; color: #336699">&nbsp;The&nbsp;user&nbsp;interface</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="Project.html" style="text-decoration: none; color: #336699">&nbsp;Projects Properties</a></p>
+    <p class="menu-left" align="right"><a href="Project_Display.html" style="text-decoration: none; color: #336699">Display</a></p>
+    <p class="menu-left" align="right"><a href="Project_Selection.html" style="text-decoration: none; color: #336699">Selection</a></p>
+    <p class="menu-left" align="right"><a href="Project_Analysis.html" style="text-decoration: none; color: #336699">Analysis</a></p>
+    <p class="menu-left" align="right"><a href="Project_Filtering.html" style="text-decoration: none; color: #336699">Filtering</a></p>
+    <p class="menu-left" align="right"><a href="Project_Calibration.html" style="text-decoration: none; color: #336699">Calibration</a></p>
+    <p class="menu-left" align="right"><a href="Project_Undersampling.html" style="text-decoration: none; color: #336699">Undersampling</a></p>
+    <p class="menu-left" align="right"><a href="Project_Instrumental.html" style="text-decoration: none; color: #336699">Instrumental</a></p>
+    <p class="menu-left" align="right"><a href="Project_Slit.html" style="text-decoration: none; color: #336699">Slit</a></p>
+    <p class="menu-left" align="right"><a href="Project_Output.html" style="text-decoration: none; color: #336699">Output</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Analysis/Analysis.html" style="text-decoration: none; color: #336699">&nbsp;Analysis&nbsp;windows&nbsp;properties</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Tools/Tools.html" style="text-decoration: none; color: #336699">&nbsp;QDOAS&nbsp;Tools</a></p>
+    </td>
+    <td width="2">&nbsp;</td>
+    <td id="maincontent">
+    <p class="head-title-page">QDOAS Projects Properties : Analysis page</p>
+    <p align="center" ><img src="Project_Analysis.jpg" alt="" width="722" height="481" border="0" usemap="#Map">
+<map name="Map">
+      <area shape="rect" coords="48,50,104,70" href="Project_Display.html">
+            <area shape="rect" coords="106,50,170,70" href="Project_Selection.html">
+            <area shape="rect" coords="233,50,293,70" href="Project_Filtering.html">
+            <area shape="rect" coords="294,50,367,70" href="Project_Calibration.html">
+            <area shape="rect" coords="368,50,460,70" href="Project_Undersampling.html">
+            <area shape="rect" coords="461,50,544,70" href="Project_Instrumental.html">
+            <area shape="rect" coords="545,50,581,70" href="Project_Slit.html">
+            <area shape="rect" coords="582,50,638,70" href="Project_Output.html">
+            <area shape="rect" coords="153,107,570,138" href="#Method">
+            <area shape="rect" coords="153,142,570,171" href="#LSFit">
+            <area shape="rect" coords="153,173,570,206" href="#Interpolation">
+            <area shape="rect" coords="153,208,570,239" href="#SecurityGap">
+            <area shape="rect" coords="153,242,570,274" href="#ConvergenceCriterion">
+            <area shape="rect" coords="153,279,570,307" href="#NumberIterations">
+            <area shape="rect" coords="153,316,570,344" href="#SpikeTolerance"></map>
+    </p>
+    <p align="justify" ><a name="Options"></a>Default options of this page are valid for all applications. Expert users can change them to perform some tests. Further details on the retrieval algorithms can be found in the <strong>Description of Algorithms </strong>chapter of the <strong>QDOAS Software User Manual</strong>.</p>
+    <p align="justify" class="orangelarge">Analysis method<a name="Method"></a></p>
+    <p align="justify">Available retrieval methods are :</p>
+    <ul>
+      <li>Optical density fitting;</li>
+      <li>Intensity fitting  (Marquardt-Levenberg+SVD);</li>
+    </ul>
+    <p align="justify">These methods differ  by the way the Beer-Lambert's equation is expressed and resolved.&nbsp;Usually the <strong>Optical density fitting</strong> is preferred to analyze spectra.</p>
+    <p align="justify" class="orangelarge">Least-squares fit<a name="LSFit"></a></p>
+    <p align="justify">The  fit can be weighted if <strong>instrumental</strong> uncertainties on measurements are known.&nbsp;</p>
+    <p align="justify" class="orangelarge">Interpolation<a name="Interpolation"></a></p>
+    <p align="justify" ><strong>Linear</strong> and cubic <strong>Spline</strong> interpolations are  implemented.&nbsp; <strong>Spline</strong> interpolation is  recommended. &nbsp;</p>
+    <p align="justify" class="orangelarge">Interpolation security gap<a name="SecurityGap"></a></p>
+    <p align="justify" >Convolution/filtering/interpolation operations could introduce edge effects if cross-sections are strictly defined on the different analysis spectral intervals. In order to avoid that, it is recommended to add some extra pixels on both sides of the final grid. The security gap determines this number of pixels. If the selected filter requires a larger number of additional pixels, the gap is recalculated by QDOAS.</p>
+    <p align="justify" class="orangelarge">Convergence criterion<a name="ConvergenceCriterion"></a></p>
+    <p align="justify">The purpose of the iterative Marquardt-Levenberg algorithm used to  resolve the DOAS equation is to find the values of unknown variables that minimize the &laquo; chi square &raquo; (see equation in the <strong>Description of Algorithms section</strong> of the <strong>QDOAS Software User Manual</strong>). It assumes to start from an initial solution and to improve it as far as the chi square calculated at each iteration decreases. If after two successive iterations, the variation of the chi square is less than the<strong> convergence criterion</strong>, the solution is considered good enough and the algorithm stops.</p>
+    <p align="justify">Usually  a value of 1e-3 or 1e-4 is selected for the convergence criterion. The higher is  this value, the faster will be the convergence to the solution but the accuracy of  the results could be affected.</p>
+    <p align="justify" class="orangelarge">The maximum number of iterations<a name="NumberIterations"></a></p>
+    <p align="justify" >The number of iterations needed to analyze a spectrum is determined by the convergence speed of the  Marquardt-Levenberg algorithm for this spectrum. For some tests, it is sometimes useful to limit it. A value of  &laquo; 0 &raquo; doesn't limit the number of iterations.</p>
+    <p align="justify" class="orangelarge">Spike tolerance factor<a name="SpikeTolerance"></a></p>
+    <p align="justify" >QDOAS can try to  automatically remove bad data points, such as satellite measurements affected by the South Atlantic Anomaly, from the fit.  To do this, QDOAS calculates the average magnitude of the residuals after the fit.  If pixels are found with a residual exceeding this average by more than the spike tolerance factor, QDOAS will remove these pixels from the analysis and calculate a new fit.   This procedure is applied iteratively until no residuals exceed the average by more than the given tolerance factor.  The analysis results contain a list of all pixels that were removed.  This feature should be used with caution, as choosing a too low tolerance factor might exclude valid data points from the fit.</p>
+    <p align="justify">&nbsp;</p>
+  </tr>
+</table>
+<div id="footcontainer" >
+
+	  <div class="maincol" >
+	    <span class="update" >Copyright BIRA-IASB - Last update :
+<script language="JavaScript">
+  var lastModif=document.lastModified;
+  document.write(lastModif[3]+lastModif[4]+"/"+lastModif[0]+lastModif[1]+"/"+lastModif[6]+lastModif[7]+lastModif[8]+lastModif[9]);
+</script>
+	    </span>
+	  </div>
+	</div>
+    <p>&nbsp;</p>
+</body>
+</html>

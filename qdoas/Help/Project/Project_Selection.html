@@ -1,0 +1,104 @@
+<html>
+<head>
+<title>QDOAS Projects Properties : Selection page</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta NAME="description" CONTENT="QDOAS help">
+<meta NAME="keywords" CONTENT="QDOAS, project, selection, SZA, spectra number range, cloud fraction, geolocation, overpasses, satellite">
+<link rel="stylesheet" href="../uvvis.css" type="text/css">
+</head>
+
+<body>
+<table width="100%" border="0" cellpadding="10" cellspacing="0">
+
+  <tr>
+    <td width="200" valign="top" bgcolor="#F3F3F3">
+<p align="center"><a href="../index.html"><img src="../qdoas_atmospheric_toolbox_small.png" alt="QDOAS_logo" width="80" height="80"></a></p>
+<p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../GUI/GUI.html" style="text-decoration: none; color: #336699">&nbsp;The&nbsp;user&nbsp;interface</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="Project.html" style="text-decoration: none; color: #336699">&nbsp;Projects Properties</a></p>
+    <p class="menu-left" align="right"><a href="Project_Display.html" style="text-decoration: none; color: #336699">Display</a></p>
+    <p class="menu-left" align="right"><a href="Project_Selection.html" style="text-decoration: none; color: #336699">Selection</a></p>
+    <p class="menu-left" align="right"><a href="Project_Analysis.html" style="text-decoration: none; color: #336699">Analysis</a></p>
+    <p class="menu-left" align="right"><a href="Project_Filtering.html" style="text-decoration: none; color: #336699">Filtering</a></p>
+    <p class="menu-left" align="right"><a href="Project_Calibration.html" style="text-decoration: none; color: #336699">Calibration</a></p>
+    <p class="menu-left" align="right"><a href="Project_Undersampling.html" style="text-decoration: none; color: #336699">Undersampling</a></p>
+    <p class="menu-left" align="right"><a href="Project_Instrumental.html" style="text-decoration: none; color: #336699">Instrumental</a></p>
+    <p class="menu-left" align="right"><a href="Project_Slit.html" style="text-decoration: none; color: #336699">Slit</a></p>
+    <p class="menu-left" align="right"><a href="Project_Output.html" style="text-decoration: none; color: #336699">Output</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Analysis/Analysis.html" style="text-decoration: none; color: #336699">&nbsp;Analysis&nbsp;windows&nbsp;properties</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Tools/Tools.html" style="text-decoration: none; color: #336699">&nbsp;QDOAS&nbsp;Tools</a></p>
+    </td>
+    <td width="2">&nbsp;</td>
+    <td id="maincontent">
+    <p class="head-title-page">QDOAS Projects Properties : Selection page</p>
+    <p align="center" ><img src="Project_Selection.jpg" alt="" width="722" height="481" border="0" usemap="#Map">
+<map name="Map">
+      <area shape="rect" coords="48,50,104,70" href="Project_Display.html">
+          <area shape="rect" coords="171,50,232,70" href="Project_Analysis.html">
+          <area shape="rect" coords="233,50,293,70" href="Project_Filtering.html">
+          <area shape="rect" coords="294,50,367,70" href="Project_Calibration.html">
+          <area shape="rect" coords="368,50,460,70" href="Project_Undersampling.html">
+            <area shape="rect" coords="461,50,544,70" href="Project_Instrumental.html">
+            <area shape="rect" coords="545,50,581,70" href="Project_Slit.html">
+            <area shape="rect" coords="582,50,638,70" href="Project_Output.html">
+<area shape="rect" coords="59,79,256,185" href="#Selection">
+<area shape="rect" coords="260,79,459,187" href="#Selection">
+<area shape="rect" coords="464,80,662,186" href="#Selection">
+<area shape="rect" coords="59,190,662,385" href="#Geolocation">
+</map>
+    </p>
+    <p align="justify" ><a name="Selection"></a>This  page is dedicated to the selection of spectra to browse or to analyse.&nbsp; The selection of spectra can be made on : </p>
+    <table width="80%" border="0" align="center" cellpadding="5" cellspacing="10" >
+      <tr valign="top">
+        <td width="200" id="table"><strong>SZA</strong></td>
+        <td id="table"><div align="justify">specify  a range of solar zenith angles and a step in degrees;</div></td>
+      </tr>
+      <tr valign="top">
+        <td width="200" id="table"><strong>Spectra No</strong></td>
+        <td id="table"><div align="justify">
+          specify a range of record numbers;
+        </div></td>
+      </tr>
+      <tr valign="top">
+        <td width="200" id="table"><strong>Cloud fraction</strong></td>
+        <td id="table"><div align="justify">
+          for satellite measurements, specify a range of cloud fraction (0..1). Until now, only the GOME-2 file format includes information on the cloud fraction.</div></td>
+      </tr>
+      <tr valign="top">
+        <td width="200" id="table"><strong>Geolocation</strong></td>
+        <td id="table"><div align="justify">for  satellite measurements, selection of pixels based on the geolocation of measurements </div></td>
+      </tr>
+    </table>
+    <p align="justify" >To browse or to analyse all spectra of a file without any constrain, keep the fields initialized as shown in the figure above (default options).</p>
+    <p align="justify" class="orangelarge">Geolocation<a name="Geolocation"></a></p>
+    <p align="justify" >Some applications just need  satellite overpasses over a list of ground-based stations or above specific regions (satellite validation activities for example). The geolocation frame gives three possibilities to select  pixels over specific locations : </p>
+    <table width="80%" border="0" align="center" cellpadding="5" cellspacing="10" >
+      <tr valign="top">
+        <td width="200" id="table"><strong>Circle</strong></td>
+        <td id="table"><div align="justify">select  pixels within a circle whose the radius is given in kilometers and whose the center could be the position of a station defined by its latitude and longitude.</div></td>
+      </tr>
+      <tr valign="top">
+        <td width="200" id="table"><strong>Rectangle</strong></td>
+        <td id="table"><div align="justify"> select pixels above a specific region bounded by the limits in longitude and latitude  given in degrees (0..360&deg; or -180..180 for the longitude according to the satellite file format). </div></td>
+      </tr>
+      <tr valign="top">
+        <td width="200" id="table"><strong>Sites</strong></td>
+        <td id="table"><div align="justify">select  pixels within multiple circles with  radius given in kilometers and  center  position determined by the longitude and the latitude  of the observation sites defined in the <strong><a href="../GUI/GUI_Sites.html">Sites tab page</a></strong> (see  the <a href="Project_Output.html"><strong>Output page</strong></a> for the automatic creation of the output file name)</div></td>
+      </tr>
+    </table>
+    <p align="justify">&nbsp;</p>
+  </tr>
+</table>
+<div id="footcontainer" >
+
+	  <div class="maincol" >
+	    <span class="update" >Copyright BIRA-IASB - Last update :
+<script language="JavaScript">
+  var lastModif=document.lastModified;
+  document.write(lastModif[3]+lastModif[4]+"/"+lastModif[0]+lastModif[1]+"/"+lastModif[6]+lastModif[7]+lastModif[8]+lastModif[9]);
+</script>
+	    </span>
+	  </div>
+	</div>
+    <p>&nbsp;</p>
+</body>
+</html>

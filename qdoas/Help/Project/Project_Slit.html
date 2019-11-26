@@ -1,0 +1,81 @@
+<html>
+<head>
+<title>QDOAS Projects Properties : Slit page</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta NAME="description" CONTENT="QDOAS help">
+<meta NAME="keywords" CONTENT="QDOAS, project, slit, solar, high-resolution, gaussian, lorentz, voigt, error function, boxcar, norton beer strong, wavelength dependent, convolution, fast fourier transform, FWHM, degree, phase">
+<link rel="stylesheet" href="../uvvis.css" type="text/css">
+</head>
+
+<body>
+<table width="100%" border="0" cellpadding="10" cellspacing="0">
+
+  <tr>
+    <td width="200" valign="top" bgcolor="#F3F3F3">
+<p align="center"><a href="../index.html"><img src="../qdoas_atmospheric_toolbox_small.png" alt="QDOAS_logo" width="80" height="80"></a></p>
+<p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../GUI/GUI.html" style="text-decoration: none; color: #336699">&nbsp;The&nbsp;user&nbsp;interface</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="Project.html" style="text-decoration: none; color: #336699">&nbsp;Projects Properties</a></p>
+    <p class="menu-left" align="right"><a href="Project_Display.html" style="text-decoration: none; color: #336699">Display</a></p>
+    <p class="menu-left" align="right"><a href="Project_Selection.html" style="text-decoration: none; color: #336699">Selection</a></p>
+    <p class="menu-left" align="right"><a href="Project_Analysis.html" style="text-decoration: none; color: #336699">Analysis</a></p>
+    <p class="menu-left" align="right"><a href="Project_Filtering.html" style="text-decoration: none; color: #336699">Filtering</a></p>
+    <p class="menu-left" align="right"><a href="Project_Calibration.html" style="text-decoration: none; color: #336699">Calibration</a></p>
+    <p class="menu-left" align="right"><a href="Project_Undersampling.html" style="text-decoration: none; color: #336699">Undersampling</a></p>
+    <p class="menu-left" align="right"><a href="Project_Instrumental.html" style="text-decoration: none; color: #336699">Instrumental</a></p>
+    <p class="menu-left" align="right"><a href="Project_Slit.html" style="text-decoration: none; color: #336699">Slit</a></p>
+    <p class="menu-left" align="right"><a href="Project_Output.html" style="text-decoration: none; color: #336699">Output</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Analysis/Analysis.html" style="text-decoration: none; color: #336699">&nbsp;Analysis&nbsp;windows&nbsp;properties</a></p>
+    <p class="menu-left"><span class="menu-left-sub"><img src="../spacer_orange.jpg" width="2" height="2" alt="orange layout spacer"></span><a href="../Tools/Tools.html" style="text-decoration: none; color: #336699">&nbsp;QDOAS&nbsp;Tools</a></p>
+    </td>
+    <td width="2">&nbsp;</td>
+    <td id="maincontent">
+    <p class="head-title-page">QDOAS Projects Properties : Slit page</p>
+    <p align="center" ><img src="Project_Slit.jpg" alt="" width="722" height="481" border="0" usemap="#Map">
+<map name="Map">
+      <area shape="rect" coords="48,50,104,70" href="Project_Display.html">
+            <area shape="rect" coords="106,50,170,70" href="Project_Selection.html">
+          <area shape="rect" coords="171,50,232,70" href="Project_Analysis.html">
+          <area shape="rect" coords="233,50,293,70" href="Project_Filtering.html">
+            <area shape="rect" coords="294,50,367,70" href="Project_Calibration.html">
+            <area shape="rect" coords="368,50,460,70" href="Project_Undersampling.html">
+            <area shape="rect" coords="461,50,544,70" href="Project_Instrumental.html">
+            <area shape="rect" coords="582,50,638,70" href="Project_Output.html">
+<area shape="rect" coords="184,133,322,153" href="#FWHM_Correction">
+<area shape="rect" coords="54,102,664,132" href="#Solar">
+<area shape="rect" coords="54,154,664,218" href="#Type">
+</map>
+    </p>
+    <p align="justify" ><a name="Options"></a>Input cross-sections have to be degraded to the resolution of the instrument before the analysis. This can be done using the <strong><a href="../Tools/Tools_Convolution.html">convolution tool</a></strong>. However the programme also authorizes the  direct use of high-resolution cross-sections which will be convolved in real time using information provided in this page <strong><u>if and only</u></strong> if the slit function is not characterized  by the <strong>wavelength calibration procedure</strong> (see the <a href="Project_Calibration.html"><strong>Calibration page</strong></a> of <strong>Projects Properties</strong>).</p>
+    <p align="justify" class="orangelarge">Slit function type<a name="Type"></a></p>
+    <p align="justify">Several analytic line shapes are proposed including line shapes supported by the wavelength calibration procedure (gaussian, lorentzian, error function, voigt and asymmetric gaussian line shapes). Different fields have to be completed according to the selected slit function. ASCII file is requested for slit functions measured in laboratory (option File) or when the <strong>&laquo; Wavelength dependent &raquo;</strong> button is checked (analytical line shapes). </p>
+    <ul><li>
+      <div align="justify"><u>Slit functions measured in laboratory</u> : the first column should be the wavelength grid of the line shape; the maximum of the line shape is expected around 0 nm;  look-up tables can be specified for line shapes defined  at different wavelength (in this case, the first line gives the individual wavelength);</div>
+    </li>
+    <li>
+      <div align="justify"><u>Wavelength dependent analytical slit functions</u> : the input file should contain the FWHM variation with the wavelenth calibration; at a given wavelength, cross-sections will be convolved with the appropriate resolution.</div>
+    </li>
+        <li>
+      <div align="justify"><u>Wavelength dependent stretch factors on a user-defined slit function</u> : To account for an asymmetry of the slit function that varies with the wavelength, a three columns ASCII file can be specified in addition to the slit function file.
+This <strong>Stretch on wavelength</strong> file should contain the wavelength calibration and the two values of the stretch to apply on the grid of the line shape, one for each side of the slit function.
+Such a file can be obtained by merging in one file the parameters SFP1 and SFP2 resulting of the wavelength calibration (use the <strong>Save As</strong> option from the title of the plots to save the curves in an ASCII file).
+    </li>
+    </ul>
+    <p align="justify" class="orangelarge">Solar reference file<a name="Solar"></a></p>
+    <p align="justify">A high-resolution solar spectrum is expected to replace the solar spectrum of the <b>Calibration page</b> if the slit function is not characterized during the calibration procedure and solar spectrum and cross sections have to be convolved with the line shape specified in this page.
+Otherwise, if the slit function type of this page is <b>None</b>, preconvolved solar spectrum (in this page) and cross sections (in <b>Analysis windows properties</b>) are expected.</p>
+    </tr>
+</table>
+<div id="footcontainer" >
+
+	  <div class="maincol" >
+	    <span class="update" >Copyright BIRA-IASB - Last update :
+<script language="JavaScript">
+  var lastModif=document.lastModified;
+  document.write(lastModif[3]+lastModif[4]+"/"+lastModif[0]+lastModif[1]+"/"+lastModif[6]+lastModif[7]+lastModif[8]+lastModif[9]);
+</script>
+	    </span>
+	  </div>
+	</div>
+    <p>&nbsp;</p>
+</body>
+</html>
