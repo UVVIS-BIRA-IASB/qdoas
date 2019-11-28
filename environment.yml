@@ -1,0 +1,14 @@
+name: qdoas
+channels:
+  - conda-forge
+  - stcorp
+dependencies:
+  - cmake
+  - pkg-config
+  - coda
+  - gsl
+  - hdfeos2
+  - hdfeos5
+  - libnetcdf
+  - qt
+  - qwt
