@@ -1609,7 +1609,7 @@ int GOME1NETCDF_InitRef(const char *reference_filename, int *n_wavel_temp,ENGINE
      {
       vector<int> use_row(col_dim);
       const size_t start[] = {0};
-      const size_t count[] = {col_dim};
+      const size_t count[] = {(size_t)col_dim};
        reference_file.getVar("use_row", start, count, use_row.data());
 
       for (int i=0; i< col_dim; ++i) {

@@ -208,9 +208,9 @@ namespace {
     readData(orbitFile, lons, "BinScheme1/GeolocationData/Longitude");
     readData(orbitFile, lats, "BinScheme1/GeolocationData/Latitude");
     readData(orbitFile, szas, "BinScheme1/GeolocationData/SolarZenithAngle");
-    float (*longitudes)[nXTrack] = reinterpret_cast<float (*)[nXTrack]>(&lons[0]);
-    float (*latitudes)[nXTrack] = reinterpret_cast<float (*)[nXTrack]>(&lats[0]);
-    float (*solarzenithangles)[nXTrack] = reinterpret_cast<float (*)[nXTrack]>(&szas[0]);
+    auto longitudes = reinterpret_cast<float (*)[nXTrack]>(&lons[0]);
+    auto latitudes = reinterpret_cast<float (*)[nXTrack]>(&lats[0]);
+    auto solarzenithangles = reinterpret_cast<float (*)[nXTrack]>(&szas[0]);
 
     for(unsigned int i=0; i<nMeasurements; ++i) {
       for(unsigned int j = 0; j < nXTrack; ++j) {
@@ -426,10 +426,8 @@ RC OMPS_read(ENGINE_CONTEXT *pEngineContext,int record) {
     radianceError.read(pEngineContext->buffers.sigmaSpec, H5::PredType::NATIVE_DOUBLE, memspace, s);
     radianceError.close();
 
-    double (*irradiances)[currentOrbit.nLambda] =
-      reinterpret_cast<double (*)[currentOrbit.nLambda]>(&currentOrbit.irradiances[0]);
-    double (*irradiance_lambdas)[currentOrbit.nLambda] =
-      reinterpret_cast<double (*)[currentOrbit.nLambda]>(&currentOrbit.wavelengths[0]);
+    auto irradiances = reinterpret_cast<double (*)[currentOrbit.nLambda]>(&currentOrbit.irradiances[0]);
+    auto irradiance_lambdas = reinterpret_cast<double (*)[currentOrbit.nLambda]>(&currentOrbit.wavelengths[0]);
 
     memcpy(pEngineContext->buffers.irrad, irradiances[indexXTrack], currentOrbit.nLambda*sizeof(irradiances[0][0]));
     memcpy(pEngineContext->buffers.lambda_irrad, irradiance_lambdas[indexXTrack], currentOrbit.nLambda*sizeof(irradiance_lambdas[0][0]));
@@ -474,10 +472,8 @@ RC OMPS_load_analysis(ENGINE_CONTEXT *pEngineContext,void *responseHandle) {
 
   int useKurucz = 0;
 
-  double (*wavelengths)[currentOrbit.nLambda] =
-    reinterpret_cast<double (*)[currentOrbit.nLambda]>(&currentOrbit.wavelengths[0]);
-  double (*irradiances)[currentOrbit.nLambda] =
-    reinterpret_cast<double (*)[currentOrbit.nLambda]>(&currentOrbit.irradiances[0]);
+  auto wavelengths = reinterpret_cast<double (*)[currentOrbit.nLambda]>(&currentOrbit.wavelengths[0]);
+  auto irradiances = reinterpret_cast<double (*)[currentOrbit.nLambda]>(&currentOrbit.irradiances[0]);
 
   for(size_t j=0; j<currentOrbit.nXTrack; ++j) {
     for(int i=0; i<NFeno; ++i) {

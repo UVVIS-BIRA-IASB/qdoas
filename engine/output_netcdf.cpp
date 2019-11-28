@@ -681,8 +681,8 @@ RC netcdf_create_calib_var(const char *varname,vector<int>& dimids,vector<size_t
 
 RC netcdf_save_calib(double *lambda,double *reference,int indexFenoColumn,int n_wavel)
  {
-  const size_t start[] = {indexFenoColumn, 0};
-  const size_t count[] = {1, n_wavel};
+  const size_t start[] = {(size_t)indexFenoColumn, 0};
+  const size_t count[] = {1, (size_t)n_wavel};
 
   try
    {
