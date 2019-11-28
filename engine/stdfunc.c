@@ -439,11 +439,11 @@ long STD_FileLength(FILE *fp)
   overflow vulnerabilities enough billions of years in the future or
   past, or if you poke stupidly huge values into the input struct tm
   members."*/
-time_t STD_timegm(register struct tm * t)
+time_t STD_timegm(struct tm * t)
 /* struct tm to seconds since Unix epoch */
 {
-    register long year;
-    register time_t result;
+    long year;
+    time_t result;
 #define MONTHSPERYEAR   12      /* months per calendar year */
     static const int cumdays[MONTHSPERYEAR] =
         { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };

@@ -22,7 +22,7 @@ char       *STD_StrRep(char *n,char oldchar,char newchar);
 
 int         STD_IsDir(char *filename);
 
-time_t STD_timegm(register struct tm * t);
+time_t STD_timegm(struct tm * t);
 
 #if defined(_cplusplus) || defined(__cplusplus)
 }
