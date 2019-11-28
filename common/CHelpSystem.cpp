@@ -17,8 +17,9 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <QFile>
+#include <QCoreApplication>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QMessageBox>
 #include <QUrl>
 #include <QDesktopServices>
@@ -39,7 +40,7 @@ QString CHelpSystem::changeDir(void)
 
   helpDir = QFileDialog::getExistingDirectory(NULL, "Qdoas Help directory", helpDir);
 
-  if (!helpDir.isEmpty() && QFile::exists(helpDir + "/index.html") ) {
+  if (!helpDir.isEmpty() && QFileInfo(helpDir + "/index.html").isFile()) {
     CPreferences::instance()->setDirectoryName("Help", helpDir);
   } else {
     QMessageBox::warning(NULL, "Help", "Could not find Help files.");
@@ -64,17 +65,22 @@ void CHelpSystem::showHelpTopic(const QString &chapter, const QString &key)
 
 #if defined(QDOAS_HELP_PATH)
   // If QDOAS_HELP_PATH was defined at compile time, try that:
-  if (!QFile::exists(helpFile)) {
-    helpFile = QString(QDOAS_HELP_PATH) + relPath;
+  if (!QFileInfo(helpFile).isFile()) {
+    if (QString(QDOAS_HELP_PATH).startsWith('.')) {
+      // prefix the application path when QDOAS_HELP_PATH is relative
+      helpFile = QCoreApplication::applicationDirPath() + "/" + QString(QDOAS_HELP_PATH) + relPath;
+    } else {
+      helpFile = QString(QDOAS_HELP_PATH) + relPath;
+    }
   }
 #endif
 
   // If nothing was found, ask the user to point to the Help directory
-  if (!QFile::exists(helpFile)) {
+  if (!QFileInfo(helpFile).isFile()) {
     helpFile = changeDir() + relPath;
   }
 
-  if (QFile::exists(helpFile)) {
+  if (QFileInfo(helpFile).isFile()) {
     QDesktopServices::openUrl(QUrl("file:///" + helpFile)); // file: URI with three slashes for windows!
   }
 }
