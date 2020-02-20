@@ -2233,7 +2233,7 @@ int mediateRequestNextMatchingSpectrum(ENGINE_CONTEXT *pEngineContext,void *resp
 
      }
 
-     if (outputFlag && (THRD_id!=THREAD_TYPE_EXPORT)) {   // analysis : bad record but save all spectra
+     if (outputFlag && (THRD_id!=THREAD_TYPE_EXPORT) && !pEngineContext->project.asciiResults.successFlag) {   // analysis : bad record but save all spectra
 
        int indexFenoColumn=(pEngineContext->recordNumber - 1) % ANALYSE_swathSize;
 
@@ -2259,7 +2259,7 @@ int mediateRequestNextMatchingSpectrum(ENGINE_CONTEXT *pEngineContext,void *resp
     if (orec != 0
         && (rc=EngineReadFile(pEngineContext,orec,0,0))!=ERROR_ID_NO) {
 
-      if (outputFlag && (THRD_id!=THREAD_TYPE_EXPORT)) {
+      if (outputFlag && (THRD_id!=THREAD_TYPE_EXPORT) && !pEngineContext->project.asciiResults.successFlag) {
         int indexFenoColumn=(pEngineContext->recordNumber - 1) % ANALYSE_swathSize;
 
         for (int indexFeno=0;indexFeno<NFeno;indexFeno++)
@@ -2406,6 +2406,7 @@ int mediateRequestNextMatchingAnalyseSpectrum(void *engineContext,
    if (rec > 0 && (pEngineContext->indexRecord<=pEngineContext->recordNumber))
     {
      mediateRequestPlotSpectra(pEngineContext,responseHandle);
+     ANALYSE_InitResults();
 
      if (!pEngineContext->analysisRef.refAuto || pEngineContext->satelliteFlag || ((pEngineContext->recordInfo.rc=EngineNewRef(pEngineContext,responseHandle))==ERROR_ID_NO))
       pEngineContext->recordInfo.rc=ANALYSE_Spectrum(pEngineContext,responseHandle);

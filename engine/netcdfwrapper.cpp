@@ -254,7 +254,7 @@ int NetCDFGroup::defVar(const string& name, const vector<string>& dimnames, nc_t
 void NetCDFGroup::defVarChunking(int varid, int storage, size_t *chunksizes) {
   int rc;
   if ((rc=nc_def_var_chunking(groupid, varid, storage, chunksizes)) != NC_NOERR) {
-    throw std::runtime_error("Error setting variable chunking for '" + varName(varid) + "' in group '" + name + "'");
+   throw std::runtime_error("Error setting variable chunking for '" + varName(varid) + "' in group '" + name + "'");
   }
 }
 

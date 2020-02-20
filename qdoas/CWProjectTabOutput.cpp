@@ -226,6 +226,22 @@ void CWProjectTabOutput::slotBrowsePath()
 
 void CWProjectTabOutput::slotInstrumentChanged(int instrument)
 {
+  bool analysisEnabled=(m_analysisCheck->checkState() == Qt::Checked);
+  bool calibrationEnabled=(m_calibrationCheck->checkState() == Qt::Checked);
+
+	 m_instrument=instrument;
+
+	 // Disable "successful record only" for 2D formats
+
+	 m_successCheckEnable=((instrument==PRJCT_INSTR_FORMAT_OMI) ||
+	                       (instrument==PRJCT_INSTR_FORMAT_TROPOMI) ||
+                        (instrument==PRJCT_INSTR_FORMAT_APEX)  ||
+                        (instrument==PRJCT_INSTR_FORMAT_OMPS) ||
+                        (instrument==PRJCT_INSTR_FORMAT_GOME1_NETCDF) ||
+                        (instrument==PRJCT_INSTR_FORMAT_GEMS))?false:true;
+
+  m_successCheck->setEnabled((analysisEnabled || calibrationEnabled) && m_successCheckEnable);
+
   m_selector->setInstrument(instrument,TAB_SELECTOR_OUTPUT);
 }
 
@@ -255,7 +271,8 @@ void CWProjectTabOutput::setComponentsEnabled(bool analysisEnabled, bool calibra
 
   m_directoryCheck->setEnabled(allEnabled);
   m_useFileName->setEnabled(allEnabled);
-  m_successCheck->setEnabled(allEnabled);
+
+  m_successCheck->setEnabled(allEnabled && m_successCheckEnable);
   //m_newcalibCheck->setEnabled(calibrationEnabled);
   m_referenceCheck->setEnabled(allEnabled);
   m_pathFrame->setEnabled(allEnabled);

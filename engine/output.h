@@ -7,6 +7,7 @@
 
 /*! \file output.h \brief Output module interface.*/
 
+void OUTPUT_InitResults(FENO *pTabFeno);
 void OUTPUT_ResetData(void);
 
 RC OUTPUT_CheckPath(ENGINE_CONTEXT *pEngineContext,char *path,int format);

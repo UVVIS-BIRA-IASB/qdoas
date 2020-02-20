@@ -333,6 +333,11 @@ RC EngineCopyContext(ENGINE_CONTEXT *pEngineContextTarget,ENGINE_CONTEXT *pEngin
      pEngineContextTarget->indexFile=pEngineContextSource->indexFile;
      pEngineContextTarget->lastRefRecord=pEngineContextSource->lastRefRecord;
      pEngineContextTarget->lastSavedRecord=pEngineContextSource->lastSavedRecord;
+     pEngineContextTarget->maxdoasFlag=pEngineContextSource->maxdoasFlag;
+     pEngineContextTarget->satelliteFlag=pEngineContextSource->satelliteFlag;
+     pEngineContextTarget->maxdoasScanIndexFlag=pEngineContextSource->maxdoasScanIndexFlag;
+     pEngineContextTarget->mfcDoasisFlag=pEngineContextSource->mfcDoasisFlag;
+     pEngineContextTarget->refFlag=pEngineContextSource->refFlag;
     }
 
    // Return
@@ -1260,6 +1265,8 @@ RC EngineEndCurrentSession(ENGINE_CONTEXT *pEngineContext)
      tropomi_cleanup();
      FRM4DOAS_Cleanup();
      GOME1NETCDF_Cleanup();
+     AIRBORNE_ReleaseBuffers();
+
      SCIA_ReleaseBuffers(pEngineContext->project.instrumental.readOutFormat);
      apex_clean();
 

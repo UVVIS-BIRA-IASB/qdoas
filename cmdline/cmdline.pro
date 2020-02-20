@@ -18,7 +18,7 @@ INCLUDEPATH  += ../mediator ../common ../qdoas ../convolution ../usamp ../engine
 #----------------------------------------------
 
 unix {
-  LIBS         += -lcoda -lhdfeos -lnetcdf -lmfhdf -ldf -lz -ljpeg -lhe5_hdfeos -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp
+  LIBS         += -L/bira-iasb/projects/DOAS/Programmes/QDOAS/lib_2019g/lib -lcoda -lhdfeos -lGctp -lnetcdf -lmfhdf -ldf -lz -ljpeg -lhe5_hdfeos -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp
 }
 
 hpc {
@@ -46,7 +46,7 @@ caro {
     DEFINES     += QWT_DLL
   }
 
-  LIBS         += -L$$GSL_LIB_PATH -lgsl -lgslcblas -L$$CODA_LIB_PATH -lcoda -L$$HDF_LIB_PATH -lhdf -L$$MFHDF_LIB_PATH -lmfhdf  -L$$HDFEOS_LIB_PATH -lhdfeos -L$$HDFEOS5_LIB_PATH -lhe5_hdfeos -L$$NETCDF_LIB_PATH -L$$HDF5_LIB_PATH -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp -lhdf5_tools -lnetcdf -lm
+  LIBS         += -llibgsl.dll -llibgslcblas.dll -lcoda -lhdf -lmfhdf -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp -lhdf5_tools -lhdfeos -lhe5_hdfeos -lnetcdf -lm
 
   CONFIG      += console
 }

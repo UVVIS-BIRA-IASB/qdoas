@@ -622,20 +622,36 @@ static inline void get_vrt_err(struct output_field *this_field, double *vrt_err,
     : QDOAS_FILL_DOUBLE;
 }
 
-static inline void get_refzm(struct output_field *this_field, float *refzm, const ENGINE_CONTEXT *pEngineContext __attribute__ ((unused)), int indexFenoColumn, int index_calib __attribute__ ((unused))) {
-  *refzm = (float) this_field->get_tabfeno(this_field, indexFenoColumn)->Zm;
+static inline void get_refzm(struct output_field *this_field, float *refzm, const ENGINE_CONTEXT *pEngineContext, int indexFenoColumn, int index_calib __attribute__ ((unused))) {
+	 FENO *pTabFeno=this_field->get_tabfeno(this_field, indexFenoColumn);
+  *refzm = (((pTabFeno->refMaxdoasSelectionMode==ANLYS_MAXDOAS_REF_SZA) ||
+            ((pTabFeno->refMaxdoasSelectionMode==ANLYS_MAXDOAS_REF_SCAN) &&
+            ((pTabFeno->refSpectrumSelectionScanMode==ANLYS_MAXDOAS_REF_SCAN_BEFORE) || (pTabFeno->refSpectrumSelectionScanMode==ANLYS_MAXDOAS_REF_SCAN_AFTER)) &&
+             (pEngineContext->recordInfo.maxdoas.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_ZENITH))) && (pEngineContext->indexRecord!=pTabFeno->indexRef))?(float) pTabFeno->Zm:QDOAS_FILL_FLOAT;
+
+             // scan interpolate and average : currently refzm=QDOAS_FILL_FLOAT
+             //                                could be determined by interpolating or averaging the measurement times of zenith before and after
+             //                                in this case, the geolocation should be provided
 }
 
-static inline void get_refnumber(struct output_field *this_field, int *refnumber, const ENGINE_CONTEXT *pEngineContext __attribute__ ((unused)), int indexFenoColumn, int index_calib __attribute__ ((unused))) {
-  *refnumber= (float) this_field->get_tabfeno(this_field, indexFenoColumn)->indexRef;
+static inline void get_refnumber(struct output_field *this_field, int *refnumber, const ENGINE_CONTEXT *pEngineContext, int indexFenoColumn, int index_calib __attribute__ ((unused))) {
+	 FENO *pTabFeno=this_field->get_tabfeno(this_field, indexFenoColumn);
+  *refnumber= (((pTabFeno->refMaxdoasSelectionMode==ANLYS_MAXDOAS_REF_SZA) ||
+               ((pTabFeno->refMaxdoasSelectionMode==ANLYS_MAXDOAS_REF_SCAN) &&
+               (pEngineContext->recordInfo.maxdoas.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_ZENITH))) && (pEngineContext->indexRecord!=pTabFeno->indexRef))?
+                pTabFeno->indexRef:((pEngineContext->project.asciiResults.file_format==ASCII)?-1:QDOAS_FILL_INT);
 }
 
 static inline void get_refnumber_before(struct output_field *this_field, int *refnumber, const ENGINE_CONTEXT *pEngineContext __attribute__ ((unused)), int indexFenoColumn, int index_calib __attribute__ ((unused))) {
   *refnumber= (float) this_field->get_tabfeno(this_field, indexFenoColumn)->indexRefScanBefore;
+  if ((*refnumber==ITEM_NONE) && (pEngineContext->project.asciiResults.file_format!=ASCII))
+   *refnumber=QDOAS_FILL_INT;
 }
 
 static inline void get_refnumber_after(struct output_field *this_field, int *refnumber, const ENGINE_CONTEXT *pEngineContext __attribute__ ((unused)), int indexFenoColumn, int index_calib __attribute__ ((unused))) {
   *refnumber= (float) this_field->get_tabfeno(this_field, indexFenoColumn)->indexRefScanAfter;
+  if ((*refnumber==ITEM_NONE) && (pEngineContext->project.asciiResults.file_format!=ASCII))
+   *refnumber=QDOAS_FILL_INT;
 }
 
 static inline void get_ref_shift(struct output_field *this_field, float *ref_shift, const ENGINE_CONTEXT *pEngineContext __attribute__ ((unused)), int indexFenoColumn, int index_calib __attribute__ ((unused))) {

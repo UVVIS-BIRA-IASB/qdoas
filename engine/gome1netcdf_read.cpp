@@ -91,7 +91,11 @@
 
 #include "gome1netcdf_read.h"
 #include "netcdfwrapper.h"
+#ifdef _WIN32
+#include "dirent.h"
+#endif
 #include "dir_iter.h"
+
 
 extern "C" {
 #include "winthrd.h"

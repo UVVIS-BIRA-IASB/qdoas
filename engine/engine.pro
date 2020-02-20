@@ -4,7 +4,7 @@ include( ../config.pri )
 
 CONFIG += $$CODE_GENERATION
 
-QMAKE_CXXFLAGS += -std=gnu++0x
+QMAKE_CXXFLAGS += -std=c++0x # for centos -std=gnu99 # for Sles -std=c++0x # -std=gnu11 # ++0x
 
 SOURCES += *.c *.cpp
 HEADERS += *.h
@@ -16,8 +16,8 @@ INCLUDEPATH += ../mediator ../common
 
 QMAKE_CXXFLAGS_RELEASE -= -O2
 QMAKE_CFLAGS_RELEASE -= -O2
-QMAKE_CXXFLAGS_RELEASE += -O3
-QMAKE_CFLAGS_RELEASE += -O3
+# QMAKE_CXXFLAGS_RELEASE += -O3
+# QMAKE_CFLAGS_RELEASE += -O3
 
 windows {
   TARGET   = ../engine
@@ -37,7 +37,7 @@ caro {
     DEFINES     += QWT_DLL
   }
 
-  LIBS         += -L$$GSL_LIB_PATH -lgsl -L$$GSL_LIB_PATH -lgslcblas -L$$CODA_LIB_PATH -lcoda -L$$HDF_LIB_PATH -lhdf -L$$MFHDF_LIB_PATH -lmfhdf -L$$HDF5_LIB_PATH -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp -lhdf5_tools -L$$HDFEOS_LIB_PATH -lhdfeos -L$$HDFEOS5_LIB_PATH -lhe5_hdfeos -L$$NETCDF_LIB_PATH -lnetcdf -lm
+  LIBS         += -lgsl -lgslcblas -lcoda -lhdf -lmfhdf -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp -lhdf5_tools -lhdfeos -lhe5_hdfeos -lnetcdf -lm
 
   CONFIG      += windows
 }

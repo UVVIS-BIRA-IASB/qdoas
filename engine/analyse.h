@@ -163,13 +163,16 @@ struct _crossResults {
 };
 
 /*! \brief Configuration data related to an analysis window. */
+
+// for new fields, check if entries should be added in ANALYSE_ResetData
+
 struct _feno {
                                                                                 // copy of data from analysis window panel
 
   char          windowName[MAX_ITEM_NAME_LEN+1];                                // name of analysis window
-  char          refFile[MAX_ITEM_TEXT_LEN],                                   // reference file in reference file selection mode
-                  ref1[MAX_ITEM_TEXT_LEN],                                    // first reference spectrum (in order to replace the SrefEtalon in the old ANALYSIS_WINDOWS structure)
-                  ref2[MAX_ITEM_TEXT_LEN],                                    // second reference spectrum (in order to replace the SrefEtalon in the old ANALYSIS_WINDOWS structure)
+  char          refFile[MAX_ITEM_TEXT_LEN],                                     // reference file in reference file selection mode
+                  ref1[MAX_ITEM_TEXT_LEN],                                      // first reference spectrum (in order to replace the SrefEtalon in the old ANALYSIS_WINDOWS structure)
+                  ref2[MAX_ITEM_TEXT_LEN],                                      // second reference spectrum (in order to replace the SrefEtalon in the old ANALYSIS_WINDOWS structure)
                   residualsFile[MAX_ITEM_TEXT_LEN];
   double          refSZA,refSZADelta,refMaxdoasSZA,refMaxdoasSZADelta;          // in automatic reference selection mode, SZA constraints
   int             refSpectrumSelectionMode;                                     // reference spectrum selection mode
@@ -311,6 +314,8 @@ extern double *x,*Lambda,*LambdaSpec,
 // ----------
 // PROTOTYPES
 // ----------
+
+void ANALYSE_InitResults(void);
 
 RC ANALYSE_Function (double *X, double *Y, const double *SigmaY, double *Yfit, int Npts,
                       double *fitParamsC, double *fitParamsF,INDEX indexFenoColumn, struct fit_properties *fitprops);

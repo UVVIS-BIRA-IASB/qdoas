@@ -24,6 +24,7 @@ static NetCDFFile output_file,output_file_calib;
 static NetCDFGroup output_group;
 
 static size_t n_alongtrack, n_crosstrack, n_calib;
+static int successFlag;
 
 const static string calib_subgroup_name = "Calib";
 
@@ -137,20 +138,21 @@ static void define_variable(NetCDFGroup &group, const struct output_field& thefi
   if (vtype == Calibration) {
     if (n_crosstrack > 1) {
       dimids.push_back(get_dimid("n_crosstrack"));
-      chunksizes.push_back(std::max<size_t>(100, n_crosstrack));
+      chunksizes.push_back((size_t)n_crosstrack);
     }
 
     dimids.push_back(get_dimid("n_calib"));
-    chunksizes.push_back(std::max<size_t>(100, n_calib));
+    chunksizes.push_back((size_t)n_calib);
   } else {
     dimids.push_back(get_dimid("n_alongtrack"));
-    chunksizes.push_back(std::max<size_t>(100, n_alongtrack));
+    chunksizes.push_back(std::min<size_t>(1000, n_alongtrack));
 
     if (n_crosstrack > 1) {
       dimids.push_back(get_dimid("n_crosstrack"));
-      chunksizes.push_back(std::max<size_t>(100, n_crosstrack));
+      chunksizes.push_back((size_t)n_crosstrack);
     }
   }
+
   getDims(thefield, dimids, chunksizes);
 
   const int varid = group.defVar(varname, dimids, getNCType(thefield.memory_type));
@@ -210,6 +212,7 @@ static void write_global_attrs(const ENGINE_CONTEXT*pEngineContext, NetCDFGroup 
 
 static void write_calibration_field(const struct output_field& calibfield, NetCDFGroup &group, const string& varname,
                                     const vector<size_t> start, const vector<size_t> count) {
+
   switch (calibfield.memory_type) {
   case OUTPUT_INT:
     group.putVar(varname, start.data(), count.data(), static_cast<const int *>(calibfield.data));
@@ -384,13 +387,15 @@ void create_subgroups(const ENGINE_CONTEXT *pEngineContext,NetCDFGroup &group) {
   }
 }
 
-RC netcdf_open(const ENGINE_CONTEXT *pEngineContext, const char *filename) {
+RC netcdf_open(const ENGINE_CONTEXT *pEngineContext, const char *filename,int num_records) {
   try {
     output_file = NetCDFFile(filename + string(output_file_extensions[NETCDF]), NC_WRITE );
     output_group = output_file.defGroup(pEngineContext->project.asciiResults.swath_name);
 
+    successFlag = (pEngineContext->maxdoasFlag && (pEngineContext->n_crosstrack==1)) ? pEngineContext->project.asciiResults.successFlag:0;
+
     n_crosstrack = pEngineContext->n_crosstrack; // ANALYSE_swathSize;
-    n_alongtrack = pEngineContext->n_alongtrack;
+    n_alongtrack = (successFlag)?num_records:pEngineContext->n_alongtrack;
 
     n_calib = 0;
     if ((pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_OMI) &&
@@ -523,6 +528,7 @@ static void write_buffer(const struct output_field *thefield, const bool selecte
 
   size_t ncols = thefield->data_cols;
   size_t dimension = vardimension<U>();
+  size_t nrecs = (n_crosstrack>1)?n_alongtrack:num_records;
 
   // variables that depend on the analysis window go the the
   // appropriate subgroup for their analysis window:
@@ -539,17 +545,17 @@ static void write_buffer(const struct output_field *thefield, const bool selecte
     if (selected[record] && (recordinfo[record].i_crosstrack!=ITEM_NONE) && (recordinfo[record].i_alongtrack!=ITEM_NONE)) {
 
       int i_crosstrack = recordinfo[record].i_crosstrack; // (recordinfo[record].specno-1) % n_crosstrack; //specno is 1-based
-      int i_alongtrack = recordinfo[record].i_alongtrack; // (recordinfo[record].specno-1) / n_crosstrack;
+      int i_alongtrack = (successFlag)?record:recordinfo[record].i_alongtrack;  // (recordinfo[record].specno-1) / n_crosstrack;
 
       for (size_t i=0; i< ncols; ++i) {
-        // write into the buffer at the correct index position, using
+
+      	 // write into the buffer at the correct index position, using
         // the correct layout for the type of data stored:
-        int index = i_alongtrack*n_crosstrack*ncols + i_crosstrack*ncols + i;
+        int index =  i_alongtrack*n_crosstrack*ncols + i_crosstrack*ncols + i;
         assign_buffer(&buffer[dimension*index], static_cast<U*>(thefield->data)[record*ncols+i]);
       }
     }
   }
-
 
   //  vector<int> dimids(output_group.dimIDs(varname));
   //  vector<size_t> start(dimids.size());
@@ -565,6 +571,7 @@ static void write_buffer(const struct output_field *thefield, const bool selecte
   //
   // write_data_field(*thefield, output_group, varname, start, count);
   group.putVar(varname, buffer.data() );   // This causes erros under Windows
+
 }
 
 // specialization to deal with string variable types...
@@ -586,7 +593,7 @@ void write_buffer<const char*>(const struct output_field *thefield, const bool s
     if (selected[record] && (recordinfo[record].i_crosstrack!=ITEM_NONE) && (recordinfo[record].i_alongtrack!=ITEM_NONE)) {
 
       int i_crosstrack = recordinfo[record].i_crosstrack; // (recordinfo[record].specno-1) % n_crosstrack; //specno is 1-based
-      int i_alongtrack = recordinfo[record].i_alongtrack; // (recordinfo[record].specno-1) / n_crosstrack;
+      int i_alongtrack = (successFlag)?record:recordinfo[record].i_alongtrack; // (recordinfo[record].specno-1) / n_crosstrack;
 
       for (size_t i=0; i< ncols; ++i) {
         // write into the buffer at the correct index position, using
@@ -672,7 +679,6 @@ RC netcdf_create_calib_var(const char *varname,vector<int>& dimids,vector<size_t
    }
   catch (std::runtime_error& e)
    {
-    printf("Impossible to create variable %s\n",varname);
     return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, e.what() );
    }
 

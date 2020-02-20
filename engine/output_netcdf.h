@@ -10,7 +10,7 @@
 extern "C" {
 #endif
 
-  RC netcdf_open(const ENGINE_CONTEXT *pEngineContext, const char *filename);
+  RC netcdf_open(const ENGINE_CONTEXT *pEngineContext, const char *filename,int num_records);
 
   void netcdf_close_file(void);
 

@@ -130,7 +130,11 @@ static void print_output_field(FILE *fp, const struct output_field *thefield, in
     for(size_t i=0; i<ncols; i++,fprintf(fp,"\t")) fprintf(fp,thefield->format, ((char* (*)[ncols])thefield->data)[recordno][i]);
     break;
   case OUTPUT_FLOAT:
-    for(size_t i=0; i<ncols; i++,fprintf(fp,"\t")) fprintf(fp,thefield->format, ((float (*)[ncols])thefield->data)[recordno][i]);
+    for(size_t i=0; i<ncols; i++,fprintf(fp,"\t"))
+     if (((float (*)[ncols])thefield->data)[recordno][i]<9.969e36)
+      fprintf(fp,thefield->format, ((float (*)[ncols])thefield->data)[recordno][i]);
+     else
+      fprintf(fp,thefield->format,(float)999.999);
     break;
   case OUTPUT_DOUBLE:
     for(size_t i=0; i<ncols; i++,fprintf(fp,"\t")) fprintf(fp,thefield->format, ((double (*)[ncols])thefield->data)[recordno][i]);

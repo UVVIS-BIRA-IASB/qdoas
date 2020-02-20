@@ -66,6 +66,8 @@ Q_OBJECT
   QComboBox *m_selectFileFormat;
   QLineEdit *m_groupNameEdit;
   CWOutputSelector *m_selector;
+  int  m_instrument;
+  bool m_successCheckEnable;
 };
 
 #endif

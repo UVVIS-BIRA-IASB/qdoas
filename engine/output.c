@@ -554,6 +554,26 @@ RC OUTPUT_ReadAmf(const char *symbolName,const char *amfFileName,char amfType,IN
   return rc;
 }
 
+void OUTPUT_InitResults(FENO *pTabFeno)
+ {
+  // Browse symbols
+
+  for (int indexTabCross=0;indexTabCross<MAX_FIT;indexTabCross++)
+   {
+    CROSS_RESULTS *pResults=&pTabFeno->TabCrossResults[indexTabCross];
+
+    pResults->Shift=pResults->Stretch=pResults->Stretch2=
+    pResults->SigmaShift=pResults->SigmaStretch=pResults->SigmaStretch2=
+    pResults->Amf=
+    pResults->SlntCol=
+    pResults->SlntErr=
+    pResults->VrtCol=
+    pResults->VrtErr=
+    pResults->Param=
+    pResults->SigmaParam=(double)QDOAS_FILL_DOUBLE;
+   }
+ }
+
 /*! \brief release and reset all data used for output */
 void OUTPUT_ResetData(void)
  {
@@ -563,13 +583,11 @@ void OUTPUT_ResetData(void)
    {
     for (int indexFeno=0;indexFeno<MAX_FENO;indexFeno++)
      {
-       FENO *pTabFeno=&TabFeno[indexFenoColumn][indexFeno];
-
-      // Browse symbols
+     	FENO *pTabFeno=&TabFeno[indexFenoColumn][indexFeno];
 
       for (int indexTabCross=0;indexTabCross<MAX_FIT;indexTabCross++)
        {
-         CROSS_RESULTS *pResults=&pTabFeno->TabCrossResults[indexTabCross];
+        CROSS_RESULTS *pResults=&pTabFeno->TabCrossResults[indexTabCross];
 
         pResults->indexAmf=ITEM_NONE;
      // -------------------------------------------
@@ -585,15 +603,10 @@ void OUTPUT_ResetData(void)
      // -------------------------------------------
         pResults->ResCol=(double)0.;
      // -------------------------------------------
-        pResults->Amf=
-        pResults->SlntCol=
-        pResults->SlntErr=
-        pResults->VrtCol=
-        pResults->VrtErr=(double)9999.;
-     // -------------------------------------------
         pResults->SlntFact=
         pResults->VrtFact=(double)1.;
        }
+      OUTPUT_InitResults(&TabFeno[indexFenoColumn][indexFeno]);
      }
    }
 
@@ -1945,7 +1958,7 @@ static void OutputSaveRecord(const ENGINE_CONTEXT *pEngineContext,INDEX indexFen
         for(unsigned int i=0; i<output_num_fields; i++) {
           save_analysis_data(&output_data_analysis[i], index_record, pEngineContext, indexFenoColumn);
         }
-         
+
         outputRecords[index_record].i_crosstrack = pRecordInfo->i_crosstrack; // (outputRecords[index_record].specno-1) % n_crosstrack; //specno is 1-based
         outputRecords[index_record].i_alongtrack = pRecordInfo->i_alongtrack; // (outputRecords[index_record].specno-1) / n_crosstrack;
        }
@@ -2090,6 +2103,9 @@ RC OutputBuildFileName(const ENGINE_CONTEXT *pEngineContext,char *outputPath)
       inputFileName++;
     }
 
+    if (strlen(inputFileName)==0)
+     return rc;
+
     if (satelliteFlag && dirFlag) {
       // get date for the current orbit file
       int orbit_year, orbit_month, orbit_day;
@@ -2160,7 +2176,7 @@ RC open_output_file(const ENGINE_CONTEXT *pEngineContext, const char *outputFile
     return hdfeos5_open(pEngineContext, outputFileName);
     break;
   case NETCDF:
-    return netcdf_open(pEngineContext, outputFileName);
+    return netcdf_open(pEngineContext, outputFileName,outputNbRecords);
     break;
   default:
     return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_FILE_BAD_FORMAT);

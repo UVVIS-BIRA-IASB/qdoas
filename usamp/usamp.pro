@@ -51,7 +51,7 @@ caro {
   }
 
   CONFIG      += windows
-  LIBS         += -L$$GSL_LIB_PATH -lgsl -lgslcblas
+  LIBS         += -Lc:/My_Applications/QDOAS/winlibs/lib -llibgsl.dll -llibgslcblas.dll
   QT += svg
 }
 

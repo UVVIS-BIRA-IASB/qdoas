@@ -402,6 +402,28 @@ void AnalyseGetFenoLim(FENO *pFeno,INDEX *pLimMin,INDEX *pLimMax, const int n_wa
 #endif
 }
 
+void ANALYSE_InitResults(void)
+ {
+ 	// Declarations
+
+ 	INDEX indexFenoColumn,indexFeno;
+ 	FENO *pTabFeno;
+
+  for (indexFenoColumn=0;(indexFenoColumn<ANALYSE_swathSize);indexFenoColumn++)
+   {
+    for (indexFeno=0;(indexFeno<NFeno);indexFeno++)
+     {
+      // Pointers initialization
+
+      pTabFeno=&TabFeno[indexFenoColumn][indexFeno];
+      pTabFeno->RMS=QDOAS_FILL_DOUBLE;
+
+      if (!pTabFeno->hidden)
+       OUTPUT_InitResults(pTabFeno);
+     }
+   }
+ }
+
 // ---------------------------------------
 // FNPixel : Get a pixel from a wavelength
 // ---------------------------------------
@@ -4464,11 +4486,17 @@ void ANALYSE_ResetData(void)
 
       pTabFeno->indexRefMorning=
         pTabFeno->indexRefAfternoon=
-        pTabFeno->indexRef=ITEM_NONE;
+        pTabFeno->indexRef=
+        pTabFeno->indexRefScanBefore=
+        pTabFeno->indexRefScanAfter=ITEM_NONE;
 
       pTabFeno->ZmRefMorning=
         pTabFeno->ZmRefAfternoon=
         pTabFeno->Zm=
+        pTabFeno->refSZA=
+        pTabFeno->refSZADelta=
+        pTabFeno->refMaxdoasSZA=
+        pTabFeno->refMaxdoasSZADelta=
         pTabFeno->TDet=
         pTabFeno->Tm=
         pTabFeno->TimeDec=(double)9999.;
