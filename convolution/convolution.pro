@@ -5,7 +5,7 @@
 TEMPLATE = app
 TARGET   = ../../qdoas/release/convolution
 
-include( ../config.pri )
+include( ../../config.pri )
 PRE_TARGETDEPS += ../common/libcommon.a ../engine/libengine.a ../mediator/libmediator.a
 
 INCLUDEPATH  += ../mediator ../common ../engine

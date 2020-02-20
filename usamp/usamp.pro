@@ -7,7 +7,7 @@ TARGET   = ../../qdoas/release/usamp
 
 INCLUDEPATH  += ../mediator ../common ../engine
 
-include( ../config.pri )
+include( ../../config.pri )
 
 CONFIG += qt thread $$CODE_GENERATION
 QT = core gui svg xml widgets printsupport

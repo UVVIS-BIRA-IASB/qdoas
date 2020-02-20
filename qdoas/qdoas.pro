@@ -5,7 +5,7 @@
 TEMPLATE = app
 TARGET   = ../../qdoas/release/qdoas
 
-include( ../config.pri )
+include( ../../config.pri )
 PRE_TARGETDEPS += ../common/libcommon.a ../engine/libengine.a ../mediator/libmediator.a
 
 CONFIG += qt thread $$CODE_GENERATION
@@ -16,7 +16,7 @@ INCLUDEPATH  += ../mediator ../common ../engine
 DEFINES += APP_QDOAS
 
 #----------------------------------------------
-# Platform dependency ... based on ../config.pri
+# Platform dependency ... based on ../../config.pri
 #----------------------------------------------
 
 unix {

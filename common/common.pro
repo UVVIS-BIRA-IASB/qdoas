@@ -1,6 +1,6 @@
 TEMPLATE = lib
 
-include( ../config.pri )
+include( ../../config.pri )
 
 CONFIG += qt thread $$CODE_GENERATION
 QT += core gui xml widgets printsupport

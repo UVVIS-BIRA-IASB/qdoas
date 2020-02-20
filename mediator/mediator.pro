@@ -1,6 +1,6 @@
 TEMPLATE = lib
 
-include( ../config.pri )
+include( ../../config.pri )
 
 CONFIG += $$CODE_GENERATION
 
