@@ -1,7 +1,7 @@
 include_directories(../common ../mediator ${netCDF_INCLUDE_DIR})
 
 if(MSVC)
-  set(MSVC_SOURCES dirent.h)
+  include_directories(windows)
 endif()
 
 add_library(engine STATIC
@@ -121,7 +121,6 @@ add_library(engine STATIC
   xsconv.h
   zenithal.c
   zenithal.h
-  ${MSVC_SOURCES}
 )
 
 target_compile_features(engine PUBLIC cxx_std_11)
