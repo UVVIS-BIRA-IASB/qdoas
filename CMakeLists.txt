@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 3.8.0)
 
 project(qdoas)
 
-set(VERSION 3.2)
-set(QDOAS_VERSION "FRM4DOAS")
-set(QDOAS_DATE "14 June 2018")
+set(VERSION 3.4)
+set(QDOAS_VERSION "3.4")
+set(QDOAS_DATE "21 February 2020")
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
