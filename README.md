@@ -125,3 +125,6 @@ The following people contributed to the S/W :
 QDOAS is free, open source and distributed under the GNU GPL version 2.0 (see http://www.gnu.org/licenses/gpl-2.0.html for further details).
 In case of publication of results obtained using QDOAS, please mention the QDOAS S/W user manual in the reference and the authors in the acknowledgements (see above).
 
+## Acknowledgements
+
+The authors would also like to acknowledge all people who have contributed directly or indirectly to the S/W user manual and/or to the improvement of the code. 

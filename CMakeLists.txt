@@ -4,7 +4,7 @@ project(qdoas)
 
 set(VERSION 3.4)
 set(QDOAS_VERSION "3.4")
-set(QDOAS_DATE "21 February 2020")
+set(QDOAS_DATE "28 February 2020")
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
