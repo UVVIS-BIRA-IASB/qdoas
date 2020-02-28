@@ -2,13 +2,13 @@
 
 QDOAS is a cross-platform application based on the long experience of BIRA-IASB (Royal Belgian Institute for Space Aeronomy) in the development and improvement of algorithms for the retrieval of trace gases from UV-Visible spectral measurements (satellite, ground-based, mobile or aircraft-based instruments) using the DOAS (Differential Optical Absorption Spectroscopy).  This software evolves along with the measurement techniques in DOAS. It has been extensively validated in different intercomparison campaigns. The friendly user interface, flexibility and the robustness of the algorithms largely contribute to QDOAS success in the world.
 
-QDOAS is now part of the Atmospheric Toolbox (https://atmospherictoolbox.org/).
-Current version is 3.4
+QDOAS is now part of the [Atmospheric Toolbox](https://atmospherictoolbox.org/).
+The current version is 3.4.
 
-Ready-for-use packages for windows, linux and MAC systems are available.  To get the S/W, please, goto the following page and register to get the instructions how to install executables :
+Ready-for-use packages for windows, linux and MAC systems are available. To get the S/W, please, go to the following page and register to get the instructions how to install executables :
 http://uv-vis.aeronomie.be/software/QDOAS/QDOAS_Register.php
 
-This readme.md file summarizes the main features and provides prerequisites and instructions to compile QDOAS
+This readme.md file summarizes the main features and provides prerequisites and instructions to compile QDOAS.
 
 ## Main Features
 
@@ -17,21 +17,21 @@ This readme.md file summarizes the main features and provides prerequisites and 
 * The main components of the graphical user interface (GUI) are organized in multi-page panels with a fixed arrangement and tab-switched access to the different pages;
 * The application is based on a tree structure;
 * Large amount of files can be processed in one shot;
-* Support a large number of spectra file formats (for ground-based and satellites applications)
+* Support a large number of spectra file formats (for ground-based and satellites applications);
 * On line help in HTML format
 
 ### Plot
 
 * Visualization of spectra and the results in different tab pages;
 * Possibility to set plot colour and style;
-* Interactive plot mode (zooming, overlay of an existing ASCII file, possibility to fix the scaling of the plot…) : activated by right clicking the title of the plot ;
+* Interactive plot mode (zooming, overlay of an existing ASCII file, possibility to fix the scaling of the plot, ...), activated by right clicking the title of the plot;
 * Export of plot in different portable image formats (png, jpg)
 
 ### Analysis
 
 * DOAS/intensity fitting modes;
 * shift/stretch fully configurable for any spectral item (cross-section or spectrum);
-* different filters available to apply on spectra and cross section (for example : Kaiser, gaussian, boxcar, Savitsky Golay…) ;
+* different filters available to apply on spectra and cross section (for example : Kaiser, gaussian, boxcar, Savitsky Golay, ...);
 * possibility to define gaps within fitting intervals (e.g. to eliminate bad pixels);
 * possibility to fit an instrumental offset;
 * possibility to define several configurations of spectral windows under a project;
@@ -44,20 +44,20 @@ This readme.md file summarizes the main features and provides prerequisites and 
 * possibility to fix the column density of any selected species;
 * possibility to convolve cross-sections in real time using a user defined slit function or the information on calibration and slit function provided by the wavelength calibration procedure;
 * possibility to handle differences in resolutions between measured and control spectra;
-* use of Pukite cross sections (preconvolved or calculated by the S/W)
+* use of Pukite cross sections (preconvolved or calculated by the S/W);
 * molecular ring correction to account for non linear effects in the spectral analysis windows
 
 ### Calibration And Slit Function Characterization
 
 * wavelength calibration and instrumental slit function characterization using a non-linear least-squares (NLLS) fitting approach where measured intensities are fitted to a high resolution solar spectrum degraded to the resolution of the instrument. The fitting method (DOAS or intensity fitting) can be different from the method used in the analysis;
 * possibility to correct for atmospheric absorption and Ring effect;
-* supports different analytical line shapes
-* possibility to customize the calibration sub-windows
+* supports different analytical line shapes;
+* possibility to customize the calibration sub-windows;
 * for satellites, use of a predefined radiance as reference
 
 ### Output
 
-* The output is fully configurable by selecting individual items at the level of the project or at the level of analysis windows.
+* The output is fully configurable by selecting individual items at the level of the project or at the level of analysis windows;
 * ASCII and netCDF formats supported
 
 ### Tools
@@ -79,18 +79,16 @@ The GUI is built on the Open-Source version of the Qt-5 toolkit. As a result, QD
 
 Building QDOAS from sources requires :
 
-cmake_minimum_required(VERSION 3.8.0)
-
-* C++ compiler (g++ version 4 or higher is recommended, though any compiler that successfully builds QT is sufficient. See the compiler notes on the Qt website for further details).
-* Qt5  (http://www.trolltech.com)
-* QWT (http://sourceforge.net/projects/qwt)
-* CODA (https://atmospherictoolbox.org/coda/)
-* HDF4/MFHDF (https://support.hdfgroup.org/products/hdf4/)
-* HDF5/HDF5_CPP/HDF5_HL/HDF5_HL_CPP (https://www.hdfgroup.org/downloads/hdf5/)
-* HDF-EOS (https://www.hdfeos.org/)
-* H5-EOS (https://www.hdfeos.org/)
-* NETCDF (https://www.unidata.ucar.edu/software/netcdf/)
-* GSL (https://www.gnu.org/software/gsl/)
+* C++ compiler (g++ version 4 or higher is recommended, though any compiler that successfully builds QT is sufficient. See the compiler notes on the Qt website for further details)
+* [Qt5](http://www.trolltech.com)
+* [QWT](http://sourceforge.net/projects/qwt)
+* [CODA](https://atmospherictoolbox.org/coda/)
+* [HDF4/MFHDF](https://support.hdfgroup.org/products/hdf4/)
+* [HDF5/HDF5\_CPP/HDF5\_HL/HDF5\_HL\_CPP](https://www.hdfgroup.org/downloads/hdf5/)
+* [HDF-EOS](https://www.hdfeos.org/)
+* [H5-EOS](https://www.hdfeos.org/)
+* [NETCDF](https://www.unidata.ucar.edu/software/netcdf/)
+* [GSL](https://www.gnu.org/software/gsl/)
 
 ### Compilation and installation
 
@@ -109,9 +107,9 @@ Convolution, Ring and usamp tools manage their own configuration files and can b
 
 ### Starting with QDOAS
 
-If you are not familiar with QDOAS, just call qdoas to open the graphics user environment and follow the instructions in the "Quickstart" chapter of the S/W User Manual.
+If you are not familiar with QDOAS, just call qdoas to open the graphics user environment and follow the instructions in the "Quickstart" chapter of the [S/W User Manual](http://uv-vis.aeronomie.be/software/QDOAS/QDOAS_manual.pdf).
 
-GOME2 applications requires that the CODA library is previously installed (the package can be downloaded from the https://github.com/stcorp/coda/releases/tag/2.21 web site) and the CODA_DEFINITION environment variable is defined, pointing the location where to find the definitions of the supported data products.
+GOME2 applications requires that the CODA library is previously installed (the package can be downloaded from the [CODA GithHub](https://github.com/stcorp/coda/releases/latest) web site) and the `CODA_DEFINITION` environment variable is defined, pointing to the location where to find the codadef definitions of the supported data products.
 
 ## Authors
 
@@ -122,9 +120,9 @@ The following people contributed to the S/W :
 
 ## License
 
-QDOAS is free, open source and distributed under the GNU GPL version 2.0 (see http://www.gnu.org/licenses/gpl-2.0.html for further details).
-In case of publication of results obtained using QDOAS, please mention the QDOAS S/W user manual in the reference and the authors in the acknowledgements (see above).
+QDOAS is free, open source and distributed under the [GNU GPL version 2.0](http://www.gnu.org/licenses/gpl-2.0.html).
+In case of publication of results obtained using QDOAS, please mention the [QDOAS S/W user manual]((http://uv-vis.aeronomie.be/software/QDOAS/QDOAS_manual.pdf)) in the reference and the authors in the acknowledgements (see above).
 
 ## Acknowledgements
 
-The authors would also like to acknowledge all people who have contributed directly or indirectly to the S/W user manual and/or to the improvement of the code. 
+The authors would also like to acknowledge all people who have contributed directly or indirectly to the S/W user manual and/or to the improvement of the code.
