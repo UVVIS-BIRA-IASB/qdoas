@@ -1944,6 +1944,7 @@ RC AnalyseLoadVector(const char *function, const char *fileName, double *lambda,
 
   // Initializations
 
+  memset(&fileMatrix,0,sizeof(MATRIX_OBJECT));
   memset(string,0,MAX_ITEM_TEXT_LEN);
   rc=ERROR_ID_NO;
 
@@ -2003,6 +2004,8 @@ RC AnalyseLoadVector(const char *function, const char *fileName, double *lambda,
 #if defined(__DEBUG_) && __DEBUG_
     DEBUG_FunctionStop((char *)__func__,rc);
 #endif
+
+   MATRIX_Free(&fileMatrix,__func__);
 
     // Return
 
