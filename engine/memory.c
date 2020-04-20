@@ -237,8 +237,6 @@ void MEMORY_ReleaseBuffer(const char *callingFunctionName, const char *bufferNam
 
   if (memoryStack!=NULL)
    {
-    // Initializations
-
     // browse objects in the stack
 
     for (indexObjects=memoryStackObjectsNumber-1;indexObjects>=0;indexObjects--)
@@ -257,9 +255,11 @@ void MEMORY_ReleaseBuffer(const char *callingFunctionName, const char *bufferNam
 
       memoryStackBytesNumber-=totalSize;
       memoryStackObjectsNumber--;
-
+      
       if (indexObjects<memoryStackObjectsNumber)
-       memcpy(pMemory,&memoryStack[indexObjects+1],sizeof(MEMORY)*(memoryStackObjectsNumber-indexObjects));
+       for (int i=indexObjects;i<memoryStackObjectsNumber;i++)
+         memcpy(&memoryStack[i],&memoryStack[i+1],sizeof(MEMORY));
+       // memcpy(pMemory,&memoryStack[indexObjects+1],sizeof(MEMORY)*(memoryStackObjectsNumber-indexObjects));
      }
    }
 

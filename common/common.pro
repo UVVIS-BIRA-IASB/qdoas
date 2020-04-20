@@ -4,6 +4,8 @@ include( ../../config.pri )
 
 CONFIG += qt thread $$CODE_GENERATION
 QT += core gui xml widgets printsupport
+OBJECTS_DIR = ../../Obj/$$SYSTEM/common
+TARGET = $$OBJECTS_DIR/common
 
 SOURCES       = CConfigHandler.cpp \
 		CConfigSubHandlerUtils.cpp \

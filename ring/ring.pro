@@ -2,13 +2,15 @@
 # Ring Tool General Configuration
 #----------------------------------------------
 
+include( ../../config.pri )
+
 TEMPLATE = app
-TARGET   = ../../qdoas/release/ring
+PRE_TARGETDEPS += ../../Obj/$$SYSTEM/common/libcommon.a ../../Obj/$$SYSTEM/engine/libengine.a ../../Obj/$$SYSTEM/mediator/libmediator.a
+LIBS += -L../../Obj/$$SYSTEM/mediator -lmediator -L../../Obj/$$SYSTEM/engine -lengine -L../../Obj/$$SYSTEM/common -lcommon
 
 INCLUDEPATH  += ../mediator ../common ../engine
-
-include( ../../config.pri )
-PRE_TARGETDEPS += ../common/libcommon.a ../engine/libengine.a ../mediator/libmediator.a
+OBJECTS_DIR = ../../Obj/$$SYSTEM/ring
+TARGET   = ../../Bin/$$SYSTEM/ring
 
 CONFIG += qt thread $$CODE_GENERATION
 QT = core gui svg xml widgets printsupport
@@ -28,7 +30,7 @@ contains ( HELP_SYSTEM, assistant ) {
 INCLUDEPATH  += $$QWT_INC_PATH
 
 unix {
-  LIBS += -lqwt
+  LIBS += -L/bira-iasb/projects/DOAS/Programmes/QDOAS/lib_2019g/lib -lqwt-qt5
 }
 
 linux_package {

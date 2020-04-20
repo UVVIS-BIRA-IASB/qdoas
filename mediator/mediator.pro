@@ -8,6 +8,8 @@ SOURCES += *.c *.cpp
 HEADERS += *.h
 
 INCLUDEPATH  += ../engine ../common
+OBJECTS_DIR = ../../Obj/$$SYSTEM/mediator
+TARGET = $$OBJECTS_DIR/mediator
 
 windows {
   TARGET   = ../mediator

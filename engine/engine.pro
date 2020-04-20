@@ -2,6 +2,9 @@ TEMPLATE = lib
 
 include( ../../config.pri )
 
+OBJECTS_DIR = ../../Obj/$$SYSTEM/engine
+TARGET = $$OBJECTS_DIR/engine
+
 CONFIG += $$CODE_GENERATION
 
 QMAKE_CXXFLAGS += -std=c++0x # for centos -std=gnu99 # for Sles -std=c++0x # -std=gnu11 # ++0x

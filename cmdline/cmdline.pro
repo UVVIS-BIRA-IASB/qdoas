@@ -2,16 +2,18 @@
 # CmdLine General Configuration
 #----------------------------------------------
 
-TEMPLATE = app
-TARGET   = ../../qdoas/release/doas_cl
-
 include( ../../config.pri )
-PRE_TARGETDEPS += ../common/libcommon.a ../engine/libengine.a ../mediator/libmediator.a
+
+TEMPLATE = app
+PRE_TARGETDEPS += ../../Obj/$$SYSTEM/common/libcommon.a ../../Obj/$$SYSTEM/engine/libengine.a ../../Obj/$$SYSTEM/mediator/libmediator.a
+LIBS += -L../../Obj/$$SYSTEM/mediator -lmediator -L../../Obj/$$SYSTEM/engine -lengine -L../../Obj/$$SYSTEM/common -lcommon
+
+INCLUDEPATH  += ../mediator ../common ../qdoas ../convolution ../usamp ../engine ../ring
+OBJECTS_DIR = ../../Obj/$$SYSTEM/cmdline
+TARGET   = ../../Bin/$$SYSTEM/doas_cl
 
 CONFIG += qt thread $$CODE_GENERATION
 QT = core xml
-
-INCLUDEPATH  += ../mediator ../common ../qdoas ../convolution ../usamp ../engine ../ring
 
 #----------------------------------------------
 # Platform dependency ... based on ../../config.pri

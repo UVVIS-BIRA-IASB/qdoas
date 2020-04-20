@@ -2,13 +2,15 @@
 # Convolution Tool General Configuration
 #----------------------------------------------
 
-TEMPLATE = app
-TARGET   = ../../qdoas/release/convolution
-
 include( ../../config.pri )
-PRE_TARGETDEPS += ../common/libcommon.a ../engine/libengine.a ../mediator/libmediator.a
+
+TEMPLATE = app
+PRE_TARGETDEPS += ../../Obj/$$SYSTEM/common/libcommon.a ../../Obj/$$SYSTEM/engine/libengine.a ../../Obj/$$SYSTEM/mediator/libmediator.a
+LIBS += -L../../Obj/$$SYSTEM/mediator -lmediator -L../../Obj/$$SYSTEM/engine -lengine -L../../Obj/$$SYSTEM/common -lcommon
 
 INCLUDEPATH  += ../mediator ../common ../engine
+OBJECTS_DIR = ../../Obj/$$SYSTEM/convolution
+TARGET   = ../../Bin/$$SYSTEM/convolution
 
 CONFIG += qt thread $$CODE_GENERATION
 QT = core gui svg xml widgets printsupport
@@ -27,7 +29,7 @@ contains ( HELP_SYSTEM, assistant ) {
 
 INCLUDEPATH  += $$QWT_INC_PATH
 unix {
-  LIBS += -lqwt
+  LIBS += -lqwt-qt5
 }
 
 linux_package {

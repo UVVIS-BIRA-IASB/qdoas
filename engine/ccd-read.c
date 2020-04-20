@@ -689,8 +689,8 @@ RC ReliCCD_EEV(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int loca
 
            memcpy(&pRecord->present_datetime.thetime,&header.now,sizeof(struct time));
 
-           if (header.Tm<EPSILON)
-            pRecord->Tm=(double)ZEN_NbSec(&pRecord->present_datetime.thedate,&pRecord->present_datetime.thetime,0);
+           pRecord->Tm=(double)ZEN_NbSec(&pRecord->present_datetime.thedate,&pRecord->present_datetime.thetime,0);
+
 
            memcpy(&pRecord->startDateTime.thetime,&header.startTime,sizeof(struct time));
            memcpy(&pRecord->endDateTime.thetime,&header.endTime,sizeof(struct time));

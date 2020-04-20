@@ -2,16 +2,18 @@
 # Qdoas General Configuration
 #----------------------------------------------
 
-TEMPLATE = app
-TARGET   = ../../qdoas/release/qdoas
-
 include( ../../config.pri )
-PRE_TARGETDEPS += ../common/libcommon.a ../engine/libengine.a ../mediator/libmediator.a
+
+TEMPLATE = app
+PRE_TARGETDEPS += ../../Obj/$$SYSTEM/common/libcommon.a ../../Obj/$$SYSTEM/engine/libengine.a ../../Obj/$$SYSTEM/mediator/libmediator.a
+LIBS += -L../../Obj/$$SYSTEM/mediator -lmediator -L../../Obj/$$SYSTEM/engine -lengine -L../../Obj/$$SYSTEM/common -lcommon
 
 CONFIG += qt thread $$CODE_GENERATION
 QT = core gui svg xml widgets printsupport
 
 INCLUDEPATH  += ../mediator ../common ../engine
+OBJECTS_DIR = ../../Obj/$$SYSTEM/qdoas
+TARGET   = ../../Bin/$$SYSTEM/qdoas
 
 DEFINES += APP_QDOAS
 
@@ -20,7 +22,7 @@ DEFINES += APP_QDOAS
 #----------------------------------------------
 
 unix {
-  LIBS += -L/bira-iasb/projects/DOAS/Programmes/QDOAS/lib_2019g/qdoas/lib -lcoda -lhdfeos -lGctp -lnetcdf -lmfhdf -ldf -lz -ljpeg -lhe5_hdfeos -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp -lqwt
+  LIBS += -L/bira-iasb/projects/DOAS/Programmes/QDOAS/lib_2019g/lib -lcoda -lhdfeos -lGctp -lnetcdf -lmfhdf -ldf -lz -ljpeg -lhe5_hdfeos -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp -L/bira-iasb/projects/DOAS/Programmes/QDOAS/lib_2019g/lib -lqwt-qt5
 }
 
 hpc {
@@ -29,7 +31,7 @@ hpc {
 
 linux_package {
   TARGET = ../../linux_package/bin/qdoas.bin
-  LIBS += -lcoda -lhdfeos -lnetcdf -lmfhdf -ldf -lz -lhe5_hdfeos -lhdf5_hl -lhdf5 -lqwt
+  LIBS += -lcoda -lhdfeos -lnetcdf -lmfhdf -ldf -lz -lhe5_hdfeos -lhdf5_hl -lhdf5 -L/bira-iasb/projects/DOAS/Programmes/QDOAS/lib_2019g/lib -lqwt-qt5
 }
 
 mxe {

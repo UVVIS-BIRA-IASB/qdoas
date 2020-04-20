@@ -2,16 +2,18 @@
 # Usamp Tool General Configuration
 #----------------------------------------------
 
+include( ../../config.pri )
+
 TEMPLATE = app
-TARGET   = ../../qdoas/release/usamp
+PRE_TARGETDEPS += ../../Obj/$$SYSTEM/common/libcommon.a ../../Obj/$$SYSTEM/engine/libengine.a ../../Obj/$$SYSTEM/mediator/libmediator.a
+LIBS += -L../../Obj/$$SYSTEM/mediator -lmediator -L../../Obj/$$SYSTEM/engine -lengine -L../../Obj/$$SYSTEM/common -lcommon
 
 INCLUDEPATH  += ../mediator ../common ../engine
-
-include( ../../config.pri )
+OBJECTS_DIR = ../../Obj/$$SYSTEM/usamp
+TARGET   = ../../Bin/$$SYSTEM/usamp
 
 CONFIG += qt thread $$CODE_GENERATION
 QT = core gui svg xml widgets printsupport
-PRE_TARGETDEPS += ../common/libcommon.a ../engine/libengine.a ../mediator/libmediator.a
 
 DEFINES += APP_USAMP
 
@@ -28,7 +30,7 @@ contains ( HELP_SYSTEM, assistant ) {
 INCLUDEPATH  += $$QWT_INC_PATH
 
 unix {
-  LIBS += -lqwt
+  LIBS += -L/bira-iasb/projects/DOAS/Programmes/QDOAS/lib_2019g/lib -lqwt-qt5
 }
 
 linux_package {

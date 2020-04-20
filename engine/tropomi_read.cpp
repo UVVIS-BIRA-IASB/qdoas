@@ -325,9 +325,10 @@ int tropomi_read(ENGINE_CONTEXT *pEngineContext,int record) {
   if (THRD_id==THREAD_TYPE_ANALYSIS) {
      // in analysis mode, variables must have been initialized by tropomi_init()
     assert(irradiance_reference.size() == ANALYSE_swathSize);// || radiance_reference.size() == ANALYSE_swathSize);
-    n_wavel = NDET[indexPixel];
 
     const refspec& ref = irradiance_reference.at(indexPixel);
+    n_wavel = NDET[indexPixel] = ref.lambda.size(); // 20/04/2020 : it's better to set NDET to the size of the irradiance
+    
     for (size_t i=0; i<ref.lambda.size(); ++i) {
       pEngineContext->buffers.lambda_irrad[i] = ref.lambda[i];
       pEngineContext->buffers.irrad[i] = ref.irradiance[i];
@@ -358,24 +359,42 @@ int tropomi_read(ENGINE_CONTEXT *pEngineContext,int record) {
       double li = lambda[i];
       double ri = rad[i];
       double ni = rad_noise[i];
-      if (li != fill_nominal_wavelengths && ri != fill_rad && ni != fill_noise) {
-        pEngineContext->buffers.lambda[j]=li;
-        pEngineContext->buffers.spectrum[j]=ri;
-        pEngineContext->buffers.sigmaSpec[j]=ri/(std::pow(10.0, ni/10.0));
-        ++j;
-      }
+      
+      pEngineContext->buffers.lambda[i]=li;
+      if (li != fill_nominal_wavelengths && ri != fill_rad && ni != fill_noise)
+       {
+        pEngineContext->buffers.spectrum[i]=ri;
+        pEngineContext->buffers.sigmaSpec[i]=ri/(std::pow(10.0, ni/10.0));
+        j++;
+       }
+      else
+       pEngineContext->buffers.spectrum[i]=pEngineContext->buffers.sigmaSpec[i]=0.;
+        
+//       if (li != fill_nominal_wavelengths && ri != fill_rad && ni != fill_noise) {
+//         pEngineContext->buffers.lambda[j]=li;
+//         pEngineContext->buffers.spectrum[j]=ri;
+//         pEngineContext->buffers.sigmaSpec[j]=ri/(std::pow(10.0, ni/10.0));
+//         ++j;
+//       }
     }
 
     if (j == 0) {
       // All fill values, can't use this spectrum:
       return ERROR_ID_FILE_RECORD;
     }
+    else if (THRD_id!=THREAD_TYPE_ANALYSIS)
+     NDET[indexPixel] = size_spectral;
+    
     // check if the earthshine spectrum is shorter than the reference
     // spectrum (e.g.due to different number of fill values).
     // if (j<n_wavel) {
       // This is not a very clean solution, but we assume that
       // reducing NDET[i] is always safe:
-      NDET[indexPixel] = j;
+     
+     // NDET[indexPixel] = j; -> 20/04/2020 : this causes a big issue in ANALYSE_Spectrum
+     //                             for example, memcpy(Sref,Feno->Sref,sizeof(double)*n_wavel);
+     //                          in fact, we should keep the original NDET[indexPixel] and manage the
+     //                          different size for spectrum as anyway it will be interpolated to the reference grid
     // }
 
   } catch(std::runtime_error& e) {
