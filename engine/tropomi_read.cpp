@@ -31,7 +31,7 @@
 #include <stdexcept>
 #include <algorithm>
 #include <sstream>
-
+#include <assert.h>
 #include <cassert>
 #include <cmath>
 
@@ -56,6 +56,8 @@ using std::vector;
 using std::set;
 using std::stringstream;
 using std::map;
+using namespace std;
+
 
 // create an array {"BAND1", "BAND2", ... } in same order as the
 // tropomiSpectralBand enum:
@@ -340,19 +342,42 @@ int tropomi_read(ENGINE_CONTEXT *pEngineContext,int record) {
   // dimensions of radiance & error are
   // ('time','scanline','ground_pixel','spectral_channel')
   const size_t start[] = {0,indexScanline, indexPixel, 0};
-  const size_t count[] = {1, 1, 1, size_spectral};
+  const size_t start_scale[] = {0,indexScanline, indexPixel};
 
+  const size_t count[] = {1, 1, 1, size_spectral};
+  const size_t onecount[] = {1, 1, 1};
+
+
+  vector<unsigned short int> rad_int16(size_spectral);
   vector<double> rad(size_spectral);
+  vector<double> scale(1);
   vector<double> rad_noise(size_spectral);
 
   try {
-    obsGroup.getVar("radiance", start, count, rad.data() );
-    obsGroup.getVar("radiance_noise", start, count, rad_noise.data() );
-
-    const double fill_rad = obsGroup.getFillValue<double>("radiance");
+      double tempfill;
+      if(obsGroup.hasVar("radiance_int16")  ){
+          obsGroup.getVar("radiance_noise", start, count, rad_noise.data() );
+          assert(obsGroup.hasVar("radiance_scaling"));
+          obsGroup.getVar("radiance_int16", start, count, rad_int16.data() );
+          obsGroup.getVar("radiance_scaling",start_scale,onecount,scale.data() ) ;
+          const int fill_rad_int16 = obsGroup.getFillValue<int>("radiance_int16");
+          tempfill = obsGroup.getFillValue<double>("radiance_scaling");
+          for(int i = 0; i < size_spectral ;i++){ 
+              rad[i] = scale[0]*rad_int16[i];
+              if(rad_int16[i]==65535){
+                  rad[i]=tempfill;
+              }
+          }
+      }
+      else{
+          tempfill = obsGroup.getFillValue<double>("radiance");
+          obsGroup.getVar("radiance_noise", start, count, rad_noise.data() );
+          obsGroup.getVar("radiance", start, count, rad.data());
+      }
+      const double fill_rad=tempfill;
+   
     const double fill_noise = obsGroup.getFillValue<double>("radiance_noise");
     const vector<double>& lambda = nominal_wavelengths.at(indexPixel);
-
     // copy non-fill values to buffers:
     size_t j=0;
     for (size_t i=0; i<rad.size() && j<n_wavel; ++i) {
@@ -735,7 +760,11 @@ static vector<std::array<vector<earth_ref>, MAX_GROUNDPIXEL>> find_matching_spec
     }
 
     const auto orbit_fill_wavelengths = instrGroup.getFillValue<float>("nominal_wavelength");
-    const auto orbit_fill_spectra = obsGroup.getFillValue<float>("radiance");
+    string radstr="radiance";
+        if(obsGroup.hasVar("radiance_scaling")){
+            radstr="radiance_scaling";
+        }
+    const auto orbit_fill_spectra = obsGroup.getFillValue<float>(radstr);
     const auto orbit_fill_errors = obsGroup.getFillValue<float>("radiance_noise");
 
     // 2. read geolocation data and flags required to evaluate which
@@ -784,6 +813,8 @@ static vector<std::array<vector<earth_ref>, MAX_GROUNDPIXEL>> find_matching_spec
         // for one observation:
         const size_t start[] = {0, scan, row, 0};
         const size_t count[] = {1, 1, 1, size_spectral };
+        const size_t start_scale[] = {0,scan,row};
+        const size_t onecount[] = {1, 1, 1};
 
         // TODO: check use_row[row]?
         auto lat=latitudes[scan][row];
@@ -832,19 +863,38 @@ static vector<std::array<vector<earth_ref>, MAX_GROUNDPIXEL>> find_matching_spec
 
               if (i_spec == cache.end()) {
                 // spectrum was not yet read, so do that now:
-                vector<float> spec(size_spectral), err(size_spectral);
-                obsGroup.getVar("radiance", start, count, spec.data() );
-                obsGroup.getVar("radiance_noise", start, count, err.data() );
-
-//                 std::cout << "; scan " << scan << " row " << row << " lat " << lat << " long " << lon << " sza " << sza << std::endl;
+                  vector<float> spec(size_spectral), err(size_spectral);
+                  vector<unsigned short int> rad_int16(size_spectral);
+                  vector<double> scale(1);
+                  double tempfill=-999999;
+                  if(obsGroup.hasVar("radiance_int16")) {
+                      obsGroup.getVar("radiance_noise", start, count, err.data() );
+                      assert(obsGroup.hasVar("radiance_scaling"));
+                      obsGroup.getVar("radiance_int16", start, count, rad_int16.data() );
+                      obsGroup.getVar("radiance_scaling",start_scale,onecount,scale.data() ) ;
+                      const int fill_rad_int16 = obsGroup.getFillValue<int>("radiance_int16");
+                      tempfill = obsGroup.getFillValue<double>("radiance_scaling");
+                      for(int i = 0; i < size_spectral ;i++){ 
+                          spec[i] = scale[0]*rad_int16[i];
+                          if(rad_int16[i]==65535){
+                              spec[i]=tempfill;
+                          }
+                      }
+                  }
+                  else{
+                      obsGroup.getVar("radiance", start, count, spec.data() );
+                      obsGroup.getVar("radiance_noise", start, count, err.data() );
+                  }
+                 
+                  //                 std::cout << "; scan " << scan << " row " << row << " lat " << lat << " long " << lon << " sza " << sza << std::endl;
 //                 for (auto i = spec.begin(); i != spec.end(); ++i)
 //                    std::cout << *i << ' ';
 //                 std::cout << std::endl;
 
                 i_spec = cache.insert(std::move(spec)).first;
                 i_err = cache.insert(std::move(err)).first;
-
               }
+              
 
               // std::cout << "assert" << std::endl;
               // At this point, i_spec and i_err must point to valid elements of our cache.
