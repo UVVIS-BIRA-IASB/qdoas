@@ -1086,7 +1086,7 @@ static void OutputRegisterFields(const ENGINE_CONTEXT *pEngineContext, const int
        register_field( (struct output_field) { .basic_fieldname = "index_zenith_after", .memory_type = OUTPUT_INT, .resulttype = fieldtype, .format = "%#6d", .get_data = (func_void)&get_zenith_after_index });
      break;
      case PRJCT_RESULTS_RC:
-       register_field( (struct output_field) { .basic_fieldname = "global_rc", .memory_type = OUTPUT_INT, .resulttype = fieldtype, .format = "%#5d", .get_data = (func_void)&get_rc });
+       register_field( (struct output_field) { .basic_fieldname = "rc", .memory_type = OUTPUT_INT, .resulttype = fieldtype, .format = "%#5d", .get_data = (func_void)&get_rc });
        break;
      default:
        break;
@@ -1516,9 +1516,9 @@ static int register_calibration(int kurucz_index, int index_row, int index_feno)
       max_ndet = NDET[i];
   }
 
-  int rc = register_calibration_field((struct output_field){.basic_fieldname="Calib_Wavelength", .resulttype = PRJCT_RESULTS_WAVELENGTH, .index_feno=index_feno, .index_row=index_row, .index_cross=ITEM_NONE, .get_data=(func_void)&get_wavelength_calib });
+  int rc = register_calibration_field((struct output_field){.basic_fieldname="Wavelength", .resulttype = PRJCT_RESULTS_WAVELENGTH, .index_feno=index_feno, .index_row=index_row, .index_cross=ITEM_NONE, .get_data=(func_void)&get_wavelength_calib });
   if (rc != ERROR_ID_NO) return rc;
-  rc = register_calibration_field((struct output_field){.basic_fieldname="Calib_RMS", .resulttype = PRJCT_RESULTS_RMS, .index_feno=index_feno, .index_row=index_row, .index_cross=ITEM_NONE, .get_data=(func_void)&get_rms_calib });
+  rc = register_calibration_field((struct output_field){.basic_fieldname="RMS", .resulttype = PRJCT_RESULTS_RMS, .index_feno=index_feno, .index_row=index_row, .index_cross=ITEM_NONE, .get_data=(func_void)&get_rms_calib });
   if (rc != ERROR_ID_NO) return rc;
 
   for (int indexTabCross=0;indexTabCross<pTabFeno->NTabCross;indexTabCross++) {
@@ -1559,8 +1559,8 @@ static int register_calibration(int kurucz_index, int index_row, int index_feno)
 
     for(unsigned int i=0; i<sizeof(calibrationfields)/sizeof(calibrationfields[0]); i++) {
       if(calibrationfields[i].register_field) {
-        char fieldname[strlen(calibrationfields[i].output_name) + strlen(calibrationfields[i].symbol_name) +strlen("Calib_")+1];
-        sprintf(fieldname, "Calib_%s%s", calibrationfields[i].output_name, calibrationfields[i].symbol_name);
+        char fieldname[strlen(calibrationfields[i].output_name) + strlen(calibrationfields[i].symbol_name) +1];
+        sprintf(fieldname, "%s%s", calibrationfields[i].output_name, calibrationfields[i].symbol_name);
         struct output_field newfield = calibrationfields[i].fieldconfig; // copy all non-zero fields from 'fieldconfig'
         newfield.basic_fieldname=fieldname;
         newfield.index_feno=index_feno;
