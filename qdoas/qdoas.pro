@@ -9,7 +9,7 @@ PRE_TARGETDEPS += ../../Obj/$$SYSTEM/common/libcommon.a ../../Obj/$$SYSTEM/engin
 LIBS += -L../../Obj/$$SYSTEM/mediator -lmediator -L../../Obj/$$SYSTEM/engine -lengine -L../../Obj/$$SYSTEM/common -lcommon
 
 CONFIG += qt thread $$CODE_GENERATION
-QT = core gui svg xml widgets printsupport
+QT = core gui xml widgets printsupport # svg
 
 INCLUDEPATH  += ../mediator ../common ../engine
 OBJECTS_DIR = ../../Obj/$$SYSTEM/qdoas
@@ -22,11 +22,15 @@ DEFINES += APP_QDOAS
 #----------------------------------------------
 
 unix {
-  LIBS += -L/bira-iasb/projects/DOAS/Programmes/QDOAS/lib_2019g/lib -lcoda -lhdfeos -lGctp -lnetcdf -lmfhdf -ldf -lz -ljpeg -lhe5_hdfeos -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp -L/bira-iasb/projects/DOAS/Programmes/QDOAS/lib_2019g/lib -lqwt-qt5
+  LIBS += -L/bira-iasb/projects/DOAS/Programmes/QDOAS/lib_2019g/lib -lcoda -lhdfeos -lGctp -lnetcdf -lmfhdf -ldf -lz -ljpeg -lhe5_hdfeos -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp 
+}
+
+compute {
+  LIBS += -L/bira-iasb/projects/DOAS/Programmes/QDOAS/lib_2019g/lib -lqwt-qt5
 }
 
 hpc {
-  LIBS += -lGctp # must be linked after hdfeos
+  LIBS += -lGctp -L/bira-iasb/projects/DOAS/Programmes/QDOAS/lib_2019g/lib -lqwt # must be linked after hdfeos
 }
 
 linux_package {

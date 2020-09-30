@@ -13,7 +13,7 @@ OBJECTS_DIR = ../../Obj/$$SYSTEM/convolution
 TARGET   = ../../Bin/$$SYSTEM/convolution
 
 CONFIG += qt thread $$CODE_GENERATION
-QT = core gui svg xml widgets printsupport
+QT = core gui xml widgets printsupport # svg
 
 DEFINES += APP_CONV
 
@@ -28,9 +28,19 @@ contains ( HELP_SYSTEM, assistant ) {
 #----------------------------------------------
 
 INCLUDEPATH  += $$QWT_INC_PATH
+
 unix {
+  LIBS += -L/bira-iasb/projects/DOAS/Programmes/QDOAS/lib_2019g/lib -lcoda -lhdfeos -lGctp -lnetcdf -lmfhdf -ldf -lz -ljpeg -lhe5_hdfeos -lhdf5 -lhdf5_hl -lhdf5_cpp -lhdf5_hl_cpp 
+}
+
+compute {
   LIBS += -lqwt-qt5
 }
+
+hpc {
+  LIBS += -lqwt # must be linked after hdfeos
+}
+
 
 linux_package {
   TARGET = ../../linux_package/bin/convolution.bin
