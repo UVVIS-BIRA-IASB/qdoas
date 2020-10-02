@@ -1,0 +1,15 @@
+3.4.4 2020-09-30
+~~~~~~~~~~~~~~~~
+
+* MFC format : fix issue with the selection of reference spectra
+Windows OS : 'save plot' in ascii systematically added 'asc' extension even if not wanted
+
+
+3.4 2020-02-28
+~~~~~~~~~~~~~~
+
+* ground-based measurements : FRM4DOAS netCDF format
+* TROPOMI/GOMEnetCDF : use earthshine radiance as reference spectrum. This spectrum should be generated outside QDOAS in APEX netCDF format
+* addition of Pukite/Slope and Ring molecular correction terms in the analysis windows properties
+* possibility to calculate the difference of cross sections instead of orthogonalize them
+
