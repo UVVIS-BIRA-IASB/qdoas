@@ -2,7 +2,7 @@
 ~~~~~~~~~~~~~~~~
 
 * MFC format : fix issue with the selection of reference spectra
-Windows OS : 'save plot' in ascii systematically added 'asc' extension even if not wanted
+* Windows OS : 'save plot' in ascii systematically added 'asc' extension even if not wanted
 
 
 3.4 2020-02-28
