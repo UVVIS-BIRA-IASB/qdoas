@@ -88,9 +88,11 @@
 
 #include "tropomi_read.h"
 #include "gdp_bin_read.h"
-#include "tropomi_read.h"
+#include "omps_read.h"
+#include "omi_read.h"
 #include "gome2_read.h"
 #include "scia-read.h"
+#include "gome1netcdf_read.h"
 #include "spectrum_files.h"
 
 AMF_SYMBOL *OUTPUT_AmfSpace;                                                 // list of cross sections with associated AMF file

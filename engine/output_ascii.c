@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <string.h>
 
+#include "stdfunc.h"
 #include "output_common.h"
 #include "output.h"
 #include "engine_context.h"

@@ -59,6 +59,7 @@
 #include "winfiles.h"
 #include "stdfunc.h"
 
+#include <math.h>
 #include <string.h>
 #include <stdbool.h>
 
