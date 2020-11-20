@@ -404,10 +404,10 @@ void AnalyseGetFenoLim(FENO *pFeno,INDEX *pLimMin,INDEX *pLimMax, const int n_wa
 
 void ANALYSE_InitResults(void)
  {
- 	// Declarations
+     // Declarations
 
- 	INDEX indexFenoColumn,indexFeno;
- 	FENO *pTabFeno;
+     INDEX indexFenoColumn,indexFeno;
+     FENO *pTabFeno;
 
   for (indexFenoColumn=0;(indexFenoColumn<ANALYSE_swathSize);indexFenoColumn++)
    {
@@ -1324,8 +1324,8 @@ RC ShiftVector(const double *lambda, double *source, const double *deriv, double
         SPLINE_Vector(pKURUCZ_fft->fftIn+1,pKURUCZ_fft->invFftOut+1,pKURUCZ_fft->invFftIn+1,pKURUCZ_fft->oldSize,
                       &ANALYSE_shift[LimMin],&target[LimMin],LimN,pAnalysisOptions->interpol);
       } else {
-       	MATRIX_OBJECT xsNew;
-       	MATRIX_OBJECT slitMatrix[NSFP];
+           MATRIX_OBJECT xsNew;
+           MATRIX_OBJECT slitMatrix[NSFP];
         SLIT slitOptions;
         int slitType;
         int shiftIndex;
@@ -1389,7 +1389,7 @@ RC ShiftVector(const double *lambda, double *source, const double *deriv, double
                 }
               }
 
-       	      // Apply the stretch on the slit wavelength calibration
+                 // Apply the stretch on the slit wavelength calibration
               for (int i=shiftIndex;i<slitMatrix[0].nl;i++) {
                 // stretch wavelength grid around the center wavelength,
                 // using fwhmStretch1 on the left, and fwhmStretch2 on the
@@ -1399,8 +1399,8 @@ RC ShiftVector(const double *lambda, double *source, const double *deriv, double
                 slitMatrix[0].matrix[0][i]= lambda_center + delta_lambda;
               }
 
-       	      // Recalculate second derivatives and the FWHM
-       	      for (int i=1;i<slitMatrix[0].nc;i++)
+                 // Recalculate second derivatives and the FWHM
+                 for (int i=1;i<slitMatrix[0].nc;i++)
                 rc=SPLINE_Deriv2(slitMatrix[0].matrix[0]+shiftIndex,slitMatrix[0].matrix[i]+shiftIndex,slitMatrix[0].deriv2[i]+shiftIndex,slitMatrix[0].nl-shiftIndex,(char *)__func__);
              }
            }
@@ -1952,7 +1952,7 @@ RC AnalyseLoadVector(const char *function, const char *fileName, double *lambda,
     if ((fp=fopen(fullFileName,"rt"))==NULL)
       rc=ERROR_SetLast((char *)__func__,ERROR_TYPE_FATAL,ERROR_ID_FILE_NOT_FOUND,fullFileName);
     else {
-    	 int n_scan=0;
+         int n_scan=0;
       MATRIX_PassCommentLines(fp);
       n_scan=MATRIX_GetColumnsNumbers(fp,NULL);
       rewind(fp);
@@ -5008,10 +5008,10 @@ RC ANALYSE_LoadCross(ENGINE_CONTEXT *pEngineContext, const ANALYSIS_CROSS *cross
 
         // !!! Pukite, check the different cases and generate error messages for inconsistency
 
-       	if (((pEngineCross->indexPukite1==ITEM_NONE) && AnalyseAddPukiteTerm(pEngineContext,pEngineCross,indexFenoColumn,1,&pEngineCross->indexPukite1)) ||
-       	    ((pEngineCross->crossCorrection==ANLYS_CORRECTION_TYPE_PUKITE) && (pEngineCross->indexPukite2==ITEM_NONE) && AnalyseAddPukiteTerm(pEngineContext,pEngineCross,indexFenoColumn,2,&pEngineCross->indexPukite2)))
+           if (((pEngineCross->indexPukite1==ITEM_NONE) && AnalyseAddPukiteTerm(pEngineContext,pEngineCross,indexFenoColumn,1,&pEngineCross->indexPukite1)) ||
+               ((pEngineCross->crossCorrection==ANLYS_CORRECTION_TYPE_PUKITE) && (pEngineCross->indexPukite2==ITEM_NONE) && AnalyseAddPukiteTerm(pEngineContext,pEngineCross,indexFenoColumn,2,&pEngineCross->indexPukite2)))
 
-       	 rc=ERROR_SetLast((char *)__func__,ERROR_TYPE_WARNING,ERROR_ID_PUKITE,pTabFeno->windowName,WorkSpace[pEngineCross->Comp].symbolName);
+            rc=ERROR_SetLast((char *)__func__,ERROR_TYPE_WARNING,ERROR_ID_PUKITE,pTabFeno->windowName,WorkSpace[pEngineCross->Comp].symbolName);
 
         else
          {

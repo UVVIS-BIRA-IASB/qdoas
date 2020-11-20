@@ -103,7 +103,7 @@ void CWProjectTabUndersampling::slotBrowseSolarRefFile()
   CPreferences *pref = CPreferences::instance();
 
   QString filename = QFileDialog::getOpenFileName(this, "Open Solar Reference File",
-						  pref->directoryName("Ref"),
+                          pref->directoryName("Ref"),
                                                   "Kurucz File (*.ktz);;All Files (*)");
   
   if (!filename.isEmpty()) {

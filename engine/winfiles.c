@@ -281,19 +281,19 @@ void FILES_RemoveOnePath(char *path)
 
 char *FILES_RebuildFileName(char *newPath,const char *path,int useFileName)
  {
- 	char pathTmp[DOAS_MAX_PATH_LEN+1],*ptr;
+     char pathTmp[DOAS_MAX_PATH_LEN+1],*ptr;
 
- 	strcpy(pathTmp,path);
+     strcpy(pathTmp,path);
 
- 	if (!useFileName)
- 	 {
- 	 	if ((ptr=strrchr(pathTmp,PATH_SEP))==NULL)
- 	 	 pathTmp[0]='\0';
- 	 	else
- 	 	 *ptr='\0';
- 	 }
+     if (!useFileName)
+      {
+          if ((ptr=strrchr(pathTmp,PATH_SEP))==NULL)
+           pathTmp[0]='\0';
+          else
+           *ptr='\0';
+      }
 
- 	strcpy(newPath,pathTmp);
+     strcpy(newPath,pathTmp);
 
 // QDOAS ???  // Declarations
 // QDOAS ???
@@ -492,7 +492,7 @@ void FilesSaveAllPaths(FILE *fp,char *sectionName)
 
 void FilesResetDefaultPaths(void)
  {
- 	// Declaration
+     // Declaration
 
   INDEX indexFileType;
 

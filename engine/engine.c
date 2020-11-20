@@ -319,10 +319,10 @@ RC EngineCopyContext(ENGINE_CONTEXT *pEngineContextTarget,ENGINE_CONTEXT *pEngin
      // Do not make a copy of the following vectors; reset the address in order not to release vectors twice
 
      pEngineContextTarget->analysisRef.refIndexes=NULL;
- 	   pEngineContextTarget->analysisRef.zmList=NULL;
- 	   pEngineContextTarget->analysisRef.timeDec=NULL;
+        pEngineContextTarget->analysisRef.zmList=NULL;
+        pEngineContextTarget->analysisRef.timeDec=NULL;
 
- 	   pEngineContextTarget->recordInfo.mfcDoasis.fileNames=NULL;
+        pEngineContextTarget->recordInfo.mfcDoasis.fileNames=NULL;
 
      // Other fields
 
@@ -1590,8 +1590,8 @@ RC EngineBuildRefList(ENGINE_CONTEXT *pEngineContext)
       (pInstr->readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG) ||
       (pInstr->readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG_OLD))
    {
-   	ENGINE_contextRef.project.instrumental.user=
-   	ENGINE_contextRef2.project.instrumental.user=PRJCT_INSTR_IASB_TYPE_ZENITHAL;
+       ENGINE_contextRef.project.instrumental.user=
+       ENGINE_contextRef2.project.instrumental.user=PRJCT_INSTR_IASB_TYPE_ZENITHAL;
    }
 
   if (ENGINE_contextRef.recordNumber>0)
@@ -1600,7 +1600,7 @@ RC EngineBuildRefList(ENGINE_CONTEXT *pEngineContext)
 
     for (indexRecord=ENGINE_contextRef.lastRefRecord+1;indexRecord<=recordNumber;indexRecord++)
      {
-     	if (pEngineContext->mfcDoasisFlag)
+         if (pEngineContext->mfcDoasisFlag)
        sprintf(ENGINE_contextRef.fileInfo.fileName,"%s%c%s",pMfc->filePath,PATH_SEP,&pMfc->fileNames[(indexRecord-1)*(DOAS_MAX_PATH_LEN+1)]);
 
       if (!(rc=EngineReadFile(&ENGINE_contextRef,(!pEngineContext->mfcDoasisFlag)?indexRecord:1,1,localCalDay)) &&
@@ -1685,28 +1685,28 @@ RC EngineBuildRefList(ENGINE_CONTEXT *pEngineContext)
 
 RC EngineSZASetRefIndexes(ENGINE_CONTEXT *pEngineContext,FENO *pTabFeno)
  {
- 	// Declarations
+     // Declarations
 
   MFC_DOASIS *pMfc;
- 	ANALYSIS_REF *pRef;
- 	double ZmMin,ZmMax;
- 	double deltaZmMorning,deltaZmAfternoon;
- 	INDEX indexZmMin,indexRecord;
- 	int recordNumber;
- 	RC rc;
+     ANALYSIS_REF *pRef;
+     double ZmMin,ZmMax;
+     double deltaZmMorning,deltaZmAfternoon;
+     INDEX indexZmMin,indexRecord;
+     int recordNumber;
+     RC rc;
 
- 	// Initialization
+     // Initialization
 
   pMfc=&pEngineContext->recordInfo.mfcDoasis;
- 	pRef=&pEngineContext->analysisRef;
- 	ZmMin=pRef->zmList[pRef->zmMinIndex];
- 	ZmMax=pRef->zmList[pRef->zmMaxIndex];
- 	indexZmMin=pRef->zmMinIndex;
+     pRef=&pEngineContext->analysisRef;
+     ZmMin=pRef->zmList[pRef->zmMinIndex];
+     ZmMax=pRef->zmList[pRef->zmMaxIndex];
+     indexZmMin=pRef->zmMinIndex;
 
- 	recordNumber=(!pEngineContext->mfcDoasisFlag)?pEngineContext->recordNumber:pMfc->nFiles;
- 	pTabFeno->indexRefMorning=pTabFeno->indexRefAfternoon=ITEM_NONE;
+     recordNumber=(!pEngineContext->mfcDoasisFlag)?pEngineContext->recordNumber:pMfc->nFiles;
+     pTabFeno->indexRefMorning=pTabFeno->indexRefAfternoon=ITEM_NONE;
 
- 	rc=ERROR_ID_NO;
+     rc=ERROR_ID_NO;
 
   if (!pTabFeno->hidden &&
       (pTabFeno->refSpectrumSelectionMode==ANLYS_REF_SELECTION_MODE_AUTOMATIC) &&
@@ -1798,28 +1798,28 @@ RC EngineSZASetRefIndexes(ENGINE_CONTEXT *pEngineContext,FENO *pTabFeno)
 
 void EngineScanSetRefIndexes(ENGINE_CONTEXT *pEngineContext,INDEX indexRecord)
  {
- 	// Declarations
+     // Declarations
 
- 	ANALYSIS_REF *pRef;
- 	RECORD_INFO *pRecordInfo;
- 	int *refIndexes,nRef;
- 	int indexScanBefore,indexScanAfter,indexScanMin,indexScanMax,indexScanRecord;
+     ANALYSIS_REF *pRef;
+     RECORD_INFO *pRecordInfo;
+     int *refIndexes,nRef;
+     int indexScanBefore,indexScanAfter,indexScanMin,indexScanMax,indexScanRecord;
 
 
- 	// Initializations
+     // Initializations
 
- 	pRecordInfo=&pEngineContext->recordInfo;
- 	pRef=&pEngineContext->analysisRef;
+     pRecordInfo=&pEngineContext->recordInfo;
+     pRef=&pEngineContext->analysisRef;
 
   if (pEngineContext->recordInfo.maxdoas.measurementType==PRJCT_INSTR_MAXDOAS_TYPE_ZENITH)
    pRef->indexScanBefore=pRef->indexScanAfter=ITEM_NONE;
   else if ((pEngineContext->recordInfo.maxdoas.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS) ||
           ((pEngineContext->analysisRef.zenBefIndex==ITEM_NONE) && (pEngineContext->analysisRef.zenAftIndex==ITEM_NONE)))
    {
- 	  refIndexes=pRef->refIndexes;
- 	  nRef=pRef->nRef;
+       refIndexes=pRef->refIndexes;
+       nRef=pRef->nRef;
 
- 	  indexScanBefore=indexScanAfter=ITEM_NONE;
+       indexScanBefore=indexScanAfter=ITEM_NONE;
 
     // Dichotomic search of the reference spectrum
 
@@ -1865,16 +1865,16 @@ void EngineScanSetRefIndexes(ENGINE_CONTEXT *pEngineContext,INDEX indexRecord)
 
 RC EngineLoadRefMFC(ENGINE_CONTEXT *pEngineContextRef,ENGINE_CONTEXT *pEngineContext,INDEX indexRefRecord)
  {
- 	// Declarations
+     // Declarations
 
   RC rc;
 
- 	// Initialization
+     // Initialization
 
- 	rc=ERROR_ID_NO;
+     rc=ERROR_ID_NO;
 
- 	if ((indexRefRecord!=ITEM_NONE) && (indexRefRecord<=pEngineContext->recordInfo.mfcDoasis.nFiles))
- 	 {
+     if ((indexRefRecord!=ITEM_NONE) && (indexRefRecord<=pEngineContext->recordInfo.mfcDoasis.nFiles))
+      {
     // Build reference file name
 
     sprintf(pEngineContextRef->fileInfo.fileName,"%s%c%s",pEngineContext->recordInfo.mfcDoasis.filePath,PATH_SEP,&pEngineContext->recordInfo.mfcDoasis.fileNames[(indexRefRecord-1)*(DOAS_MAX_PATH_LEN+1)]);
@@ -1958,7 +1958,7 @@ RC EngineNewRef(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
    if (pEngineContext->mfcDoasisFlag)
     indexRecord=MFC_SearchForCurrentFileIndex(pEngineContext);
    else
-   	indexRecord=pEngineContext->indexRecord;
+       indexRecord=pEngineContext->indexRecord;
 
    // For scan mode, determine the indexes of the zenith records before and after the current record
 
@@ -1971,8 +1971,8 @@ RC EngineNewRef(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
 
       EngineScanSetRefIndexes(pEngineContext,indexRecord);
 
-  	  indexScanBefore=pRef->indexScanBefore;
-  	  indexScanAfter=pRef->indexScanAfter;
+        indexScanBefore=pRef->indexScanBefore;
+        indexScanAfter=pRef->indexScanAfter;
     }
 
    // Browse analysis windows
@@ -1994,9 +1994,9 @@ RC EngineNewRef(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
 
        if (pTabFeno->refMaxdoasSelectionMode==ANLYS_MAXDOAS_REF_SZA)
         {
-        	if (newref && ((rc=EngineSZASetRefIndexes(pEngineContext,pTabFeno))!=ERROR_ID_NO))
-        	 break;
-        	else
+            if (newref && ((rc=EngineSZASetRefIndexes(pEngineContext,pTabFeno))!=ERROR_ID_NO))
+             break;
+            else
           indexRefRecord=(pRecord->localTimeDec<=ENGINE_localNoon)?pTabFeno->indexRefMorning:pTabFeno->indexRefAfternoon;
         }
        else if (pTabFeno->refSpectrumSelectionScanMode==ANLYS_MAXDOAS_REF_SCAN_BEFORE)
@@ -2027,21 +2027,21 @@ RC EngineNewRef(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
                ((indexRefRecord!=ITEM_NONE) && (indexRefRecord!=pTabFeno->indexRef)) ||
                ((indexRefRecord==ITEM_NONE) && ((pTabFeno->refSpectrumSelectionScanMode==ANLYS_MAXDOAS_REF_SCAN_INTERPOLATE) || (indexScanBefore!=pTabFeno->indexRefScanBefore) || (indexScanAfter!=pTabFeno->indexRefScanAfter))))
         {
-        	pTabFeno->newrefFlag=1;
+            pTabFeno->newrefFlag=1;
 
          if (!pEngineContext->mfcDoasisFlag)
           {
-          	if (indexRefRecord!=ITEM_NONE)
+              if (indexRefRecord!=ITEM_NONE)
             rc=EngineReadFile(&ENGINE_contextRef,indexRefRecord,0,0);
            else if (!(rc=EngineReadFile(&ENGINE_contextRef,indexScanBefore,0,0)))       // in average mode, it is better to reload reference spectra because ref contexts could have changed in previous analysis windows
             rc=EngineReadFile(&ENGINE_contextRef2,indexScanAfter,0,0);
           }
          else
           {
-          	if (indexRefRecord!=ITEM_NONE)
-          	 rc=EngineLoadRefMFC(&ENGINE_contextRef,pEngineContext,indexRefRecord);
-          	else if (!(rc=EngineLoadRefMFC(&ENGINE_contextRef,pEngineContext,indexScanBefore)))
-          	 rc=EngineLoadRefMFC(&ENGINE_contextRef2,pEngineContext,indexScanAfter);
+              if (indexRefRecord!=ITEM_NONE)
+               rc=EngineLoadRefMFC(&ENGINE_contextRef,pEngineContext,indexRefRecord);
+              else if (!(rc=EngineLoadRefMFC(&ENGINE_contextRef,pEngineContext,indexScanBefore)))
+               rc=EngineLoadRefMFC(&ENGINE_contextRef2,pEngineContext,indexScanAfter);
           }
 
          if (!rc)
@@ -2052,25 +2052,25 @@ RC EngineNewRef(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
             memcpy(pTabFeno->Sref,ENGINE_contextRef.buffers.spectrum,sizeof(double)*pTabFeno->NDET);
            else
             {
-            	double *sref1,*sref2;
-            	double tint1,tint2;
+                double *sref1,*sref2;
+                double tint1,tint2;
 
-            	sref1=ENGINE_contextRef.buffers.spectrum;
-            	sref2=ENGINE_contextRef2.buffers.spectrum;
+                sref1=ENGINE_contextRef.buffers.spectrum;
+                sref2=ENGINE_contextRef2.buffers.spectrum;
 
-            	tint1=(fabs(ENGINE_contextRef.recordInfo.Tint)<(double)EPSILON)?(double)1.:ENGINE_contextRef.recordInfo.Tint;     // to avoid division by zero if the integration time is not defined
-            	tint2=(fabs(ENGINE_contextRef2.recordInfo.Tint)<(double)EPSILON)?(double)1.:ENGINE_contextRef2.recordInfo.Tint;   // to avoid division by zero if the integration time is not defined
+                tint1=(fabs(ENGINE_contextRef.recordInfo.Tint)<(double)EPSILON)?(double)1.:ENGINE_contextRef.recordInfo.Tint;     // to avoid division by zero if the integration time is not defined
+                tint2=(fabs(ENGINE_contextRef2.recordInfo.Tint)<(double)EPSILON)?(double)1.:ENGINE_contextRef2.recordInfo.Tint;   // to avoid division by zero if the integration time is not defined
 
-            	// normalize by the integration time first in order to have the same absorption structures
+                // normalize by the integration time first in order to have the same absorption structures
 
-            	if (pTabFeno->refSpectrumSelectionScanMode==ANLYS_MAXDOAS_REF_SCAN_AVERAGE)
-           	 	for (int i=0;i<pTabFeno->NDET;i++)
-           	 	 pTabFeno->Sref[i]=(sref1[i]/tint1+sref2[i]/tint2)*0.5;
-           	 else if (pTabFeno->refSpectrumSelectionScanMode==ANLYS_MAXDOAS_REF_SCAN_INTERPOLATE)
-           	  {
-           	 	 for (int i=0;i<pTabFeno->NDET;i++)
-           	 	  pTabFeno->Sref[i]=sref1[i]/tint1+(pEngineContext->recordInfo.Tm-ENGINE_contextRef.recordInfo.Tm)*(sref2[i]/tint2-sref1[i]/tint1)/(ENGINE_contextRef2.recordInfo.Tm-ENGINE_contextRef.recordInfo.Tm);
-           	  }
+                if (pTabFeno->refSpectrumSelectionScanMode==ANLYS_MAXDOAS_REF_SCAN_AVERAGE)
+                    for (int i=0;i<pTabFeno->NDET;i++)
+                     pTabFeno->Sref[i]=(sref1[i]/tint1+sref2[i]/tint2)*0.5;
+                else if (pTabFeno->refSpectrumSelectionScanMode==ANLYS_MAXDOAS_REF_SCAN_INTERPOLATE)
+                 {
+                     for (int i=0;i<pTabFeno->NDET;i++)
+                      pTabFeno->Sref[i]=sref1[i]/tint1+(pEngineContext->recordInfo.Tm-ENGINE_contextRef.recordInfo.Tm)*(sref2[i]/tint2-sref1[i]/tint1)/(ENGINE_contextRef2.recordInfo.Tm-ENGINE_contextRef.recordInfo.Tm);
+                 }
             }
 
            if (!pTabFeno->useEtalon)
@@ -2204,7 +2204,7 @@ RC EngineNewRef(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
 
            if ((pTabFeno->indexRefScanBefore!=ITEM_NONE) && (pTabFeno->indexRefScanAfter!=ITEM_NONE))
             {
-            	pDay=&ENGINE_contextRef2.recordInfo.present_datetime.thedate;
+                pDay=&ENGINE_contextRef2.recordInfo.present_datetime.thedate;
 
              if (pEngineContext->mfcDoasisFlag)
               mediateResponseCellInfo(indexPage,indexLine++,indexColumn,responseHandle,"Reference file (2)","%s",&pEngineContext->recordInfo.mfcDoasis.fileNames[(pTabFeno->indexRefScanAfter-1)*(DOAS_MAX_PATH_LEN+1)]);

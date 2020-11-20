@@ -260,7 +260,7 @@ void SCIA_ReleaseBuffers(char format) {
 
   for (sciaOrbitFileIndex=0;sciaOrbitFileIndex<sciaOrbitFilesN;sciaOrbitFileIndex++)
    {
-   	pOrbitFile=&sciaOrbitFiles[sciaOrbitFileIndex];
+       pOrbitFile=&sciaOrbitFiles[sciaOrbitFileIndex];
 
     // Release buffers common to both formats
 
@@ -296,7 +296,7 @@ void SCIA_ReleaseBuffers(char format) {
    }
 
   for (sciaOrbitFileIndex=0;sciaOrbitFileIndex<MAX_SCIA_FILES;sciaOrbitFileIndex++)
-  	memset(&sciaOrbitFiles[sciaOrbitFileIndex],0,sizeof(SCIA_ORBIT_FILE));
+      memset(&sciaOrbitFiles[sciaOrbitFileIndex],0,sizeof(SCIA_ORBIT_FILE));
 
   sciaOrbitFilesN=0;
   sciaCurrentFileIndex=ITEM_NONE;
@@ -439,31 +439,31 @@ void SCIA_FromMJD2000ToYMD(double mjd,struct datetime *datetime)
 
   if (SCIA_ms>=1000)
    {
-   	SCIA_ms%=1000;
-   	if (++pTime->ti_sec>=(unsigned char)60)
-   	 {
-   	 	pTime->ti_sec%=(unsigned char)60;
-   	 	if (++pTime->ti_min>=(unsigned char)60)
-     	 {
-     	 	pTime->ti_min%=(unsigned char)60;
-     	 	if (++pTime->ti_hour>=(unsigned char)24)
-     	 	 {
-     	 	 	pTime->ti_hour%=(unsigned char)24;
-     	 	 	nDaysInMonth=daysInMonth[pDate->da_mon-1];
-     	 	 	if (((pDate->da_year%4)==0) && (pDate->da_mon==(char)2))
-     	 	 	 nDaysInMonth++;
-     	 	 	if (++pDate->da_day>(char)nDaysInMonth)
-     	 	 	 {
-     	 	 	 	pDate->da_day=1;
-     	 	 	 	if (++pDate->da_mon>(char)12)
-     	 	 	 	 {
-     	 	 	 	 	pDate->da_mon=(char)1;
-     	 	 	 	 	pDate->da_year++;
-     	 	 	 	 }
-     	 	 	 }
-     	 	 }
-   	 	 }
-   	 }
+       SCIA_ms%=1000;
+       if (++pTime->ti_sec>=(unsigned char)60)
+        {
+            pTime->ti_sec%=(unsigned char)60;
+            if (++pTime->ti_min>=(unsigned char)60)
+          {
+              pTime->ti_min%=(unsigned char)60;
+              if (++pTime->ti_hour>=(unsigned char)24)
+               {
+                   pTime->ti_hour%=(unsigned char)24;
+                   nDaysInMonth=daysInMonth[pDate->da_mon-1];
+                   if (((pDate->da_year%4)==0) && (pDate->da_mon==(char)2))
+                    nDaysInMonth++;
+                   if (++pDate->da_day>(char)nDaysInMonth)
+                    {
+                        pDate->da_day=1;
+                        if (++pDate->da_mon>(char)12)
+                         {
+                             pDate->da_mon=(char)1;
+                             pDate->da_year++;
+                         }
+                    }
+               }
+             }
+        }
    }
   datetime->millis = SCIA_ms;
  }
@@ -576,7 +576,7 @@ RC SciaNadirStates(ENGINE_CONTEXT *pEngineContext,INDEX fileIndex)
          maxPix[indexCluster]=pClusDef->npixels;
         if (pClusDef->nobs<pStateInfo->nobs)
          {
-         	// given a set of clusters, the total number of records is determined with the lowest spatial resolution
+             // given a set of clusters, the total number of records is determined with the lowest spatial resolution
 
           pStateInfo->nobs=pClusDef->nobs;
           pStateInfo->clusId=pCluster->clusId;
@@ -879,7 +879,7 @@ RC SciaReadNadirMDSInfo(ENGINE_CONTEXT *pEngineContext,INDEX fileIndex)
     // Browse NADIR MDS
 
     for (offset=pOrbitFile->sciaPDSInfo.mds_offset[MDS_NADIR],indexNadirMDS=0;
-	     indexNadirMDS<(int)pOrbitFile->sciaPDSInfo.nadir.num_dsr;indexNadirMDS++) {
+         indexNadirMDS<(int)pOrbitFile->sciaPDSInfo.nadir.num_dsr;indexNadirMDS++) {
       // Read the MDS offset
 
       rc=fseek(pOrbitFile->sciaPDSInfo.FILE_l1c,offset,SEEK_SET);
@@ -1121,7 +1121,7 @@ RC SCIA_SetPDS(ENGINE_CONTEXT *pEngineContext) {
         if ((ptr!=NULL) && (_n==4))
           *ptr='\0';
 
-       	// Get the file extension of the original file name
+           // Get the file extension of the original file name
 
         memset(fileExt,0,MAX_STR_SHORT_LEN);
 

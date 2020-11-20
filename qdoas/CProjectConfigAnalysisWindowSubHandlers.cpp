@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "constants.h"
 
 CAnalysisWindowSubHandler::CAnalysisWindowSubHandler(CConfigHandler *master,
-						     CAnalysisWindowConfigItem *item) :
+                             CAnalysisWindowConfigItem *item) :
   CConfigSubHandler(master),
   m_item(item)
 {
@@ -81,27 +81,27 @@ bool CAnalysisWindowSubHandler::start(const QString &element, const QXmlAttribut
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(d->refOneFile))
-	strcpy(d->refOneFile, str.toLocal8Bit().data());
+    strcpy(d->refOneFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage("Reference 1 Filename too long");
+    return postErrorMessage("Reference 1 Filename too long");
     }
 
     str = atts.value("reftwo");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(d->refTwoFile))
-	strcpy(d->refTwoFile, str.toLocal8Bit().data());
+    strcpy(d->refTwoFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage("Reference 2 Filename too long");
+    return postErrorMessage("Reference 2 Filename too long");
     }
 
     str = atts.value("residual");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(d->residualFile))
-	strcpy(d->residualFile, str.toLocal8Bit().data());
+    strcpy(d->residualFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage("Residual Filename too long");
+    return postErrorMessage("Residual Filename too long");
     }
 
     d->refMinLongitude = atts.value("minlon").toDouble();
@@ -181,7 +181,7 @@ int CAnalysisWindowSubHandler::mapToPolyType(const QString &str)
 }
 
 CAnalysisWindowCrossSectionSubHandler::CAnalysisWindowCrossSectionSubHandler(CConfigHandler *master,
-									     cross_section_list_t *d) :
+                                         cross_section_list_t *d) :
   CConfigSubHandler(master),
   m_d(d)
 {
@@ -262,9 +262,9 @@ bool CAnalysisWindowCrossSectionSubHandler::start(const QXmlAttributes &atts)
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(d->crossSectionFile))
-	strcpy(d->crossSectionFile, str.toLocal8Bit().data());
+    strcpy(d->crossSectionFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage("Cross Section filename too long");
+    return postErrorMessage("Cross Section filename too long");
     }
     else
       return postErrorMessage("Missing cross section file");
@@ -273,9 +273,9 @@ bool CAnalysisWindowCrossSectionSubHandler::start(const QXmlAttributes &atts)
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(d->amfFile))
-	strcpy(d->amfFile, str.toLocal8Bit().data());
+    strcpy(d->amfFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage("AMF filename too long");
+    return postErrorMessage("AMF filename too long");
     }
 
     // All OK
@@ -290,7 +290,7 @@ bool CAnalysisWindowCrossSectionSubHandler::start(const QXmlAttributes &atts)
 //------------------------------------------------------------
 
 CAnalysisWindowLinearSubHandler::CAnalysisWindowLinearSubHandler(CConfigHandler *master,
-								 struct anlyswin_linear *d) :
+                                 struct anlyswin_linear *d) :
   CConfigSubHandler(master),
   m_d(d)
 {
@@ -315,7 +315,7 @@ bool CAnalysisWindowLinearSubHandler::start(const QXmlAttributes &atts)
 //------------------------------------------------------------
 
 CAnalysisWindowNonLinearSubHandler::CAnalysisWindowNonLinearSubHandler(CConfigHandler *master,
-								       struct anlyswin_nonlinear *d) :
+                                       struct anlyswin_nonlinear *d) :
   CConfigSubHandler(master),
   m_d(d)
 {
@@ -430,7 +430,7 @@ bool CAnalysisWindowNonLinearSubHandler::start(const QXmlAttributes &atts)
 //------------------------------------------------------------
 
 CAnalysisWindowShiftStretchSubHandler::CAnalysisWindowShiftStretchSubHandler(CConfigHandler *master,
-									     shift_stretch_list_t *d) :
+                                         shift_stretch_list_t *d) :
   CConfigSubHandler(master),
   m_d(d)
 {
@@ -485,10 +485,10 @@ bool CAnalysisWindowShiftStretchSubHandler::start(const QString &element, const 
 
       QString str = atts.value("name");
       if (!str.isEmpty() && str.length() < (int)SYMBOL_NAME_BUFFER_LENGTH) {
-	strcpy(&(d->symbol[d->nSymbol][0]), str.toLocal8Bit().data());
-	++(d->nSymbol);
+    strcpy(&(d->symbol[d->nSymbol][0]), str.toLocal8Bit().data());
+    ++(d->nSymbol);
 
-	return true;
+    return true;
       }
     }
   }
@@ -507,7 +507,7 @@ bool CAnalysisWindowShiftStretchSubHandler::end(void)
 //------------------------------------------------------------
 
 CAnalysisWindowGapSubHandler::CAnalysisWindowGapSubHandler(CConfigHandler *master,
-							   gap_list_t *d) :
+                               gap_list_t *d) :
   CConfigSubHandler(master),
   m_d(d)
 {
@@ -532,7 +532,7 @@ bool CAnalysisWindowGapSubHandler::start(const QXmlAttributes &atts)
 //------------------------------------------------------------
 
 CAnalysisWindowOutputSubHandler::CAnalysisWindowOutputSubHandler(CConfigHandler *master,
-								 output_list_t *d) :
+                                 output_list_t *d) :
   CConfigSubHandler(master),
   m_d(d)
 {
@@ -572,7 +572,7 @@ bool CAnalysisWindowOutputSubHandler::start(const QXmlAttributes &atts)
 //------------------------------------------------------------
 
 CAnalysisWindowSfpSubHandler::CAnalysisWindowSfpSubHandler(CConfigHandler *master,
-							   struct calibration_sfp *d) :
+                               struct calibration_sfp *d) :
   CConfigSubHandler(master),
   m_d(d)
 {

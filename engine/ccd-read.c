@@ -148,13 +148,13 @@ CCD_DATA;
 
 typedef struct cameraPicture
  {
- 	int timestamp;
- 	char fileName[MAX_STR_LEN];
+     int timestamp;
+     char fileName[MAX_STR_LEN];
  }
 CAMERA_PICTURE;
 
 const char *MAXDOAS_measureTypes[PRJCT_INSTR_MAXDOAS_TYPE_MAX]=
-     	                            { "None","Off axis","Direct sun","Zenith","Dark","Lamp","Bentham","Almucantar","Offset","Azimuth", "Principal plane", "Horizon", "Moon" };
+                                     { "None","Off axis","Direct sun","Zenith","Dark","Lamp","Bentham","Almucantar","Offset","Azimuth", "Principal plane", "Horizon", "Moon" };
 
 
 // ------------------------------------------------------------------
@@ -177,10 +177,10 @@ int ccdImageFilesN=0;
 
 void CCD_GetImageFilesList(SHORT_DATE *pFileDate,char *rootPath)
  {
- 	// Declarations
+     // Declarations
 
- 	char imageFileName[MAX_ITEM_TEXT_LEN];
- 	char dateStr[9],*ptr;
+     char imageFileName[MAX_ITEM_TEXT_LEN];
+     char dateStr[9],*ptr;
   struct dirent *fileInfo;
   int hour,minute,sec,newtimestamp;
   INDEX i;
@@ -201,17 +201,17 @@ void CCD_GetImageFilesList(SHORT_DATE *pFileDate,char *rootPath)
 
    for (hDir=opendir(ccdCurrentImagePath);(hDir!=NULL) && ((fileInfo=readdir(hDir))!=NULL);)
     {
-    	sprintf(imageFileName,"%s/%s",ccdCurrentImagePath,fileInfo->d_name);
+        sprintf(imageFileName,"%s/%s",ccdCurrentImagePath,fileInfo->d_name);
 
      if (!STD_IsDir(imageFileName) && ((ptr=strstr(fileInfo->d_name,dateStr))!=NULL))
       {
-      	sscanf(ptr+9,"%02d%02d%02d",&hour,&minute,&sec);
-      	newtimestamp=hour*3600+minute*60+sec;
+          sscanf(ptr+9,"%02d%02d%02d",&hour,&minute,&sec);
+          newtimestamp=hour*3600+minute*60+sec;
 
        for (i=ccdImageFilesN;(i>0) && (newtimestamp<ccdImageFilesList[i-1].timestamp);i--)
         memcpy(&ccdImageFilesList[i],&ccdImageFilesList[i-1],sizeof(CAMERA_PICTURE));
 
-      	ccdImageFilesList[i].timestamp=newtimestamp;
+          ccdImageFilesList[i].timestamp=newtimestamp;
        strcpy(ccdImageFilesList[i].fileName,imageFileName);
 
        ccdImageFilesN++;
@@ -221,7 +221,7 @@ void CCD_GetImageFilesList(SHORT_DATE *pFileDate,char *rootPath)
 
 char *CCD_GetImageFile(INDEX indexImage)
  {
- 	return (indexImage==ITEM_NONE)?NULL:ccdImageFilesList[indexImage].fileName;
+     return (indexImage==ITEM_NONE)?NULL:ccdImageFilesList[indexImage].fileName;
  }
 
 
@@ -243,16 +243,16 @@ INDEX CCD_SearchForImage(int timestampMin,int timestampMax)
 
   while (imin+1<imax)
    {
-   	i=(imax+imin)>>1;
+       i=(imax+imin)>>1;
 
-   	if (timestamp<=ccdImageFilesList[imin].timestamp)
-   	 i=imax=imin;
-   	else if (timestamp>=ccdImageFilesList[imax].timestamp)
-   	 i=imin=imax;
-   	else if (timestamp<ccdImageFilesList[i].timestamp)
-   	 imax=i;
-   	else if (timestamp>=ccdImageFilesList[i].timestamp)
-   	 imin=i;
+       if (timestamp<=ccdImageFilesList[imin].timestamp)
+        i=imax=imin;
+       else if (timestamp>=ccdImageFilesList[imax].timestamp)
+        i=imin=imax;
+       else if (timestamp<ccdImageFilesList[i].timestamp)
+        imax=i;
+       else if (timestamp>=ccdImageFilesList[i].timestamp)
+        imin=i;
    }
 
   if ((imax>=imin) && (i>=imin) && (i<=imax))
@@ -334,10 +334,10 @@ RC SetCCD_EEV(ENGINE_CONTEXT *pEngineContext,FILE *specFp,FILE *darkFp)
 
     fread(&header,sizeof(CCD_DATA),1,specFp);                             // Get date and time of the first record
 
-   	memcpy(&pEngineContext->fileInfo.startDate,&header.today,sizeof(SHORT_DATE));
-   	memcpy(&pEngineContext->fileInfo.startTime,&header.now,sizeof(struct time));
+       memcpy(&pEngineContext->fileInfo.startDate,&header.today,sizeof(SHORT_DATE));
+       memcpy(&pEngineContext->fileInfo.startTime,&header.now,sizeof(struct time));
 
-   	fseek(specFp,0L,SEEK_SET);
+       fseek(specFp,0L,SEEK_SET);
 
     while (!feof(specFp) && fread(&header,sizeof(CCD_DATA),1,specFp))
      {
@@ -548,16 +548,16 @@ RC ReliCCD_EEV(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int loca
           rc=ERROR_ID_FILE_END;
          else if (!header.saveTracks)
           {
-          	if (header.doubleFlag==(char)1)
-          	 memcpy(dspectrum,tmpSpectrum,sizeof(double)*spSize);
-          	else
+              if (header.doubleFlag==(char)1)
+               memcpy(dspectrum,tmpSpectrum,sizeof(double)*spSize);
+              else
             for (i=0;i<spSize;i++)
              dspectrum[i]=(double)spectrum[i];
           }
          else
           {
-          	if (header.doubleFlag==(char)1)
-          	 {
+              if (header.doubleFlag==(char)1)
+               {
              // Accumulate spectra
 
              for (i=0;i<n_wavel;i++)
@@ -567,9 +567,9 @@ RC ReliCCD_EEV(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int loca
                 dspectrum[i]+=tmpSpectrum[n_wavel*j+i];
                dspectrum[i]/=ccdY;
               }
-          	 }
-          	else
-          	 {
+               }
+              else
+               {
              // Accumulate spectra
 
              for (i=0;i<n_wavel;i++)
@@ -627,7 +627,7 @@ RC ReliCCD_EEV(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int loca
 
            if (header.alsFlag)
             {
-            	pRecord->als.alsFlag=header.alsFlag;
+                pRecord->als.alsFlag=header.alsFlag;
              pRecord->als.scanIndex=header.scanIndex;
              pRecord->als.scanningAngle=header.scanningAngle;                                          // total number of spectra in tracks
              pRecord->als.compassAngle=header.compassAngle;
@@ -653,15 +653,15 @@ RC ReliCCD_EEV(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int loca
 
               if (pRecord->maxdoas.measurementType==PRJCT_INSTR_MAXDOAS_TYPE_OFFSET)
                {
-               	pRecord->ccd.targetElevation=header.targetElevation=-1.;
-               	pRecord->ccd.targetAzimuth=header.targetAzimuth=-1.;
+                   pRecord->ccd.targetElevation=header.targetElevation=-1.;
+                   pRecord->ccd.targetAzimuth=header.targetAzimuth=-1.;
                }
               else if ((fabs(header.trackerElevation+1.)<EPSILON) && (fabs(header.trackerAzimuth+1.)<EPSILON))  // NO sun tracker
                {
-               	pRecord->ccd.targetElevation=header.targetElevation=-1.;
-               	pRecord->ccd.targetAzimuth=header.targetAzimuth=-1.;
+                   pRecord->ccd.targetElevation=header.targetElevation=-1.;
+                   pRecord->ccd.targetAzimuth=header.targetAzimuth=-1.;
 
-               	pRecord->maxdoas.measurementType=header.measureType=PRJCT_INSTR_MAXDOAS_TYPE_ZENITH;
+                   pRecord->maxdoas.measurementType=header.measureType=PRJCT_INSTR_MAXDOAS_TYPE_ZENITH;
                }
               else
                {
@@ -672,14 +672,14 @@ RC ReliCCD_EEV(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int loca
                  }
                 else
                  {
-               	  if (fabs(header.targetElevation+1.)<EPSILON)
-              	   	header.targetElevation=floor(header.trackerElevation+0.5);
-              	   if (fabs(header.targetAzimuth+1.)<EPSILON)
-              	   	header.targetAzimuth=floor(header.trackerAzimuth+0.5);
-              	  }
+                     if (fabs(header.targetElevation+1.)<EPSILON)
+                         header.targetElevation=floor(header.trackerElevation+0.5);
+                     if (fabs(header.targetAzimuth+1.)<EPSILON)
+                         header.targetAzimuth=floor(header.trackerAzimuth+0.5);
+                    }
 
-               	pRecord->ccd.targetElevation=header.targetElevation;
-               	pRecord->ccd.targetAzimuth=header.targetAzimuth;
+                   pRecord->ccd.targetElevation=header.targetElevation;
+                   pRecord->ccd.targetAzimuth=header.targetAzimuth;
                }
             }
 
@@ -761,7 +761,7 @@ RC ReliCCD_EEV(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int loca
 
                      spSize=(header.saveTracks)?ccdX*(header.roiSlitEnd-header.roiSlitStart+1)/header.roiSlitGroup:ccdX;
 
-                    	fread(darkCurrent,sizeof(unsigned short)*spSize,1,darkFp);
+                        fread(darkCurrent,sizeof(unsigned short)*spSize,1,darkFp);
 
                      for (i=0;i<n_wavel;i++)
                       {
@@ -782,7 +782,7 @@ RC ReliCCD_EEV(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int loca
              if (pRecord->NSomme)
               for (i=0;i<n_wavel;i++)
                {
-               	pBuffers->darkCurrent[i]/=(double)pRecord->NSomme;              // if we have different integration times for the spectrum
+                   pBuffers->darkCurrent[i]/=(double)pRecord->NSomme;              // if we have different integration times for the spectrum
                 pBuffers->spectrum[i]-=pBuffers->darkCurrent[i];
                }
             }
@@ -807,10 +807,10 @@ RC ReliCCD_EEV(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int loca
 
            else if (!dateFlag && (measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_NONE))
             {
-            	if (((measurementType==PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS) && (pRecord->maxdoas.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS) && (pRecord->maxdoas.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_ZENITH)) ||
-            	    ((measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS) && (pRecord->maxdoas.measurementType!=measurementType)))
+                if (((measurementType==PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS) && (pRecord->maxdoas.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS) && (pRecord->maxdoas.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_ZENITH)) ||
+                    ((measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS) && (pRecord->maxdoas.measurementType!=measurementType)))
 
-            	 rc=ERROR_ID_FILE_RECORD;
+                 rc=ERROR_ID_FILE_RECORD;
             }
 
           }
@@ -822,15 +822,15 @@ RC ReliCCD_EEV(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int loca
 
   if (!rc && (pRecord->ccd.vip.matrix!=NULL) && (THRD_browseType==THREAD_BROWSE_SPECTRA))
    {
-   	memcpy(tmpSpectrum,dspectrum,sizeof(double)*n_wavel);
+       memcpy(tmpSpectrum,dspectrum,sizeof(double)*n_wavel);
 
-   	for (i=0;i<n_wavel;i++)
-   	 {
-   	 	dspectrum[i]=(double)0.;
+       for (i=0;i<n_wavel;i++)
+        {
+            dspectrum[i]=(double)0.;
 
-   	 	for (j=0;j<n_wavel;j++)
-  	 	  dspectrum[i]+=pRecord->ccd.vip.matrix[j%NCURVE][(j/NCURVE)*n_wavel+i]*tmpSpectrum[j];
-   	 }
+            for (j=0;j<n_wavel;j++)
+             dspectrum[i]+=pRecord->ccd.vip.matrix[j%NCURVE][(j/NCURVE)*n_wavel+i]*tmpSpectrum[j];
+        }
    }
 
   // Release the allocated buffers

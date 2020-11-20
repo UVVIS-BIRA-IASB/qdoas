@@ -94,7 +94,7 @@ ERROR_TABLE;
 
 ERROR_TABLE errorTable[]=
  {
- 	// Standard errors
+     // Standard errors
 
   { ERROR_ID_NO                        , "no error"                                                                                                           },
   { ERROR_ID_BUG                       , "\"%s\" This is an error or limitation of QDOAS. Please contact the authors at qdoas@aeronomie.be"                   },
@@ -227,23 +227,23 @@ static int errorStackN=0;                                                       
 
 RC ERROR_DisplayMessage(void *responseHandle)
  {
- 	// Declarations
+     // Declarations
 
- 	ERROR_DESCRIPTION errorDescription;
- 	RC rc;
+     ERROR_DESCRIPTION errorDescription;
+     RC rc;
 
- 	rc=0;
+     rc=0;
 
- 	// Get the last error message
+     // Get the last error message
 
- 	while (ERROR_GetLast(&errorDescription)!=0)
- 	 {
- 	  mediateResponseErrorMessage(errorDescription.errorFunction,errorDescription.errorString,errorDescription.errorType, responseHandle);
- 	  if (errorDescription.errorType==ERROR_TYPE_FATAL)
- 	   rc=-1;
- 	 }
+     while (ERROR_GetLast(&errorDescription)!=0)
+      {
+       mediateResponseErrorMessage(errorDescription.errorFunction,errorDescription.errorString,errorDescription.errorType, responseHandle);
+       if (errorDescription.errorType==ERROR_TYPE_FATAL)
+        rc=-1;
+      }
 
- 	return rc;    // 0 on success, -1 on fatal error
+     return rc;    // 0 on success, -1 on fatal error
  }
 
 // -----------------------------------------------------------------------------
@@ -270,7 +270,7 @@ RC ERROR_SetLast(const char *callingFunction,int errorType,RC errorId,...)
 
   if (errorId!=ERROR_ID_NO)
    {
-   	// Browse already registered errors
+       // Browse already registered errors
 
     for (i=0;i<errorStackN;i++)
      if (errorStack[i].errorId==errorId
@@ -343,7 +343,7 @@ RC ERROR_SetLast(const char *callingFunction,int errorType,RC errorId,...)
 
 RC ERROR_GetLast(ERROR_DESCRIPTION *pError)
  {
- 	// Transmit the information about the last error
+     // Transmit the information about the last error
 
   if (pError!=NULL)
    {

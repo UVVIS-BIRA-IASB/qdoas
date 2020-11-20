@@ -166,9 +166,9 @@ CWActiveContext::CWActiveContext(QWidget *parent) :
   connect(m_cancelButton, SIGNAL(clicked()), this, SLOT(slotCancelButtonClicked()));
 
   connect(m_graphTab, SIGNAL(currentChanged(int)),
-	  this, SLOT(slotCurrentGraphTabChanged(int)));
+      this, SLOT(slotCurrentGraphTabChanged(int)));
   connect(m_activeTab, SIGNAL(currentChanged(int)),
-	  this, SLOT(slotCurrentActiveTabChanged(int)));
+      this, SLOT(slotCurrentActiveTabChanged(int)));
 
   // explicitly hide the edit stuff to start with
   m_helpButton->hide();
@@ -223,11 +223,11 @@ void CWActiveContext::addEditor(CWEditor *editor)
 
       // take the last part of the context tag name as the tab label
       if (editor->editContextTag().contains(':')) {
-	QString label = editor->editContextTag();
-	m_activeTab->addTab(label.remove(0, label.lastIndexOf(':')+1));
+    QString label = editor->editContextTag();
+    m_activeTab->addTab(label.remove(0, label.lastIndexOf(':')+1));
       }
       else
-	m_activeTab->addTab(editor->editContextTag());
+    m_activeTab->addTab(editor->editContextTag());
 
     }
 
@@ -464,7 +464,7 @@ void CWActiveContext::slotPlotPages(const QList< RefCountConstPtr<CPlotPageData>
       // if must already exist for this to be meaningful ...
       QString tmpTag;
       if (m_plotRegion->pageExists(pageNumber, tmpTag)) {
-	retainedList.push_back(pageNumber);
+    retainedList.push_back(pageNumber);
       }
       m_graphTab->setTabText(index, tmpTag);
     }

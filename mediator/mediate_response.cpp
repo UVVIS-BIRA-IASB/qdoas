@@ -88,14 +88,14 @@ void mediateReleasePlotData(plot_data_t *d)
 
 
 void mediateResponsePlotData(int page,
-			     plot_data_t *plotDataArray,
-			     int arrayLength,
-			     enum ePlotScaleType type,
-			     int forceAutoScaling,
-			     const char *title,
-			     const char *xLabel,
-			     const char *yLabel,
-			     void *responseHandle)
+                 plot_data_t *plotDataArray,
+                 int arrayLength,
+                 enum ePlotScaleType type,
+                 int forceAutoScaling,
+                 const char *title,
+                 const char *xLabel,
+                 const char *yLabel,
+                 void *responseHandle)
 {
   CEngineResponseVisual *resp = static_cast<CEngineResponseVisual*>(responseHandle);
 
@@ -123,41 +123,41 @@ void mediateResponsePlotImage(int page,const char *imageFile,const char *title,v
  }
 
 void mediateResponseCellDataDouble(int page,
-				   int row,
-				   int column,
-				   double doubleValue,
-				   void *responseHandle)
+                   int row,
+                   int column,
+                   double doubleValue,
+                   void *responseHandle)
 {
   CEngineResponseVisual *resp = static_cast<CEngineResponseVisual*>(responseHandle);
   resp->addCell(page, row, column, QVariant(doubleValue));
 }
 
 void mediateResponseCellDataInteger(int page,
-				    int row,
-				    int column,
-				    int integerValue,
-				    void *responseHandle)
+                    int row,
+                    int column,
+                    int integerValue,
+                    void *responseHandle)
 {
   CEngineResponseVisual *resp = static_cast<CEngineResponseVisual*>(responseHandle);
   resp->addCell(page, row, column, QVariant(integerValue));
 }
 
 void mediateResponseCellDataString(int page,
-				   int row,
-				   int column,
-				   const char *stringValue,
-				   void *responseHandle)
+                   int row,
+                   int column,
+                   const char *stringValue,
+                   void *responseHandle)
 {
   CEngineResponseVisual *resp = static_cast<CEngineResponseVisual*>(responseHandle);
   resp->addCell(page, row, column, QVariant(QString(stringValue)));
 }
 
 void mediateResponseCellInfo(int page,
-				   int row,
-				   int column,
-				   void *responseHandle,
-				   const char *label,
-				   const char *stringFormat,...)
+                   int row,
+                   int column,
+                   void *responseHandle,
+                   const char *label,
+                   const char *stringFormat,...)
  {
    va_list argList;
    char stringValue[1024];
@@ -173,10 +173,10 @@ void mediateResponseCellInfo(int page,
  }
 
 void mediateResponseCellInfoNoLabel(int page,
-				   int row,
-				   int column,
-				   void *responseHandle,
-				   const char *stringFormat,...)
+                   int row,
+                   int column,
+                   void *responseHandle,
+                   const char *stringFormat,...)
  {
    va_list argList;
    char stringValue[1024];
@@ -190,9 +190,9 @@ void mediateResponseCellInfoNoLabel(int page,
  }
 
 void mediateResponseLabelPage(int page,
-			      const char *title,
-			      const char *tag,
-			      void *responseHandle)
+                  const char *title,
+                  const char *tag,
+                  void *responseHandle)
 {
   CEngineResponseVisual *resp = static_cast<CEngineResponseVisual*>(responseHandle);
   resp->addPageTitleAndTag(page, title, tag);
@@ -208,9 +208,9 @@ void mediateResponseRetainPage(int page, void * responseHandle)
 }
 
 void mediateResponseErrorMessage(const char *function,
-				 const char *messageString,
-				 enum eEngineErrorType errorType,
-				 void *responseHandle)
+                 const char *messageString,
+                 enum eEngineErrorType errorType,
+                 void *responseHandle)
 {
   CEngineResponse *resp = static_cast<CEngineResponse*>(responseHandle);
   resp->addErrorMessage(QString(function), QString(messageString), errorType);

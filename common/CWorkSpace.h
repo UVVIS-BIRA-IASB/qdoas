@@ -91,7 +91,7 @@ class CWorkSpace
   // create item and return pointer the storage allocated (and managed) by the workspace. NULL is returned on failure.
   mediate_project_t* createProject(const QString &newProjectName);
   mediate_analysis_window_t* createAnalysisWindow(const QString &projectName, const QString &newWindowName,
-						  const QString &preceedingWindowName = QString());
+                          const QString &preceedingWindowName = QString());
   bool createSite(const QString &newSiteName, const QString &abbr, double longitude, double latitude, double altitude);
   bool createSymbol(const QString &newSymbolName, const QString &description);
 
@@ -116,7 +116,7 @@ class CWorkSpace
   QStringList symbolList(void) const;
   QStringList analysisWindowsWithSymbol(const QString &projectName, const QString &symbol) const;
   bool setAnalysisWindowEnabled(const QString &projectName,
-				const QString &windowName, bool enabled); 
+                const QString &windowName, bool enabled); 
 
   bool destroyProject(const QString &projectName);
   bool destroyAnalysisWindow(const QString &projectName, const QString &newWindowName);

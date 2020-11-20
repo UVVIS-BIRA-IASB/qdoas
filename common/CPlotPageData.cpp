@@ -53,7 +53,7 @@ const QString& CPlotPageData::tag(void) const
 
 int CPlotPageData::type(void) const
 {
-	  return m_pageType;
+      return m_pageType;
 }  
 
 RefCountConstPtr<CPlotDataSet> CPlotPageData::dataSet(int index) const

@@ -60,9 +60,9 @@ void mediateResponseAddImage(int page,const char *imageFile,void *responseHandle
 int mediateRequestDisplaySpecInfo(void *engineContext,int page,void *responseHandle);
 
 void mediateResponsePlotData(int page, plot_data_t *plotDataArray, int arrayLength,
-			     enum ePlotScaleType type, int forceAutoScaling,
-			     const char *title, const char *xLabel,
-			     const char *yLabel, void *responseHandle);
+                 enum ePlotScaleType type, int forceAutoScaling,
+                 const char *title, const char *xLabel,
+                 const char *yLabel, void *responseHandle);
 
 void mediateResponsePlotImage(int page,const char *imageFile,const char *title,void *responseHandle);
 

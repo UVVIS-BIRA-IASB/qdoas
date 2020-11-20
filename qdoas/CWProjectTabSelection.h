@@ -34,7 +34,7 @@ class CWGeolocation;
 
 class CWProjectTabSelection : public QFrame
 {
-	Q_OBJECT
+    Q_OBJECT
  public:
   CWProjectTabSelection(const mediate_project_selection_t *properties, QWidget *parent = 0);
 

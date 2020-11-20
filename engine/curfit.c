@@ -108,7 +108,7 @@
 
 double Fchisq(int mode,int nFree,double *Y,double *Yfit,double *sigmaY,int nY)
  {
- 	// Declarations
+     // Declarations
 
   double chisq, weight;
   int k, mode2use;
@@ -180,7 +180,7 @@ double Fchisq(int mode,int nFree,double *Y,double *Yfit,double *sigmaY,int nY)
 
 RC CurfitMatinv(double **array,int nOrder,double *pDet)
  {
- 	// Declarations
+     // Declarations
 
   int    *ik, *jk, i, j, k, l;                                                  // indexes for loops and array
   double  amax,                                                                 // the largest element of a matrix
@@ -202,12 +202,12 @@ RC CurfitMatinv(double **array,int nOrder,double *pDet)
 
   else
    {
-   	// Reorganize the matrix in order to have the largest element in the diagonal
-   	// in order to improve the computational precision
+       // Reorganize the matrix in order to have the largest element in the diagonal
+       // in order to improve the computational precision
 
     for (k=0;k<nOrder;k++)
      {
-     	// search for the largest element in the matrix array(k:nOrder,k:nOrder)
+         // search for the largest element in the matrix array(k:nOrder,k:nOrder)
 
       do
        {
@@ -217,15 +217,15 @@ RC CurfitMatinv(double **array,int nOrder,double *pDet)
          for (j=k;j<nOrder;j++)
           if (fabs(amax)<=fabs(array[i][j]))
            {
-           	amax=array[i][j];
-           	ik[k]=i;
-           	jk[k]=j;
+               amax=array[i][j];
+               ik[k]=i;
+               jk[k]=j;
            }
 
         if (amax==(double)0.)
          {
-         	*pDet=(double)0.;                                                     // a error message will be returned by the calling function
-         	return rc;
+             *pDet=(double)0.;                                                     // a error message will be returned by the calling function
+             return rc;
          }
 
         // Reorganize the matrix in order to have the largest element in array[k][k] (make it a diagonal element)
@@ -339,7 +339,7 @@ RC CurfitMatinv(double **array,int nOrder,double *pDet)
 
 char *CurfitError(char *string,INDEX indexError,double *p,double *deltap)
  {
- 	// Declarations
+     // Declarations
 
   CROSS_REFERENCE *pTabCross;                                                   // settings of a parameter to fit
   char param[MAX_ITEM_NAME_LEN+1];                                             // the name of the parameter
@@ -440,7 +440,7 @@ static RC CurfitNumDeriv(double *specX, double *srefX, const double *sigmaY, int
      // Calculate the partial derivative of the function for the non linear parameter
 
     if (Dj==0.)
-    	rc=ERROR_SetLast(__func__,ERROR_TYPE_WARNING,ERROR_ID_DIVISION_BY_0,"delta");
+        rc=ERROR_SetLast(__func__,ERROR_TYPE_WARNING,ERROR_ID_DIVISION_BY_0,"delta");
     else
      for (i=0;i<nY;i++)
       deriv[indexA][i]=(Yfit2[i]-Yfit[i])/Dj;
@@ -601,7 +601,7 @@ RC Curfit(int     mode,                                                         
           double *Yfit,                                                         // O   vector of calculated values of Y
           double *pLambda,                                                      // O   proportion of gradient search included
           double *pChisqr,                                                      // O   reduced Chi square for fit (output)
-          INDEX	  indexFenoColumn,
+          INDEX      indexFenoColumn,
           struct fit_properties *fitprops)
  {
   // Declarations
@@ -734,7 +734,7 @@ RC Curfit(int     mode,                                                         
 
       if (((rc=CurfitMatinv(array,nA,&det))>=THREAD_EVENT_STOP) || (det==(double)0.))
        {
-       	rc=ERROR_SetLast(__func__,ERROR_TYPE_WARNING,ERROR_ID_MATINV);
+           rc=ERROR_SetLast(__func__,ERROR_TYPE_WARNING,ERROR_ID_MATINV);
         goto EndCurfit;
        }
 
@@ -764,7 +764,7 @@ RC Curfit(int     mode,                                                         
 
       if (niter> CURFIT_MAX_ITER)
        {
-       	rc=ERROR_SetLast(__func__,ERROR_TYPE_WARNING,ERROR_ID_CONVERGENCE, CURFIT_MAX_ITER);
+           rc=ERROR_SetLast(__func__,ERROR_TYPE_WARNING,ERROR_ID_CONVERGENCE, CURFIT_MAX_ITER);
         goto EndCurfit;
        }
      }
@@ -805,7 +805,7 @@ RC Curfit(int     mode,                                                         
 
       if (array[j][j]/alpha[j][j]*chisqr<=0.)
        {
-       	rc=ERROR_SetLast("Curfit3",ERROR_TYPE_WARNING,ERROR_ID_SQRT_ARG,CurfitError(string,j,A,deltaA));
+           rc=ERROR_SetLast("Curfit3",ERROR_TYPE_WARNING,ERROR_ID_SQRT_ARG,CurfitError(string,j,A,deltaA));
         goto EndCurfit;
        }
 

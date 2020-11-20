@@ -82,9 +82,9 @@
 
 typedef struct _debugFunction
  {
- 	char fctName[MAX_FCT_LEN+1];                                                 // the name of the function
- 	MASK  fctType;                                                                // the type of the function
- 	int   fctLevel;                                                               // the debugging level of the function
+     char fctName[MAX_FCT_LEN+1];                                                 // the name of the function
+     MASK  fctType;                                                                // the type of the function
+     int   fctLevel;                                                               // the debugging level of the function
  }
 DEBUG_FUNCTION;
 
@@ -187,61 +187,61 @@ void DEBUG_PrintVar(char *message,...)
 
       // Get the information on the variable to debug
 
-     	if ((rc=MEMORY_GetInfo(pVar,argPtr))!=ERROR_ID_NO)
-     	 fprintf(fp,"%s+++ Can not debug %p (%d)\n",debugIndentStr,argPtr,rc);
-     	else
-     	 {
-     	  // Define the area to read out
+         if ((rc=MEMORY_GetInfo(pVar,argPtr))!=ERROR_ID_NO)
+          fprintf(fp,"%s+++ Can not debug %p (%d)\n",debugIndentStr,argPtr,rc);
+         else
+          {
+           // Define the area to read out
 
-     	  if (pVar->varMatrixFlag)                                                // matrix
-     	   {
-     	    pVar->varNlMin=(int)va_arg(argList,int);
-     	    pVar->varNlMax=(int)va_arg(argList,int);
-     	    pVar->varNcMin=(int)va_arg(argList,int);
-     	    pVar->varNcMax=(int)va_arg(argList,int);
-     	   }
-     	  else                                                                    // vector
-     	   {
-     	    pVar->varNlMin=(int)va_arg(argList,int);
-     	    pVar->varNlMax=(int)va_arg(argList,int);
-     	   }
+           if (pVar->varMatrixFlag)                                                // matrix
+            {
+             pVar->varNlMin=(int)va_arg(argList,int);
+             pVar->varNlMax=(int)va_arg(argList,int);
+             pVar->varNcMin=(int)va_arg(argList,int);
+             pVar->varNcMax=(int)va_arg(argList,int);
+            }
+           else                                                                    // vector
+            {
+             pVar->varNlMin=(int)va_arg(argList,int);
+             pVar->varNlMax=(int)va_arg(argList,int);
+            }
 
-     	  // Check the type of the variable to debug
+           // Check the type of the variable to debug
 
-     	  if ((pVar->varType==MEMORY_TYPE_UNKNOWN) || (pVar->varType==MEMORY_TYPE_STRUCT))
-       	 fprintf(fp,"%s+++ Can not debug %s (%s type)\n",debugIndentStr,pVar->varName,MEMORY_types[pVar->varType]);
+           if ((pVar->varType==MEMORY_TYPE_UNKNOWN) || (pVar->varType==MEMORY_TYPE_STRUCT))
+            fprintf(fp,"%s+++ Can not debug %s (%s type)\n",debugIndentStr,pVar->varName,MEMORY_types[pVar->varType]);
 
         // Check the area to print
 
-       	else if ((pVar->varNlMin<pVar->varNlOff) || (pVar->varNlMin>pVar->varNl+pVar->varNlOff-1) ||
-       	         (pVar->varNlMax<pVar->varNlOff) || (pVar->varNlMax>pVar->varNl+pVar->varNlOff-1) ||
-       	         (pVar->varNcMin<pVar->varNcOff) || (pVar->varNcMin>pVar->varNc+pVar->varNcOff-1) ||
-       	         (pVar->varNcMax<pVar->varNcOff) || (pVar->varNcMax>pVar->varNc+pVar->varNcOff-1))
+           else if ((pVar->varNlMin<pVar->varNlOff) || (pVar->varNlMin>pVar->varNl+pVar->varNlOff-1) ||
+                    (pVar->varNlMax<pVar->varNlOff) || (pVar->varNlMax>pVar->varNl+pVar->varNlOff-1) ||
+                    (pVar->varNcMin<pVar->varNcOff) || (pVar->varNcMin>pVar->varNc+pVar->varNcOff-1) ||
+                    (pVar->varNcMax<pVar->varNcOff) || (pVar->varNcMax>pVar->varNc+pVar->varNcOff-1))
 
          fprintf(fp,"%s+++ Can not debug %s because indexes (%d:%d,%d:%d) are out of range (%d:%d,%d:%d)\n",
                      debugIndentStr,pVar->varName,pVar->varNlMin,pVar->varNlMax,pVar->varNcMin,pVar->varNcMax,
-     	 	             pVar->varNlOff,pVar->varNl+pVar->varNlOff-1,pVar->varNcOff,pVar->varNc+pVar->varNcOff-1);
+                           pVar->varNlOff,pVar->varNl+pVar->varNlOff-1,pVar->varNcOff,pVar->varNc+pVar->varNcOff-1);
 
-       	else if ((nl!=ITEM_NONE) && ((pVar->varNlMax-pVar->varNlMin+1)!=nl))
-       	 fprintf(fp,"%s+++ Can not debug %s (dimensions should agree : %d lines <-> %d lines for the first variable to debug )\n",
-       	         debugIndentStr,pVar->varName,pVar->varNlMax-pVar->varNlMin+1,nl);
+           else if ((nl!=ITEM_NONE) && ((pVar->varNlMax-pVar->varNlMin+1)!=nl))
+            fprintf(fp,"%s+++ Can not debug %s (dimensions should agree : %d lines <-> %d lines for the first variable to debug )\n",
+                    debugIndentStr,pVar->varName,pVar->varNlMax-pVar->varNlMin+1,nl);
 
         // Add the variable to the list of variables to debug
 
         else
-       	 {
-       	  nl=pVar->varNlMax-pVar->varNlMin+1;
+            {
+             nl=pVar->varNlMax-pVar->varNlMin+1;
 
-       	  if (pVar->varNc>1)
-     	 	   fprintf(fp,"%s+++ Debug %s (%s, %dx%d, %d:%d,%d:%d)\n",debugIndentStr,pVar->varName,MEMORY_types[pVar->varType],
-     	 	           nl,(pVar->varNcMax-pVar->varNcMin+1),pVar->varNlMin,pVar->varNlMax,pVar->varNcMin,pVar->varNcMax);
+             if (pVar->varNc>1)
+                 fprintf(fp,"%s+++ Debug %s (%s, %dx%d, %d:%d,%d:%d)\n",debugIndentStr,pVar->varName,MEMORY_types[pVar->varType],
+                         nl,(pVar->varNcMax-pVar->varNcMin+1),pVar->varNlMin,pVar->varNlMax,pVar->varNcMin,pVar->varNcMax);
           else
-     	 	   fprintf(fp,"%s+++ Debug %s (%s, %d, %d:%d)\n",debugIndentStr,pVar->varName,MEMORY_types[pVar->varType],
-     	 	           nl,pVar->varNlMin,pVar->varNlMax);
+                 fprintf(fp,"%s+++ Debug %s (%s, %d, %d:%d)\n",debugIndentStr,pVar->varName,MEMORY_types[pVar->varType],
+                         nl,pVar->varNlMin,pVar->varNlMax);
 
-     	 	  nVar++;
-       	 }
-     	 }
+                nVar++;
+            }
+          }
      }
     va_end(argList);
 
@@ -421,27 +421,27 @@ RC DEBUG_FunctionBegin(char *fctName,MASK fctType)
 
           if (debugNFct)                                                        // for the function registered from DEBUG_Start, do not account for the
            {                                                                    // function type
-           	fprintf(fp,"(");
+               fprintf(fp,"(");
 
             // Output the type of the function
 
-       	    if ((fctType&DEBUG_FCTTYPE_MEM)!=0)
+               if ((fctType&DEBUG_FCTTYPE_MEM)!=0)
              fprintf(fp,"%s",(nFctTypes++)?"/MEM":"MEM");
-       	    if ((fctType&DEBUG_FCTTYPE_GUI)!=0)
-  	          fprintf(fp,"%s",(nFctTypes++)?"/GUI":"GUI");
-       	    if ((fctType&DEBUG_FCTTYPE_MATH)!=0)
+               if ((fctType&DEBUG_FCTTYPE_GUI)!=0)
+                fprintf(fp,"%s",(nFctTypes++)?"/GUI":"GUI");
+               if ((fctType&DEBUG_FCTTYPE_MATH)!=0)
              fprintf(fp,"%s",(nFctTypes++)?"/MATH":"MATH");
-       	    if ((fctType&DEBUG_FCTTYPE_APPL)!=0)
-  	          fprintf(fp,"%s",(nFctTypes++)?"/APPL":"APPL");
-       	    if ((fctType&DEBUG_FCTTYPE_UTIL)!=0)
+               if ((fctType&DEBUG_FCTTYPE_APPL)!=0)
+                fprintf(fp,"%s",(nFctTypes++)?"/APPL":"APPL");
+               if ((fctType&DEBUG_FCTTYPE_UTIL)!=0)
              fprintf(fp,"%s",(nFctTypes++)?"/UTIL":"UTIL");
-       	    if ((fctType&DEBUG_FCTTYPE_FILE)!=0)
-  	          fprintf(fp,"%s",(nFctTypes++)?"/FILE":"FILE");
-       	    if ((fctType&DEBUG_FCTTYPE_CONFIG)!=0)
-  	          fprintf(fp,"%s",(nFctTypes++)?"/CONFIG":"CONFIG");
+               if ((fctType&DEBUG_FCTTYPE_FILE)!=0)
+                fprintf(fp,"%s",(nFctTypes++)?"/FILE":"FILE");
+               if ((fctType&DEBUG_FCTTYPE_CONFIG)!=0)
+                fprintf(fp,"%s",(nFctTypes++)?"/CONFIG":"CONFIG");
 
-  	         fprintf(fp,")");
-  	        }
+               fprintf(fp,")");
+              }
 
           fprintf(fp,"\n");
          }
@@ -491,8 +491,8 @@ RC DEBUG_FunctionStop(char *fctName,RC rcFct)
      debugNFct--;
 
     else if ((--debugNFct<0) ||
-     	       (strlen(debugFct[debugNFct].fctName)!=strlen(fctName)) ||
-     	        strcasecmp(debugFct[debugNFct].fctName,fctName))
+                (strlen(debugFct[debugNFct].fctName)!=strlen(fctName)) ||
+                 strcasecmp(debugFct[debugNFct].fctName,fctName))
 
 
 rc=ERROR_SetLast("DEBUG_FunctionStop",ERROR_TYPE_DEBUG,ERROR_ID_DEBUG_FCTBLOCK,
@@ -593,29 +593,29 @@ RC DEBUG_Start(char *fileName,char *callingFct,MASK fctMask,int nLevels,int varF
 
   else
    {
-   	// Header
+       // Header
 
-   	fprintf(fp,"\nDEBUG fctMask : ");
+       fprintf(fp,"\nDEBUG fctMask : ");
 
-   	if ((fctMask&DEBUG_FCTTYPE_MEM)!=0)
+       if ((fctMask&DEBUG_FCTTYPE_MEM)!=0)
      fprintf(fp,"%s",(nFctTypes++)?"/MEM":"MEM");
-   	if ((fctMask&DEBUG_FCTTYPE_GUI)!=0)
-  	  fprintf(fp,"%s",(nFctTypes++)?"/GUI":"GUI");
-   	if ((fctMask&DEBUG_FCTTYPE_MATH)!=0)
+       if ((fctMask&DEBUG_FCTTYPE_GUI)!=0)
+        fprintf(fp,"%s",(nFctTypes++)?"/GUI":"GUI");
+       if ((fctMask&DEBUG_FCTTYPE_MATH)!=0)
      fprintf(fp,"%s",(nFctTypes++)?"/MATH":"MATH");
-   	if ((fctMask&DEBUG_FCTTYPE_APPL)!=0)
-  	  fprintf(fp,"%s",(nFctTypes++)?"/APPL":"APPL");
-   	if ((fctMask&DEBUG_FCTTYPE_UTIL)!=0)
+       if ((fctMask&DEBUG_FCTTYPE_APPL)!=0)
+        fprintf(fp,"%s",(nFctTypes++)?"/APPL":"APPL");
+       if ((fctMask&DEBUG_FCTTYPE_UTIL)!=0)
      fprintf(fp,"%s",(nFctTypes++)?"/UTIL":"UTIL");
-   	if ((fctMask&DEBUG_FCTTYPE_FILE)!=0)
-  	  fprintf(fp,"%s",(nFctTypes++)?"/FILE":"FILE");
-   	if ((fctMask&DEBUG_FCTTYPE_CONFIG)!=0)
-  	  fprintf(fp,"%s",(nFctTypes++)?"/CONFIG":"CONFIG");
+       if ((fctMask&DEBUG_FCTTYPE_FILE)!=0)
+        fprintf(fp,"%s",(nFctTypes++)?"/FILE":"FILE");
+       if ((fctMask&DEBUG_FCTTYPE_CONFIG)!=0)
+        fprintf(fp,"%s",(nFctTypes++)?"/CONFIG":"CONFIG");
 
-   	fprintf(fp," fctLevels %d\n",min(nLevels,DEBUG_MAX_LEVELS));
-   	fprintf(fp,"--------------------------------------------------------------------------------\n");
+       fprintf(fp," fctLevels %d\n",min(nLevels,DEBUG_MAX_LEVELS));
+       fprintf(fp,"--------------------------------------------------------------------------------\n");
 
-   	// Initialization of static variables
+       // Initialization of static variables
 
     strcpy(debugFileName,fileName);
 
@@ -649,7 +649,7 @@ RC DEBUG_Start(char *fileName,char *callingFct,MASK fctMask,int nLevels,int varF
 // PURPOSE       Stop the debugging mode
 //
 // RETURN        ERROR_ID_DEBUG_STOP if the debug mode was not running
-//               ERROR_ID_DEBUG_FCTBLOCK	if a problem with a function block is detected
+//               ERROR_ID_DEBUG_FCTBLOCK    if a problem with a function block is detected
 //               ERROR_ID_DEBUG_ otherwise
 // -----------------------------------------------------------------------------
 
@@ -671,11 +671,11 @@ RC DEBUG_Stop(char *callingFct)
   else if ((strlen(debugFct[0].fctName)==strlen(callingFct)) &&
            !strcasecmp(debugFct[0].fctName,callingFct))
    {
-   	// Unregister the calling function
+       // Unregister the calling function
 
- 	  rc=DEBUG_FunctionStop(debugFct[0].fctName,0);
+       rc=DEBUG_FunctionStop(debugFct[0].fctName,0);
 
- 	  // Reset debug variables
+       // Reset debug variables
 
     memset(debugFileName,0,DOAS_MAX_PATH_LEN+1);
 

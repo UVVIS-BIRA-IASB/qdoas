@@ -761,7 +761,7 @@ void getValidFieldFlags(int *validFlags, int instrument,int selectorOrigin)
 
   if (selectorOrigin==TAB_SELECTOR_EXPORT)
    {
-   	validFlags[PRJCT_RESULTS_LAMBDA]=1;
-   	validFlags[PRJCT_RESULTS_SPECTRA]=1;
+       validFlags[PRJCT_RESULTS_LAMBDA]=1;
+       validFlags[PRJCT_RESULTS_SPECTRA]=1;
    }
  }

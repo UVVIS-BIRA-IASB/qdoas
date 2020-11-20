@@ -85,16 +85,16 @@
 int MEMORY_stackSize=MEMORY_STACK_SIZE;                                         // the size of the stack of allocated objects
 const char *MEMORY_types[MEMORY_TYPE_MAX]=                                           // available types for allocated objects
  {
- 	"unknown",                                                                    // unknown
- 	"pointer",                                                                    // pointer
- 	"string",                                                                     // character/string
- 	"short",                                                                      // short
- 	"unsigned short",                                                             // unsigned short
- 	"integer",                                                                    // integer
- 	"long",                                                                       // long
- 	"float",                                                                      // float
- 	"double",                                                                     // double
- 	"structure",                                                                  // structure
+     "unknown",                                                                    // unknown
+     "pointer",                                                                    // pointer
+     "string",                                                                     // character/string
+     "short",                                                                      // short
+     "unsigned short",                                                             // unsigned short
+     "integer",                                                                    // integer
+     "long",                                                                       // long
+     "float",                                                                      // float
+     "double",                                                                     // double
+     "structure",                                                                  // structure
  };
 
 // ================
@@ -341,7 +341,7 @@ double *MEMORY_AllocDVector(const char *callingFunctionName, const char *bufferN
 
 void MEMORY_ReleaseDVector(const char *callingFunctionName, const char *bufferName,double *v,int nl)
  {
- 	// Register the function in debugging mode
+     // Register the function in debugging mode
 
   #if defined(__DEBUG_) && __DEBUG_
   DEBUG_FunctionBegin("MEMORY_ReleaseDVector",DEBUG_FCTTYPE_MEM);
@@ -468,18 +468,18 @@ void MEMORY_ReleaseDMatrix(const char *callingFunctionName,const char *bufferNam
 
 RC MEMORY_Alloc(void)
  {
- 	// Declaration
+     // Declaration
 
- 	RC rc;                                                                        // return code
+     RC rc;                                                                        // return code
 
- 	// Initialization
+     // Initialization
 
- 	rc=ERROR_ID_NO;
+     rc=ERROR_ID_NO;
 
- 	if (memoryStack!=NULL)
- 	 rc=ERROR_SetLast("MEMORY_Alloc",ERROR_TYPE_DEBUG,ERROR_ID_MEMORY_STACKALLOCATED);
- 	else
- 	 {
+     if (memoryStack!=NULL)
+      rc=ERROR_SetLast("MEMORY_Alloc",ERROR_TYPE_DEBUG,ERROR_ID_MEMORY_STACKALLOCATED);
+     else
+      {
 
     // Initialize all the static variables handling the stack
 
@@ -534,13 +534,13 @@ RC MEMORY_End(void)
    rc=ERROR_SetLast("MEMORY_End",ERROR_TYPE_DEBUG,ERROR_ID_MEMORY_STACKNOTALLOCATED);
   else
    {
-   	// Browse remaining objects in the stack
+       // Browse remaining objects in the stack
 
-   	DEBUG_Print("Number of remaining objects in the stack : %d\n",memoryStackObjectsNumber);
+       DEBUG_Print("Number of remaining objects in the stack : %d\n",memoryStackObjectsNumber);
 
-   	if (memoryStackObjectsNumber>0)
-   	 {
-   	  rc=ERROR_SetLast("MEMORY_End",ERROR_TYPE_DEBUG,ERROR_ID_MEMORY_STACKNOTEMPTY,memoryStackObjectsNumber);
+       if (memoryStackObjectsNumber>0)
+        {
+         rc=ERROR_SetLast("MEMORY_End",ERROR_TYPE_DEBUG,ERROR_ID_MEMORY_STACKNOTEMPTY,memoryStackObjectsNumber);
       DEBUG_Print("Allocation/Release error(s) : \n");
 
       for (indexObjects=0;indexObjects<memoryStackObjectsNumber;indexObjects++)
@@ -559,7 +559,7 @@ RC MEMORY_End(void)
 
     free(memoryStack);
 
- 	  // Reinitialize all the static variables handling the stack
+       // Reinitialize all the static variables handling the stack
 
     memoryStackObjectsNumber=
     memoryStackBytesNumber=
@@ -599,76 +599,76 @@ RC MEMORY_End(void)
 
 RC MEMORY_GetInfo(DEBUG_VARIABLE *pVariable,char *pBuffer)
  {
- 	// Declarations
+     // Declarations
 
   MEMORY *pMemory;                                                              // pointer to an object in the stack
- 	INDEX i;                                                                      // browse objects in the stack
- 	RC rc;                                                                        // return code
+     INDEX i;                                                                      // browse objects in the stack
+     RC rc;                                                                        // return code
 
- 	// Initialization
+     // Initialization
 
- 	rc=ERROR_ID_NO;
+     rc=ERROR_ID_NO;
 
- 	// Check that the stack exists
+     // Check that the stack exists
 
- 	if (memoryStack==NULL)
+     if (memoryStack==NULL)
    rc=ERROR_SetLast("MEMORY_GetInfo",ERROR_TYPE_DEBUG,ERROR_ID_MEMORY_STACKNOTALLOCATED);
   else if (pVariable!=NULL)
    {
     memset(pVariable,0,sizeof(DEBUG_VARIABLE));
 
-   	// Browse objects in the stack
+       // Browse objects in the stack
 
-   	for (i=0;i<memoryStackObjectsNumber;i++)
-   	 if (memoryStack[i].pBuffer-memoryStack[i].offset*memoryStack[i].itemSize==pBuffer)
-   	  break;
+       for (i=0;i<memoryStackObjectsNumber;i++)
+        if (memoryStack[i].pBuffer-memoryStack[i].offset*memoryStack[i].itemSize==pBuffer)
+         break;
 
-   	// Object not found
+       // Object not found
 
-   	if (i>=memoryStackObjectsNumber)
-   	 rc=ERROR_SetLast("MEMORY_GetInfo",ERROR_TYPE_DEBUG,ERROR_ID_MEMORY_OBJECTNOTFOUND,pBuffer);
-   	else
-   	 {
-   	  // Retrieve information on the found object
+       if (i>=memoryStackObjectsNumber)
+        rc=ERROR_SetLast("MEMORY_GetInfo",ERROR_TYPE_DEBUG,ERROR_ID_MEMORY_OBJECTNOTFOUND,pBuffer);
+       else
+        {
+         // Retrieve information on the found object
 
-   	  pMemory=&memoryStack[i];
+         pMemory=&memoryStack[i];
 
-   	  strncpy(pVariable->varName,pMemory->bufferName,MAX_VAR_LEN);
-   	  pVariable->varData.ucharVector=(char *)pMemory->pBuffer;
+         strncpy(pVariable->varName,pMemory->bufferName,MAX_VAR_LEN);
+         pVariable->varData.ucharVector=(char *)pMemory->pBuffer;
 
-   	  // The variable to debug is a vector
+         // The variable to debug is a vector
 
-   	  if (pMemory->type!=MEMORY_TYPE_PTR)
-   	   {
-   	    pVariable->varType=pMemory->type;
-   	    pVariable->varNl=pMemory->itemNumber;
-   	    pVariable->varNlOff=pMemory->offset;
-   	    pVariable->varNc=1;
-   	    pVariable->varNcOff=0;
-   	    pVariable->varNlMin=0;
-   	    pVariable->varNlMax=pVariable->varNl-1;
-   	    pVariable->varNcMin=pVariable->varNcMax=0;
-   	    pVariable->varMatrixFlag=0;
-   	   }
+         if (pMemory->type!=MEMORY_TYPE_PTR)
+          {
+           pVariable->varType=pMemory->type;
+           pVariable->varNl=pMemory->itemNumber;
+           pVariable->varNlOff=pMemory->offset;
+           pVariable->varNc=1;
+           pVariable->varNcOff=0;
+           pVariable->varNlMin=0;
+           pVariable->varNlMax=pVariable->varNl-1;
+           pVariable->varNcMin=pVariable->varNcMax=0;
+           pVariable->varMatrixFlag=0;
+          }
 
-   	  // The variable to debug is a matrix
+         // The variable to debug is a matrix
 
-   	  else if (i+1>=memoryStackObjectsNumber)
-   	   rc=ERROR_SetLast("MEMORY_GetInfo",ERROR_TYPE_DEBUG,ERROR_ID_MEMORY_DEFMATRIX,pMemory->bufferName);
-   	  else
-   	   {
-   	    pVariable->varType=(pMemory+1)->type;
-   	    pVariable->varNl=(pMemory+1)->itemNumber;
-   	    pVariable->varNlOff=(pMemory+1)->offset;
-   	    pVariable->varNc=pMemory->itemNumber;
-   	    pVariable->varNcOff=pMemory->offset;
-   	    pVariable->varNlMin=0;
-   	    pVariable->varNlMax=pVariable->varNl-1;
-   	    pVariable->varNcMin=0;
-   	    pVariable->varNcMax=pVariable->varNc-1;
-   	    pVariable->varMatrixFlag=1;
-   	   }
-   	 }
+         else if (i+1>=memoryStackObjectsNumber)
+          rc=ERROR_SetLast("MEMORY_GetInfo",ERROR_TYPE_DEBUG,ERROR_ID_MEMORY_DEFMATRIX,pMemory->bufferName);
+         else
+          {
+           pVariable->varType=(pMemory+1)->type;
+           pVariable->varNl=(pMemory+1)->itemNumber;
+           pVariable->varNlOff=(pMemory+1)->offset;
+           pVariable->varNc=pMemory->itemNumber;
+           pVariable->varNcOff=pMemory->offset;
+           pVariable->varNlMin=0;
+           pVariable->varNlMax=pVariable->varNl-1;
+           pVariable->varNcMin=0;
+           pVariable->varNcMax=pVariable->varNc-1;
+           pVariable->varMatrixFlag=1;
+          }
+        }
    }
 
   // Return

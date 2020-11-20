@@ -549,7 +549,7 @@ static void write_buffer(const struct output_field *thefield, const bool selecte
 
       for (size_t i=0; i< ncols; ++i) {
 
-      	 // write into the buffer at the correct index position, using
+           // write into the buffer at the correct index position, using
         // the correct layout for the type of data stored:
         int index =  i_alongtrack*n_crosstrack*ncols + i_crosstrack*ncols + i;
         assign_buffer(&buffer[dimension*index], static_cast<U*>(thefield->data)[record*ncols+i]);

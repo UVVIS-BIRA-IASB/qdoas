@@ -183,17 +183,17 @@ void setMediateSlit(SLIT *pEngineSlit,const mediate_slit_function_t *pMediateSli
 
 void setMediateFilter(PRJCT_FILTER *pEngineFilter,const mediate_filter_t *pMediateFilter,int hpFilterFlag,int convoluteFlag)
  {
- 	// Initializations
+     // Initializations
 
- 	memset(pEngineFilter,0,sizeof(PRJCT_FILTER));
+     memset(pEngineFilter,0,sizeof(PRJCT_FILTER));
 
- 	pEngineFilter->type=pMediateFilter->mode;
- 	pEngineFilter->filterEffWidth=(double)0.;
+     pEngineFilter->type=pMediateFilter->mode;
+     pEngineFilter->filterEffWidth=(double)0.;
 
- 	// Fill up the structure according to the filter type
+     // Fill up the structure according to the filter type
 
- 	switch(pEngineFilter->type)
- 	 {
+     switch(pEngineFilter->type)
+      {
  // ----------------------------------------------------------------------------
     case PRJCT_FILTER_TYPE_KAISER :                                             // kaiser filter
 
@@ -295,5 +295,5 @@ void setMediateFilter(PRJCT_FILTER *pEngineFilter,const mediate_filter_t *pMedia
 
     break;
  // ----------------------------------------------------------------------------
- 	 }
+      }
  }

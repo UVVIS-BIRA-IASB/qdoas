@@ -176,9 +176,9 @@ CWMain::CWMain(QWidget *parent) :
 
   // connections
   connect(m_controller, SIGNAL(signalPlotPage(const RefCountConstPtr<CPlotPageData> &)),
-	  this, SLOT(slotPlotPage(const RefCountConstPtr<CPlotPageData> &)));
+      this, SLOT(slotPlotPage(const RefCountConstPtr<CPlotPageData> &)));
   connect(m_controller, SIGNAL(signalErrorMessages(int, const QString &)),
-	  this, SLOT(slotErrorMessages(int, const QString &)));
+      this, SLOT(slotErrorMessages(int, const QString &)));
 }
 
 CWMain::~CWMain()
@@ -226,8 +226,8 @@ bool CWMain::checkStateAndConsiderSaveFile(void)
   }
 
   QMessageBox::StandardButton choice = QMessageBox::question(this, "Save Changes", msg,
-							     QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
-							     QMessageBox::Save);
+                                 QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
+                                 QMessageBox::Save);
 
   if (choice == QMessageBox::Discard)
     return true; // discard changes
@@ -285,8 +285,8 @@ void CWMain::slotOpenFile()
   CPreferences *prefs = CPreferences::instance();
 
   QString fileName = QFileDialog::getOpenFileName(this, "Open Project File",
-						  prefs->directoryName("ConvConf"),
-						  "Convolution Config (*.xml);;All Files (*)");
+                          prefs->directoryName("ConvConf"),
+                          "Convolution Config (*.xml);;All Files (*)");
 
   if (fileName.isEmpty()) {
     return;
@@ -318,9 +318,9 @@ void CWMain::slotOpenFile()
     for (int i = 0; i<10; ++i) {
       QString path = handler->getPath(i);
       if (path.isEmpty())
-	pathMgr->removePath(i);
+    pathMgr->removePath(i);
       else
-	pathMgr->addPath(i, path);
+    pathMgr->addPath(i, path);
     }
 
     // copy the properties data ...
@@ -378,27 +378,27 @@ void CWMain::slotSaveAsFile()
     returnCode = QMessageBox::Cancel;
 
     QString fileName = QFileDialog::getSaveFileName(this, "SaveAs Config File",
-						    CPreferences::instance()->directoryName("ConvConf"),
-						    "Convolution Config (*.xml);;All Files (*)");
+                            CPreferences::instance()->directoryName("ConvConf"),
+                            "Convolution Config (*.xml);;All Files (*)");
 
     // empty fileName implies cancel
     if (!fileName.isEmpty()) {
 
       if (!fileName.contains('.'))
-	fileName += ".xml";
+    fileName += ".xml";
 
       // write the file
       QString msg = writer.write(fileName);
       if (!msg.isNull()) {
-	msg += "\nPress Retry to select another output configuration file.";
-	returnCode = QMessageBox::critical(this, "Configuration File Write Failure", msg,
-					   QMessageBox::Retry | QMessageBox::Cancel,
-					   QMessageBox::Retry);
+    msg += "\nPress Retry to select another output configuration file.";
+    returnCode = QMessageBox::critical(this, "Configuration File Write Failure", msg,
+                       QMessageBox::Retry | QMessageBox::Cancel,
+                       QMessageBox::Retry);
       }
       else {
-	// wrote the file ... change the project filename and store the properties
-	setConfigFileName(fileName);
-	m_properties = m_guiProperties;
+    // wrote the file ... change the project filename and store the properties
+    setConfigFileName(fileName);
+    m_properties = m_guiProperties;
       }
     }
   }
@@ -461,7 +461,7 @@ void CWMain::slotExportPlots()
 
 void CWMain::slotQdoasHelp()
 {
-	CHelpSystem::showHelpTopic(QString("Tools"),QString("Tools_Convolution"));
+    CHelpSystem::showHelpTopic(QString("Tools"),QString("Tools_Convolution"));
 }
 
 void CWMain::slotAboutQdoas()

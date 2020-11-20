@@ -53,7 +53,7 @@ CXYPlotData::~CXYPlotData()
 //----------------------------------------------------
 
 CPlotDataSet::CPlotDataSet(enum ePlotScaleType scaleType, bool forceAutoScaling,
-			   const char *title, const char *xlabel, const char *ylabel) :
+               const char *title, const char *xlabel, const char *ylabel) :
   m_scaleType(scaleType),
   m_forceAutoScaling(forceAutoScaling),
   m_title(title),

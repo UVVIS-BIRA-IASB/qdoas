@@ -119,35 +119,35 @@
 #define NPMD 7
 #define MAX_DETECTOR_PIXELS  1024
 #define MAX_CHANNELS         8
-				/* BCPS per second, float for calcul. */
+                /* BCPS per second, float for calcul. */
 #define BCPS_FACTOR          16.0
-				/* BCPS per second, integer for counter etc. */
+                /* BCPS per second, integer for counter etc. */
 #define BCPS_PER_SECOND      16
 
 
-				/* SOME limb numbers */
-				/* limb levels */
+                /* SOME limb numbers */
+                /* limb levels */
 #define MAX_LIMB_LEVELS      35
 #define LIMB_LEVELS          35
                                 /* Duration of a LIMB state in s */
 #define LIMB_DURATION_SEC 59.0625
-				/* duration one scan 24BCPS = 1.5s  */
+                /* duration one scan 24BCPS = 1.5s  */
 #define BCPS_PER_LIMBSCAN    24
-				/* duration scan to scan 24+3 BCPS */
+                /* duration scan to scan 24+3 BCPS */
 #define BCPS_LIMBSCAN_TO_LIMBSCAN 27
-				/* Factors for converting integer angles */
-				/*  etc. to real angles */
+                /* Factors for converting integer angles */
+                /*  etc. to real angles */
 #define ANGLE_FAC 1e-6
 #define HEIGHT_FAC 1e-5
 #define INT_TIME_FAC 16
 
-#define DU_FAC 3.719385638E-17  	/* = 1 / 2.69e16 */
-				/* Some time factors */
+#define DU_FAC 3.719385638E-17      /* = 1 / 2.69e16 */
+                /* Some time factors */
 #define SECOND_PER_HOUR 3600
 #define SECOND_PER_DAY 86400
 #define MIKROSEC_PER_SEC 1000000
 
-				/* Some maximum sizes in variable DSR */
+                /* Some maximum sizes in variable DSR */
 #define DOAS_BIAS_MAX_FIT_PAR   15
 #define DOAS_BIAS_MAX_CROSS_COR 105 /* (15*(15-1))/2 */
 #define CLOUDS_AEROSOL_L2N_MAX_PMD 32
@@ -161,42 +161,42 @@ enum err_flag {FATAL, WARNING, INFO};
 
 /* simple error routine */
 int scia_err (enum err_flag err_flag,
-	      const char *source_file, int line, const char* message,
-	      const char* arg);
+          const char *source_file, int line, const char* message,
+          const char* arg);
 
-				/* Error codes, used in the various routines of the
-				   SCIA library */
+                /* Error codes, used in the various routines of the
+                   SCIA library */
 typedef enum SCIA_err {
-    OK,		/* No error */
-    SCIA_ERROR,	/* unspecified error */
+    OK,        /* No error */
+    SCIA_ERROR,    /* unspecified error */
     MPH_ERROR, /* Error in reading MPH (wrong product?) */
     SPH_ERROR, /* Error in reading SPH (wrong product?) */
     DSD_ERROR, /* Error in reading DSDs (Format change??) */
-    FILE_NOT_FOUND,	/* File cannot be opened */
-    FILE_NOT_CLOSED,	/* File nannot be closed
-			   (not opened?) */
-    SCIA_DSD_NOT_ATTACHED,	/* DSD not attached */
-    OUT_OF_MEMORY,		/* Allocation operation failed */
+    FILE_NOT_FOUND,    /* File cannot be opened */
+    FILE_NOT_CLOSED,    /* File nannot be closed
+               (not opened?) */
+    SCIA_DSD_NOT_ATTACHED,    /* DSD not attached */
+    OUT_OF_MEMORY,        /* Allocation operation failed */
     /* Level 2 NRT/OL errorcodes */
-    SCIA_BAD_SPECIFICATION,	/* Invalid DOAS/BIAS request */
-    SCIA_MDS_EMPTY,		/* No data for requested MDS */
+    SCIA_BAD_SPECIFICATION,    /* Invalid DOAS/BIAS request */
+    SCIA_MDS_EMPTY,        /* No data for requested MDS */
     SCIA_LIMB_MDS_EMPTY,        /* Limb MDS empty */
-    SCIA_END_OF_MDS,		/* No more MDS available */
-    SCIA_GEO_MISMATCH,		/* Geolocation and MDS do not fit */
+    SCIA_END_OF_MDS,        /* No more MDS available */
+    SCIA_GEO_MISMATCH,        /* Geolocation and MDS do not fit */
     SCIA_PRODUCT_INCONSISTENCY, /* Something is very wrong ... */
-				/* ... Geo-coadd something is not impl. yet */
+                /* ... Geo-coadd something is not impl. yet */
     SCIA_GEO_INTEGR_TIME_NOT_IMPLEMENTED,
 
-    SCIA_PRODUCTNAME_MISMATCH,	/* Name for molecule used in DSD and fitwindow
-				   string does not match */
-				/*  for ...next... functions*/
+    SCIA_PRODUCTNAME_MISMATCH,    /* Name for molecule used in DSD and fitwindow
+                   string does not match */
+                /*  for ...next... functions*/
     /* Level 1c errorcodes */
     END_OF_DATA, /* Behind last data */
-    END_OF_NADIR,	/* Behind last nadir data */
-    END_OF_LIMB, 	/* Behind last limb data */
+    END_OF_NADIR,    /* Behind last nadir data */
+    END_OF_LIMB,     /* Behind last limb data */
     END_OF_OCCULTATION,/* Behind last occultation data */
     CLUSTER_WAVELENGTH_MISMATCH, /* Available cluster not in
-				    wavelength window */
+                    wavelength window */
     NO_CLUSTER_MATCH_IN_STATE,
     NO_SCIADATA,
     NO_NADIR,
@@ -204,16 +204,16 @@ typedef enum SCIA_err {
     NO_OCC,
     NO_MON,
     NO_SUN_REF,
-    NO_NADIR_DATA,	/*  */
-    NO_PMD_DATA,	/*  */
-    NO_LIMB_DATA,	/*  */
-    NO_OCC_DATA,	/*  */
-    NO_MON_DATA,	/*  */
-    NO_SUN_REF_DATA,	/*  */
+    NO_NADIR_DATA,    /*  */
+    NO_PMD_DATA,    /*  */
+    NO_LIMB_DATA,    /*  */
+    NO_OCC_DATA,    /*  */
+    NO_MON_DATA,    /*  */
+    NO_SUN_REF_DATA,    /*  */
     NO_ADS_STATES, /* ADS STATES not found */
     NO_FIXED_WAVELENGTH, /* */
     NO_GADS_CAL_OPTIONS, /* Error in open
-			    GADS_CAL_OPTIONS */
+                GADS_CAL_OPTIONS */
     END_OF_NADIR_STATES, /* No more Nadir states */
     END_OF_STATES, /* No more Nadir states */
     INCONSISTENT_STATE,  /* Inconsistency in state */
@@ -221,9 +221,9 @@ typedef enum SCIA_err {
     NO_L1C_FILE,         /* not a l1c product */
     /* Level 1B errorcodes */
     NO_L1B_FILE,         /* not a l1b product */
-    ADS_READ_ERROR,		/* Error in Reading ADS/GADS */
+    ADS_READ_ERROR,        /* Error in Reading ADS/GADS */
     WRITE_1B_DSR_GADS_INCONSISTENT, /* */
-    SCIA_GOME_EXTRA_PRODUCT 	/* New molecules in GOME */
+    SCIA_GOME_EXTRA_PRODUCT     /* New molecules in GOME */
 } SCIA_err;
 
 typedef int L1_MDS_TYPE;

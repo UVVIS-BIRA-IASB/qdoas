@@ -44,8 +44,8 @@ enum ePlotScaleType {
 
 enum _spectraAutoscale
  {
- 	allowFixedScale,                                                              // allow the scaling if checked in the plot properties
- 	forceAutoScale                                                                // do not account for the scaling
+     allowFixedScale,                                                              // allow the scaling if checked in the plot properties
+     forceAutoScale                                                                // do not account for the scaling
  };
 
 // Indexes for the plot pages

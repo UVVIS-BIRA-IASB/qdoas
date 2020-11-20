@@ -211,7 +211,7 @@ RC MATRIX_Copy(MATRIX_OBJECT *pTarget,MATRIX_OBJECT *pSource, const char *callin
            (pSource->deriv2!=NULL)?1:0,callingFunction))==ERROR_ID_NO)
 
    {
-   	// Make a copy of the input matrix into the new allocated one
+       // Make a copy of the input matrix into the new allocated one
 
     for (indexC=pSource->basec;indexC<pSource->basec+pSource->nc;indexC++)
      memcpy(pTarget->matrix[indexC]+pSource->basel,pSource->matrix[indexC]+pSource->basel,sizeof(double)*pSource->nl);
@@ -233,115 +233,115 @@ RC MATRIX_Copy(MATRIX_OBJECT *pTarget,MATRIX_OBJECT *pSource, const char *callin
 // ================
 
     double ScientificToDouble(char *in_String) {
-    	// Loop Variables
-    	int        Counter       = 0;
-    	int        Length        = strlen(in_String) + 1;
-    	// Flags and signs
-    	int        NegativeFlag  = 0;
-    	int        DecimalFlag   = 0;
-    	int        ExponentSign  = 0;  // -1 = Negative, 0 = None, 1 = Positive
-    	// Numerical Data
-    	int        Exponent      = 0;
-    	double     FinalDivision = 1.;
-    	double     Digits        = 0.;
+        // Loop Variables
+        int        Counter       = 0;
+        int        Length        = strlen(in_String) + 1;
+        // Flags and signs
+        int        NegativeFlag  = 0;
+        int        DecimalFlag   = 0;
+        int        ExponentSign  = 0;  // -1 = Negative, 0 = None, 1 = Positive
+        // Numerical Data
+        int        Exponent      = 0;
+        double     FinalDivision = 1.;
+        double     Digits        = 0.;
 
-    	// Loop per each character. Ignore anything weird.
-    	for (;Counter < Length; Counter++) {
-    		// Depending on the current character
-    		switch (in_String[Counter]) {
-    			// On any digit
-    			case '0': case '5':
-    			case '1': case '6':
-    			case '2': case '7':
-    			case '3': case '8':
-    			case '4': case '9':
-    				// If we haven't reached an exponent yet ("e")
-    				if (ExponentSign == 0) {
-    					// Adjust the final division if a decimal was encountered
-    					if (DecimalFlag) FinalDivision *= (double)10.;
-    					// Add a digit to our main number
-    					Digits = (Digits * 10.) + (in_String[Counter] - '0');
-    				// If we passed an "e" at some point
-    				} else {
-    					// Add a digit to our exponent
-    					Exponent = (Exponent * 10) + (in_String[Counter] - '0');
-    				}
-    				break;
-    			// On a negative sign
-    			case '-':
-    				// If we passed an 'e'
-    				if (ExponentSign > 0)
-    					// The exponent sign will be negative
-    					ExponentSign = -1;
-    				// Otherwise we are still dealing with the main number
-    				else
-    					// Set the negative flag. We will negate the main number later.
-    					NegativeFlag = 1;
-    				break;
-    			// If we encounter some kind of "e"
-    			case 'e': case 'E':
-    				// Set the exponent flag
-    				ExponentSign = 1;
-    				break;
-    			// If we encounter a period
-    			case '.':
-    				// Set the decimal flag. We will start tracking decimal depth.
-    				DecimalFlag = 1;
-    				break;
-    			// We gladly accept all sorts of additional garbage.
-    			default:
-    				break;
-    		}
-    	}
-    	// If the negative flag is set, negate the main number
-    	if (NegativeFlag)
-    		Digits = -Digits;
+        // Loop per each character. Ignore anything weird.
+        for (;Counter < Length; Counter++) {
+            // Depending on the current character
+            switch (in_String[Counter]) {
+                // On any digit
+                case '0': case '5':
+                case '1': case '6':
+                case '2': case '7':
+                case '3': case '8':
+                case '4': case '9':
+                    // If we haven't reached an exponent yet ("e")
+                    if (ExponentSign == 0) {
+                        // Adjust the final division if a decimal was encountered
+                        if (DecimalFlag) FinalDivision *= (double)10.;
+                        // Add a digit to our main number
+                        Digits = (Digits * 10.) + (in_String[Counter] - '0');
+                    // If we passed an "e" at some point
+                    } else {
+                        // Add a digit to our exponent
+                        Exponent = (Exponent * 10) + (in_String[Counter] - '0');
+                    }
+                    break;
+                // On a negative sign
+                case '-':
+                    // If we passed an 'e'
+                    if (ExponentSign > 0)
+                        // The exponent sign will be negative
+                        ExponentSign = -1;
+                    // Otherwise we are still dealing with the main number
+                    else
+                        // Set the negative flag. We will negate the main number later.
+                        NegativeFlag = 1;
+                    break;
+                // If we encounter some kind of "e"
+                case 'e': case 'E':
+                    // Set the exponent flag
+                    ExponentSign = 1;
+                    break;
+                // If we encounter a period
+                case '.':
+                    // Set the decimal flag. We will start tracking decimal depth.
+                    DecimalFlag = 1;
+                    break;
+                // We gladly accept all sorts of additional garbage.
+                default:
+                    break;
+            }
+        }
+        // If the negative flag is set, negate the main number
+        if (NegativeFlag)
+            Digits = -Digits;
 
-    	// If the exponent is supposed to be negative, negate it now
-    	if (ExponentSign < 0)
-    		Exponent = 0 - Exponent;
+        // If the exponent is supposed to be negative, negate it now
+        if (ExponentSign < 0)
+            Exponent = 0 - Exponent;
 
-    	// Return the calculated result of our observations
-    	return ((double)Digits / (double)FinalDivision) * (double)(pow((double)10.0f, (double)Exponent));
+        // Return the calculated result of our observations
+        return ((double)Digits / (double)FinalDivision) * (double)(pow((double)10.0f, (double)Exponent));
     }
 
 int MatrixNextDouble(FILE *fp,double *dvalue)
  {
- 	// Declarations
+     // Declarations
 
- 	char c,oldc;
- 	char item[MAX_ITEM_TEXT_LEN];
- 	int nc;
- 	int isdouble;
+     char c,oldc;
+     char item[MAX_ITEM_TEXT_LEN];
+     int nc;
+     int isdouble;
 
- 	memset(item,0,MAX_ITEM_TEXT_LEN);
- 	*dvalue=(double)0.;
+     memset(item,0,MAX_ITEM_TEXT_LEN);
+     *dvalue=(double)0.;
 
- 	for (nc=0,isdouble=0,oldc=' ';((c=fgetc(fp))!=EOF) && nc<MAX_ITEM_TEXT_LEN;)
- 	 {
- 	 	if ((c==EOF) || (c=='\n') || (c==0x0D) || (c==0x0A) || ((c==' ') && (oldc!=' ')) || ((c=='\t') && (nc>0)))
- 	 	 {
- 	 	  if (nc>0)
- 	 	   isdouble=((c==EOF) || (c=='\n') || (c==0x0D) || (c==0x0A))?-1:1;
- 	 	  break;
- 	 	 }
- 	 	else if ((c!=' ') && (c!='\t'))
- 	 	 {
- 	 	 	if (!strchr("0123456789+-eE.",c))
- 	 	   break;
- 	 	  else
- 	 	   item[nc++]=c;
- 	 	 }
+     for (nc=0,isdouble=0,oldc=' ';((c=fgetc(fp))!=EOF) && nc<MAX_ITEM_TEXT_LEN;)
+      {
+          if ((c==EOF) || (c=='\n') || (c==0x0D) || (c==0x0A) || ((c==' ') && (oldc!=' ')) || ((c=='\t') && (nc>0)))
+           {
+            if (nc>0)
+             isdouble=((c==EOF) || (c=='\n') || (c==0x0D) || (c==0x0A))?-1:1;
+            break;
+           }
+          else if ((c!=' ') && (c!='\t'))
+           {
+               if (!strchr("0123456789+-eE.",c))
+             break;
+            else
+             item[nc++]=c;
+           }
 
- 	 	oldc=c;
- 	 }
+          oldc=c;
+      }
 
   if (nc<MAX_ITEM_TEXT_LEN)
- 	 *dvalue=(double)ScientificToDouble(item);
+      *dvalue=(double)ScientificToDouble(item);
 
- 	// return
+     // return
 
- 	return isdouble;
+     return isdouble;
  }
 
 void MATRIX_PassCommentLines(FILE *fp)
@@ -362,11 +362,11 @@ int MATRIX_GetColumnsNumbers(FILE *fp,double *pFirstValue)
 
   while ((rcNextDouble=MatrixNextDouble(fp,&tempValue))!=0)
    {
-   	if (!nc)
-   	 firstCalib=tempValue;
-   	nc++;
-   	if (rcNextDouble<0)
-   	 break;
+       if (!nc)
+        firstCalib=tempValue;
+       nc++;
+       if (rcNextDouble<0)
+        break;
    }
 
   if (pFirstValue!=NULL)
@@ -503,8 +503,8 @@ RC MATRIX_Load(const char *fileName,MATRIX_OBJECT *pMatrix,
           // check each column has same length 'nc'. we should now find a newline or the end of the file:
 
           int next=' ';
-         	while ((next==' ') || (next=='\t'))
-         	 next = fgetc(fp);
+             while ((next==' ') || (next=='\t'))
+              next = fgetc(fp);
 
           //int next = fgetc(fp);
           if ( next != '\n' && next != EOF) {
@@ -556,7 +556,7 @@ RC MATRIX_Load(const char *fileName,MATRIX_OBJECT *pMatrix,
   #if defined(__DEBUG_) && __DEBUG_
   if (!rc)
    {
-   	int basel=0,basec=0;
+       int basel=0,basec=0;
     DEBUG_PrintVar("the matrix",pMatrix->matrix,basel,basel+nl-1,basec,basec+nc-1,NULL);
     if (allocateDeriv2)
      DEBUG_PrintVar("the 2nd derivatives",pMatrix->deriv2,basel,basel+nl-1,basec+1,basec+nc-1,NULL);

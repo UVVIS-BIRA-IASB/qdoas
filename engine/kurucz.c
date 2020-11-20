@@ -93,7 +93,7 @@ int KURUCZ_indexLine=1;
 
 double corrcoef(double *x,double *y,int n)
  {
- 	// Declarations
+     // Declarations
 
   int j;
   double yt,xt,r;   // df,t
@@ -138,20 +138,20 @@ double corrcoef(double *x,double *y,int n)
 
 double ShiftCorrel(double *lambda,double *ref,double *spec,double *spec2,double *lambdas,double *specInt,int n,int imin,int imax,double *x,int *pRc)
  {
- 	// Declarations
+     // Declarations
 
- 	int i,npix;
- 	double correl;
- 	RC rc;
+     int i,npix;
+     double correl;
+     RC rc;
 
- 	// Initializations
+     // Initializations
 
- 	npix=(imax-imin+1);
- 	correl=(double)0.;
+     npix=(imax-imin+1);
+     correl=(double)0.;
 
- 	rc=ERROR_ID_NO;
+     rc=ERROR_ID_NO;
 
- 	// Shift the wavelength calibration
+     // Shift the wavelength calibration
 
   for (i=0;i<n;i++)
    lambdas[i]=lambda[i]+x[0];
@@ -170,9 +170,9 @@ double ShiftCorrel(double *lambda,double *ref,double *spec,double *spec2,double 
 
 void KuruczSmooth(double *lambda,double *spectrum,int n,int width,int imin,int imax,int normFlag,double *smoothed)
  {
- 	// Declarations
+     // Declarations
 
- 	int i,j,jmin,jmax;
+     int i,j,jmin,jmax;
   double sum,norm;
 
   // Initializations
@@ -180,24 +180,24 @@ void KuruczSmooth(double *lambda,double *spectrum,int n,int width,int imin,int i
   for (i=0;i<n;i++)
    smoothed[i]=(double)0.;
 
- 	for (i=imin,norm=(double)0.;i<=imax;i++)
- 	 {
- 	 	jmin=max(0,i-width);
- 	 	jmax=min(n-1,i+width);
+     for (i=imin,norm=(double)0.;i<=imax;i++)
+      {
+          jmin=max(0,i-width);
+          jmax=min(n-1,i+width);
 
- 	 	for (j=jmin,sum=(double)0.;j<=jmax;j++)
- 	 	 sum+=spectrum[j];
+          for (j=jmin,sum=(double)0.;j<=jmax;j++)
+           sum+=spectrum[j];
 
- 	 	if (fabs(sum)>EPSILON)
- 	   smoothed[i]=spectrum[i]/sum;
- 	 	norm+=smoothed[i]*smoothed[i];
- 	 }
+          if (fabs(sum)>EPSILON)
+        smoothed[i]=spectrum[i]/sum;
+          norm+=smoothed[i]*smoothed[i];
+      }
 
- 	// Normalization
+     // Normalization
 
- 	if (normFlag && (norm>EPSILON))
- 	 for (i=imin;i<=imax;i++)
- 	  smoothed[i]/=norm;
+     if (normFlag && (norm>EPSILON))
+      for (i=imin;i<=imax;i++)
+       smoothed[i]/=norm;
  }
 
 /******************************************************************************/
@@ -706,9 +706,9 @@ void nelmin ( double fn (double *,double *,double *,double *,double *,double *,i
 
 RC KuruczConvolveSolarSpectrum(MATRIX_OBJECT *pSolar,double *newlambda,int n_wavel,int indexFenoColumn)
  {
- 	// Declarations
+     // Declarations
 
- 	CROSS_REFERENCE *TabCross;
+     CROSS_REFERENCE *TabCross;
   MATRIX_OBJECT slitMatrix[NSFP],*pSlitMatrix;
   double slitParam[NSFP];
   SLIT slitOptions;
@@ -842,64 +842,64 @@ RC KuruczConvolveSolarSpectrum(MATRIX_OBJECT *pSolar,double *newlambda,int n_wav
 
 RC KuruczCalculatePreshift(double *calibratedLambda,double *calibratedRef,double *newRef,int ndet,double preshiftMin,double preshiftMax,double step,double lambdaMin,double lambdaMax,double *pShift)
  {
- 	// Declarations
+     // Declarations
 
   double *lambdas,*Sref1,*Sref2,*Sref2Deriv,*Sref2Interp,*shift,*coeff;
   int ishift,ishiftMin,nshift,nfuncEval,nrestart,imin,imax,nsmooth;
   double shiftIni,shiftMin,coefMin,varstep;
- 	RC rc,rc2;
+     RC rc,rc2;
 
 #if defined(__DEBUG_) && __DEBUG_
   DEBUG_FunctionBegin((char *)__func__,DEBUG_FCTTYPE_APPL|DEBUG_FCTTYPE_MEM);
 #endif
 
- 	// Initialization
+     // Initialization
 
   Sref1=Sref2=Sref2Deriv=Sref2Interp=shift=NULL;
   nshift=(double)((preshiftMax-preshiftMin)/step)+1.;
 
   varstep=1;
   *pShift=(double)0.;
- 	rc=ERROR_ID_NO;
+     rc=ERROR_ID_NO;
 
- 	// Allocate temporary buffers
+     // Allocate temporary buffers
 
- 	if (((lambdas=(double *)MEMORY_AllocDVector("KuruczCalculatePreshift","lambdas",0,ndet-1))==NULL) ||
- 	    ((Sref1=(double *)MEMORY_AllocDVector("KuruczCalculatePreshift","Sref1",0,ndet-1))==NULL) ||
- 	    ((Sref2=(double *)MEMORY_AllocDVector("KuruczCalculatePreshift","Sref2",0,ndet-1))==NULL) ||
- 	    ((Sref2Deriv=(double *)MEMORY_AllocDVector("KuruczCalculatePreshift","Sref2Deriv",0,ndet-1))==NULL) ||
- 	    ((Sref2Interp=(double *)MEMORY_AllocDVector("KuruczCalculatePreshift","Sref2Interp",0,ndet-1))==NULL) ||
- 	    ((shift=(double *)MEMORY_AllocDVector("KuruczCalculatePreshift","shift",0,nshift-1))==NULL) ||
- 	    ((coeff=(double *)MEMORY_AllocDVector("KuruczCalculatePreshift","coeff",0,nshift-1))==NULL))
+     if (((lambdas=(double *)MEMORY_AllocDVector("KuruczCalculatePreshift","lambdas",0,ndet-1))==NULL) ||
+         ((Sref1=(double *)MEMORY_AllocDVector("KuruczCalculatePreshift","Sref1",0,ndet-1))==NULL) ||
+         ((Sref2=(double *)MEMORY_AllocDVector("KuruczCalculatePreshift","Sref2",0,ndet-1))==NULL) ||
+         ((Sref2Deriv=(double *)MEMORY_AllocDVector("KuruczCalculatePreshift","Sref2Deriv",0,ndet-1))==NULL) ||
+         ((Sref2Interp=(double *)MEMORY_AllocDVector("KuruczCalculatePreshift","Sref2Interp",0,ndet-1))==NULL) ||
+         ((shift=(double *)MEMORY_AllocDVector("KuruczCalculatePreshift","shift",0,nshift-1))==NULL) ||
+         ((coeff=(double *)MEMORY_AllocDVector("KuruczCalculatePreshift","coeff",0,nshift-1))==NULL))
 
- 	 rc=ERROR_ID_ALLOC;
+      rc=ERROR_ID_ALLOC;
 
- 	// Load the reference spectrum at minimum SZA
+     // Load the reference spectrum at minimum SZA
 
- 	else // if (!(rc=EngineBuildRefList(pEngineContext)) && ((indexRef=pEngineContext->analysisRef.zmMinIndex)!=ITEM_NONE) &&
- 	     //   ((!pEngineContext->mfcDoasisFlag && !(rc=EngineReadFile(&ENGINE_contextRef,indexRef,0,0))) ||
- 	     //     (pEngineContext->mfcDoasisFlag && !(rc=EngineLoadRefMFC(&ENGINE_contextRef,pEngineContext,indexRef)))))
- 	 {
+     else // if (!(rc=EngineBuildRefList(pEngineContext)) && ((indexRef=pEngineContext->analysisRef.zmMinIndex)!=ITEM_NONE) &&
+          //   ((!pEngineContext->mfcDoasisFlag && !(rc=EngineReadFile(&ENGINE_contextRef,indexRef,0,0))) ||
+          //     (pEngineContext->mfcDoasisFlag && !(rc=EngineLoadRefMFC(&ENGINE_contextRef,pEngineContext,indexRef)))))
+      {
     imin=max(0,FNPixel(calibratedLambda,lambdaMin,ndet,PIXEL_CLOSEST));
- 	  imax=min(ndet-1,FNPixel(calibratedLambda,lambdaMax,ndet,PIXEL_CLOSEST));
+       imax=min(ndet-1,FNPixel(calibratedLambda,lambdaMax,ndet,PIXEL_CLOSEST));
 
- 	  nsmooth=(int)floor((double)(imax-imin+1)/(calibratedLambda[imax]-calibratedLambda[imin])*2.5+0.5);
+       nsmooth=(int)floor((double)(imax-imin+1)/(calibratedLambda[imax]-calibratedLambda[imin])*2.5+0.5);
 
- 	  for (int i=0;i<ndet;i++)
- 	   Sref1[i]=Sref2[i]=Sref2Deriv[i]=Sref2Interp[i]=(double)0.;
+       for (int i=0;i<ndet;i++)
+        Sref1[i]=Sref2[i]=Sref2Deriv[i]=Sref2Interp[i]=(double)0.;
 
- 	 	// Smooth structures in both reference spectra; spectra are also normalized
+          // Smooth structures in both reference spectra; spectra are also normalized
 
- 	 	KuruczSmooth(calibratedLambda,calibratedRef,ndet,nsmooth,imin,imax,1,Sref1);
+          KuruczSmooth(calibratedLambda,calibratedRef,ndet,nsmooth,imin,imax,1,Sref1);
     KuruczSmooth(calibratedLambda,newRef,ndet,nsmooth,imin,imax,1,Sref2);
 
- 	 	for (ishift=ishiftMin=0;(ishift<nshift) && !rc;ishift++)
+          for (ishift=ishiftMin=0;(ishift<nshift) && !rc;ishift++)
      {
-     	shift[ishift]=preshiftMin+(double)ishift*step;
-     	coeff[ishift]=ShiftCorrel(calibratedLambda,Sref1,Sref2,Sref2Deriv,lambdas,Sref2Interp,ndet,imin,imax,&shift[ishift],&rc);
+         shift[ishift]=preshiftMin+(double)ishift*step;
+         coeff[ishift]=ShiftCorrel(calibratedLambda,Sref1,Sref2,Sref2Deriv,lambdas,Sref2Interp,ndet,imin,imax,&shift[ishift],&rc);
 
-     	if (!rc && (coeff[ishift]<coeff[ishiftMin]))
-     	 ishiftMin=ishift;
+         if (!rc && (coeff[ishift]<coeff[ishiftMin]))
+          ishiftMin=ishift;
      }
 
     shiftIni=shift[ishiftMin];
@@ -1063,7 +1063,7 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
   double calib_stretch2[pKurucz->Nb_Win];
 
   if (((shiftPoly=(double *)MEMORY_AllocDVector("KURUCZ_Spectrum ","shiftPoly",0,oldNDET-1))==NULL) ||
-  	  ((spectrumData=(plot_data_t *)MEMORY_AllocBuffer(__func__,"spectrumData",pKurucz->Nb_Win*2,sizeof(plot_data_t),0,MEMORY_TYPE_STRUCT))==NULL))
+        ((spectrumData=(plot_data_t *)MEMORY_AllocBuffer(__func__,"spectrumData",pKurucz->Nb_Win*2,sizeof(plot_data_t),0,MEMORY_TYPE_STRUCT))==NULL))
    {
     rc=ERROR_ID_ALLOC;
     goto EndKuruczSpectrum;
@@ -1279,8 +1279,8 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
        }
       else
        {
-       	for (i=SvdPDeb;i<=SvdPFin;i++)
-       	 {
+           for (i=SvdPDeb;i<=SvdPFin;i++)
+            {
           dispAbsolu[i]=ANALYSE_absolu[i]=(ANALYSE_tc[i]!=(double)0.)?ANALYSE_absolu[i]/ANALYSE_tc[i]:(double)0.;
           dispSecX[i]=ANALYSE_secX[i]=exp(log(spectrum[i])+ANALYSE_absolu[i]/ANALYSE_tc[i]); // spectrum[i]+solar[i]*ANALYSE_absolu[i]/ANALYSE_tc[i];
          }
@@ -1440,7 +1440,7 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
        {
         for (indexWindow=0;indexWindow<Nb_Win;indexWindow++)
          {
-         	pixMin=spectrum_start(subwindow_fit[indexWindow].specrange);
+             pixMin=spectrum_start(subwindow_fit[indexWindow].specrange);
           pixMax=spectrum_end(subwindow_fit[indexWindow].specrange);
 
           mediateAllocateAndSetNumberedPlotData(&spectrumData[indexWindow],"Residual",&Lambda[pixMin],&pKurucz->dispAbsolu[indexWindow][pixMin],pixMax-pixMin+1,(indexWindow%2)?DashLine:Line,0);
@@ -1493,7 +1493,7 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
          {
           for (indexWindow=0;indexWindow<Nb_Win;indexWindow++)
            {
-           	pixMin=spectrum_start(subwindow_fit[indexWindow].specrange);
+               pixMin=spectrum_start(subwindow_fit[indexWindow].specrange);
             pixMax=spectrum_end(subwindow_fit[indexWindow].specrange);
 
             for (j=pixMin;j<=pixMax;j++)
@@ -1548,7 +1548,7 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
            {
             for (indexWindow=0;indexWindow<Nb_Win;indexWindow++)
              {
-             	pixMin=spectrum_start(subwindow_fit[indexWindow].specrange);
+                 pixMin=spectrum_start(subwindow_fit[indexWindow].specrange);
               pixMax=spectrum_end(subwindow_fit[indexWindow].specrange);
 
               for (j=pixMin;j<=pixMax;j++)
@@ -1742,24 +1742,24 @@ RC KURUCZ_ApplyCalibration(FENO *pTabFeno,double *newLambda,INDEX indexFenoColum
       (pTabFeno->useKurucz==ANLYS_KURUCZ_REF || pTabFeno->useKurucz==ANLYS_KURUCZ_SPEC) &&    // calibration applied on the reference or the spectrum
       pKuruczOptions->fwhmFit)                                                               // fit of the slit function
    {
-   	if (pKuruczOptions->fwhmType==SLIT_TYPE_FILE)                                                // slit function is file type
-   	 {
-   	 	if (!(rc=MATRIX_Copy(&slitMatrix[0],&KURUCZ_buffers[indexFenoColumn].slitFunction,__func__)) &&
-   	 	    !(rc=MATRIX_Allocate(&slitMatrix[1],n_wavel,3,0,0,1,__func__)))
-   	 	 {
+       if (pKuruczOptions->fwhmType==SLIT_TYPE_FILE)                                                // slit function is file type
+        {
+            if (!(rc=MATRIX_Copy(&slitMatrix[0],&KURUCZ_buffers[indexFenoColumn].slitFunction,__func__)) &&
+                !(rc=MATRIX_Allocate(&slitMatrix[1],n_wavel,3,0,0,1,__func__)))
+             {
         memcpy(slitMatrix[1].matrix[0],newLambda,sizeof(double)*n_wavel);
         memcpy(slitMatrix[1].matrix[1],pTabFeno->fwhmVector[0],sizeof(double)*n_wavel);
         memcpy(slitMatrix[1].matrix[2],pTabFeno->fwhmVector[1],sizeof(double)*n_wavel);
 
         if (!(rc=SPLINE_Deriv2(slitMatrix[1].matrix[0],slitMatrix[1].matrix[1],slitMatrix[1].deriv2[1],slitMatrix[1].nl,__func__)))
           rc=SPLINE_Deriv2(slitMatrix[1].matrix[0],slitMatrix[1].matrix[2],slitMatrix[1].deriv2[2],slitMatrix[1].nl,__func__);
-   	 	 }
+             }
      }
     else
      {
-  	   for (i=0;(i<NSFP) && !rc;i++)
-  	    if (pTabFeno->fwhmVector[i]!=NULL)
-  	     {
+         for (i=0;(i<NSFP) && !rc;i++)
+          if (pTabFeno->fwhmVector[i]!=NULL)
+           {
          if (MATRIX_Allocate(&slitMatrix[i],n_wavel,2,0,0,1,__func__)!=0)
           rc=ERROR_ID_ALLOC;
          else
@@ -2209,12 +2209,12 @@ RC KURUCZ_Alloc(const PROJECT *pProject, const double *lambda,INDEX indexKurucz,
 
     pKurucz->dispAbsolu[indexWindow]=pKurucz->dispSecX[indexWindow]=NULL;
 
-   	if (((pKurucz->dispAbsolu[indexWindow]=(double *)MEMORY_AllocDVector(__func__,"dispAbsolu",0,n_wavel-1))==NULL) ||
-   	    ((pKurucz->dispSecX[indexWindow]=(double *)MEMORY_AllocDVector(__func__,"dispSecX",0,n_wavel-1))==NULL))
-   	 {
+       if (((pKurucz->dispAbsolu[indexWindow]=(double *)MEMORY_AllocDVector(__func__,"dispAbsolu",0,n_wavel-1))==NULL) ||
+           ((pKurucz->dispSecX[indexWindow]=(double *)MEMORY_AllocDVector(__func__,"dispSecX",0,n_wavel-1))==NULL))
+        {
       rc=ERROR_ID_ALLOC;
       goto EndKuruczAlloc;
-   	 }
+        }
    }
 
   if (hFilterFlag && pKurucz->solarFGap)
@@ -2349,7 +2349,7 @@ RC KURUCZ_Alloc(const PROJECT *pProject, const double *lambda,INDEX indexKurucz,
 
            if (hrDeb==hrFin)
             {
-            	rc=ERROR_SetLast(__func__,ERROR_TYPE_WARNING,ERROR_ID_POW);
+                rc=ERROR_SetLast(__func__,ERROR_TYPE_WARNING,ERROR_ID_POW);
              goto EndKuruczAlloc;
             }
 
@@ -2475,7 +2475,7 @@ void KURUCZ_Free(void)
 
   for (indexFenoColumn=0;indexFenoColumn<ANALYSE_swathSize;indexFenoColumn++)
    {
-   	pKurucz=&KURUCZ_buffers[indexFenoColumn];
+       pKurucz=&KURUCZ_buffers[indexFenoColumn];
 
     MATRIX_Free(&pKurucz->hrSolar,"KURUCZ_Free");
     MATRIX_Free(&pKurucz->slitFunction,"KURUCZ_Free");
@@ -2525,10 +2525,10 @@ void KURUCZ_Free(void)
 
     for (indexWindow=0;indexWindow<pKurucz->Nb_Win;indexWindow++)
      {
-     	if (pKurucz->dispAbsolu[indexWindow]!=NULL)
-     	 MEMORY_ReleaseDVector("KURUCZ_Free ","dispAbsolu",pKurucz->dispAbsolu[indexWindow],0);
-     	if (pKurucz->dispSecX[indexWindow]!=NULL)
-     	 MEMORY_ReleaseDVector("KURUCZ_Free ","dispSecX",pKurucz->dispSecX[indexWindow],0);
+         if (pKurucz->dispAbsolu[indexWindow]!=NULL)
+          MEMORY_ReleaseDVector("KURUCZ_Free ","dispAbsolu",pKurucz->dispAbsolu[indexWindow],0);
+         if (pKurucz->dispSecX[indexWindow]!=NULL)
+          MEMORY_ReleaseDVector("KURUCZ_Free ","dispSecX",pKurucz->dispSecX[indexWindow],0);
      }
 
     if (pKurucz->dispAbsolu!=NULL)

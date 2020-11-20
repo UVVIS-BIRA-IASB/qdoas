@@ -90,7 +90,7 @@ void initializeMediateAnalysisWindow(mediate_analysis_window_t *d)
 
   for (i=0;i<MAX_AW_SHIFT_STRETCH;i++)
    {
-   	d->shiftStretchList.shiftStretch[i].shFit=ANLYS_SHIFT_TYPE_NONLINEAR;
+       d->shiftStretchList.shiftStretch[i].shFit=ANLYS_SHIFT_TYPE_NONLINEAR;
 
     d->shiftStretchList.shiftStretch[i].shInit=
     d->shiftStretchList.shiftStretch[i].stInit=

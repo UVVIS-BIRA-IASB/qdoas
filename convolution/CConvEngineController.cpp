@@ -38,7 +38,7 @@ void CConvEngineController::notifyPlotData(QList<SPlotData> &plotDataList, QList
       
       // discard the rest ...
       while (!titleList.isEmpty())
-	titleList.pop_front();
+    titleList.pop_front();
     }
 
     // put the page in a smart pointer for safe dispatch.

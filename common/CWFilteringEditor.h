@@ -41,9 +41,9 @@ class CWFilteringEditor : public QFrame
   enum UsageType { None, CalFitCheck, SubDivSwitch };
 
   CWFilteringEditor(const mediate_filter_t *lowpass,
-		    const mediate_filter_t *highpass,
-		    enum UsageType highPassUsage,
-		    QWidget *parent = 0);
+            const mediate_filter_t *highpass,
+            enum UsageType highPassUsage,
+            QWidget *parent = 0);
 
   void reset(const mediate_filter_t *lowpass, const mediate_filter_t *highpass);
   void apply(mediate_filter_t *lowpass, mediate_filter_t *highpass) const;
@@ -68,7 +68,7 @@ class CWFilterUsageEdit : public QFrame
 Q_OBJECT
  public:
   CWFilterUsageEdit(const struct filter_usage *d, CWFilteringEditor::UsageType type,
-		  QWidget *parent = 0);
+          QWidget *parent = 0);
 
   void reset(const struct filter_usage *d);
   void apply(struct filter_usage *d) const;
@@ -91,7 +91,7 @@ class CWKaiserEdit : public QFrame
 {
  public:
   CWKaiserEdit(const struct filter_kaiser *d, CWFilteringEditor::UsageType type,
-	       QWidget *parent = 0);
+           QWidget *parent = 0);
 
   void reset(const struct filter_kaiser *d);
   void apply(struct filter_kaiser *d) const;
@@ -108,11 +108,11 @@ class CWBoxcarTriangularBinomialEdit : public QFrame
 {
  public:
   CWBoxcarTriangularBinomialEdit(const struct filter_boxcar *d, CWFilteringEditor::UsageType type,
-				 QWidget *parent = 0);
+                 QWidget *parent = 0);
   CWBoxcarTriangularBinomialEdit(const struct filter_triangular *d, CWFilteringEditor::UsageType type,
-				 QWidget *parent = 0);
+                 QWidget *parent = 0);
   CWBoxcarTriangularBinomialEdit(const struct filter_binomial *d, CWFilteringEditor::UsageType type,
-				 QWidget *parent = 0);
+                 QWidget *parent = 0);
 
   void reset(const struct filter_boxcar *d);
   void apply(struct filter_boxcar *d) const;
@@ -136,7 +136,7 @@ class CWGaussianEdit : public QFrame
 {
  public:
   CWGaussianEdit(const struct filter_gaussian *d, CWFilteringEditor::UsageType type,
-		 QWidget *parent = 0);
+         QWidget *parent = 0);
 
   void reset(const struct filter_gaussian *d);
   void apply(struct filter_gaussian *d) const;
@@ -153,7 +153,7 @@ class CWSavitzkyGolayEdit : public QFrame
 {
  public:
   CWSavitzkyGolayEdit(const struct filter_savitzky_golay *d, CWFilteringEditor::UsageType type,
-		      QWidget *parent = 0);
+              QWidget *parent = 0);
 
   void reset(const struct filter_savitzky_golay *d);
   void apply(struct filter_savitzky_golay *d) const;

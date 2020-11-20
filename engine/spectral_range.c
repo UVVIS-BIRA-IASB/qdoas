@@ -53,11 +53,11 @@ bool spectrum_remove_pixel(doas_spectrum *spectrum, int pixel) {
     if (pixel == current->start)
       {
         if (current->start != current->end) // check the interval is not 1 pixel long
-	  current->start = pixel +1;
+      current->start = pixel +1;
         else { // interval is one pixel, so we remove it
           *previouspointer = current->next; // point to the element after the current range
           free(current);
-	}
+    }
       }
     else if (pixel == current->end)  // pixel was at the end of the range
       current->end = pixel-1;

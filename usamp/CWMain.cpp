@@ -61,11 +61,11 @@ CWMain::CWMain(QWidget *parent) :
 {
   // ----------------------------------------------------------------------------
 
-	// to avoid that a thousands comma separator (QT 4.7.3)
+    // to avoid that a thousands comma separator (QT 4.7.3)
 
-	   QLocale qlocale=QLocale::system();
-	   qlocale.setNumberOptions(QLocale::OmitGroupSeparator);
-	   QLocale::setDefault(qlocale);
+       QLocale qlocale=QLocale::system();
+       qlocale.setNumberOptions(QLocale::OmitGroupSeparator);
+       QLocale::setDefault(qlocale);
 
   setlocale(LC_NUMERIC, "C");
 
@@ -181,9 +181,9 @@ CWMain::CWMain(QWidget *parent) :
 
   // connections
   connect(m_controller, SIGNAL(signalPlotPage(const RefCountConstPtr<CPlotPageData> &)),
-	  this, SLOT(slotPlotPage(const RefCountConstPtr<CPlotPageData> &)));
+      this, SLOT(slotPlotPage(const RefCountConstPtr<CPlotPageData> &)));
   connect(m_controller, SIGNAL(signalErrorMessages(int, const QString &)),
-	  this, SLOT(slotErrorMessages(int, const QString &)));
+      this, SLOT(slotErrorMessages(int, const QString &)));
 }
 
 void CWMain::closeEvent(QCloseEvent *e)
@@ -227,8 +227,8 @@ bool CWMain::checkStateAndConsiderSaveFile(void)
   }
 
   QMessageBox::StandardButton choice = QMessageBox::question(this, "Save Changes", msg,
-							     QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
-							     QMessageBox::Save);
+                                 QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
+                                 QMessageBox::Save);
 
   if (choice == QMessageBox::Discard)
     return true; // discard changes
@@ -284,8 +284,8 @@ void CWMain::slotOpenFile()
   CPreferences *prefs = CPreferences::instance();
 
   QString fileName = QFileDialog::getOpenFileName(this, "Open Project File",
-						  prefs->directoryName("UsampConf"),
-						  "Usamp Config (*.xml);;All Files (*)");
+                          prefs->directoryName("UsampConf"),
+                          "Usamp Config (*.xml);;All Files (*)");
 
   if (fileName.isEmpty()) {
     return;
@@ -317,9 +317,9 @@ void CWMain::slotOpenFile()
     for (int i = 0; i<10; ++i) {
       QString path = handler->getPath(i);
       if (path.isEmpty())
-	pathMgr->removePath(i);
+    pathMgr->removePath(i);
       else
-	pathMgr->addPath(i, path);
+    pathMgr->addPath(i, path);
     }
 
     // copy the properties data ...
@@ -373,27 +373,27 @@ void CWMain::slotSaveAsFile()
     returnCode = QMessageBox::Cancel;
 
     QString fileName = QFileDialog::getSaveFileName(this, "SaveAs Config File",
-						    CPreferences::instance()->directoryName("UsampConf"),
-						    "Usamp Config (*.xml);;All Files (*)");
+                            CPreferences::instance()->directoryName("UsampConf"),
+                            "Usamp Config (*.xml);;All Files (*)");
 
     // empty fileName implies cancel
     if (!fileName.isEmpty()) {
 
       if (!fileName.contains('.'))
-	fileName += ".xml";
+    fileName += ".xml";
 
       // write the file
       QString msg = writer.write(fileName);
       if (!msg.isNull()) {
-	msg += "\nPress Retry to select another output configuration file.";
-	returnCode = QMessageBox::critical(this, "Configuration File Write Failure", msg,
-					   QMessageBox::Retry | QMessageBox::Cancel,
-					   QMessageBox::Retry);
+    msg += "\nPress Retry to select another output configuration file.";
+    returnCode = QMessageBox::critical(this, "Configuration File Write Failure", msg,
+                       QMessageBox::Retry | QMessageBox::Cancel,
+                       QMessageBox::Retry);
       }
       else {
-	// wrote the file ... change the project filename and store the properties
-	setConfigFileName(fileName);
-	m_properties = m_guiProperties;
+    // wrote the file ... change the project filename and store the properties
+    setConfigFileName(fileName);
+    m_properties = m_guiProperties;
       }
     }
   }
@@ -456,7 +456,7 @@ void CWMain::slotExportPlots()
 
 void CWMain::slotQdoasHelp()
 {
-	CHelpSystem::showHelpTopic(QString("Tools"),QString("Tools_Usamp"));
+    CHelpSystem::showHelpTopic(QString("Tools"),QString("Tools_Usamp"));
 }
 
 void CWMain::slotAboutQdoas()
@@ -488,7 +488,7 @@ void CWMain::slotErrorMessages(int highestLevel, const QString &messages)
 
 void CWMain::slotRunUsamp()
 {
-	 int rc;
+     int rc;
 
   // uses a snapshot of the guiProperties ...
   fetchGuiProperties();

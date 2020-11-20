@@ -74,7 +74,7 @@ QString CUsampConfigWriter::write(const QString &fileName)
     fprintf(fp, "\"invalid\"");
   }
   fprintf(fp, " shift=\"%g\" rmhdr=\"%s\"", d->shift,
-	  (d->noheader ? sTrue : sFalse));
+      (d->noheader ? sTrue : sFalse));
 
   tmpStr = pathMgr->simplifyPath(QString(d->outputPhaseOneFile));
   fprintf(fp, " outphase1=\"%s\"", tmpStr.toLocal8Bit().data());

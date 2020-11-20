@@ -102,18 +102,18 @@ bool CConfigHandler::endElement(const QString &namespaceURI, const QString &loca
 
     if (status) {
       if (m_subHandlerStack.back().depth == m_elementStack.count()) {
-	status = m_activeSubHandler->end();
-	// done with this handler ... discard it
-	delete m_activeSubHandler;
-	m_subHandlerStack.pop_back();
-	// revert back to the previous handler
-	if (!m_subHandlerStack.isEmpty())
-	  m_activeSubHandler = m_subHandlerStack.back().handler;
-	else
-	  m_activeSubHandler = NULL;
+    status = m_activeSubHandler->end();
+    // done with this handler ... discard it
+    delete m_activeSubHandler;
+    m_subHandlerStack.pop_back();
+    // revert back to the previous handler
+    if (!m_subHandlerStack.isEmpty())
+      m_activeSubHandler = m_subHandlerStack.back().handler;
+    else
+      m_activeSubHandler = NULL;
       }
       else {
-	status = m_activeSubHandler->end(qName);
+    status = m_activeSubHandler->end(qName);
       }
     }
   }
@@ -142,7 +142,7 @@ bool CConfigHandler::startDocument()
 }
 
 bool CConfigHandler::startElement(const QString &namespaceURI, const QString &localName,
-				  const QString &qName, const QXmlAttributes &atts)
+                  const QString &qName, const QXmlAttributes &atts)
 {
   bool result;
 
@@ -153,7 +153,7 @@ bool CConfigHandler::startElement(const QString &namespaceURI, const QString &lo
 }
 
 bool CConfigHandler::installSubHandler(CConfigSubHandler *newHandler,
-						   const QXmlAttributes &atts)
+                           const QXmlAttributes &atts)
 {
   m_subHandlerStack.push_back(SSubHandlerItem(newHandler, m_elementStack.count()));
   m_activeSubHandler = newHandler;

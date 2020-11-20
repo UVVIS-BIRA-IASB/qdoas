@@ -100,11 +100,11 @@ void CSession::addFile(const QFileInfo &file, const QString &projectName)
       item->addFile(file);
 
       if (m_mode == CSession::Analyse || m_mode == CSession::Calibrate) {
-	int nWindows;
-	mediate_analysis_window_t *d = CWorkSpace::instance()->analysisWindowList(projectName, nWindows);
-	if (d != NULL) {
-	  item->giveAnalysisWindowList(d, nWindows);
-	}
+    int nWindows;
+    mediate_analysis_window_t *d = CWorkSpace::instance()->analysisWindowList(projectName, nWindows);
+    if (d != NULL) {
+      item->giveAnalysisWindowList(d, nWindows);
+    }
       }
 
       m_map.insert(sessionmap_t::value_type(projectName,item));
@@ -251,7 +251,7 @@ CSessionIterator& CSessionIterator::operator()(int index)
   m_fileIndex = index;
   m_mapIt = m_session->m_map.begin();
   while (m_mapIt != m_session->m_map.end() &&
-	 m_fileIndex >= (m_mapIt->second)->m_files.size()) {
+     m_fileIndex >= (m_mapIt->second)->m_files.size()) {
     m_offset += (m_mapIt->second)->m_files.size();
     m_fileIndex = index - m_offset;
     ++m_mapIt;

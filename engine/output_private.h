@@ -392,10 +392,10 @@ static inline void get_diodes(struct output_field *this_field __attribute__ ((un
 }
 
 static inline void get_precalculated_flux(struct output_field *this_field __attribute__ ((unused)), float *fluxes, const ENGINE_CONTEXT *pEngineContext, int indexFenoColumn __attribute__ ((unused)), int index_calib __attribute__ ((unused))) {
-	 fluxes[0]=pEngineContext->recordInfo.ccd.wve1;
-	 fluxes[1]=pEngineContext->recordInfo.ccd.flux1;
-	 fluxes[2]=pEngineContext->recordInfo.ccd.wve2;
-	 fluxes[3]=pEngineContext->recordInfo.ccd.flux2;
+     fluxes[0]=pEngineContext->recordInfo.ccd.wve1;
+     fluxes[1]=pEngineContext->recordInfo.ccd.flux1;
+     fluxes[2]=pEngineContext->recordInfo.ccd.wve2;
+     fluxes[3]=pEngineContext->recordInfo.ccd.flux2;
 }
 
 static inline void get_target_azimuth(struct output_field *this_field __attribute__ ((unused)), float *azimuth, const ENGINE_CONTEXT *pEngineContext, int indexFenoColumn __attribute__ ((unused)), int index_calib __attribute__ ((unused))) {
@@ -623,7 +623,7 @@ static inline void get_vrt_err(struct output_field *this_field, double *vrt_err,
 }
 
 static inline void get_refzm(struct output_field *this_field, float *refzm, const ENGINE_CONTEXT *pEngineContext, int indexFenoColumn, int index_calib __attribute__ ((unused))) {
-	 FENO *pTabFeno=this_field->get_tabfeno(this_field, indexFenoColumn);
+     FENO *pTabFeno=this_field->get_tabfeno(this_field, indexFenoColumn);
   *refzm = (((pTabFeno->refMaxdoasSelectionMode==ANLYS_MAXDOAS_REF_SZA) ||
             ((pTabFeno->refMaxdoasSelectionMode==ANLYS_MAXDOAS_REF_SCAN) &&
             ((pTabFeno->refSpectrumSelectionScanMode==ANLYS_MAXDOAS_REF_SCAN_BEFORE) || (pTabFeno->refSpectrumSelectionScanMode==ANLYS_MAXDOAS_REF_SCAN_AFTER)) &&
@@ -635,7 +635,7 @@ static inline void get_refzm(struct output_field *this_field, float *refzm, cons
 }
 
 static inline void get_refnumber(struct output_field *this_field, int *refnumber, const ENGINE_CONTEXT *pEngineContext, int indexFenoColumn, int index_calib __attribute__ ((unused))) {
-	 FENO *pTabFeno=this_field->get_tabfeno(this_field, indexFenoColumn);
+     FENO *pTabFeno=this_field->get_tabfeno(this_field, indexFenoColumn);
   *refnumber= (((pTabFeno->refMaxdoasSelectionMode==ANLYS_MAXDOAS_REF_SZA) ||
                ((pTabFeno->refMaxdoasSelectionMode==ANLYS_MAXDOAS_REF_SCAN) &&
                (pEngineContext->recordInfo.maxdoas.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_ZENITH))) && (pEngineContext->indexRecord!=pTabFeno->indexRef))?

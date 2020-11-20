@@ -33,7 +33,7 @@ CUsampConfigHandler::CUsampConfigHandler() :
 }
 
 bool CUsampConfigHandler::startElement(const QString &namespaceURI, const QString &localName,
-				       const QString &qName, const QXmlAttributes &atts)
+                       const QString &qName, const QXmlAttributes &atts)
 {
   bool result;
   

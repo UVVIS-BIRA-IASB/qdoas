@@ -103,7 +103,7 @@ int mfcLastSpectrum=0;
 
 RC MFC_ResetFiles(ENGINE_CONTEXT *pEngineContext)
  {
- 	MFC_DOASIS *pMfc=&pEngineContext->recordInfo.mfcDoasis;
+     MFC_DOASIS *pMfc=&pEngineContext->recordInfo.mfcDoasis;
 
   if (pMfc->fileNames!=NULL)
    MEMORY_ReleaseBuffer("MFC_ResetFiles","fileNames",pMfc->fileNames);
@@ -116,9 +116,9 @@ RC MFC_ResetFiles(ENGINE_CONTEXT *pEngineContext)
 
 RC MFC_LoadOffset(ENGINE_CONTEXT *pEngineContext)
  {
- 	// Declarations
+     // Declarations
 
- 	PROJECT *pProject;                                                            // pointer to the current project
+     PROJECT *pProject;                                                            // pointer to the current project
   PRJCT_INSTRUMENTAL *pInstrumental;                                            // pointer to the instrumental part of the project
   PRJCT_MFC *pMfc;
   BUFFERS *pBuffers;                                                            // pointer to the buffers part of the engine context
@@ -159,9 +159,9 @@ RC MFC_LoadOffset(ENGINE_CONTEXT *pEngineContext)
 
 RC MFC_LoadDark(ENGINE_CONTEXT *pEngineContext)
  {
- 	// Declarations
+     // Declarations
 
- 	PROJECT *pProject;                                                            // pointer to the current project
+     PROJECT *pProject;                                                            // pointer to the current project
   PRJCT_INSTRUMENTAL *pInstrumental;                                            // pointer to the instrumental part of the project
   PRJCT_MFC *pMfc;
   BUFFERS *pBuffers;                                                            // pointer to the buffers part of the engine context
@@ -202,7 +202,7 @@ RC MFC_LoadDark(ENGINE_CONTEXT *pEngineContext)
 
 RC MFC_AllocFiles(ENGINE_CONTEXT *pEngineContext)
  {
- 	// Declarations
+     // Declarations
 
   char           filePath[DOAS_MAX_PATH_LEN+1];
   char           fileName[DOAS_MAX_PATH_LEN+1];
@@ -263,11 +263,11 @@ RC MFC_AllocFiles(ENGINE_CONTEXT *pEngineContext)
      rc=ERROR_ID_ALLOC;
     else
      {
-     	memset(pEngineContext->recordInfo.mfcDoasis.fileNames,0,fileNumber*(DOAS_MAX_PATH_LEN+1));
-     	pEngineContext->recordInfo.mfcDoasis.nFiles=fileNumber;
-     	fileList=pEngineContext->recordInfo.mfcDoasis.fileNames;
+         memset(pEngineContext->recordInfo.mfcDoasis.fileNames,0,fileNumber*(DOAS_MAX_PATH_LEN+1));
+         pEngineContext->recordInfo.mfcDoasis.nFiles=fileNumber;
+         fileList=pEngineContext->recordInfo.mfcDoasis.fileNames;
 
-     	// Browse files in the folder a second time and save the file names
+         // Browse files in the folder a second time and save the file names
 
       for (hDir=opendir(filePath),indexFile=0;(hDir!=NULL) && ((fileInfo=readdir(hDir))!=NULL);)
        {
@@ -331,25 +331,25 @@ RC MFC_AllocFiles(ENGINE_CONTEXT *pEngineContext)
 
 INDEX MFC_SearchForCurrentFileIndex(ENGINE_CONTEXT *pEngineContext)
  {
- 	// Declarations
+     // Declarations
 
- 	char  fileName[DOAS_MAX_PATH_LEN+1];                                        // name of the current file
- 	char *ptr,*filesList;
- 	INDEX   indexRecord,indexRecordLow,indexRecordCur,indexRecordHigh;
- 	int nFiles;
- 	RC rcCmp;
+     char  fileName[DOAS_MAX_PATH_LEN+1];                                        // name of the current file
+     char *ptr,*filesList;
+     INDEX   indexRecord,indexRecordLow,indexRecordCur,indexRecordHigh;
+     int nFiles;
+     RC rcCmp;
 
- 	// Initializations
+     // Initializations
 
- 	indexRecord=ITEM_NONE;
- 	filesList=pEngineContext->recordInfo.mfcDoasis.fileNames;
- 	nFiles=pEngineContext->recordInfo.mfcDoasis.nFiles;
+     indexRecord=ITEM_NONE;
+     filesList=pEngineContext->recordInfo.mfcDoasis.fileNames;
+     nFiles=pEngineContext->recordInfo.mfcDoasis.nFiles;
 
- 	//  Browse files
+     //  Browse files
 
- 	if (pEngineContext->analysisRef.refScan && (filesList!=NULL) && ((ptr=strrchr(pEngineContext->fileInfo.fileName,'/'))!=NULL) && (strlen(ptr+1)>0))
- 	 {
- 	  strcpy(fileName,ptr+1);
+     if (pEngineContext->analysisRef.refScan && (filesList!=NULL) && ((ptr=strrchr(pEngineContext->fileInfo.fileName,'/'))!=NULL) && (strlen(ptr+1)>0))
+      {
+       strcpy(fileName,ptr+1);
 
     // the record is not in the list
 
@@ -362,26 +362,26 @@ INDEX MFC_SearchForCurrentFileIndex(ENGINE_CONTEXT *pEngineContext)
 
       while (indexRecordHigh-indexRecordLow>1)
        {
-       	indexRecordCur=(indexRecordLow+indexRecordHigh)>>1;
+           indexRecordCur=(indexRecordLow+indexRecordHigh)>>1;
 
-       	if (!(rcCmp=strcasecmp(filesList+indexRecordCur*(DOAS_MAX_PATH_LEN+1),fileName)))
+           if (!(rcCmp=strcasecmp(filesList+indexRecordCur*(DOAS_MAX_PATH_LEN+1),fileName)))
          {
-       	  indexRecord=indexRecordCur;
-       	  break;
-       	 }
-       	else if (rcCmp<0)
-       	 indexRecordLow=indexRecordCur;
-       	else
-       	 indexRecordHigh=indexRecordCur;
+             indexRecord=indexRecordCur;
+             break;
+            }
+           else if (rcCmp<0)
+            indexRecordLow=indexRecordCur;
+           else
+            indexRecordHigh=indexRecordCur;
        }
 
       indexRecord++;   // because recordNo starts at 1 !!!
      }
- 	 }
+      }
 
- 	// Return
+     // Return
 
- 	return indexRecord;
+     return indexRecord;
  }
 
 // -----------------------------------------------------------------------------
@@ -600,7 +600,7 @@ RC ReliMFC(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int localDay
      {
       if ((mfcMask==pMfc->mfcMaskSpec) &&
          (((pMfc->mfcMaskSpec!=(unsigned int)0) && ((unsigned int)MFC_header.ty==mfcMask)) ||
-		  ((pMfc->mfcMaskSpec==(unsigned int)0) && ((unsigned int)MFC_header.ty==pMfc->mfcMaskSpec))) &&
+          ((pMfc->mfcMaskSpec==(unsigned int)0) && ((unsigned int)MFC_header.ty==pMfc->mfcMaskSpec))) &&
         (((double)pMfc->wavelength>(double)100.) && ((MFC_header.wavelength1<(double)pMfc->wavelength-5.) || (MFC_header.wavelength1>(double)pMfc->wavelength+5.))))
 
        rc=ERROR_ID_FILE_RECORD;
@@ -647,7 +647,7 @@ RC ReliMFC(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int localDay
        }
 //      else if (MFC_header.noscans<=0)
 //       rc=ERROR_ID_FILE_RECORD;
-     	// Wavelength selection
+         // Wavelength selection
 
       if (!rc)
        {
@@ -842,7 +842,7 @@ RC MFC_ReadRecordStd(ENGINE_CONTEXT *pEngineContext,char *fileName,
 
      for (i=0;i<pixFin;i++)
       {
-      	fgets(line,MAX_STR_SHORT_LEN,fp);
+          fgets(line,MAX_STR_SHORT_LEN,fp);
        sscanf(line,"%lf",&spe[i]);
       }
 
@@ -947,24 +947,24 @@ RC MFC_ReadRecordStd(ENGINE_CONTEXT *pEngineContext,char *fileName,
 
     while (fgets(line,MAX_STR_SHORT_LEN,fp))
      {
-     	if (strchr(line,'=')!=NULL)
-     	 {
-     	 	sscanf(line,"%s = %s",keyWord,keyValue);
-     	 	if (!strcasecmp(keyWord,"AzimuthAngle"))
-     	 	 pRecord->azimuthViewAngle=(float)atof(keyValue);
-     	 	else if (!strcasecmp(keyWord,"ElevationAngle"))
-     	 	 pRecord->elevationViewAngle=(float)atof(keyValue);
-     	 	else if (!strcasecmp(keyWord,"ExposureTime"))
-     	 	 pRecord->Tint=(double)atof(keyValue)*0.001;
-     	 	else if (!strcasecmp(keyWord,"Latitude"))
-     	 	 pRecord->latitude=(double)atof(keyValue);
-     	 	else if (!strcasecmp(keyWord,"Longitude"))
-     	 	 pRecord->longitude=(double)atof(keyValue);
-     	 	else if (!strcasecmp(keyWord,"NumScans"))
-     	 	 pRecord->NSomme=(int)atoi(keyValue);
-     	 	else if (!strcasecmp(keyWord,"Temperature"))
-     	 	 pRecord->TDet=(double)atof(keyValue);
-     	 }
+         if (strchr(line,'=')!=NULL)
+          {
+              sscanf(line,"%s = %s",keyWord,keyValue);
+              if (!strcasecmp(keyWord,"AzimuthAngle"))
+               pRecord->azimuthViewAngle=(float)atof(keyValue);
+              else if (!strcasecmp(keyWord,"ElevationAngle"))
+               pRecord->elevationViewAngle=(float)atof(keyValue);
+              else if (!strcasecmp(keyWord,"ExposureTime"))
+               pRecord->Tint=(double)atof(keyValue)*0.001;
+              else if (!strcasecmp(keyWord,"Latitude"))
+               pRecord->latitude=(double)atof(keyValue);
+              else if (!strcasecmp(keyWord,"Longitude"))
+               pRecord->longitude=(double)atof(keyValue);
+              else if (!strcasecmp(keyWord,"NumScans"))
+               pRecord->NSomme=(int)atoi(keyValue);
+              else if (!strcasecmp(keyWord,"Temperature"))
+               pRecord->TDet=(double)atof(keyValue);
+          }
      }
 
     pRecord->maxdoas.measurementType=(pRecord->elevationViewAngle>80.)?PRJCT_INSTR_MAXDOAS_TYPE_ZENITH:PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS;  // Not the possibility to separate almucantar, horizon and direct sun from off-axis measurements
@@ -1218,7 +1218,7 @@ RC MFCBIRA_Set(ENGINE_CONTEXT *pEngineContext,FILE *specFp)
 
       if (!rc && (offset!=NULL) && (darkCurrent!=NULL))
        {
-   	 	  // Initialize vectors
+              // Initialize vectors
 
         VECTOR_Init(offset,(double)0.,n_wavel);
         VECTOR_Init(darkCurrent,(double)0.,n_wavel);
@@ -1229,31 +1229,31 @@ RC MFCBIRA_Set(ENGINE_CONTEXT *pEngineContext,FILE *specFp)
 
         for (i=nOff=nDrk=0,drkTint=0.;i<pEngineContext->recordNumber;i++)
          {
-         	fseek(specFp,2L*sizeof(int)+i*(sizeof(MFCBIRA_HEADER)+n_wavel*sizeof(float)),SEEK_SET);
-   	      fread(&header,sizeof(MFCBIRA_HEADER),1,specFp);
+             fseek(specFp,2L*sizeof(int)+i*(sizeof(MFCBIRA_HEADER)+n_wavel*sizeof(float)),SEEK_SET);
+             fread(&header,sizeof(MFCBIRA_HEADER),1,specFp);
 
-   	      // Load offset
+             // Load offset
 
-   	      if (header.measurementType==PRJCT_INSTR_MAXDOAS_TYPE_OFFSET)
-   	       {
-   	        fread(spectrum,sizeof(float),n_wavel,specFp);
-   	        for (j=0;j<n_wavel;j++)
-   	         offset[j]+=(double)spectrum[j];
+             if (header.measurementType==PRJCT_INSTR_MAXDOAS_TYPE_OFFSET)
+              {
+               fread(spectrum,sizeof(float),n_wavel,specFp);
+               for (j=0;j<n_wavel;j++)
+                offset[j]+=(double)spectrum[j];
 
-   	        nOff+=header.scansNumber;                                             // all offset should have the same exposure time
-   	       }
+               nOff+=header.scansNumber;                                             // all offset should have the same exposure time
+              }
 
-   	      // Load dark current
+             // Load dark current
 
-   	      else if (header.measurementType==PRJCT_INSTR_MAXDOAS_TYPE_DARK)
-   	       {
-   	        fread(spectrum,sizeof(float),n_wavel,specFp);
-   	        for (j=0;j<n_wavel;j++)
-   	         darkCurrent[j]+=(double)spectrum[j];
+             else if (header.measurementType==PRJCT_INSTR_MAXDOAS_TYPE_DARK)
+              {
+               fread(spectrum,sizeof(float),n_wavel,specFp);
+               for (j=0;j<n_wavel;j++)
+                darkCurrent[j]+=(double)spectrum[j];
 
-   	        nDrk+=header.scansNumber;
-   	        drkTint=header.exposureTime;                                        // all dark current should have the same exposure time
-   	       }
+               nDrk+=header.scansNumber;
+               drkTint=header.exposureTime;                                        // all dark current should have the same exposure time
+              }
          }
 
 
@@ -1261,16 +1261,16 @@ RC MFCBIRA_Set(ENGINE_CONTEXT *pEngineContext,FILE *specFp)
         // Average offset (account for the number of spectra and the number of scans)
 
         if (nOff)
-        	for (j=0;j<n_wavel;j++)
-        	 offset[j]/=nOff;
+            for (j=0;j<n_wavel;j++)
+             offset[j]/=nOff;
 
         // Average dark current and correct by the offset
 
         if (nDrk)
-        	for (j=0;j<n_wavel;j++)                                                     // drk=drk-offset*drkScans/offScans
-        	 darkCurrent[j]=(darkCurrent[j]-offset[j]*nDrk)/(nDrk*drkTint);       // number of scans for the dark current should be 1
+            for (j=0;j<n_wavel;j++)                                                     // drk=drk-offset*drkScans/offScans
+             darkCurrent[j]=(darkCurrent[j]-offset[j]*nDrk)/(nDrk*drkTint);       // number of scans for the dark current should be 1
        }
-   	 }
+        }
   }
 
   // Release allocated buffer
@@ -1327,19 +1327,19 @@ RC MFCBIRA_Reli(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int loc
    rc=ERROR_ID_ALLOC;
   else
    {
-   	// Go to the requested record
+       // Go to the requested record
 
-   	fseek(specFp,2L*sizeof(int)+(recordNo-1)*(sizeof(MFCBIRA_HEADER)+n_wavel*sizeof(float)),SEEK_SET);
-   	fread(&header,sizeof(MFCBIRA_HEADER),1,specFp);
-   	fread(spectrum,sizeof(float),n_wavel,specFp);
+       fseek(specFp,2L*sizeof(int)+(recordNo-1)*(sizeof(MFCBIRA_HEADER)+n_wavel*sizeof(float)),SEEK_SET);
+       fread(&header,sizeof(MFCBIRA_HEADER),1,specFp);
+       fread(spectrum,sizeof(float),n_wavel,specFp);
 
-   	// Retrieve the main information from the header
+       // Retrieve the main information from the header
 
-   	pRecord->NSomme=header.scansNumber;
-   	pRecord->Tint=header.exposureTime;
-   	pRecord->latitude=header.latitude;
-   	pRecord->longitude=header.longitude;
-   	pRecord->TotalAcqTime=header.totalAcqTime;
+       pRecord->NSomme=header.scansNumber;
+       pRecord->Tint=header.exposureTime;
+       pRecord->latitude=header.latitude;
+       pRecord->longitude=header.longitude;
+       pRecord->TotalAcqTime=header.totalAcqTime;
     pRecord->elevationViewAngle=header.elevationAngle;
     pRecord->azimuthViewAngle=header.azimuthAngle;
     pRecord->TDet=header.temperature;
@@ -1396,34 +1396,34 @@ RC MFCBIRA_Reli(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int loc
     pRecord->localCalDay=ZEN_FNCaljda(&tmLocal);
     pRecord->localTimeDec=fmod(pRecord->TimeDec+24.+timeshift,(double)24.);
 
-   	for (i=0;i<n_wavel;i++)
-   	 pBuffers->spectrum[i]=(double)spectrum[i];
+       for (i=0;i<n_wavel;i++)
+        pBuffers->spectrum[i]=(double)spectrum[i];
 
-   	if ((header.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_DARK) && (header.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_OFFSET))
-   	 {
-     	// Offset correction
+       if ((header.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_DARK) && (header.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_OFFSET))
+        {
+         // Offset correction
 
-   	  if (pBuffers->offset!=NULL)
-   	   for (i=0;i<n_wavel;i++)
-   	    pBuffers->spectrum[i]-=pBuffers->offset[i]*header.scansNumber;          // offset is already divided by its number of scans
+         if (pBuffers->offset!=NULL)
+          for (i=0;i<n_wavel;i++)
+           pBuffers->spectrum[i]-=pBuffers->offset[i]*header.scansNumber;          // offset is already divided by its number of scans
 
-   	  // Dark current correction                                                // dark current is already divided by it integration time
+         // Dark current correction                                                // dark current is already divided by it integration time
 
-   	  if (pBuffers->varPix!=NULL)
-   	   for (i=0;i<n_wavel;i++)
-   	    {
-   	     pBuffers->spectrum[i]-=pBuffers->varPix[i]*header.scansNumber*header.exposureTime;
-   	     pBuffers->spectrum[i]/=header.scansNumber;
-   	    }
+         if (pBuffers->varPix!=NULL)
+          for (i=0;i<n_wavel;i++)
+           {
+            pBuffers->spectrum[i]-=pBuffers->varPix[i]*header.scansNumber*header.exposureTime;
+            pBuffers->spectrum[i]/=header.scansNumber;
+           }
 
-   	  // Average
+         // Average
 
-  	   // for (i=0;i<NDET;i++)
-  	   // pBuffers->spectrum[i]/=header.scansNumber;
+         // for (i=0;i<NDET;i++)
+         // pBuffers->spectrum[i]/=header.scansNumber;
 
       if (rc || (dateFlag && ((pRecord->localCalDay!=localDay) ||
                               (pRecord->elevationViewAngle<pEngineContext->project.spectra.refAngle-pEngineContext->project.spectra.refTol) ||
-                              (pRecord->elevationViewAngle>pEngineContext->project.spectra.refAngle+pEngineContext->project.spectra.refTol))))  	                 // reference spectra could be a not zenith sky spectrum
+                              (pRecord->elevationViewAngle>pEngineContext->project.spectra.refAngle+pEngineContext->project.spectra.refTol))))                       // reference spectra could be a not zenith sky spectrum
 
       //  if (rc || (dateFlag && ((pRecord->elevationViewAngle<80.) || (header.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_ZENITH))) ) //||                     // reference spectra are zenith only
                 //(!dateFlag && pEngineContext->analysisRef.refScan && !pEngineContext->analysisRef.refSza && (pRecord->elevationViewAngle>80.)))
@@ -1501,7 +1501,7 @@ RC MFC_LoadAnalysis(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
                          &MFC_headerDrk,pBuffers->varPix,
                          &MFC_headerOff,pBuffers->offset,
                          pInstrumental->mfc.mfcMaskSpec,pInstrumental->mfc.mfcMaskSpec,pInstrumental->mfc.mfcRevert);
-    	 	else
+             else
         rc=MFC_ReadRecordStd(pEngineContext,fileName,
                             &tbinaryRef,pTabFeno->Sref,
                             &MFC_headerDrk,pBuffers->varPix,

@@ -6,13 +6,13 @@
 BEGIN_C_DECLS
 
 typedef enum  SCIA_PRODUCT {SCIA_L2N,
-			    SCIA_L2O,
-			    SCIA_L2M,
-			    SCIA_L1B,
-			    SCIA_L1C,
-			    MIPAS_L2,
-			    GOME_L2,
-			    SCIA_MAX_PRODUCT
+                SCIA_L2O,
+                SCIA_L2M,
+                SCIA_L1B,
+                SCIA_L1C,
+                MIPAS_L2,
+                GOME_L2,
+                SCIA_MAX_PRODUCT
 } SCIA_PRODUCT;
 
 
@@ -57,11 +57,11 @@ typedef struct MPH {
     char spare_2[40];
         /*  UTC start time of data sensing (first measurement in first data
             record) UTC Time format. If not used, set to
-	    ___________________________. */
+        ___________________________. */
     char sensing_start[28];
         /*  UTC stop time of data sensing (last measurements last data record)
             UTC Time format. If not used, set to
-	    ___________________________. */
+        ___________________________. */
     char sensing_stop[28];
         /*  Spare */
     char spare_3[40];
@@ -107,7 +107,7 @@ typedef struct MPH {
         /*  Spare */
     char spare_5[32];
         /*  UTC time of the occurrence of the Leap SecondSet to
-	    ___________________________
+        ___________________________
             if not used. */
     char leap_utc[28];
         /*  Leap second sign(+001 if positive Leap Second, -001 if negative)Set
@@ -325,7 +325,7 @@ void UTC_STRING(MJD* time, char* string);
 double JULDAY( struct tm myclock );
 
 int yyyymmdd_2_MJD( const char yyyymmdd[],
-		    MJD* mjd);
+            MJD* mjd);
 
 /* calc frac days after 1/1/2002 */
 double JDAY_01012000 ( MJD* time );
@@ -338,8 +338,8 @@ void yyyymmdd_string(char* utc, char* yyyymmdd);
    and catch numbers for data/time parts */
 
 void yyyymmdd_string_num (char* utc, char* yyyymmdd,
-			  int *yyyy, int *mm, int *dd, int *hh, int *min, int *ss,
-			  int *ms);
+              int *yyyy, int *mm, int *dd, int *hh, int *min, int *ss,
+              int *ms);
 /* convert date string from yyyy-mm-dd hh:mm:ss.xx to
    Envisat format  25-SEP-2006 02:32:39.880363 */
 void alpha_month (const char* yyyy_mm_dd, char *dd_mmm_yyyy);
@@ -394,9 +394,9 @@ double grad(double rad);
 
 
 int ANGLES (double sza_in, double los_in, double saa_in, double z_in,
-	    double *sza_out, double *los_out, double *saa_out, double z_out,
-	    double earth_radius,
-	    double *tangent_height);
+        double *sza_out, double *los_out, double *saa_out, double z_out,
+        double earth_radius,
+        double *tangent_height);
 
 
 /* little helpber to replace space and tab by underscore */
@@ -413,7 +413,7 @@ char* str_unslash (const char* str);
    y              y    interpolated values
 */
 int linear_interpol (double *y, double* x, int n_x,
-		     double x0, double y0, double x1, double y1);
+             double x0, double y0, double x1, double y1);
 
 /* smooth an array with boxcar/triangular of width box_width */
 /*  y, ny : y input array of n_y values, will be

@@ -22,8 +22,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
 CProjClipBucket::CProjClipBucket(const QString &projectName, mediate_project_t *projectProperties,
-				 QList<mediate_analysis_window_t*> &analysisWindows,
-				 QList<QTreeWidgetItem*> &rawSpectraItems) :
+                 QList<mediate_analysis_window_t*> &analysisWindows,
+                 QList<QTreeWidgetItem*> &rawSpectraItems) :
   name(projectName),
   properties(projectProperties),
   windows(analysisWindows),
@@ -80,8 +80,8 @@ void CProjectTreeClipboard::endInsertItems(void)
 // a complete project ... takes ownershift responsibility of data referenced
 // by pointer (ie. properties, AWs, tree items)
 void CProjectTreeClipboard::insertProject(const QString &projectName, mediate_project_t *properties,
-					  QList<mediate_analysis_window_t*> &analysisWindows,
-					  QList<QTreeWidgetItem*> &rawSpectraItems)
+                      QList<mediate_analysis_window_t*> &analysisWindows,
+                      QList<QTreeWidgetItem*> &rawSpectraItems)
 {
   // first consider the mark ... clear the group on first touch 
   if (m_markedProjectGroup) {

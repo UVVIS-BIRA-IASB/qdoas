@@ -138,7 +138,7 @@ void CWRingTabGeneral::reset(const mediate_ring_t *properties)
 
 void CWRingTabGeneral::apply(mediate_ring_t *properties) const
 {
- 	properties->normalize = (m_normalizeCheck->checkState() == Qt::Checked) ? 1 : 0;
+     properties->normalize = (m_normalizeCheck->checkState() == Qt::Checked) ? 1 : 0;
   properties->noheader = (m_headerCheck->checkState() == Qt::Checked) ? 1 : 0;
   properties->saveraman = (m_ramanCheck->checkState() == Qt::Checked) ? 1 : 0;
   properties->temperature = m_tempEdit->text().toDouble();
@@ -155,8 +155,8 @@ void CWRingTabGeneral::slotBrowseOutput()
   CPreferences *pref = CPreferences::instance();
 
   QString filename = QFileDialog::getSaveFileName(this, "Output File",
-						  pref->directoryName("Output"),
-						  "All files (*)");
+                          pref->directoryName("Output"),
+                          "All files (*)");
 
 
   if (!filename.isEmpty()) {
@@ -171,8 +171,8 @@ void CWRingTabGeneral::slotBrowseCalibration()
   CPreferences *pref = CPreferences::instance();
 
   QString filename = QFileDialog::getOpenFileName(this, "Calibration File",
-						  pref->directoryName("Calib"),
-						  "Calibration File (*.clb);;All files (*)");
+                          pref->directoryName("Calib"),
+                          "Calibration File (*.clb);;All files (*)");
   if (!filename.isEmpty()) {
     pref->setDirectoryNameGivenFile("Calib", filename);
 
@@ -185,8 +185,8 @@ void CWRingTabGeneral::slotBrowseSolarReference()
   CPreferences *pref = CPreferences::instance();
 
   QString filename = QFileDialog::getOpenFileName(this, "reference File",
-						  pref->directoryName("Ref"),
-						  "Kurucz File (*.ktz);;All files (*)");
+                          pref->directoryName("Ref"),
+                          "Kurucz File (*.ktz);;All files (*)");
 
   if (!filename.isEmpty()) {
     pref->setDirectoryNameGivenFile("Ref", filename);

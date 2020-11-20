@@ -181,15 +181,15 @@ RC UofTGotoRecord(FILE *specFp,int recordNo)
          (fileLine[1]=='*') &&
          (fileLine[2]=='*'))
       {
-      	// Retrieve the record index
+          // Retrieve the record index
 
        fgets(fileLine,STRING_LENGTH,specFp);
-      	sscanf(fileLine,"%d",&UofT_lastRecord);
+          sscanf(fileLine,"%d",&UofT_lastRecord);
 
-      	// Check if it is the searched record
+          // Check if it is the searched record
 
-      	if (UofT_lastRecord==recordNo)
-      	 break;
+          if (UofT_lastRecord==recordNo)
+           break;
       }
    }
 

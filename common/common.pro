@@ -8,24 +8,24 @@ OBJECTS_DIR = ../../Obj/$$SYSTEM/common
 TARGET = $$OBJECTS_DIR/common
 
 SOURCES       = CConfigHandler.cpp \
-		CConfigSubHandlerUtils.cpp \
-		CEngineResponse.cpp \
-		CHelpSystem.cpp \
-		ConfigWriterUtils.cpp \
-		CPathMgr.cpp \
-		CPathSubHandler.cpp \
-		CPlotDataSet.cpp \
-		CPlotPageData.cpp \
-		CPlotProperties.cpp \
-		CScaleControl.cpp \
-		CTablePageData.cpp \
-		CValidator.cpp \
-		CWAboutDialog.cpp \
-		CWFilteringEditor.cpp \
-		CWPlotArea.cpp \
-		CWPlotPage.cpp \
-		CWPlotPropertiesConfig.cpp \
-		CWPlotPropertiesDialog.cpp \
+                CConfigSubHandlerUtils.cpp \
+                CEngineResponse.cpp \
+                CHelpSystem.cpp \
+                ConfigWriterUtils.cpp \
+                CPathMgr.cpp \
+                CPathSubHandler.cpp \
+                CPlotDataSet.cpp \
+                CPlotPageData.cpp \
+                CPlotProperties.cpp \
+                CScaleControl.cpp \
+                CTablePageData.cpp \
+                CValidator.cpp \
+                CWAboutDialog.cpp \
+                CWFilteringEditor.cpp \
+                CWPlotArea.cpp \
+                CWPlotPage.cpp \
+                CWPlotPropertiesConfig.cpp \
+                CWPlotPropertiesDialog.cpp \
                 CWSlitEditors.cpp \
                 CWorkSpace.cpp
 

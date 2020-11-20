@@ -65,11 +65,11 @@ CWMain::CWMain(QWidget *parent) :
 {
   // ----------------------------------------------------------------------------
 
-	// to avoid that a thousands comma separator (QT 4.7.3)
+    // to avoid that a thousands comma separator (QT 4.7.3)
 
-	   QLocale qlocale=QLocale::system();
-	   qlocale.setNumberOptions(QLocale::OmitGroupSeparator);
-	   QLocale::setDefault(qlocale);
+       QLocale qlocale=QLocale::system();
+       qlocale.setNumberOptions(QLocale::OmitGroupSeparator);
+       QLocale::setDefault(qlocale);
 
   setlocale(LC_NUMERIC, "C");
 
@@ -153,7 +153,7 @@ CWMain::CWMain(QWidget *parent) :
   connect(m_projTree, SIGNAL(signalStartSession(const RefCountPtr<CSession>&)),
           m_controller, SLOT(slotStartSession(const RefCountPtr<CSession>&)));
   connect(m_projTree, SIGNAL(signalViewCrossSections(const RefCountPtr<CViewCrossSectionData>&)),
-	  m_controller, SLOT(slotViewCrossSections(const RefCountPtr<CViewCrossSectionData>&)));
+      m_controller, SLOT(slotViewCrossSections(const RefCountPtr<CViewCrossSectionData>&)));
 
   // Menu and toolbar actions
 
@@ -269,32 +269,32 @@ CWMain::CWMain(QWidget *parent) :
 
   // connections
   connect(m_controller, SIGNAL(signalCurrentRecordChanged(int,int)),
-	  navPanelRecords, SLOT(slotSetCurrentRecord(int,int)));
+      navPanelRecords, SLOT(slotSetCurrentRecord(int,int)));
   connect(m_controller, SIGNAL(signalFileListChanged(const QStringList&)),
-	  navPanelRecords, SLOT(slotSetFileList(const QStringList&)));
+      navPanelRecords, SLOT(slotSetFileList(const QStringList&)));
   connect(m_controller, SIGNAL(signalCurrentFileChanged(int,int)),
-	  navPanelRecords, SLOT(slotSetCurrentFile(int,int)));
+      navPanelRecords, SLOT(slotSetCurrentFile(int,int)));
   connect(m_controller, SIGNAL(signalSessionRunning(bool)),
-	  navPanelRecords, SLOT(slotSetEnabled(bool)));
+      navPanelRecords, SLOT(slotSetEnabled(bool)));
   connect(m_controller, SIGNAL(signalSessionRunning(bool)),
-	  m_projTree, SLOT(slotSessionRunning(bool)));
+      m_projTree, SLOT(slotSessionRunning(bool)));
 
   connect(navPanelRecords, SIGNAL(signalFirstClicked()),
-	  m_controller, SLOT(slotFirstRecord()));
+      m_controller, SLOT(slotFirstRecord()));
   connect(navPanelRecords, SIGNAL(signalPreviousClicked()),
-	  m_controller, SLOT(slotPreviousRecord()));
+      m_controller, SLOT(slotPreviousRecord()));
   connect(navPanelRecords, SIGNAL(signalNextClicked()),
-	  m_controller, SLOT(slotNextRecord()));
+      m_controller, SLOT(slotNextRecord()));
   connect(navPanelRecords, SIGNAL(signalLastClicked()),
-	  m_controller, SLOT(slotLastRecord()));
+      m_controller, SLOT(slotLastRecord()));
   connect(navPanelRecords, SIGNAL(signalRecordChanged(int)),
-	  m_controller, SLOT(slotGotoRecord(int)));
+      m_controller, SLOT(slotGotoRecord(int)));
   connect(navPanelRecords, SIGNAL(signalSelectedFileChanged(int)),
-	  m_controller, SLOT(slotGotoFile(int)));
+      m_controller, SLOT(slotGotoFile(int)));
   connect(navPanelRecords, SIGNAL(signalStopClicked()),
-	  m_controller, SLOT(slotStopSession()));
+      m_controller, SLOT(slotStopSession()));
   connect(navPanelRecords, SIGNAL(signalStep()),
-	  m_controller, SLOT(slotStep()));
+      m_controller, SLOT(slotStep()));
   connect(navPanelRecords, SIGNAL(signalPlayStatusChanged(bool)),
           this, SLOT(slotSetMessageFileLogging(bool)));
 
@@ -309,11 +309,11 @@ CWMain::CWMain(QWidget *parent) :
 
   // error messages
   connect(m_controller, SIGNAL(signalErrorMessages(int, const QString &)),
-	  this, SLOT(slotErrorMessages(int, const QString &)));
+      this, SLOT(slotErrorMessages(int, const QString &)));
 
   // tab-based coupling of plot and table display
   connect(m_activeContext, SIGNAL(signalActivePageChanged(int)),
-	  m_tableRegion, SLOT(slotDisplayPage(int)));
+      m_tableRegion, SLOT(slotDisplayPage(int)));
 
   // state invalidation driven by the project tree
   connect(m_projTree, SIGNAL(signalSpectraTreeChanged()), m_stateMonitor, SLOT(slotInvalidate()));
@@ -366,8 +366,8 @@ bool CWMain::checkStateAndConsiderSaveFile(void)
   }
 
   QMessageBox::StandardButton choice = QMessageBox::question(this, "Save Changes", msg,
-							     QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
-							     QMessageBox::Save);
+                                 QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
+                                 QMessageBox::Save);
 
   if (choice == QMessageBox::Discard)
     return true; // discard changes
@@ -407,8 +407,8 @@ void CWMain::slotOpenFile()
   CPreferences *prefs = CPreferences::instance();
 
   QString fileName = QFileDialog::getOpenFileName(this, "Open Project File",
-						  prefs->directoryName("QdoasConf"),
-						  "Qdoas Project Config (*.xml);;All Files (*)");
+                          prefs->directoryName("QdoasConf"),
+                          "Qdoas Project Config (*.xml);;All Files (*)");
 
   if (fileName.isEmpty()) {
     return;
@@ -452,9 +452,9 @@ void CWMain::openFile(const QString &fileName) {
     for (int i = 0; i<10; ++i) {
       QString path = handler->getPath(i);
       if (path.isEmpty())
-	pathMgr->removePath(i);
+    pathMgr->removePath(i);
       else
-	pathMgr->addPath(i, path);
+    pathMgr->addPath(i, path);
     }
 
     // sites
@@ -463,7 +463,7 @@ void CWMain::openFile(const QString &fileName) {
     while (siteIt != siteItems.end()) {
 
       ws->createSite((*siteIt)->siteName(), (*siteIt)->abbreviation(),
-		     (*siteIt)->longitude(), (*siteIt)->latitude(), (*siteIt)->altitude());
+             (*siteIt)->longitude(), (*siteIt)->latitude(), (*siteIt)->altitude());
       ++siteIt;
     }
 
@@ -524,27 +524,27 @@ void CWMain::slotSaveAsFile()
     returnCode = QMessageBox::Cancel;
 
     QString fileName = QFileDialog::getSaveFileName(this, "SaveAs Project File",
-						    CPreferences::instance()->directoryName("QdoasConf"),
-						    "Qdoas Project Config (*.xml);;All Files (*)");
+                            CPreferences::instance()->directoryName("QdoasConf"),
+                            "Qdoas Project Config (*.xml);;All Files (*)");
 
     // empty fileName implies cancel
     if (!fileName.isEmpty()) {
 
       if (!fileName.contains('.'))
-	fileName += ".xml";
+    fileName += ".xml";
 
       // write the file
       QString msg = writer.write(fileName);
       if (!msg.isNull()) {
-	msg += "\nPress Retry to select another output project file.";
-	returnCode = QMessageBox::critical(this, "Project File Write Failure", msg,
-					   QMessageBox::Retry | QMessageBox::Cancel,
-					   QMessageBox::Retry);
+    msg += "\nPress Retry to select another output project file.";
+    returnCode = QMessageBox::critical(this, "Project File Write Failure", msg,
+                       QMessageBox::Retry | QMessageBox::Cancel,
+                       QMessageBox::Retry);
       }
       else {
-	// wrote the file ... change the project filename and validate
-	setProjectFileName(fileName);
-	m_stateMonitor->slotValidate();
+    // wrote the file ... change the project filename and validate
+    setProjectFileName(fileName);
+    m_stateMonitor->slotValidate();
         // add the new file name to the "Open Recent" menu
         updateRecentFiles(fileName);
       }

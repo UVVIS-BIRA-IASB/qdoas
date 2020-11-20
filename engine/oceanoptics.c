@@ -95,7 +95,7 @@ RC SetOceanOptics(ENGINE_CONTEXT *pEngineContext,FILE *specFp)
    rc=ERROR_SetLast("SetOceanOptics",ERROR_TYPE_WARNING,ERROR_ID_FILE_NOT_FOUND,pEngineContext->fileInfo.fileName);
   else
    {
-   	// Get the number of records in the file
+       // Get the number of records in the file
 
     fseek(specFp,0L,SEEK_SET);
     pEngineContext->recordNumber=1;
@@ -168,52 +168,52 @@ RC ReliOceanOptics(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int 
   else
    {
     npixels=n_wavel;
-   	while (!feof(specFp) && fgets(fileLine,MAX_ITEM_TEXT_LEN,specFp))
-   	 {
-   	 	if  (!spectrumFound)
-   	 	 {
-   	 	 	if ((str=strstr(fileLine,"Integration Time (usec)"))!=NULL)
-   	 	 	 {
-   	 	 	  sscanf(fileLine,"Integration Time (usec): %lf",&pRecordInfo->Tint);
-   	 	 	  pRecordInfo->Tint*=(double)1.e-6;
-   	 	 	 }
-   	 	 	else if ((str=strstr(fileLine,"Integration Time (sec)"))!=NULL)
-  	 	 	  sscanf(fileLine,"Integration Time (sec): %lf",&pRecordInfo->Tint);
-   	 	 	else if ((str=strstr(fileLine,"Spectra Averaged: "))!=NULL)
-  	 	 	  sscanf(fileLine,"Spectra Averaged: %d",&pRecordInfo->NSomme);
-  	 	 	 else if ((str=strstr(fileLine,"Date: "))!=NULL)
-  	 	 	  sscanf(fileLine,"Date: %[^' '] %[^' '] %d %d:%d:%d %[^' '] %d",weekday,month,&day,&hour,&minutes,&sec,tmp,&year);
-   	 	 	else if ((str=strstr(fileLine,"Number of Pixels in Processed Spectrum: "))!=NULL)
-   	 	 	 {
-  	 	 	   sscanf(fileLine,"Number of Pixels in Processed Spectrum: %d",&npixels);
-  	 	 	   if (npixels>n_wavel)
-  	 	 	    npixels=n_wavel;
-  	 	 	  }
-   	 	 	else if ((str=strstr(fileLine,">>>>>Begin Processed Spectral Data<<<<<"))!=NULL)
-  	 	 	  spectrumFound=1;
-   	 	 }
-   	 	else if (i<npixels)
-   	 	 {
-	 	 	   sscanf(fileLine,"%lf %lf",&lambda[i],&spectrum[i]);
-	 	 	   i++;
-	 	 	  }
-   	 }
+       while (!feof(specFp) && fgets(fileLine,MAX_ITEM_TEXT_LEN,specFp))
+        {
+            if  (!spectrumFound)
+             {
+                 if ((str=strstr(fileLine,"Integration Time (usec)"))!=NULL)
+                  {
+                   sscanf(fileLine,"Integration Time (usec): %lf",&pRecordInfo->Tint);
+                   pRecordInfo->Tint*=(double)1.e-6;
+                  }
+                 else if ((str=strstr(fileLine,"Integration Time (sec)"))!=NULL)
+                  sscanf(fileLine,"Integration Time (sec): %lf",&pRecordInfo->Tint);
+                 else if ((str=strstr(fileLine,"Spectra Averaged: "))!=NULL)
+                  sscanf(fileLine,"Spectra Averaged: %d",&pRecordInfo->NSomme);
+                 else if ((str=strstr(fileLine,"Date: "))!=NULL)
+                  sscanf(fileLine,"Date: %[^' '] %[^' '] %d %d:%d:%d %[^' '] %d",weekday,month,&day,&hour,&minutes,&sec,tmp,&year);
+                 else if ((str=strstr(fileLine,"Number of Pixels in Processed Spectrum: "))!=NULL)
+                  {
+                   sscanf(fileLine,"Number of Pixels in Processed Spectrum: %d",&npixels);
+                   if (npixels>n_wavel)
+                    npixels=n_wavel;
+                  }
+                 else if ((str=strstr(fileLine,">>>>>Begin Processed Spectral Data<<<<<"))!=NULL)
+                  spectrumFound=1;
+             }
+            else if (i<npixels)
+             {
+                 sscanf(fileLine,"%lf %lf",&lambda[i],&spectrum[i]);
+                 i++;
+                }
+        }
 
-   	if (strlen(month))
-   	 {
-   	 	for (mon=0;mon<12;mon++)
-   	 	 if (!strncmp(month,oomonth[mon],3))
-   	 	  break;
+       if (strlen(month))
+        {
+            for (mon=0;mon<12;mon++)
+             if (!strncmp(month,oomonth[mon],3))
+              break;
 
-   	 	if (mon<12)
-   	 	 {
-   	 	 	pRecordInfo->present_datetime.thedate.da_day=(char)day;
-   	 	 	pRecordInfo->present_datetime.thedate.da_mon=(char)mon+1;
-   	 	 	pRecordInfo->present_datetime.thedate.da_year=year;
+            if (mon<12)
+             {
+                 pRecordInfo->present_datetime.thedate.da_day=(char)day;
+                 pRecordInfo->present_datetime.thedate.da_mon=(char)mon+1;
+                 pRecordInfo->present_datetime.thedate.da_year=year;
 
-   	 	 	pRecordInfo->present_datetime.thetime.ti_hour=(char)hour;
-   	 	 	pRecordInfo->present_datetime.thetime.ti_min=(char)minutes;
-   	 	 	pRecordInfo->present_datetime.thetime.ti_sec=(char)sec;
+                 pRecordInfo->present_datetime.thetime.ti_hour=(char)hour;
+                 pRecordInfo->present_datetime.thetime.ti_min=(char)minutes;
+                 pRecordInfo->present_datetime.thetime.ti_sec=(char)sec;
 
         pRecordInfo->Tm=(double)ZEN_NbSec(&pRecordInfo->present_datetime.thedate,&pRecordInfo->present_datetime.thetime,0);
 
@@ -221,8 +221,8 @@ RC ReliOceanOptics(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int 
 
         pRecordInfo->localCalDay=ZEN_FNCaljda(&tmLocal);
         pRecordInfo->localTimeDec=fmod(pRecordInfo->TimeDec+24.+THRD_localShift,(double)24.);
-   	 	 }
-   	 }
+             }
+        }
 
     if (!rc && (mon>0) && (mon<=12) && dateFlag && (pRecordInfo->localCalDay!=localDay))
      rc=ERROR_ID_FILE_RECORD;

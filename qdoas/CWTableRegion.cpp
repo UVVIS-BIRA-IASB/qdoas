@@ -76,8 +76,8 @@ void CWTableRegion::slotSaveAs()
   CPreferences *prefs = CPreferences::instance();
 
   QString fileName = QFileDialog::getSaveFileName(this, "SaveAs Table",
-						  prefs->directoryName("Table"),
-						  "Text file (*.txt)");
+                          prefs->directoryName("Table"),
+                          "Text file (*.txt)");
 
   if (!fileName.isEmpty()) {
 
@@ -94,14 +94,14 @@ void CWTableRegion::slotSaveAs()
       int cols = m_model->columnCount();
       
       for (int j=0; j<rows; ++j) {
-	for (int i=0; i<cols; ++i) {
-	  QString tmp(m_model->index(j, i, QModelIndex()).data().toString());
-	
-	  if (i != 0)
-	    fputc('\t', fp);
-	  fprintf(fp, "%s", tmp.toLocal8Bit().constData());
-	}
-	fputc('\n', fp);
+    for (int i=0; i<cols; ++i) {
+      QString tmp(m_model->index(j, i, QModelIndex()).data().toString());
+    
+      if (i != 0)
+        fputc('\t', fp);
+      fprintf(fp, "%s", tmp.toLocal8Bit().constData());
+    }
+    fputc('\n', fp);
       }
 
       fclose(fp);

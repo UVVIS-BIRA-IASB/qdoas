@@ -265,7 +265,7 @@ RC ERF_Alloc(void)
 
   else
    {
-   	// Build the grid (0..3 nm by 0.01 step) and calculate the error function
+       // Build the grid (0..3 nm by 0.01 step) and calculate the error function
 
     for (i=0,x=(double)0.;i<(INDEX)(ERF_N);i++,x+=(double)0.01)
      {

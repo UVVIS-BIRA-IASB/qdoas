@@ -385,7 +385,7 @@ bool CProjectSelectionSubHandler::start(const QString &element, const QXmlAttrib
 // handler for <analysis> (child of project)
 
 CProjectAnalysisSubHandler::CProjectAnalysisSubHandler(CConfigHandler *master,
-						       mediate_project_analysis_t *analysis) :
+                               mediate_project_analysis_t *analysis) :
   CConfigSubHandler(master),
   m_analysis(analysis)
 {
@@ -435,7 +435,7 @@ bool CProjectAnalysisSubHandler::start(const QXmlAttributes &atts)
 // handler for <raw_spectra> (child of project)
 
 CProjectRawSpectraSubHandler::CProjectRawSpectraSubHandler(CConfigHandler *master,
-							   CProjectConfigTreeNode *node) :
+                               CProjectConfigTreeNode *node) :
   CConfigSubHandler(master),
   m_node(node)
 {
@@ -462,7 +462,7 @@ bool CProjectRawSpectraSubHandler::start(const QString &element, const QXmlAttri
     // expand the name (the directory name)
     name = m_master->pathExpand(name);
     m_node->addChild(new CProjectConfigDirectory(name, atts.value("filters"),
-						 (atts.value("recursive") == "true"), enabled));
+                         (atts.value("recursive") == "true"), enabled));
   }
   else if (element == "folder") {
     // create an item for the folder now ...
@@ -481,7 +481,7 @@ bool CProjectRawSpectraSubHandler::start(const QString &element, const QXmlAttri
 // handler for <calibration> (child of project)
 
 CProjectCalibrationSubHandler::CProjectCalibrationSubHandler(CConfigHandler *master,
-							     mediate_project_calibration_t *calibration) :
+                                 mediate_project_calibration_t *calibration) :
   CConfigSubHandler(master),
   m_calibration(calibration)
 {
@@ -634,7 +634,7 @@ bool CProjectCalibrationSubHandler::start(const QString &element, const QXmlAttr
 // handler for <undersampling> (child of project)
 
 CProjectUndersamplingSubHandler::CProjectUndersamplingSubHandler(CConfigHandler *master,
-								 mediate_project_undersampling_t *undersampling) :
+                                 mediate_project_undersampling_t *undersampling) :
   CConfigSubHandler(master),
   m_undersampling(undersampling)
 {
@@ -672,7 +672,7 @@ bool CProjectUndersamplingSubHandler::start(const QXmlAttributes &atts)
 // handler for <instrumental> (child of project)
 
 CProjectInstrumentalSubHandler::CProjectInstrumentalSubHandler(CConfigHandler *master,
-							       mediate_project_instrumental_t *instrumental) :
+                                   mediate_project_instrumental_t *instrumental) :
   CConfigSubHandler(master),
   m_instrumental(instrumental)
 {
@@ -794,9 +794,9 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->ascii.calibrationFile))
-	strcpy(m_instrumental->ascii.calibrationFile, str.toLocal8Bit().data());
+    strcpy(m_instrumental->ascii.calibrationFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage(CALIBRATION_FILENAME_ERR);
+    return postErrorMessage(CALIBRATION_FILENAME_ERR);
     }
 
     str = atts.value("transmission");
@@ -805,9 +805,9 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->ascii.transmissionFunctionFile))
-	strcpy(m_instrumental->ascii.transmissionFunctionFile, str.toLocal8Bit().data());
+    strcpy(m_instrumental->ascii.transmissionFunctionFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage(TRANSMISSION_FILENAME_ERR);
+    return postErrorMessage(TRANSMISSION_FILENAME_ERR);
     }
 
   }
@@ -830,9 +830,9 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->acton.calibrationFile))
-	strcpy(m_instrumental->acton.calibrationFile, str.toLocal8Bit().data());
+    strcpy(m_instrumental->acton.calibrationFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage(CALIBRATION_FILENAME_ERR);
+    return postErrorMessage(CALIBRATION_FILENAME_ERR);
     }
 
     str = atts.value("transmission");
@@ -841,9 +841,9 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->acton.transmissionFunctionFile))
-	strcpy(m_instrumental->acton.transmissionFunctionFile, str.toLocal8Bit().data());
+    strcpy(m_instrumental->acton.transmissionFunctionFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage(TRANSMISSION_FILENAME_ERR);
+    return postErrorMessage(TRANSMISSION_FILENAME_ERR);
     }
 
   }
@@ -895,9 +895,9 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->mfc.calibrationFile))
-	strcpy(m_instrumental->mfc.calibrationFile, str.toLocal8Bit().data());
+    strcpy(m_instrumental->mfc.calibrationFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage(CALIBRATION_FILENAME_ERR);
+    return postErrorMessage(CALIBRATION_FILENAME_ERR);
     }
 
     str = atts.value("transmission");
@@ -906,26 +906,26 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->mfc.transmissionFunctionFile))
-	strcpy(m_instrumental->mfc.transmissionFunctionFile, str.toLocal8Bit().data());
+    strcpy(m_instrumental->mfc.transmissionFunctionFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage(TRANSMISSION_FILENAME_ERR);
+    return postErrorMessage(TRANSMISSION_FILENAME_ERR);
     }
     str = atts.value("dark");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->mfc.darkCurrentFile))
-	strcpy(m_instrumental->mfc.darkCurrentFile, str.toLocal8Bit().data());
+    strcpy(m_instrumental->mfc.darkCurrentFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage("Dark Current Filename too long");
+    return postErrorMessage("Dark Current Filename too long");
     }
 
     str = atts.value("offset");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->mfc.offsetFile))
-	strcpy(m_instrumental->mfc.offsetFile, str.toLocal8Bit().data());
+    strcpy(m_instrumental->mfc.offsetFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage("Offset Filename too long");
+    return postErrorMessage("Offset Filename too long");
     }
 
   }
@@ -950,9 +950,9 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->mfcstd.calibrationFile))
-	strcpy(m_instrumental->mfcstd.calibrationFile, str.toLocal8Bit().data());
+    strcpy(m_instrumental->mfcstd.calibrationFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage(CALIBRATION_FILENAME_ERR);
+    return postErrorMessage(CALIBRATION_FILENAME_ERR);
     }
 
     str = atts.value("transmission");
@@ -961,26 +961,26 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->mfcstd.transmissionFunctionFile))
-	strcpy(m_instrumental->mfcstd.transmissionFunctionFile, str.toLocal8Bit().data());
+    strcpy(m_instrumental->mfcstd.transmissionFunctionFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage(TRANSMISSION_FILENAME_ERR);
+    return postErrorMessage(TRANSMISSION_FILENAME_ERR);
     }
     str = atts.value("dark");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->mfcstd.darkCurrentFile))
-	strcpy(m_instrumental->mfcstd.darkCurrentFile, str.toLocal8Bit().data());
+    strcpy(m_instrumental->mfcstd.darkCurrentFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage("Dark Current Filename too long");
+    return postErrorMessage("Dark Current Filename too long");
     }
 
     str = atts.value("offset");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->mfcstd.offsetFile))
-	strcpy(m_instrumental->mfcstd.offsetFile, str.toLocal8Bit().data());
+    strcpy(m_instrumental->mfcstd.offsetFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage("Offset Filename too long");
+    return postErrorMessage("Offset Filename too long");
     }
   }
   else if (element == "mfcbira") { // MFC bira
@@ -995,9 +995,9 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->mfcbira.calibrationFile))
-	strcpy(m_instrumental->mfcbira.calibrationFile, str.toLocal8Bit().data());
+    strcpy(m_instrumental->mfcbira.calibrationFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage(CALIBRATION_FILENAME_ERR);
+    return postErrorMessage(CALIBRATION_FILENAME_ERR);
     }
 
     str = atts.value("transmission");
@@ -1006,9 +1006,9 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->mfcbira.transmissionFunctionFile))
-	strcpy(m_instrumental->mfcbira.transmissionFunctionFile, str.toLocal8Bit().data());
+    strcpy(m_instrumental->mfcbira.transmissionFunctionFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage(TRANSMISSION_FILENAME_ERR);
+    return postErrorMessage(TRANSMISSION_FILENAME_ERR);
     }
   }
 
@@ -1039,9 +1039,9 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->ccdeev.calibrationFile))
-	strcpy(m_instrumental->ccdeev.calibrationFile, str.toLocal8Bit().data());
+    strcpy(m_instrumental->ccdeev.calibrationFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage(CALIBRATION_FILENAME_ERR);
+    return postErrorMessage(CALIBRATION_FILENAME_ERR);
     }
 
     str = atts.value("transmission");
@@ -1050,42 +1050,42 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->ccdeev.transmissionFunctionFile))
-	strcpy(m_instrumental->ccdeev.transmissionFunctionFile, str.toLocal8Bit().data());
+    strcpy(m_instrumental->ccdeev.transmissionFunctionFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage(TRANSMISSION_FILENAME_ERR);
+    return postErrorMessage(TRANSMISSION_FILENAME_ERR);
     }
 
     str = atts.value("image");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->ccdeev.imagePath))
-	strcpy(m_instrumental->ccdeev.imagePath, str.toLocal8Bit().data());
+    strcpy(m_instrumental->ccdeev.imagePath, str.toLocal8Bit().data());
       else
-	return postErrorMessage("Stray Light Correction Filename too long");
+    return postErrorMessage("Stray Light Correction Filename too long");
     }
 
     str = atts.value("stray");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->ccdeev.straylightCorrectionFile))
-	strcpy(m_instrumental->ccdeev.straylightCorrectionFile, str.toLocal8Bit().data());
+    strcpy(m_instrumental->ccdeev.straylightCorrectionFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage("Stray Light Correction Filename too long");
+    return postErrorMessage("Stray Light Correction Filename too long");
     }
 
     str = atts.value("dnl");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->ccdeev.detectorNonLinearityFile))
-	strcpy(m_instrumental->ccdeev.detectorNonLinearityFile, str.toLocal8Bit().data());
+    strcpy(m_instrumental->ccdeev.detectorNonLinearityFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage("Detector Non-Linearity Filename too long");
+    return postErrorMessage("Detector Non-Linearity Filename too long");
     }
 
     str = atts.value("type");
 
     if (!str.isEmpty())
-    	 {
+         {
       if (str == "all")
         m_instrumental->ccdeev.spectralType = PRJCT_INSTR_MAXDOAS_TYPE_NONE;
       else if (str == "off-axis")
@@ -1145,9 +1145,9 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->omi.trackSelection))
-	strcpy(m_instrumental->omi.trackSelection, str.toLocal8Bit().data());
+    strcpy(m_instrumental->omi.trackSelection, str.toLocal8Bit().data());
       else
-	return postErrorMessage("Track selection string too long");
+    return postErrorMessage("Track selection string too long");
     }
 
     str = atts.value("xTrackMode");
@@ -1163,9 +1163,9 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->omi.calibrationFile))
-	strcpy(m_instrumental->omi.calibrationFile, str.toLocal8Bit().data());
+    strcpy(m_instrumental->omi.calibrationFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage(CALIBRATION_FILENAME_ERR);
+    return postErrorMessage(CALIBRATION_FILENAME_ERR);
     }
 
     str = atts.value("transmission");
@@ -1174,9 +1174,9 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->omi.transmissionFunctionFile))
-	strcpy(m_instrumental->omi.transmissionFunctionFile, str.toLocal8Bit().data());
+    strcpy(m_instrumental->omi.transmissionFunctionFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage(TRANSMISSION_FILENAME_ERR);
+    return postErrorMessage(TRANSMISSION_FILENAME_ERR);
     }
 
   }
@@ -1194,18 +1194,18 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < sizeof(m_instrumental->tropomi.reference_orbit_dir))
-	strcpy(m_instrumental->tropomi.reference_orbit_dir, str.toLocal8Bit().data());
+    strcpy(m_instrumental->tropomi.reference_orbit_dir, str.toLocal8Bit().data());
       else
-	return postErrorMessage("Tropomi reference orbit directory name too long");
+    return postErrorMessage("Tropomi reference orbit directory name too long");
     }
 
     str = atts.value("trackSelection");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->tropomi.trackSelection))
-	strcpy(m_instrumental->tropomi.trackSelection, str.toLocal8Bit().data());
+    strcpy(m_instrumental->tropomi.trackSelection, str.toLocal8Bit().data());
       else
-	return postErrorMessage("Track selection string too long");
+    return postErrorMessage("Track selection string too long");
     }
 
 
@@ -1213,18 +1213,18 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < sizeof(m_instrumental->tropomi.calibrationFile))
-	strcpy(m_instrumental->tropomi.calibrationFile, str.toLocal8Bit().data());
+    strcpy(m_instrumental->tropomi.calibrationFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage("Calibration Filename too long");
+    return postErrorMessage("Calibration Filename too long");
     }
 
     str = atts.value("instr");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < sizeof(m_instrumental->tropomi.instrFunctionFile))
-	strcpy(m_instrumental->tropomi.instrFunctionFile, str.toLocal8Bit().data());
+    strcpy(m_instrumental->tropomi.instrFunctionFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage("Instrument Function  Filename too long");
+    return postErrorMessage("Instrument Function  Filename too long");
     }
   }
   else if (element == "apex") {
@@ -1232,9 +1232,9 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->apex.trackSelection))
-	strcpy(m_instrumental->apex.trackSelection, str.toLocal8Bit().data());
+    strcpy(m_instrumental->apex.trackSelection, str.toLocal8Bit().data());
       else
-	return postErrorMessage("Track selection string too long");
+    return postErrorMessage("Track selection string too long");
     }
 
 
@@ -1242,18 +1242,18 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < sizeof(m_instrumental->tropomi.calibrationFile))
-	strcpy(m_instrumental->tropomi.calibrationFile, str.toLocal8Bit().data());
+    strcpy(m_instrumental->tropomi.calibrationFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage("Calibration Filename too long");
+    return postErrorMessage("Calibration Filename too long");
     }
 
     str = atts.value("instr");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < sizeof(m_instrumental->tropomi.instrFunctionFile))
-	strcpy(m_instrumental->tropomi.instrFunctionFile, str.toLocal8Bit().data());
+    strcpy(m_instrumental->tropomi.instrFunctionFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage("Instrument Function  Filename too long");
+    return postErrorMessage("Instrument Function  Filename too long");
     }
   }
   else if (element == "gome2") { // GOME2
@@ -1281,18 +1281,18 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < sizeof(m_instrumental->biraairborne.calibrationFile))
-	      strcpy(m_instrumental->biraairborne.calibrationFile, str.toLocal8Bit().data());
+          strcpy(m_instrumental->biraairborne.calibrationFile, str.toLocal8Bit().data());
       else
-	      return postErrorMessage("Calibration Filename too long");
+          return postErrorMessage("Calibration Filename too long");
     }
 
     str = atts.value("instr");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < sizeof(m_instrumental->biraairborne.transmissionFunctionFile))
-	      strcpy(m_instrumental->biraairborne.transmissionFunctionFile, str.toLocal8Bit().data());
+          strcpy(m_instrumental->biraairborne.transmissionFunctionFile, str.toLocal8Bit().data());
       else
-	      return postErrorMessage("Instrument Function  Filename too long");
+          return postErrorMessage("Instrument Function  Filename too long");
     }
   }
   else if (element == "biramobile") {  // BIRA MOBILE
@@ -1311,18 +1311,18 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < sizeof(m_instrumental->biramobile.calibrationFile))
-	      strcpy(m_instrumental->biramobile.calibrationFile, str.toLocal8Bit().data());
+          strcpy(m_instrumental->biramobile.calibrationFile, str.toLocal8Bit().data());
       else
-	      return postErrorMessage("Calibration Filename too long");
+          return postErrorMessage("Calibration Filename too long");
     }
 
     str = atts.value("instr");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < sizeof(m_instrumental->biramobile.transmissionFunctionFile))
-	      strcpy(m_instrumental->biramobile.transmissionFunctionFile, str.toLocal8Bit().data());
+          strcpy(m_instrumental->biramobile.transmissionFunctionFile, str.toLocal8Bit().data());
       else
-	      return postErrorMessage("Instrument Function  Filename too long");
+          return postErrorMessage("Instrument Function  Filename too long");
     }
   }
   else if (element == "oceanoptics") { // OCEAN OPTICS
@@ -1337,18 +1337,18 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < sizeof(m_instrumental->oceanoptics.calibrationFile))
-	strcpy(m_instrumental->oceanoptics.calibrationFile, str.toLocal8Bit().data());
+    strcpy(m_instrumental->oceanoptics.calibrationFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage("Calibration Filename too long");
+    return postErrorMessage("Calibration Filename too long");
     }
 
     str = atts.value("instr");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < sizeof(m_instrumental->oceanoptics.transmissionFunctionFile))
-	strcpy(m_instrumental->oceanoptics.transmissionFunctionFile, str.toLocal8Bit().data());
+    strcpy(m_instrumental->oceanoptics.transmissionFunctionFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage("Instrument Function  Filename too long");
+    return postErrorMessage("Instrument Function  Filename too long");
     }
   }
     else if (element == "gems") {
@@ -1411,18 +1411,18 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < sizeof(m_instrumental->frm4doas.calibrationFile))
-	strcpy(m_instrumental->frm4doas.calibrationFile, str.toLocal8Bit().data());
+    strcpy(m_instrumental->frm4doas.calibrationFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage("Calibration Filename too long");
+    return postErrorMessage("Calibration Filename too long");
     }
 
     str = atts.value("instr");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < sizeof(m_instrumental->frm4doas.transmissionFunctionFile))
-	strcpy(m_instrumental->frm4doas.transmissionFunctionFile, str.toLocal8Bit().data());
+    strcpy(m_instrumental->frm4doas.transmissionFunctionFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage("Instrument Function  Filename too long");
+    return postErrorMessage("Instrument Function  Filename too long");
     }
   }
 
@@ -1752,9 +1752,9 @@ bool CProjectInstrumentalSubHandler::helperLoadScia(const QXmlAttributes &atts, 
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(d->detectorNonLinearityFile))
-	strcpy(d->detectorNonLinearityFile, str.toLocal8Bit().data());
+    strcpy(d->detectorNonLinearityFile, str.toLocal8Bit().data());
       else
-	return postErrorMessage("Detector Non-Linearity Filename too long");
+    return postErrorMessage("Detector Non-Linearity Filename too long");
     }
 
   return true;
@@ -1764,7 +1764,7 @@ bool CProjectInstrumentalSubHandler::helperLoadScia(const QXmlAttributes &atts, 
 // handler for <slit> (child of project)
 
 CProjectSlitSubHandler::CProjectSlitSubHandler(CConfigHandler *master,
-					       mediate_project_slit_t *slit) :
+                           mediate_project_slit_t *slit) :
   CConfigSubHandler(master),
   m_slit(slit)
 {
@@ -1802,7 +1802,7 @@ bool CProjectSlitSubHandler::start(const QString &element, const QXmlAttributes 
 // handler for <output> (child of project)
 
 CProjectOutputSubHandler::CProjectOutputSubHandler(CConfigHandler *master,
-						   mediate_project_output_t *output) :
+                           mediate_project_output_t *output) :
   CSelectorSubHandler(master, &(output->selection)),
   m_output(output)
 {
@@ -1872,7 +1872,7 @@ bool CProjectOutputSubHandler::start(const QXmlAttributes &atts)
 // handler for <export> (child of project)
 
 CProjectExportSubHandler::CProjectExportSubHandler(CConfigHandler *master,
-						   mediate_project_export_t *exportSpectra) :
+                           mediate_project_export_t *exportSpectra) :
   CSelectorSubHandler(master, &(exportSpectra->selection)),
   m_export(exportSpectra)
 {

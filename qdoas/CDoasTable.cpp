@@ -220,16 +220,16 @@ void CDoasTable::setColumnOffset(int offset)
       tmp = m_columnList.at(index);
 
       if (index < m_columnOffset) {
-	tmp->hide();
+    tmp->hide();
       }
       else {
-	if (x < width()) {
-	  tmp->setColumnHorizontalPosition(x);
-	  x += tmp->columnWidth();
-	}
-	else {
-	  tmp->hide();
-	}
+    if (x < width()) {
+      tmp->setColumnHorizontalPosition(x);
+      x += tmp->columnWidth();
+    }
+    else {
+      tmp->hide();
+    }
       }
       ++index;
     }
@@ -353,11 +353,11 @@ void CDoasTable::updateCols(int wid, int hei) {
     }
     else {
       if (x < wid) {
-	tmp->setColumnHorizontalPosition(x);
-	x += tmp->columnWidth();
+    tmp->setColumnHorizontalPosition(x);
+    x += tmp->columnWidth();
       }
       else {
-	tmp->hide();
+    tmp->hide();
       }
     }
     ++index;
@@ -533,12 +533,12 @@ void CDoasTableColumn::layoutAndDisplay(void)
     }
     else {
       if (y < m_viewport->height()) {
-	tmp->move(m_xBorder, y + m_yBorder);
-	tmp->show();
-	y += tmp->height() + m_yBorder + m_yBorder;
+    tmp->move(m_xBorder, y + m_yBorder);
+    tmp->show();
+    y += tmp->height() + m_yBorder + m_yBorder;
       }
       else {
-	tmp->hide();
+    tmp->hide();
       }
     }
     ++index;
@@ -756,7 +756,7 @@ QWidget* CDoasTableColumnEdit::createCellWidget(const QVariant &cellData)
 
   connect(tmp, SIGNAL(textChanged(const QString&)), tmp, SLOT(slotTextChanged(const QString&)));
   connect(tmp, SIGNAL(signalTextChanged(const QWidget*,const QVariant&)),
-	  this, SLOT(slotCellDataChanged(const QWidget*,const QVariant&)));
+      this, SLOT(slotCellDataChanged(const QWidget*,const QVariant&)));
 
   return tmp;
 }
@@ -786,7 +786,7 @@ void CDoasTableColumnEdit::setCellData(int rowIndex, const QVariant &cellData)
 //-------------------------------------
 
 CDoasTableColumnIntEdit::CDoasTableColumnIntEdit(int minimum, int maximum,
-						 const QString &label, CDoasTable *owner, int minimumWidth) :
+                         const QString &label, CDoasTable *owner, int minimumWidth) :
   CDoasTableColumnEdit(label, owner, minimumWidth),
   m_minimum(minimum),
   m_maximum(maximum)
@@ -823,7 +823,7 @@ QVariant CDoasTableColumnIntEdit::getCellData(int rowIndex) const
 //-------------------------------------
 
 CDoasTableColumnDoubleEdit::CDoasTableColumnDoubleEdit(double minimum, double maximum, int decimals,
-						       const QString &label, CDoasTable *owner, int minimumWidth) :
+                               const QString &label, CDoasTable *owner, int minimumWidth) :
   CDoasTableColumnEdit(label, owner, minimumWidth),
   m_minimum(minimum),
   m_maximum(maximum),
@@ -1047,7 +1047,7 @@ void CDoasTableColumnComboBox::slotTextChanged(const QString &newText)
 }
 
 CDoasTableColumnCombo::CDoasTableColumnCombo(const QStringList &tags, const QString &label, CDoasTable *owner,
-				 int minimumWidth) :
+                 int minimumWidth) :
   CDoasTableColumn(label, owner, minimumWidth),
   m_tags(tags)
 {
@@ -1071,7 +1071,7 @@ QWidget* CDoasTableColumnCombo::createCellWidget(const QVariant &cellData)
 
   connect(tmp, SIGNAL(currentIndexChanged(const QString&)), tmp, SLOT(slotTextChanged(const QString&)));
   connect(tmp, SIGNAL(signalTextChanged(const QWidget*,const QVariant&)),
-	  this, SLOT(slotCellDataChanged(const QWidget*,const QVariant&)));
+      this, SLOT(slotCellDataChanged(const QWidget*,const QVariant&)));
 
   return tmp;
 }
@@ -1097,7 +1097,7 @@ void CDoasTableColumnCombo::setCellData(int rowIndex, const QVariant &cellData)
     if (tmp) {
       int index = tmp->findText(cellData.toString());
       if (index != -1)
-	tmp->setCurrentIndex(index);
+    tmp->setCurrentIndex(index);
     }
   }
 }
@@ -1130,7 +1130,7 @@ QWidget* CDoasTableColumnCheck::createCellWidget(const QVariant &cellData)
 
   connect(tmp, SIGNAL(stateChanged(int)), tmp, SLOT(slotStateChanged(int)));
   connect(tmp, SIGNAL(signalStateChanged(const QWidget*,const QVariant&)),
-	  this, SLOT(slotCellDataChanged(const QWidget*,const QVariant&)));
+      this, SLOT(slotCellDataChanged(const QWidget*,const QVariant&)));
 
   return tmp;
 }

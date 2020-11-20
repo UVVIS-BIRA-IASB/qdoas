@@ -33,8 +33,8 @@ class CProjClipBucket
 {
  private:
   CProjClipBucket(const QString &projectName, mediate_project_t *properties,
-		  QList<mediate_analysis_window_t*> &analysisWindows,
-		  QList<QTreeWidgetItem*> &rawSpectraItems);
+          QList<mediate_analysis_window_t*> &analysisWindows,
+          QList<QTreeWidgetItem*> &rawSpectraItems);
 
   ~CProjClipBucket();
 
@@ -63,8 +63,8 @@ class CProjectTreeClipboard
   // a complete project ... takes ownershift responsibility of data referenced
   // by pointer (ie. properties, AWs, tree items)
   void insertProject(const QString &projectName, mediate_project_t *properties,
-		     QList<mediate_analysis_window_t*> &analysisWindows,
-		     QList<QTreeWidgetItem*> &rawSpectraItems);
+             QList<mediate_analysis_window_t*> &analysisWindows,
+             QList<QTreeWidgetItem*> &rawSpectraItems);
 
   // a single analysis window ... takes ownership of the analysisWindow
   void insertAnalysisWindow(mediate_analysis_window_t *analysisWindow);

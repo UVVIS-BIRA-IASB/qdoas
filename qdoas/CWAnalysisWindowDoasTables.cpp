@@ -47,13 +47,13 @@ CWMoleculesDiffOrthoCombo::CWMoleculesDiffOrthoCombo(const QString &excludedSymb
   m_symbols(symbols),
   m_menu(NULL)
 {
- 	// m_ComboBox = new QComboBox(this);
- 	setMinimumWidth(180);
+     // m_ComboBox = new QComboBox(this);
+     setMinimumWidth(180);
 
- 	addItem("None");
- 	addItem("Differential XS");
- 	addItem("Orthogonalize to ...");
- 	addItem("Subtract from ...");
+     addItem("None");
+     addItem("Differential XS");
+     addItem("Orthogonalize to ...");
+     addItem("Subtract from ...");
 }
 
 CMoleculeDoasTableColumnDiffOrtho::CMoleculeDoasTableColumnDiffOrtho(const QString &label, CDoasTable *owner, int columnWidth) :
@@ -93,9 +93,9 @@ QWidget* CMoleculeDoasTableColumnDiffOrtho::createCellWidget(const QVariant &cel
 
   connect(tmp, SIGNAL(currentIndexChanged(const QString&)), tmp, SLOT(slotTextChanged(const QString&)));
   connect(tmp, SIGNAL(signalTextChanged(const QWidget*,const QVariant&)),
-	  this, SLOT(slotCellDataChanged(const QWidget*,const QVariant&)));
+      this, SLOT(slotCellDataChanged(const QWidget*,const QVariant&)));
   connect(p, SIGNAL(signalSymbolListChanged(const QStringList &)),
-	  tmp, SLOT(slotSymbolListChanged(const QStringList &)));
+      tmp, SLOT(slotSymbolListChanged(const QStringList &)));
 
   return tmp;
 }
@@ -106,14 +106,14 @@ CWMoleculesCorrectionCombo::CWMoleculesCorrectionCombo(const QString &excludedSy
   m_symbols(symbols),
   m_menu(NULL)
 {
- 	// m_ComboBox = new QComboBox(this);
- 	setMinimumWidth(220);
+     // m_ComboBox = new QComboBox(this);
+     setMinimumWidth(220);
 
- 	addItem("None");
- 	addItem("Slope");
- 	addItem("Pukite");
- 	addItem("Mol. ring ...");
- 	// addItem("Slope+Mol. ring ...");
+     addItem("None");
+     addItem("Slope");
+     addItem("Pukite");
+     addItem("Mol. ring ...");
+     // addItem("Slope+Mol. ring ...");
 }
 
 CMoleculeDoasTableColumnCorrection::CMoleculeDoasTableColumnCorrection(const QString &label, CDoasTable *owner, int columnWidth) :
@@ -153,9 +153,9 @@ QWidget* CMoleculeDoasTableColumnCorrection::createCellWidget(const QVariant &ce
 
   connect(tmp, SIGNAL(currentIndexChanged(const QString&)), tmp, SLOT(slotTextChanged(const QString&)));
   connect(tmp, SIGNAL(signalTextChanged(const QWidget*,const QVariant&)),
-	  this, SLOT(slotCellDataChanged(const QWidget*,const QVariant&)));
+      this, SLOT(slotCellDataChanged(const QWidget*,const QVariant&)));
   connect(p, SIGNAL(signalSymbolListChanged(const QStringList &)),
-	  tmp, SLOT(slotSymbolListChanged(const QStringList &)));
+      tmp, SLOT(slotSymbolListChanged(const QStringList &)));
 
   return tmp;
 }
@@ -164,7 +164,7 @@ QWidget* CMoleculeDoasTableColumnCorrection::createCellWidget(const QVariant &ce
 
 
 CWMoleculesDoasTable::CWMoleculesDoasTable(const QString &label, int columnWidth,
-					   int headerHeight, QWidget *parent) :
+                       int headerHeight, QWidget *parent) :
   CDoasTable(label, headerHeight, parent),
   m_selectedRow(-1)
 {
@@ -258,7 +258,7 @@ void CWMoleculesDoasTable::populate(const cross_section_list_t *data)
 
     // add the row (with filenames)
     addRow(cStandardRowHeight, QString(d->symbol), initialValues,
-	   QString(d->crossSectionFile), QString(d->amfFile));
+       QString(d->crossSectionFile), QString(d->amfFile));
 
     ++d; // iterate over the array
     ++row;
@@ -411,7 +411,7 @@ bool CWMoleculesDoasTable::apply(cross_section_list_t *data) const
 }
 
 void CWMoleculesDoasTable::addRow(int height, const QString &label, QList<QVariant> &cellData,
-				  const QString &csFilename, const QString &amfFilename)
+                  const QString &csFilename, const QString &amfFilename)
 {
   addRow(height, label, cellData);
 
@@ -535,7 +535,7 @@ QString CWMoleculesDoasTable::mapCorrectionTypeToComboString(int type)
 
 int CWMoleculesDoasTable::mapComboStringToCorrectionType(const QString &str)
 {
-	 if (str == "Slope") return ANLYS_CORRECTION_TYPE_SLOPE;
+     if (str == "Slope") return ANLYS_CORRECTION_TYPE_SLOPE;
   if (str == "Pukite") return ANLYS_CORRECTION_TYPE_PUKITE;
   if (str == "Mol. ring ...") return ANLYS_CORRECTION_TYPE_MOLECULAR_RING;
   if (str == "Slope/Mol. ring ...") return ANLYS_CORRECTION_TYPE_MOLECULAR_RING_SLOPE;
@@ -665,7 +665,7 @@ void CWMoleculesDoasTable::slotInsertRow()
     CPreferences *prefs = CPreferences::instance();
 
     QString fileName = QFileDialog::getOpenFileName(this, "Select Cross Section File",
-						    prefs->directoryName("CrossSection"), filter);
+                            prefs->directoryName("CrossSection"), filter);
 
     if (!fileName.isEmpty() && fileName.length() < FILENAME_BUFFER_LENGTH) {
 
@@ -677,28 +677,28 @@ void CWMoleculesDoasTable::slotInsertRow()
       // the start of the filename MUST match a free symbol ...
       it = freeSymbols.begin();
       while (it != freeSymbols.end()) {
-	QString tmp(*it);
-	tmp.append('_');
-	if (baseName.startsWith(tmp, Qt::CaseInsensitive)) {
-	  // a match to a symbol ... OK to add the row ...
-	  QList<QVariant> initialValues;
-	  // NOTE: initialized with default values here ...
-	  initialValues.push_back(QString("None"));
-	  initialValues.push_back(QString("Interpolate"));                             // cross type should be set to interpolate by default
-	  initialValues.push_back(QString("None"));
-	  initialValues.push_back(QString("None"));
-	  initialValues.push_back(true);
-	  initialValues.push_back(true);                                               // Require filter should be initialized at true !!!
-	  initialValues.push_back(false);
-	  initialValues.push_back(true);
-	  initialValues.push_back(0.0);
-	  initialValues.push_back(1.0e-3);
-	  initialValues.push_back(0.0);
+    QString tmp(*it);
+    tmp.append('_');
+    if (baseName.startsWith(tmp, Qt::CaseInsensitive)) {
+      // a match to a symbol ... OK to add the row ...
+      QList<QVariant> initialValues;
+      // NOTE: initialized with default values here ...
+      initialValues.push_back(QString("None"));
+      initialValues.push_back(QString("Interpolate"));                             // cross type should be set to interpolate by default
+      initialValues.push_back(QString("None"));
+      initialValues.push_back(QString("None"));
+      initialValues.push_back(true);
+      initialValues.push_back(true);                                               // Require filter should be initialized at true !!!
+      initialValues.push_back(false);
+      initialValues.push_back(true);
+      initialValues.push_back(0.0);
+      initialValues.push_back(1.0e-3);
+      initialValues.push_back(0.0);
 
-	  addRow(cStandardRowHeight, *it, initialValues, fileName, QString());
-	  return;
-	}
-	++it;
+      addRow(cStandardRowHeight, *it, initialValues, fileName, QString());
+      return;
+    }
+    ++it;
       }
     }
   }
@@ -732,10 +732,10 @@ void CWMoleculesDoasTable::slotChangeCrossSectionFileName()
       prefix.append('_');
 
       if (base.startsWith(prefix, Qt::CaseInsensitive)) {
-	m_csFilename[m_selectedRow] = filename; // change the filename
+    m_csFilename[m_selectedRow] = filename; // change the filename
       }
       else {
-	QMessageBox::warning(this, "Invalid XS Filename", "The filename was NOT changed because the selected filename\ndid not correspond with the selected symbol.");
+    QMessageBox::warning(this, "Invalid XS Filename", "The filename was NOT changed because the selected filename\ndid not correspond with the selected symbol.");
       }
     }
   }
@@ -762,10 +762,10 @@ void CWMoleculesDoasTable::slotAmfFileName()
       prefix.append('_');
 
       if (base.startsWith(prefix, Qt::CaseInsensitive)) {
-	m_amfFilename[m_selectedRow] = filename; // change the filename
+    m_amfFilename[m_selectedRow] = filename; // change the filename
       }
       else {
-	QMessageBox::warning(this, "Invalid AMF Filename", "The filename was NOT changed because the selected filename\ndid not correspond with the selected symbol.");
+    QMessageBox::warning(this, "Invalid AMF Filename", "The filename was NOT changed because the selected filename\ndid not correspond with the selected symbol.");
       }
     }
   }
@@ -779,7 +779,7 @@ void CWMoleculesDoasTable::slotFitColumnCheckable(int state)
 //------------------------------------------------------------
 
 CWNonLinearParametersDoasTable::CWNonLinearParametersDoasTable(const QString &label,
-							       int headerHeight, QWidget *parent) :
+                                   int headerHeight, QWidget *parent) :
   CDoasTable(label, headerHeight, parent),
   m_selectedRow(-1)
 {
@@ -983,7 +983,7 @@ void CWNonLinearParametersDoasTable::slotSelectFile()
     {
       QString filename = QFileDialog::getOpenFileName(this, "Com Filename", m_comFilename);
       if (!filename.isEmpty()) {
-	m_comFilename = filename; // change the filename
+    m_comFilename = filename; // change the filename
       }
     }
     break;
@@ -991,7 +991,7 @@ void CWNonLinearParametersDoasTable::slotSelectFile()
     {
       QString filename = QFileDialog::getOpenFileName(this, "Usamp1 Filename", m_usamp1Filename);
       if (!filename.isEmpty()) {
-	m_usamp1Filename = filename; // change the filename
+    m_usamp1Filename = filename; // change the filename
       }
     }
     break;
@@ -999,7 +999,7 @@ void CWNonLinearParametersDoasTable::slotSelectFile()
     {
       QString filename = QFileDialog::getOpenFileName(this, "Usamp2 Filename", m_usamp2Filename);
       if (!filename.isEmpty()) {
-	m_usamp2Filename = filename; // change the filename
+    m_usamp2Filename = filename; // change the filename
       }
     }
     break;
@@ -1009,7 +1009,7 @@ void CWNonLinearParametersDoasTable::slotSelectFile()
 //------------------------------------------------------------
 
 CWShiftAndStretchDialog::CWShiftAndStretchDialog(const QStringList &freeSymbols, const QStringList &selectedSymbols,
-						 QWidget *parent) :
+                         QWidget *parent) :
   QDialog(parent)
 {
   setWindowTitle("Symbol Selection");
@@ -1060,7 +1060,7 @@ QStringList CWShiftAndStretchDialog::selectedSymbols(void) const
 //------------------------------------------------------------
 
 CWShiftAndStretchDoasTable::CWShiftAndStretchDoasTable(const QString &label,
-						       int headerHeight, QWidget *parent) :
+                               int headerHeight, QWidget *parent) :
   CDoasTable(label, headerHeight, parent),
   m_selectedRow(-1)
 {
@@ -1121,11 +1121,11 @@ void CWShiftAndStretchDoasTable::populate(const shift_stretch_list_t *data)
     int i = 0;
     while (i < d->nSymbol) {
       if (i == 0) {
-	label = QString(d->symbol[i]);
+    label = QString(d->symbol[i]);
       }
       else {
-	label.append("; ");
-	label.append(QString(d->symbol[i]));
+    label.append("; ");
+    label.append(QString(d->symbol[i]));
       }
       ++i;
     }
@@ -1217,7 +1217,7 @@ void CWShiftAndStretchDoasTable::removeRow(int rowIndex)
     while (it != symbols.end()) {
       // release locks ... unless special symbol
       if (m_specialSymbols.indexOf(*it) == -1)
-	emit signalUnlockSymbol(*it, this);
+    emit signalUnlockSymbol(*it, this);
       // put symbol back in the freeSymbol list
       m_freeSymbols << *it;
       ++it;
@@ -1341,9 +1341,9 @@ void CWShiftAndStretchDoasTable::slotInsertRow()
       QString tmp = *it;
       ++it;
       while (it != selection.end()) {
-	tmp.append("; ");
-	tmp.append(*it);
-	++it;
+    tmp.append("; ");
+    tmp.append(*it);
+    ++it;
       }
 
       QList<QVariant> initialValues;
@@ -1387,44 +1387,44 @@ void CWShiftAndStretchDoasTable::slotModifyRow()
       QStringList selection = dialog.selectedSymbols();
 
       if (!selection.isEmpty()) {
-	// OK to change ...
+    // OK to change ...
 
-	int index;
-	const QStringList &old = m_selectedSymbolList.at(m_selectedRow);
+    int index;
+    const QStringList &old = m_selectedSymbolList.at(m_selectedRow);
 
-	// release the locks on the original selection and free those symbols
-	QStringList::const_iterator it = old.begin();
-	while (it != old.end()) {
-	  if (m_specialSymbols.indexOf(*it) == -1)
-	    emit signalUnlockSymbol(*it, this);
+    // release the locks on the original selection and free those symbols
+    QStringList::const_iterator it = old.begin();
+    while (it != old.end()) {
+      if (m_specialSymbols.indexOf(*it) == -1)
+        emit signalUnlockSymbol(*it, this);
 
-	  ++it;
-	}
-	m_freeSymbols << old;
+      ++it;
+    }
+    m_freeSymbols << old;
 
-	// now change and lock the new selection ... and change the label ...
-	m_selectedSymbolList.replace(m_selectedRow, selection);
+    // now change and lock the new selection ... and change the label ...
+    m_selectedSymbolList.replace(m_selectedRow, selection);
 
-	QString tmp;
+    QString tmp;
 
-	it = selection.begin();
-	while (it != selection.end()) {
-	  if (m_specialSymbols.indexOf(*it) == -1)
-	    emit signalLockSymbol(*it, this);
+    it = selection.begin();
+    while (it != selection.end()) {
+      if (m_specialSymbols.indexOf(*it) == -1)
+        emit signalLockSymbol(*it, this);
 
-	  index = m_freeSymbols.indexOf(*it);
-	  if (index != -1)
-	    m_freeSymbols.removeAt(index);
+      index = m_freeSymbols.indexOf(*it);
+      if (index != -1)
+        m_freeSymbols.removeAt(index);
 
-	  if (!tmp.isEmpty())
-	    tmp.append("; ");
-	  tmp.append(*it);
+      if (!tmp.isEmpty())
+        tmp.append("; ");
+      tmp.append(*it);
 
-	  ++it;
-	}
+      ++it;
+    }
 
 
-	setHeaderLabel(m_selectedRow, tmp);
+    setHeaderLabel(m_selectedRow, tmp);
       }
     }
   }
@@ -1638,14 +1638,14 @@ void CWOutputDoasTable::slotSymbolListChanged(const QStringList &symbols)
     if (index == -1) {
       // not found => no row for this exists yet, so add one.
       if (initialValues.isEmpty()) {
-	initialValues.push_back(QVariant(false));
-	initialValues.push_back(QVariant());
-	initialValues.push_back(QVariant(true));
-	initialValues.push_back(QVariant(true));
-	initialValues.push_back(QVariant(1.0));
-	initialValues.push_back(QVariant(false));
-	initialValues.push_back(QVariant(false));
-	initialValues.push_back(QVariant(1.0));
+    initialValues.push_back(QVariant(false));
+    initialValues.push_back(QVariant());
+    initialValues.push_back(QVariant(true));
+    initialValues.push_back(QVariant(true));
+    initialValues.push_back(QVariant(1.0));
+    initialValues.push_back(QVariant(false));
+    initialValues.push_back(QVariant(false));
+    initialValues.push_back(QVariant(1.0));
       }
       m_symbols << *it;
       CDoasTable::addRow(cStandardRowHeight, *it, initialValues);

@@ -214,7 +214,7 @@ void CWProjectTabOutput::slotBrowsePath()
   CPreferences *pref = CPreferences::instance();
 
   QString fileName = QFileDialog::getSaveFileName(this, "Select Output Path", pref->directoryName("Output"),
-						  "All Files (*)");
+                          "All Files (*)");
 
   if (!fileName.isEmpty()) {
     // save it again
@@ -229,12 +229,12 @@ void CWProjectTabOutput::slotInstrumentChanged(int instrument)
   bool analysisEnabled=(m_analysisCheck->checkState() == Qt::Checked);
   bool calibrationEnabled=(m_calibrationCheck->checkState() == Qt::Checked);
 
-	 m_instrument=instrument;
+     m_instrument=instrument;
 
-	 // Disable "successful record only" for 2D formats
+     // Disable "successful record only" for 2D formats
 
-	 m_successCheckEnable=((instrument==PRJCT_INSTR_FORMAT_OMI) ||
-	                       (instrument==PRJCT_INSTR_FORMAT_TROPOMI) ||
+     m_successCheckEnable=((instrument==PRJCT_INSTR_FORMAT_OMI) ||
+                           (instrument==PRJCT_INSTR_FORMAT_TROPOMI) ||
                         (instrument==PRJCT_INSTR_FORMAT_APEX)  ||
                         (instrument==PRJCT_INSTR_FORMAT_OMPS) ||
                         (instrument==PRJCT_INSTR_FORMAT_GOME1_NETCDF) ||

@@ -170,8 +170,8 @@ void CWUsampTabGeneral::slotBrowseOutputPhaseOne()
   CPreferences *pref = CPreferences::instance();
 
   QString filename = QFileDialog::getSaveFileName(this, "Output File (Phase 1)",
-						  pref->directoryName("Output"),
-						  "All files (*)");
+                          pref->directoryName("Output"),
+                          "All files (*)");
 
 
   if (!filename.isEmpty()) {
@@ -186,8 +186,8 @@ void CWUsampTabGeneral::slotBrowseOutputPhaseTwo()
   CPreferences *pref = CPreferences::instance();
 
   QString filename = QFileDialog::getSaveFileName(this, "Output File (Phase 2)",
-						  pref->directoryName("Output"),
-						  "All files (*)");
+                          pref->directoryName("Output"),
+                          "All files (*)");
 
 
   if (!filename.isEmpty()) {
@@ -202,8 +202,8 @@ void CWUsampTabGeneral::slotBrowseCalibration()
   CPreferences *pref = CPreferences::instance();
 
   QString filename = QFileDialog::getOpenFileName(this, "Calibration File",
-						  pref->directoryName("Calib"),
-						  "Calibration File (*.clb);;All files (*)");
+                          pref->directoryName("Calib"),
+                          "Calibration File (*.clb);;All files (*)");
   if (!filename.isEmpty()) {
     pref->setDirectoryNameGivenFile("Calib", filename);
 
@@ -216,8 +216,8 @@ void CWUsampTabGeneral::slotBrowseSolarReference()
   CPreferences *pref = CPreferences::instance();
 
   QString filename = QFileDialog::getOpenFileName(this, "reference File",
-						  pref->directoryName("Ref"),
-						  "Kurucz File (*.ktz);;All files (*)");
+                          pref->directoryName("Ref"),
+                          "Kurucz File (*.ktz);;All files (*)");
 
   if (!filename.isEmpty()) {
     pref->setDirectoryNameGivenFile("Ref", filename);

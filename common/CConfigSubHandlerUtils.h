@@ -30,7 +30,7 @@ class CFilteringSubHandler : public CConfigSubHandler
 {
  public:
   CFilteringSubHandler(CConfigHandler *master,
-		       mediate_filter_t *filter);
+               mediate_filter_t *filter);
 
   virtual bool start(const QXmlAttributes &atts);
   virtual bool start(const QString &element, const QXmlAttributes &atts);
@@ -45,7 +45,7 @@ class CSlitFunctionSubHandler : public CConfigSubHandler
 {
  public:
   CSlitFunctionSubHandler(CConfigHandler *master,
-			  mediate_slit_function_t *function);
+              mediate_slit_function_t *function);
 
   virtual bool start(const QXmlAttributes &atts);
   virtual bool start(const QString &element, const QXmlAttributes &atts);

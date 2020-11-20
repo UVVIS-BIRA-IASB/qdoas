@@ -26,15 +26,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 int main(int argc, char *argv[])
 {
-	// ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
 
-	// to avoid that a thousands comma separator (QT 4.7.3)
+    // to avoid that a thousands comma separator (QT 4.7.3)
 
-	   QLocale qlocale=QLocale::system();
-	   qlocale.setNumberOptions(QLocale::OmitGroupSeparator);
-	   QLocale::setDefault(qlocale);
+       QLocale qlocale=QLocale::system();
+       qlocale.setNumberOptions(QLocale::OmitGroupSeparator);
+       QLocale::setDefault(qlocale);
 
-	// ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
   QApplication app(argc, argv);
 
   CWMain main;

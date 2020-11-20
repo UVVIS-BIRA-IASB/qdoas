@@ -80,11 +80,11 @@ int readConfigQdoas(commands_t *cmd, QList<const CProjectConfigItem*> &projectIt
 int analyseProjectQdoas(const CProjectConfigItem *projItem, const QString &outputDir, const QString &calibDir, const QList<QString> &filenames);
 int analyseProjectQdoas(const CProjectConfigItem *projItem, const QString &outputDir,const QString &calibDir);
 int analyseProjectQdoasPrepare(void **engineContext, const CProjectConfigItem *projItem, const QString &outputDir,const QString &calibDir,
-			       CBatchEngineController *controller);
+                   CBatchEngineController *controller);
 int analyseProjectQdoasFile(void *engineContext, CBatchEngineController *controller, const QString &filename);
 int analyseProjectQdoasTreeNode(void *engineContext, CBatchEngineController *controller, const CProjectConfigTreeNode *node);
 int analyseProjectQdoasDirectory(void *engineContext, CBatchEngineController *controller, const QString &dir,
-				 const QString &filters, bool recursive);
+                 const QString &filters, bool recursive);
 
 
 
@@ -105,11 +105,11 @@ int main(int argc, char **argv)
 
   // ----------------------------------------------------------------------------
 
-	// to avoid that a thousands comma separator (QT 4.7.3)
+    // to avoid that a thousands comma separator (QT 4.7.3)
 
-	   QLocale qlocale=QLocale::system();
-	   qlocale.setNumberOptions(QLocale::OmitGroupSeparator);
-	   QLocale::setDefault(qlocale);
+       QLocale qlocale=QLocale::system();
+       qlocale.setNumberOptions(QLocale::OmitGroupSeparator);
+       QLocale::setDefault(qlocale);
 
   setlocale(LC_NUMERIC, "C");
 
@@ -157,60 +157,60 @@ enum RunMode parseCommandLine(int argc, char **argv, commands_t *cmd)
     if (argv[i][0] == '-') {
 
       if (!strcmp(argv[i], "-c")) { // configuration file ...
-	if (++i < argc && argv[i][0] != '-') {
-		 fileSwitch=0;
-	  if (cmd->configFile.isEmpty()) {
-	    cmd->configFile = argv[i];
-	    runMode = Batch;
-	  }
-	  else
-	    std::cout << "Duplicate '-c' option." << std::endl;
-	}
-	else {
-	  runMode = Error;
-	  std::cout << "Option '-c' requires an argument (configuration file)." << std::endl;
-	}
+    if (++i < argc && argv[i][0] != '-') {
+         fileSwitch=0;
+      if (cmd->configFile.isEmpty()) {
+        cmd->configFile = argv[i];
+        runMode = Batch;
+      }
+      else
+        std::cout << "Duplicate '-c' option." << std::endl;
+    }
+    else {
+      runMode = Error;
+      std::cout << "Option '-c' requires an argument (configuration file)." << std::endl;
+    }
 
       }
       else if (!strcmp(argv[i], "-a")) { // project name file ...
-	if (++i < argc && argv[i][0] != '-') {
-		 fileSwitch=0;
-	  cmd->projectName = argv[i];
-	}
-	else {
-	  runMode = Error;
-	  std::cout << "Option '-a' requires an argument (project name)." << std::endl;
-	}
+    if (++i < argc && argv[i][0] != '-') {
+         fileSwitch=0;
+      cmd->projectName = argv[i];
+    }
+    else {
+      runMode = Error;
+      std::cout << "Option '-a' requires an argument (project name)." << std::endl;
+    }
 
       }
       else if (!strcmp(argv[i], "-k")) { // project name file ...
-	if (++i < argc && argv[i][0] != '-') {
-		 fileSwitch=0;
-		 calibSwitch=1;
-	  cmd->projectName = argv[i];
-	}
-	else {
-	  runMode = Error;
-	  std::cout << "Option '-k' requires an argument (project name)." << std::endl;
-	}
+    if (++i < argc && argv[i][0] != '-') {
+         fileSwitch=0;
+         calibSwitch=1;
+      cmd->projectName = argv[i];
+    }
+    else {
+      runMode = Error;
+      std::cout << "Option '-k' requires an argument (project name)." << std::endl;
+    }
 
       }
       else if (!strcmp(argv[i], "-saveref")) { // save irradiances
-      	  calibSaveSwitch=calibSwitch;
-        	if (!calibSwitch)
-        	  std::cout << "Warning : Option '-saveref' has effect only with '-k' option." << std::endl;
+            calibSaveSwitch=calibSwitch;
+            if (!calibSwitch)
+              std::cout << "Warning : Option '-saveref' has effect only with '-k' option." << std::endl;
       }
 
       else if (!strcmp(argv[i], "-f")) { // filename ...
-	if (++i < argc && argv[i][0] != '-')
-		 {
+    if (++i < argc && argv[i][0] != '-')
+         {
     fileSwitch=1;
- 	  cmd->filenames.push_back(argv[i]);
-	  }
-	else {
-	  runMode = Error;
-	  std::cout << "Option '-f' requires an argument (filename)." << std::endl;
-	}
+       cmd->filenames.push_back(argv[i]);
+      }
+    else {
+      runMode = Error;
+      std::cout << "Option '-f' requires an argument (filename)." << std::endl;
+    }
 
       }
       else if (!strcmp(argv[i], "-new_irrad")) { // filename ...
@@ -226,31 +226,31 @@ enum RunMode parseCommandLine(int argc, char **argv, commands_t *cmd)
 
       }
  else if (!strcmp(argv[i],"-xml"))
-	 if (++i < argc && argv[i][0] != '-')
-	 	 {
+     if (++i < argc && argv[i][0] != '-')
+          {
      xmlSwitch=1;
-  	  cmd->xmlCommands.push_back(argv[i]);
-	   }
-	 else {
-	   runMode = Error;
-	   std::cout << "Option '-xml' requires at least an argument (xmlPath=xmlValue)." << std::endl;
-	 }
-	else if (!strcmp(argv[i],"-v"))
-	 verboseMode=1;
+        cmd->xmlCommands.push_back(argv[i]);
+       }
+     else {
+       runMode = Error;
+       std::cout << "Option '-xml' requires at least an argument (xmlPath=xmlValue)." << std::endl;
+     }
+    else if (!strcmp(argv[i],"-v"))
+     verboseMode=1;
  else if (!strcmp(argv[i], "-o")) { // output directory ...
-	if (++i < argc && argv[i][0] != '-') {
-		 fileSwitch=0;
-	  cmd->outputDir = argv[i];
-	}
-	else {
-	  runMode = Error;
-	  std::cout << "Option '-o' requires an argument (directory)." << std::endl;
-	}
+    if (++i < argc && argv[i][0] != '-') {
+         fileSwitch=0;
+      cmd->outputDir = argv[i];
+    }
+    else {
+      runMode = Error;
+      std::cout << "Option '-o' requires an argument (directory)." << std::endl;
+    }
 
       }
       else if (!strcmp(argv[i], "-h")) { // help ...
-      	fileSwitch=0;
-	runMode = Help;
+          fileSwitch=0;
+    runMode = Help;
       }
     }
     else if (fileSwitch)
@@ -314,20 +314,20 @@ enum BatchTool requiredBatchTool(const QString &filename)
       // should begin with '<?xml'
       if (strlen(buffer) > 5 && !strncmp(buffer, "<?xml", 5)) {
 
-	if (fgets(buffer, sizeof(buffer), fp) != NULL) {
-	  // opening tag ...
-	  int len = strlen(buffer);
+    if (fgets(buffer, sizeof(buffer), fp) != NULL) {
+      // opening tag ...
+      int len = strlen(buffer);
 
-	  if (len >= 7 && !strncmp(buffer, "<qdoas>", 7))
-	    type = Qdoas;
-	  else if (len >= 13 && !strncmp(buffer, "<convolution>", 13))
-	    type = Convolution;
-	  else if (len >= 6 && !strncmp(buffer, "<ring>", 6))
-	    type = Ring;
-	  else if (len >= 7 && !strncmp(buffer, "<usamp>", 7))
-	    type = Usamp;
+      if (len >= 7 && !strncmp(buffer, "<qdoas>", 7))
+        type = Qdoas;
+      else if (len >= 13 && !strncmp(buffer, "<convolution>", 13))
+        type = Convolution;
+      else if (len >= 6 && !strncmp(buffer, "<ring>", 6))
+        type = Ring;
+      else if (len >= 7 && !strncmp(buffer, "<usamp>", 7))
+        type = Usamp;
 
-	}
+    }
       }
     }
 
@@ -382,14 +382,14 @@ int batchProcessQdoas(commands_t *cmd)
       // if files were specified on the command-line, then ignore the files in the project.
       if (projectItems.size() == 1) {
 
-	const CProjectConfigItem *p = projectItems.takeFirst();
+    const CProjectConfigItem *p = projectItems.takeFirst();
 
-	retCode = analyseProjectQdoas(p, cmd->outputDir, cmd->calibDir,cmd->filenames);
+    retCode = analyseProjectQdoas(p, cmd->outputDir, cmd->calibDir,cmd->filenames);
 
-	delete p;
+    delete p;
       }
       else {
-	// error ... dont know which project to use ...
+    // error ... dont know which project to use ...
       }
     }
     else {
@@ -439,7 +439,7 @@ int readConfigQdoas(commands_t *cmd, QList<const CProjectConfigItem*> &projectIt
     while (siteIt != siteItems.end()) {
 
       ws->createSite((*siteIt)->siteName(), (*siteIt)->abbreviation(),
-		     (*siteIt)->longitude(), (*siteIt)->latitude(), (*siteIt)->altitude());
+             (*siteIt)->longitude(), (*siteIt)->latitude(), (*siteIt)->altitude());
       ++siteIt;
     }
 
@@ -459,19 +459,19 @@ int readConfigQdoas(commands_t *cmd, QList<const CProjectConfigItem*> &projectIt
     if (!cmd->projectName.isEmpty()) {
       // select only the matching project and discard the rest ...
       while (!tmpItems.isEmpty()) {
-	const CProjectConfigItem *p = tmpItems.takeFirst();
+    const CProjectConfigItem *p = tmpItems.takeFirst();
 
-	if (p->name().toUpper() == cmd->projectName.toUpper())
+    if (p->name().toUpper() == cmd->projectName.toUpper())
 
-	  {
+      {
             if (xmlSwitch)
               QDOASXML_Parse(cmd->xmlCommands,p);
 
             projectItems.push_back(p);
-	  }
+      }
 
-	else
-	  delete p;
+    else
+      delete p;
       }
     }
     else if(xmlSwitch) {
@@ -480,7 +480,7 @@ int readConfigQdoas(commands_t *cmd, QList<const CProjectConfigItem*> &projectIt
     } else {
 
       while (!tmpItems.isEmpty()) {
-	projectItems.push_back(tmpItems.takeFirst());
+    projectItems.push_back(tmpItems.takeFirst());
       }
     }
 
@@ -521,10 +521,10 @@ int analyseProjectQdoas(const CProjectConfigItem *projItem, const QString &outpu
     QFileInfo info(*it);
 
     if (info.isFile())
-  	  retCode = analyseProjectQdoasFile(engineContext, controller, *it);
-  	 else if (info.isDir())
- 	   retCode=analyseProjectQdoasDirectory(engineContext,controller,info.filePath(),fileFilter,1);
- 	  else
+        retCode = analyseProjectQdoasFile(engineContext, controller, *it);
+       else if (info.isDir())
+        retCode=analyseProjectQdoasDirectory(engineContext,controller,info.filePath(),fileFilter,1);
+       else
      retCode=analyseProjectQdoasDirectory(engineContext,controller,info.path(),info.fileName(),1);
 
     ++it;
@@ -573,7 +573,7 @@ int analyseProjectQdoas(const CProjectConfigItem *projItem, const QString &outpu
 }
 
 int analyseProjectQdoasPrepare(void **engineContext, const CProjectConfigItem *projItem, const QString &outputDir,const QString &calibDir,
-			       CBatchEngineController *controller)
+                   CBatchEngineController *controller)
 {
   CWorkSpace *ws = CWorkSpace::instance();
   int n;
@@ -630,10 +630,10 @@ int analyseProjectQdoasPrepare(void **engineContext, const CProjectConfigItem *p
     QList<const CAnalysisWindowConfigItem*>::const_iterator awIt = awList.begin();
     while (awIt != awList.end()) {
 
-    	 // Do not account for disabled analysis windows
+         // Do not account for disabled analysis windows
 
-    	 if ((*awIt)->isEnabled())
-    	  {
+         if ((*awIt)->isEnabled())
+          {
         *awCursor = *((*awIt)->properties());
         // mask any display flags ...
         ++awCursor;
@@ -732,14 +732,14 @@ int analyseProjectQdoasTreeNode(void *engineContext, CBatchEngineController *con
     if (node->isEnabled()) {
       switch (node->type()) {
       case CProjectConfigTreeNode::eFile:
-	retCode = analyseProjectQdoasFile(engineContext, controller, node->name());
-	break;
+    retCode = analyseProjectQdoasFile(engineContext, controller, node->name());
+    break;
       case CProjectConfigTreeNode::eFolder:
-	retCode = analyseProjectQdoasTreeNode(engineContext, controller, node->firstChild());
-	break;
+    retCode = analyseProjectQdoasTreeNode(engineContext, controller, node->firstChild());
+    break;
       case CProjectConfigTreeNode::eDirectory:
-	retCode = analyseProjectQdoasDirectory(engineContext, controller, node->name(), node->filter(), node->recursive());
-	break;
+    retCode = analyseProjectQdoasDirectory(engineContext, controller, node->name(), node->filter(), node->recursive());
+    break;
       }
     }
 
@@ -750,7 +750,7 @@ int analyseProjectQdoasTreeNode(void *engineContext, CBatchEngineController *con
 }
 
 int analyseProjectQdoasDirectory(void *engineContext, CBatchEngineController *controller,
-				 const QString &dir, const QString &filter, bool recursive)
+                 const QString &dir, const QString &filter, bool recursive)
 {
   TRACE("analyseProjectQdoasDirectory " << dir.toStdString());
 
@@ -838,40 +838,40 @@ int batchProcessConvolution(commands_t *cmd)
 
       if (!filenames.isEmpty()) {
 
-	// can only process one file (because the output is a file name).
+    // can only process one file (because the output is a file name).
 
-	QList<QString>::const_iterator it = filenames.begin();
+    QList<QString>::const_iterator it = filenames.begin();
 
-	strcpy(properties.general.inputFile, it->toLocal8Bit().data());
+    strcpy(properties.general.inputFile, it->toLocal8Bit().data());
 
-	if ((retCode=mediateRequestConvolution(engineContext, &properties, resp))==ERROR_ID_NO)
-	 retCode = mediateConvolutionCalculate(engineContext,resp);
-	resp->process(controller);
+    if ((retCode=mediateRequestConvolution(engineContext, &properties, resp))==ERROR_ID_NO)
+     retCode = mediateConvolutionCalculate(engineContext,resp);
+    resp->process(controller);
 
-	++it;
-	if (it != filenames.end()) {
-	  // give a warning for the remaining files
-	  std::cout << "WARNING: Only one file can be processed. Ignoring the file(s)..." << std::endl;
-	  while (it != filenames.end()) {
+    ++it;
+    if (it != filenames.end()) {
+      // give a warning for the remaining files
+      std::cout << "WARNING: Only one file can be processed. Ignoring the file(s)..." << std::endl;
+      while (it != filenames.end()) {
 
-	    std::cout << "    " << it->toStdString() << std::endl;
-	    ++it;
-	  }
-	}
+        std::cout << "    " << it->toStdString() << std::endl;
+        ++it;
+      }
+    }
 
       }
       else {
-	// use the current input file
-	mediateRequestConvolution(engineContext, &properties, resp);
-	retCode = mediateConvolutionCalculate(engineContext,resp);
-	resp->process(controller);
+    // use the current input file
+    mediateRequestConvolution(engineContext, &properties, resp);
+    retCode = mediateConvolutionCalculate(engineContext,resp);
+    resp->process(controller);
       }
 
       if (retCode)
        std::cout << "Convolution tool failed, please check your input";
 
       if (mediateXsconvDestroyContext(engineContext, resp) != 0) {
-	retCode = 1;
+    retCode = 1;
       }
     }
 
@@ -922,7 +922,7 @@ int batchProcessRing(commands_t *cmd)
 
     if (!cmd->outputDir.isEmpty() && cmd->outputDir.size() < FILENAME_BUFFER_LENGTH-1)
      {
-    	 strcpy(properties.outputFile,cmd->outputDir.toLocal8Bit().data());
+         strcpy(properties.outputFile,cmd->outputDir.toLocal8Bit().data());
      }
 
     if (mediateXsconvCreateContext(&engineContext, resp) != 0)
@@ -935,34 +935,34 @@ int batchProcessRing(commands_t *cmd)
 
       if (!filenames.isEmpty())
        {
-       	// can only process one file (because the output is a file name).
+           // can only process one file (because the output is a file name).
 
-       	QList<QString>::const_iterator it = filenames.begin();
+           QList<QString>::const_iterator it = filenames.begin();
 
-       	strcpy(properties.calibrationFile, it->toLocal8Bit().data());
+           strcpy(properties.calibrationFile, it->toLocal8Bit().data());
 
-       	if ((retCode=mediateRequestRing(engineContext, &properties, resp))==ERROR_ID_NO)
-       	 retCode = mediateRingCalculate(engineContext,resp);
-       	resp->process(controller);
+           if ((retCode=mediateRequestRing(engineContext, &properties, resp))==ERROR_ID_NO)
+            retCode = mediateRingCalculate(engineContext,resp);
+           resp->process(controller);
 
-       	++it;
-       	if (it != filenames.end())
-       	 {
-       	  // give a warning for the remaining files
-       	  std::cout << "WARNING: Only one file can be processed. Ignoring the file(s)..." << std::endl;
-       	  while (it != filenames.end())
-       	   {
-       	    std::cout << "    " << it->toStdString() << std::endl;
-       	    ++it;
-        	  }
-        	}
+           ++it;
+           if (it != filenames.end())
+            {
+             // give a warning for the remaining files
+             std::cout << "WARNING: Only one file can be processed. Ignoring the file(s)..." << std::endl;
+             while (it != filenames.end())
+              {
+               std::cout << "    " << it->toStdString() << std::endl;
+               ++it;
+              }
+            }
        }
       else
        {
         // use the current input file
-	       mediateRequestRing(engineContext, &properties, resp);
-	       retCode = mediateRingCalculate(engineContext,resp);
-	       resp->process(controller);
+           mediateRequestRing(engineContext, &properties, resp);
+           retCode = mediateRingCalculate(engineContext,resp);
+           resp->process(controller);
        }
 
       if (retCode)
@@ -970,7 +970,7 @@ int batchProcessRing(commands_t *cmd)
 
       if (mediateXsconvDestroyContext(engineContext, resp) != 0)
        {
-	       retCode = 1;
+           retCode = 1;
        }
      }
 
@@ -1018,22 +1018,22 @@ int batchProcessUsamp(commands_t *cmd)
 
     if (!cmd->outputDir.isEmpty() && cmd->outputDir.size() < FILENAME_BUFFER_LENGTH-1)
      {
-    	 char *ptr;
-    	 char  tmpFile[FILENAME_BUFFER_LENGTH];
+         char *ptr;
+         char  tmpFile[FILENAME_BUFFER_LENGTH];
 
-    	 strcpy(tmpFile,cmd->outputDir.toLocal8Bit().data());
+         strcpy(tmpFile,cmd->outputDir.toLocal8Bit().data());
 
-    	 if ((ptr=strchr(tmpFile,'_'))!=NULL)
-    	  {
-    	  	*ptr++='\0';
-    	  	sprintf(properties.outputPhaseOneFile,"%s1_%s",tmpFile,ptr);
-    	  	sprintf(properties.outputPhaseTwoFile,"%s2_%s",tmpFile,ptr);
-    	  }
-    	 else
-    	  {
-    	  	sprintf(properties.outputPhaseOneFile,"%s_1",tmpFile);
-    	  	sprintf(properties.outputPhaseTwoFile,"%s_2",tmpFile);
-    	  }
+         if ((ptr=strchr(tmpFile,'_'))!=NULL)
+          {
+              *ptr++='\0';
+              sprintf(properties.outputPhaseOneFile,"%s1_%s",tmpFile,ptr);
+              sprintf(properties.outputPhaseTwoFile,"%s2_%s",tmpFile,ptr);
+          }
+         else
+          {
+              sprintf(properties.outputPhaseOneFile,"%s_1",tmpFile);
+              sprintf(properties.outputPhaseTwoFile,"%s_2",tmpFile);
+          }
      }
 
     if (mediateXsconvCreateContext(&engineContext, resp) != 0)
@@ -1046,34 +1046,34 @@ int batchProcessUsamp(commands_t *cmd)
 
       if (!filenames.isEmpty())
        {
-       	// can only process one file (because the output is a file name).
+           // can only process one file (because the output is a file name).
 
-       	QList<QString>::const_iterator it = filenames.begin();
+           QList<QString>::const_iterator it = filenames.begin();
 
-       	strcpy(properties.calibrationFile, it->toLocal8Bit().data());
+           strcpy(properties.calibrationFile, it->toLocal8Bit().data());
 
-       	if ((retCode=mediateRequestUsamp(engineContext, &properties, resp))==ERROR_ID_NO)
-       	 retCode = mediateUsampCalculate(engineContext,resp);
-       	resp->process(controller);
+           if ((retCode=mediateRequestUsamp(engineContext, &properties, resp))==ERROR_ID_NO)
+            retCode = mediateUsampCalculate(engineContext,resp);
+           resp->process(controller);
 
-       	++it;
-       	if (it != filenames.end())
-       	 {
-       	  // give a warning for the remaining files
-       	  std::cout << "WARNING: Only one file can be processed. Ignoring the file(s)..." << std::endl;
-       	  while (it != filenames.end())
-       	   {
-       	    std::cout << "    " << it->toStdString() << std::endl;
-       	    ++it;
-        	  }
-        	}
+           ++it;
+           if (it != filenames.end())
+            {
+             // give a warning for the remaining files
+             std::cout << "WARNING: Only one file can be processed. Ignoring the file(s)..." << std::endl;
+             while (it != filenames.end())
+              {
+               std::cout << "    " << it->toStdString() << std::endl;
+               ++it;
+              }
+            }
        }
       else
        {
         // use the current input file
-	       mediateRequestUsamp(engineContext, &properties, resp);
-	       retCode = mediateUsampCalculate(engineContext,resp);
-	       resp->process(controller);
+           mediateRequestUsamp(engineContext, &properties, resp);
+           retCode = mediateUsampCalculate(engineContext,resp);
+           resp->process(controller);
        }
 
       if (retCode)
@@ -1081,7 +1081,7 @@ int batchProcessUsamp(commands_t *cmd)
 
       if (mediateXsconvDestroyContext(engineContext, resp) != 0)
        {
-	       retCode = 1;
+           retCode = 1;
        }
      }
 

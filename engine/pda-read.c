@@ -471,7 +471,7 @@ RC SetPDA_EGG(ENGINE_CONTEXT *pEngineContext,FILE *specFp,int newFlag)
    rc=ERROR_SetLast("SetPDA_EGG",ERROR_TYPE_WARNING,ERROR_ID_FILE_NOT_FOUND,pEngineContext->fileInfo.fileName);
   else
    {
-   	// Initializations
+       // Initializations
 
 // !!! */    char *ptr,fileout[MAX_ITEM_TEXT_LEN];
 // !!! */    FILE *fp;

@@ -155,8 +155,8 @@ RC SPLINE_Deriv2(const double *X, const double *Y,double *Y2,int n,const char *c
        qn=un=(double)0.;
       else
        {
-	qn=(double)0.5;
-	un=(double)(3./(X[i]-X[i-1]))*(ypn-(Y[i]-Y[i-1])/(X[i]-X[i-1]));
+    qn=(double)0.5;
+    un=(double)(3./(X[i]-X[i-1]))*(ypn-(Y[i]-Y[i-1])/(X[i]-X[i-1]));
        }
 
       Y2[i]=(un-qn*u[i-1])/(qn*Y2[i-1]+1.);

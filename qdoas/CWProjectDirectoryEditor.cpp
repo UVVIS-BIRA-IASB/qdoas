@@ -119,12 +119,12 @@ bool CWProjectDirectoryEditor::actionOk(void)
     // still a valid point in the tree
     if (m_directoryName->isEnabled()) {
       msg = m_projectTree->editInsertDirectory(item, m_directoryName->text(),
-					       m_fileFilters->text(),
-					       (m_recursiveCheckBox->checkState() == Qt::Checked));
+                           m_fileFilters->text(),
+                           (m_recursiveCheckBox->checkState() == Qt::Checked));
     }
     else {
       msg = m_projectTree->editChangeDirectoryProperties(item, m_fileFilters->text(),
-							 (m_recursiveCheckBox->checkState() == Qt::Checked));
+                             (m_recursiveCheckBox->checkState() == Qt::Checked));
     }
     
     if (msg.isNull())

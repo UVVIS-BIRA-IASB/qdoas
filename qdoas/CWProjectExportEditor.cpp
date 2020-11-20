@@ -49,10 +49,10 @@ CWProjectExportEditor::CWProjectExportEditor(CWProjectTree *projectTree, QTreeWi
   m_properties(properties),
   m_format(format)
 {
-	 m_captionStr = "Export Data/Spectra";
-	 m_contextTag = "Export Data/Spectra";
+     m_captionStr = "Export Data/Spectra";
+     m_contextTag = "Export Data/Spectra";
 
-	 // main layout: VBox
+     // main layout: VBox
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
   QFrame *pathFrame;
 
@@ -131,7 +131,7 @@ void CWProjectExportEditor::slotBrowsePath()
   CPreferences *pref = CPreferences::instance();
 
   QString fileName = QFileDialog::getSaveFileName(this, "Select export path or file name", pref->directoryName("Export"),
-						  "All Files (*)");
+                          "All Files (*)");
 
   if (!fileName.isEmpty()) {
     // save it again

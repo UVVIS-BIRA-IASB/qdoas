@@ -13,23 +13,23 @@ typedef struct _AnalyseLinearParameters ANALYSE_LINEAR_PARAMETERS;
 typedef struct _AnalyseNonLinearParameters ANALYSE_NON_LINEAR_PARAMETERS;
 
 struct _AnalyseLinearParameters {
- 	char symbolName[MAX_ITEM_TEXT_LEN];
- 	int polyOrder;
- 	int baseOrder;
- 	int storeFit;
- 	int storeError;
+     char symbolName[MAX_ITEM_TEXT_LEN];
+     int polyOrder;
+     int baseOrder;
+     int storeFit;
+     int storeError;
 };
 
 struct _AnalyseNonLinearParameters {
- 	char symbolName[MAX_ITEM_TEXT_LEN];
- 	char crossFileName[MAX_ITEM_TEXT_LEN];
- 	int fitFlag;
- 	double initialValue;
- 	double deltaValue;
- 	double minValue;
- 	double maxValue;
- 	int storeFit;
- 	int storeError;
+     char symbolName[MAX_ITEM_TEXT_LEN];
+     char crossFileName[MAX_ITEM_TEXT_LEN];
+     int fitFlag;
+     double initialValue;
+     double deltaValue;
+     double minValue;
+     double maxValue;
+     int storeFit;
+     int storeError;
 };
 
 // Analysis window description

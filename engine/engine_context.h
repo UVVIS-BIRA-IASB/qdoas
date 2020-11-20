@@ -117,8 +117,8 @@ PRJCT_ASCII;
 
 typedef struct _prjctSaozFormat
  {
- 	int spectralRegion;
- 	int spectralType;
+     int spectralRegion;
+     int spectralType;
  }
 PRJCT_SAOZ;
 
@@ -132,8 +132,8 @@ PRJCT_SCIA;
 
 typedef struct _prjctGomeFormat
  {
- 	int bandType;
- 	int pixelType;
+     int bandType;
+     int pixelType;
  }
 PRJCT_GOME;
 
@@ -323,7 +323,7 @@ GOME2_DATA;
 // Record information specific to OMI
 
 typedef struct _omi {
-  unsigned short *omiPixelQF; 	                                                // pixel quality flag
+  unsigned short *omiPixelQF;                                                     // pixel quality flag
   unsigned short  omiGroundPQF;                                                 // ground pixel quality flags
   unsigned short  omiXtrackQF;                                                  // xtrack quality flags
   unsigned short  instrumentConfigurationId;
@@ -360,17 +360,17 @@ MKZY_DATA;
 
 typedef struct _mfc
  {
- 	char    filePath[DOAS_MAX_PATH_LEN+1];
- 	char   *fileNames;                                                            // in automatic selection of the reference spectrum, maxdoas measurements in MFC format (DOASIS binary or STD), it is important to save
- 	int     nFiles;                                                               // the names of all files in the directory
- 	int     resetFlag;
+     char    filePath[DOAS_MAX_PATH_LEN+1];
+     char   *fileNames;                                                            // in automatic selection of the reference spectrum, maxdoas measurements in MFC format (DOASIS binary or STD), it is important to save
+     int     nFiles;                                                               // the names of all files in the directory
+     int     resetFlag;
  }
 MFC_DOASIS;
 
 typedef struct _mfcBira
  {
- 	char originalFileName[1024];
- 	int  measurementType;
+     char originalFileName[1024];
+     int  measurementType;
  }
 MFC_BIRA;
 
@@ -409,21 +409,21 @@ UOFT_DATA;
 
 typedef struct _airborneBira
  {
- 	unsigned char servoSentPosition;
- 	unsigned char servoReceivedPosition;
- 	float outsideTemp;                                                            // outside temperature
- 	float insideTemp;                                                             // inside temperature
- 	float dewPoint;
- 	float humidity;
- 	float altitudeP;
- 	float pressure;
- 	float longitudeEnd,latitudeEnd,altitudeEnd;
- 	struct datetime startTime;
- 	struct datetime endTime;
- 	// struct time gpsStartTime;    // to delete -> to confirm by Alexis
- 	// struct time gpsEndTime;
+     unsigned char servoSentPosition;
+     unsigned char servoReceivedPosition;
+     float outsideTemp;                                                            // outside temperature
+     float insideTemp;                                                             // inside temperature
+     float dewPoint;
+     float humidity;
+     float altitudeP;
+     float pressure;
+     float longitudeEnd,latitudeEnd,altitudeEnd;
+     struct datetime startTime;
+     struct datetime endTime;
+     // struct time gpsStartTime;    // to delete -> to confirm by Alexis
+     // struct time gpsEndTime;
 
- 	float  pitch,roll,heading;                                                    // airborne
+     float  pitch,roll,heading;                                                    // airborne
  }
 UAVBIRA_DATA;
 
@@ -565,23 +565,23 @@ CALIB_FENO;
 
 typedef struct _analysisRef
  {
- 	int    *refIndexes;
- 	double *zmList;
- 	double *timeDec;
+     int    *refIndexes;
+     double *zmList;
+     double *timeDec;
 
- 	int nRef;
- 	int zmMinIndex;
- 	int zmMaxIndex;
- 	int zenBefIndex;
- 	int zenAftIndex;
+     int nRef;
+     int zmMinIndex;
+     int zmMaxIndex;
+     int zenBefIndex;
+     int zenAftIndex;
 
- 	int indexScanBefore;
- 	int indexScanAfter;
+     int indexScanBefore;
+     int indexScanAfter;
 
- 	int refAuto;
- 	int refScan;
- 	int refSza;
- 	int refLon;
+     int refAuto;
+     int refScan;
+     int refSza;
+     int refLon;
  }
 ANALYSIS_REF;
 

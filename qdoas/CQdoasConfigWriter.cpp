@@ -54,9 +54,9 @@ QString CQdoasConfigWriter::write(const QString &fileName)
 
   // paths
   fprintf(fp, "  <paths>\n"
-	  "    <!-- upto 10 paths can be specified (index 0 to 9). Any file or directory name in the  -->\n"
-	  "    <!-- raw_spectra tree that begins with %%? (where ? is a single digit) is expanded with -->\n"
-	  "    <!-- the correponding path.                                                            -->\n\n");
+      "    <!-- upto 10 paths can be specified (index 0 to 9). Any file or directory name in the  -->\n"
+      "    <!-- raw_spectra tree that begins with %%? (where ? is a single digit) is expanded with -->\n"
+      "    <!-- the correponding path.                                                            -->\n\n");
 
   for (i=0; i<10; ++i) {
     QString path = pathMgr->path(i);
@@ -72,8 +72,8 @@ QString CQdoasConfigWriter::write(const QString &fileName)
     fprintf(fp, "  <sites>\n");
     for (i=0; i<n; ++i) {
       fprintf(fp, "    <site name=\"%s\" abbrev=\"%s\" long=\"%.3f\" lat=\"%.3f\" alt=\"%.3f\" />\n",
-	      siteList[i].name, siteList[i].abbreviation, siteList[i].longitude,
-	      siteList[i].latitude, siteList[i].altitude);
+          siteList[i].name, siteList[i].abbreviation, siteList[i].longitude,
+          siteList[i].latitude, siteList[i].altitude);
     }
     fprintf(fp, "  </sites>\n");
     delete [] siteList;
@@ -85,7 +85,7 @@ QString CQdoasConfigWriter::write(const QString &fileName)
     fprintf(fp, "  <symbols>\n");
     for (i=0; i<n; ++i) {
       fprintf(fp, "    <symbol name=\"%s\" descr=\"%s\" />\n",
-	      symbolList[i].name, symbolList[i].description);
+          symbolList[i].name, symbolList[i].description);
     }
     fprintf(fp, "  </symbols>\n");
     delete [] symbolList;
@@ -123,20 +123,20 @@ void CQdoasConfigWriter::writeProjects(FILE *fp)
 
       properties = CWorkSpace::instance()->findProject(projName);
       if (properties != NULL) {
-	// write the project data
-	fprintf(fp, "  <project name=\"%s\" disable=\"%s\">\n", projName.toUtf8().constData(),
-		(projItem->isEnabled() ? sFalse : sTrue));
-	writeProperties(fp, properties);
+    // write the project data
+    fprintf(fp, "  <project name=\"%s\" disable=\"%s\">\n", projName.toUtf8().constData(),
+        (projItem->isEnabled() ? sFalse : sTrue));
+    writeProperties(fp, properties);
 
-	// Analysis Windows ...
-	item = projItem->child(1); // Analysis Windows Branch
-	writeAnalysisWindows(fp, projName, item);
+    // Analysis Windows ...
+    item = projItem->child(1); // Analysis Windows Branch
+    writeAnalysisWindows(fp, projName, item);
 
-	// Raw spectra ...
-	item = projItem->child(0); // Raw Spectra Branch
-	writeRawSpectraTree(fp, item);
+    // Raw spectra ...
+    item = projItem->child(0); // Raw Spectra Branch
+    writeRawSpectraTree(fp, item);
 
-	fprintf(fp, "  </project>\n");
+    fprintf(fp, "  </project>\n");
       }
     }
     ++i;
@@ -161,7 +161,7 @@ void CQdoasConfigWriter::writeProperties(FILE *fp, const mediate_project_t *d)
 void CQdoasConfigWriter::writePropertiesDisplay(FILE *fp, const mediate_project_display_t *d)
 {
   fprintf(fp, "    <display spectra=\"%s\" data=\"%s\" calib=\"%s\" fits=\"%s\">\n",
-	  (d->requireSpectra ? sTrue : sFalse), (d->requireData ? sTrue : sFalse), (d->requireCalib ? sTrue : sFalse), (d->requireFits ? sTrue : sFalse));
+      (d->requireSpectra ? sTrue : sFalse), (d->requireData ? sTrue : sFalse), (d->requireCalib ? sTrue : sFalse), (d->requireFits ? sTrue : sFalse));
 
   writeDataSelectList(fp, &(d->selection));
 
@@ -191,10 +191,10 @@ void CQdoasConfigWriter::writePropertiesSelection(FILE *fp, const mediate_projec
      fprintf(fp, "      <geolocation selected=\"none\">\n");
   }
   fprintf(fp, "        <circle radius=\"%.3f\" long=\"%.3f\" lat=\"%.3f\" />\n",
-	  d->geo.circle.radius, d->geo.circle.centerLongitude, d->geo.circle.centerLatitude);
+      d->geo.circle.radius, d->geo.circle.centerLongitude, d->geo.circle.centerLatitude);
   fprintf(fp, "        <rectangle west=\"%.3f\" east=\"%.3f\" south=\"%.3f\" north=\"%.3f\" />\n",
-	  d->geo.rectangle.westernLongitude, d->geo.rectangle.easternLongitude,
-	  d->geo.rectangle.southernLatitude, d->geo.rectangle.northernLatitude);
+      d->geo.rectangle.westernLongitude, d->geo.rectangle.easternLongitude,
+      d->geo.rectangle.southernLatitude, d->geo.rectangle.northernLatitude);
   fprintf(fp, "        <sites radius=\"%.3f\" />\n", d->geo.sites.radius);
   fprintf(fp, "      </geolocation>\n    </selection>\n");
 
@@ -235,16 +235,16 @@ void CQdoasConfigWriter::writePropertiesAnalysis(FILE *fp, const mediate_project
     fprintf(fp, "\"invalid\"");
   }
   fprintf(fp, " gap=\"%d\" converge=\"%g\" max_iterations=\"%d\" spike_tolerance=\"%g\" >\n",
-	  d->interpolationSecurityGap,
-	  d->convergenceCriterion,
-	  d->maxIterations,
-	  d->spike_tolerance);
+      d->interpolationSecurityGap,
+      d->convergenceCriterion,
+      d->maxIterations,
+      d->spike_tolerance);
   fprintf(fp,
-	  "      <!-- method        : ODF ML+SVD -->\n"
-	  "      <!-- fit           : none instr -->\n"
-	  "      <!-- unit          : pixel nm -->\n"
-	  "      <!-- interpolation : linear spline -->\n"
-	  "    </analysis>\n");
+      "      <!-- method        : ODF ML+SVD -->\n"
+      "      <!-- fit           : none instr -->\n"
+      "      <!-- unit          : pixel nm -->\n"
+      "      <!-- interpolation : linear spline -->\n"
+      "    </analysis>\n");
 }
 
 void CQdoasConfigWriter::writePropertiesCalibration(FILE *fp, const mediate_project_calibration_t *d)
@@ -290,14 +290,14 @@ void CQdoasConfigWriter::writePropertiesCalibration(FILE *fp, const mediate_proj
   fprintf(fp, " slfFile=\"%s\" />\n", d->slfFile);
 
   fprintf(fp, "      <display spectra=\"%s\" fits=\"%s\" residual=\"%s\" shiftsfp=\"%s\" />\n",
-	  (d->requireSpectra ? sTrue : sFalse), (d->requireFits ? sTrue : sFalse),
-	  (d->requireResidual ? sTrue : sFalse), (d->requireShiftSfp ? sTrue : sFalse));
+      (d->requireSpectra ? sTrue : sFalse), (d->requireFits ? sTrue : sFalse),
+      (d->requireResidual ? sTrue : sFalse), (d->requireShiftSfp ? sTrue : sFalse));
   fprintf(fp, "      <polynomial shift=\"%d\" sfp=\"%d\" />\n", d->shiftDegree, d->sfpDegree);
   fprintf(fp, "      <window min=\"%.1f\" max=\"%.1f\" intervals=\"%d\" custom_windows=\"",
-	  d->wavelengthMin, d->wavelengthMax, d->subWindows);
+      d->wavelengthMin, d->wavelengthMax, d->subWindows);
 
-	 for (int i=0;i<d->subWindows;i++)
-	  fprintf(fp,"%.2lf-%.2lf,",d->customLambdaMin[i],d->customLambdaMax[i]);
+     for (int i=0;i<d->subWindows;i++)
+      fprintf(fp,"%.2lf-%.2lf,",d->customLambdaMin[i],d->customLambdaMax[i]);
 
   fprintf(fp,"\" division=");
 
@@ -314,10 +314,10 @@ void CQdoasConfigWriter::writePropertiesCalibration(FILE *fp, const mediate_proj
   default:
     fprintf(fp, "\"invalid\"");
   }
-	 fprintf(fp," size=\"%.2f\" />\n",d->windowSize);
+     fprintf(fp," size=\"%.2f\" />\n",d->windowSize);
 
 
-	 fprintf(fp, "      <preshift calculate=\"%s\" min=\"%.1f\" max=\"%.1f\" />\n",(d->preshiftFlag ? sTrue : sFalse),d->preshiftMin, d->preshiftMax);
+     fprintf(fp, "      <preshift calculate=\"%s\" min=\"%.1f\" max=\"%.1f\" />\n",(d->preshiftFlag ? sTrue : sFalse),d->preshiftMin, d->preshiftMax);
 
   writeCrossSectionList(fp, &(d->crossSectionList));
   writeSfps(fp, &(d->sfp[0]));
@@ -470,10 +470,10 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
     fprintf(fp, "\"invalid\"");
   }
   fprintf(fp, " zen=\"%s\" azi=\"%s\" ele=\"%s\" date=\"%s\" time=\"%s\" lambda=\"%s\" straylight=\"%s\" lambda_min=\"%g\" lambda_max=\"%g\"",
-	  (d->ascii.flagZenithAngle ? sTrue : sFalse), (d->ascii.flagAzimuthAngle ? sTrue : sFalse),
-	  (d->ascii.flagElevationAngle ? sTrue : sFalse), (d->ascii.flagDate ? sTrue : sFalse),
-	  (d->ascii.flagTime ? sTrue : sFalse), (d->ascii.flagWavelength ? sTrue : sFalse),
-	  (d->ascii.straylight ? sTrue : sFalse),d->ascii.lambdaMin,d->ascii.lambdaMax);
+      (d->ascii.flagZenithAngle ? sTrue : sFalse), (d->ascii.flagAzimuthAngle ? sTrue : sFalse),
+      (d->ascii.flagElevationAngle ? sTrue : sFalse), (d->ascii.flagDate ? sTrue : sFalse),
+      (d->ascii.flagTime ? sTrue : sFalse), (d->ascii.flagWavelength ? sTrue : sFalse),
+      (d->ascii.straylight ? sTrue : sFalse),d->ascii.lambdaMin,d->ascii.lambdaMax);
 
   tmpStr = pathMgr->simplifyPath(QString(d->ascii.calibrationFile));
   fprintf(fp, " calib=\"%s\"", tmpStr.toUtf8().constData());
@@ -639,9 +639,9 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
 
   // mfc
   fprintf(fp, "      <mfc size=\"%d\" first=\"%d\" revert=\"%s\" auto=\"%s\" omask=\"%d\" imask=\"%d\" dmask=\"%d\" smask=\"%d\" straylight=\"%s\" lambda_min=\"%g\" lambda_max=\"%g\"",
-	  d->mfc.detectorSize, d->mfc.firstWavelength,
-	  (d->mfc.revert ? sTrue: sFalse), (d->mfc.autoFileSelect ? sTrue : sFalse),
-	  d->mfc.offsetMask, d->mfc.instrFctnMask, d->mfc.darkCurrentMask, d->mfc.spectraMask,(d->mfc.straylight ? sTrue : sFalse),d->mfc.lambdaMin,d->mfc.lambdaMax);
+      d->mfc.detectorSize, d->mfc.firstWavelength,
+      (d->mfc.revert ? sTrue: sFalse), (d->mfc.autoFileSelect ? sTrue : sFalse),
+      d->mfc.offsetMask, d->mfc.instrFctnMask, d->mfc.darkCurrentMask, d->mfc.spectraMask,(d->mfc.straylight ? sTrue : sFalse),d->mfc.lambdaMin,d->mfc.lambdaMax);
 
   tmpStr = pathMgr->simplifyPath(QString(d->mfc.calibrationFile));
   fprintf(fp, " calib=\"%s\"", tmpStr.toUtf8().constData());
@@ -765,29 +765,29 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
   fprintf(fp," pixel=");
   switch(d->gdpnetcdf.pixelType)
    {
-   	case PRJCT_INSTR_GDP_PIXEL_ALL :
-   	 fprintf(fp,"\"all\"");
-   	break;
+       case PRJCT_INSTR_GDP_PIXEL_ALL :
+        fprintf(fp,"\"all\"");
+       break;
 
-   	case PRJCT_INSTR_GDP_PIXEL_EAST :
-   	 fprintf(fp,"\"east\"");
-   	break;
+       case PRJCT_INSTR_GDP_PIXEL_EAST :
+        fprintf(fp,"\"east\"");
+       break;
 
-   	case PRJCT_INSTR_GDP_PIXEL_CENTER :
-   	 fprintf(fp,"\"center\"");
-   	break;
+       case PRJCT_INSTR_GDP_PIXEL_CENTER :
+        fprintf(fp,"\"center\"");
+       break;
 
-   	case PRJCT_INSTR_GDP_PIXEL_WEST :
-   	 fprintf(fp,"\"west\"");
-   	break;
+       case PRJCT_INSTR_GDP_PIXEL_WEST :
+        fprintf(fp,"\"west\"");
+       break;
 
-   	case PRJCT_INSTR_GDP_PIXEL_BACKSCAN :
-   	 fprintf(fp,"\"backscan\"");
-   	break;
+       case PRJCT_INSTR_GDP_PIXEL_BACKSCAN :
+        fprintf(fp,"\"backscan\"");
+       break;
 
-   	default:
-   	 fprintf(fp,"\"invalid\"");
-   	break;
+       default:
+        fprintf(fp,"\"invalid\"");
+       break;
    };
 
   tmpStr = pathMgr->simplifyPath(QString(d->gdpnetcdf.calibrationFile));
@@ -824,29 +824,29 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
   fprintf(fp," pixel=");
   switch(d->gdpbin.pixelType)
    {
-   	case PRJCT_INSTR_GDP_PIXEL_ALL :
-   	 fprintf(fp,"\"all\"");
-   	break;
+       case PRJCT_INSTR_GDP_PIXEL_ALL :
+        fprintf(fp,"\"all\"");
+       break;
 
-   	case PRJCT_INSTR_GDP_PIXEL_EAST :
-   	 fprintf(fp,"\"east\"");
-   	break;
+       case PRJCT_INSTR_GDP_PIXEL_EAST :
+        fprintf(fp,"\"east\"");
+       break;
 
-   	case PRJCT_INSTR_GDP_PIXEL_CENTER :
-   	 fprintf(fp,"\"center\"");
-   	break;
+       case PRJCT_INSTR_GDP_PIXEL_CENTER :
+        fprintf(fp,"\"center\"");
+       break;
 
-   	case PRJCT_INSTR_GDP_PIXEL_WEST :
-   	 fprintf(fp,"\"west\"");
-   	break;
+       case PRJCT_INSTR_GDP_PIXEL_WEST :
+        fprintf(fp,"\"west\"");
+       break;
 
-   	case PRJCT_INSTR_GDP_PIXEL_BACKSCAN :
-   	 fprintf(fp,"\"backscan\"");
-   	break;
+       case PRJCT_INSTR_GDP_PIXEL_BACKSCAN :
+        fprintf(fp,"\"backscan\"");
+       break;
 
-   	default:
-   	 fprintf(fp,"\"invalid\"");
-   	break;
+       default:
+        fprintf(fp,"\"invalid\"");
+       break;
    };
 
   tmpStr = pathMgr->simplifyPath(QString(d->gdpbin.calibrationFile));
@@ -947,8 +947,8 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
   }
 
   fprintf(fp, " min=\"%.1f\" max=\"%.1f\" ave=\"%s\" trackSelection=\"%s\" pixelQF_rejectionFlag=\"%s\" pixelQF_maxGaps=\"%d\" pixelQF_mask=\"%d\" xTrackMode=\"%s\"",
-	  d->omi.minimumWavelength, d->omi.maximumWavelength, (d->omi.flagAverage ? sTrue : sFalse),d->omi.trackSelection,
-	  (d->omi.pixelQFRejectionFlag ? sTrue : sFalse),d->omi.pixelQFMaxGaps,d->omi.pixelQFMask,
+      d->omi.minimumWavelength, d->omi.maximumWavelength, (d->omi.flagAverage ? sTrue : sFalse),d->omi.trackSelection,
+      (d->omi.pixelQFRejectionFlag ? sTrue : sFalse),d->omi.pixelQFMaxGaps,d->omi.pixelQFMask,
           this_xtrack_mode);
 
   tmpStr = pathMgr->simplifyPath(QString(d->omi.calibrationFile));
@@ -1100,7 +1100,7 @@ void CQdoasConfigWriter::writePropertiesSlit(FILE *fp, const mediate_project_sli
   QString tmpStr = CPathMgr::instance()->simplifyPath(QString(d->solarRefFile));
 
   fprintf(fp, "    <slit ref=\"%s\" fwhmcor=\"%s\">\n", tmpStr.toUtf8().constData(),
-	  (d->applyFwhmCorrection ? sTrue : sFalse));
+      (d->applyFwhmCorrection ? sTrue : sFalse));
 
   writeSlitFunction(fp, 6, &(d->function));
 
@@ -1145,8 +1145,8 @@ void CQdoasConfigWriter::writePropertiesExport(FILE *fp, const mediate_project_e
 void CQdoasConfigWriter::writeRawSpectraTree(FILE *fp, const QTreeWidgetItem *rawSpectraItem)
 {
   fprintf(fp, "    <raw_spectra>\n"
-	  "      <!-- Disable file, folder and directory items with the disable set equal to \"true\". -->\n"
-	  "      <!--  The default is enabled.                                                       -->\n");
+      "      <!-- Disable file, folder and directory items with the disable set equal to \"true\". -->\n"
+      "      <!--  The default is enabled.                                                       -->\n");
 
   QTreeWidgetItem *item;
   int nChildren = rawSpectraItem->childCount();
@@ -1174,15 +1174,15 @@ void CQdoasConfigWriter::writeSpectraTreeNode(FILE *fp, const QTreeWidgetItem *i
       for (i=0; i<depth; ++i) fprintf(fp, "  "); // indenting
       fprintf(fp, "<folder name=\"%s\"", item->text(0).toUtf8().constData());
       if (folderItem->isEnabled())
-	fprintf(fp, ">\n");
+    fprintf(fp, ">\n");
       else
-	fprintf(fp, " disable=\"true\">\n");
+    fprintf(fp, " disable=\"true\">\n");
 
       // now all children ...
       i = 0;
       while (i < nChildren) {
-	writeSpectraTreeNode(fp, item->child(i), depth + 1);
-	++i;
+    writeSpectraTreeNode(fp, item->child(i), depth + 1);
+    ++i;
       }
 
       for (i=0; i<depth; ++i) fprintf(fp, "  "); // indenting
@@ -1196,13 +1196,13 @@ void CQdoasConfigWriter::writeSpectraTreeNode(FILE *fp, const QTreeWidgetItem *i
 
       for (i=0; i<depth; ++i) fprintf(fp, "  "); // indenting
       fprintf(fp, "<directory name=\"%s\" filters=\"%s\" recursive=\"%s\"",
-	      dirName.toUtf8().constData(),
-	      dirItem->fileFilters().toUtf8().constData(),
-	      (dirItem->isRecursive() ? sTrue : sFalse));
+          dirName.toUtf8().constData(),
+          dirItem->fileFilters().toUtf8().constData(),
+          (dirItem->isRecursive() ? sTrue : sFalse));
       if (dirItem->isEnabled())
-	fprintf(fp, " />\n");
+    fprintf(fp, " />\n");
       else
-	fprintf(fp, " disable=\"true\" />\n");
+    fprintf(fp, " disable=\"true\" />\n");
     }
     break;
   case cSpectraFileItemType:
@@ -1213,9 +1213,9 @@ void CQdoasConfigWriter::writeSpectraTreeNode(FILE *fp, const QTreeWidgetItem *i
       for (i=0; i<depth; ++i) fprintf(fp, "  "); // indenting
       fprintf(fp, "<file name=\"%s\"", fileName.toUtf8().constData());
       if (fileItem->isEnabled())
-	fprintf(fp, " />\n");
+    fprintf(fp, " />\n");
       else
-	fprintf(fp, " disable=\"true\" />\n");
+    fprintf(fp, " disable=\"true\" />\n");
     }
     break;
   }
@@ -1240,61 +1240,61 @@ void CQdoasConfigWriter::writeAnalysisWindows(FILE *fp, const QString &projectNa
       properties = CWorkSpace::instance()->findAnalysisWindow(projectName, awName);
       if (properties != NULL) {
 
-	fprintf(fp, "    <analysis_window name=\"%s\" disable=\"%s\" kurucz=", awName.toUtf8().constData(),
-		(awItem->isEnabled() ? sFalse : sTrue));
+    fprintf(fp, "    <analysis_window name=\"%s\" disable=\"%s\" kurucz=", awName.toUtf8().constData(),
+        (awItem->isEnabled() ? sFalse : sTrue));
 
-	switch (properties->kuruczMode) {
-	case ANLYS_KURUCZ_REF:
-	  fprintf(fp, "\"ref\""); break;
-	case ANLYS_KURUCZ_SPEC:
-	  fprintf(fp, "\"spec\""); break;
-	case ANLYS_KURUCZ_REF_AND_SPEC:
-	  fprintf(fp, "\"ref+spec\""); break;
-	default:
-	  fprintf(fp, "\"none\"");
-	}
+    switch (properties->kuruczMode) {
+    case ANLYS_KURUCZ_REF:
+      fprintf(fp, "\"ref\""); break;
+    case ANLYS_KURUCZ_SPEC:
+      fprintf(fp, "\"spec\""); break;
+    case ANLYS_KURUCZ_REF_AND_SPEC:
+      fprintf(fp, "\"ref+spec\""); break;
+    default:
+      fprintf(fp, "\"none\"");
+    }
 
-	if (properties->refSpectrumSelection == ANLYS_REF_SELECTION_MODE_AUTOMATIC)
-	  fprintf(fp, " refsel=\"auto\"");
-	else
-	  fprintf(fp, " refsel=\"file\"");
+    if (properties->refSpectrumSelection == ANLYS_REF_SELECTION_MODE_AUTOMATIC)
+      fprintf(fp, " refsel=\"auto\"");
+    else
+      fprintf(fp, " refsel=\"file\"");
 
-	fprintf(fp, " min=\"%.3f\" max=\"%.3f\" resol_fwhm=\"%.3f\" lambda0=\"%.3f\" >\n", properties->fitMinWavelength, properties->fitMaxWavelength, properties->resolFwhm,properties->lambda0);
+    fprintf(fp, " min=\"%.3f\" max=\"%.3f\" resol_fwhm=\"%.3f\" lambda0=\"%.3f\" >\n", properties->fitMinWavelength, properties->fitMaxWavelength, properties->resolFwhm,properties->lambda0);
 
-	fprintf(fp, "      <display spectrum=\"%s\" poly=\"%s\" fits=\"%s\" residual=\"%s\" predef=\"%s\" ratio=\"%s\" />\n",
-		(properties->requireSpectrum ? sTrue : sFalse),
-		(properties->requirePolynomial ? sTrue : sFalse),
-		(properties->requireFit ? sTrue : sFalse),
-		(properties->requireResidual ? sTrue : sFalse),
-		(properties->requirePredefined ? sTrue : sFalse),
-		(properties->requireRefRatio ? sTrue : sFalse));
+    fprintf(fp, "      <display spectrum=\"%s\" poly=\"%s\" fits=\"%s\" residual=\"%s\" predef=\"%s\" ratio=\"%s\" />\n",
+        (properties->requireSpectrum ? sTrue : sFalse),
+        (properties->requirePolynomial ? sTrue : sFalse),
+        (properties->requireFit ? sTrue : sFalse),
+        (properties->requireResidual ? sTrue : sFalse),
+        (properties->requirePredefined ? sTrue : sFalse),
+        (properties->requireRefRatio ? sTrue : sFalse));
 
-	tmpStr = pathMgr->simplifyPath(QString(properties->refOneFile));
-	fprintf(fp, "      <files refone=\"%s\"\n", tmpStr.toUtf8().constData());
-	tmpStr = pathMgr->simplifyPath(QString(properties->refTwoFile));
-	fprintf(fp, "             reftwo=\"%s\"\n", tmpStr.toUtf8().constData());
-	tmpStr = pathMgr->simplifyPath(QString(properties->residualFile));
+    tmpStr = pathMgr->simplifyPath(QString(properties->refOneFile));
+    fprintf(fp, "      <files refone=\"%s\"\n", tmpStr.toUtf8().constData());
+    tmpStr = pathMgr->simplifyPath(QString(properties->refTwoFile));
+    fprintf(fp, "             reftwo=\"%s\"\n", tmpStr.toUtf8().constData());
+    tmpStr = pathMgr->simplifyPath(QString(properties->residualFile));
 
-	fprintf(fp, "             residual=\"%s\"\nszacenter=\"%.3f\" szadelta=\"%.3f\" scanmode=",tmpStr.toUtf8().constData(),properties->refSzaCenter , properties->refSzaDelta);
+    fprintf(fp, "             residual=\"%s\"\nszacenter=\"%.3f\" szadelta=\"%.3f\" scanmode=",tmpStr.toUtf8().constData(),properties->refSzaCenter , properties->refSzaDelta);
 
-	switch(properties->refSpectrumSelectionScanMode)
-	 {
-	 	case ANLYS_MAXDOAS_REF_SCAN_BEFORE :
-	 	 fprintf(fp,"\"before\" ");
-	 	break;
+    switch(properties->refSpectrumSelectionScanMode)
+     {
+         case ANLYS_MAXDOAS_REF_SCAN_BEFORE :
+          fprintf(fp,"\"before\" ");
+         break;
 
-	 	case ANLYS_MAXDOAS_REF_SCAN_AVERAGE :
-	 	 fprintf(fp,"\"average\" ");
-	 	break;
+         case ANLYS_MAXDOAS_REF_SCAN_AVERAGE :
+          fprintf(fp,"\"average\" ");
+         break;
 
-	 	case ANLYS_MAXDOAS_REF_SCAN_INTERPOLATE :
-	 	 fprintf(fp,"\"interpolate\" ");
-	 	break;
+         case ANLYS_MAXDOAS_REF_SCAN_INTERPOLATE :
+          fprintf(fp,"\"interpolate\" ");
+         break;
 
-	 	default :
-	 	 fprintf(fp,"\"after\" ");
-	 	break;
-	 }
+         default :
+          fprintf(fp,"\"after\" ");
+         break;
+     }
 
         fprintf(fp,"minlon=\"%.3f\" maxlon=\"%.3f\" minlat=\"%.3f\" maxlat=\"%.3f\" refns=\"%d\" cloudfmin=\"%.3f\" cloudfmax=\"%.3f\" \n",
                 properties->refMinLongitude, properties->refMaxLongitude,
@@ -1306,25 +1306,25 @@ void CQdoasConfigWriter::writeAnalysisWindows(FILE *fp, const QString &projectNa
         // for backwards compatibility, we still write the GOME pixeltype selection configuration, defaulting to "true" for all types.
         fprintf(fp, "             east=\"true\" center=\"true\" west=\"true\" backscan=\"true\" />\n");
 
-	// cross sections ....
-	writeCrossSectionList(fp, &(properties->crossSectionList));
+    // cross sections ....
+    writeCrossSectionList(fp, &(properties->crossSectionList));
 
-	// linear
-	writeLinear(fp, &(properties->linear));
+    // linear
+    writeLinear(fp, &(properties->linear));
 
-	// nonlinear
-	writeNonLinear(fp, &(properties->nonlinear));
+    // nonlinear
+    writeNonLinear(fp, &(properties->nonlinear));
 
-	// shift and stretch
-	writeShiftStretchList(fp, &(properties->shiftStretchList));
+    // shift and stretch
+    writeShiftStretchList(fp, &(properties->shiftStretchList));
 
-	// gaps...
-	writeGapList(fp, &(properties->gapList));
+    // gaps...
+    writeGapList(fp, &(properties->gapList));
 
-	// output...
-	writeOutputList(fp, &(properties->outputList));
+    // output...
+    writeOutputList(fp, &(properties->outputList));
 
-	fprintf(fp, "    </analysis_window>\n");
+    fprintf(fp, "    </analysis_window>\n");
       }
     }
 
@@ -1359,10 +1359,10 @@ void CQdoasConfigWriter::writeCrossSectionList(FILE *fp, const cross_section_lis
 
   while (j < data->nCrossSection) {
     fprintf(fp, "        <cross_section sym=\"%s\" ortho=\"%s\" subtract=\"%s\" subtract_flag=\"%s\" cstype=",
-	    d->symbol,
-	    d->orthogonal,
-	    d->subtract,
-	   (d->subtractFlag)?"true":"false");
+        d->symbol,
+        d->orthogonal,
+        d->subtract,
+       (d->subtractFlag)?"true":"false");
 
     switch (d->crossType) {
     case ANLYS_CROSS_ACTION_INTERPOLATE:
@@ -1405,11 +1405,11 @@ void CQdoasConfigWriter::writeCrossSectionList(FILE *fp, const cross_section_lis
     fprintf(fp, " molecular_xs=\"%s\"",d->molecularRing);
 
     fprintf(fp, " fit=\"%s\" filter=\"%s\" cstrncc=\"%s\" ccfit=\"%s\" icc=\"%.3f\" dcc=\"%.3f\" ccio=\"%.3e\" ccmin=\"%.3e\" ccmax=\"%.3e\"",
-	    (d->requireFit ? sTrue : sFalse),
-	    (d->requireFilter ? sTrue : sFalse),
-	    (d->constrainedCc ? sTrue : sFalse),
-	    (d->requireCcFit ? sTrue : sFalse),
-	    d->initialCc, d->deltaCc, d->ccIo,d->ccMin,d->ccMax);
+        (d->requireFit ? sTrue : sFalse),
+        (d->requireFilter ? sTrue : sFalse),
+        (d->constrainedCc ? sTrue : sFalse),
+        (d->requireCcFit ? sTrue : sFalse),
+        d->initialCc, d->deltaCc, d->ccIo,d->ccMin,d->ccMax);
     tmpStr = pathMgr->simplifyPath(QString(d->crossSectionFile)); // TODO: use fromUtf8() here...
     fprintf(fp, " csfile=\"%s\"", tmpStr.toUtf8().constData());
     tmpStr = pathMgr->simplifyPath(QString(d->amfFile));
@@ -1427,12 +1427,12 @@ void CQdoasConfigWriter::writeLinear(FILE *fp, const struct anlyswin_linear *d)
   writePolyType(fp, "xpoly", d->xPolyOrder);
   writePolyType(fp, "xbase", d->xBaseOrder);
   fprintf(fp, " xfit=\"%s\" xerr=\"%s\"",
-	  (d->xFlagFitStore ? sTrue : sFalse),
-	  (d->xFlagErrStore ? sTrue : sFalse));
+      (d->xFlagFitStore ? sTrue : sFalse),
+      (d->xFlagErrStore ? sTrue : sFalse));
   writePolyType(fp, "offpoly", d->offsetPolyOrder);
   fprintf(fp, " offfit=\"%s\" offerr=\"%s\" offizero=\"%s\"",
-	  (d->offsetFlagFitStore ? sTrue : sFalse),
-	  (d->offsetFlagErrStore ? sTrue : sFalse),
+      (d->offsetFlagFitStore ? sTrue : sFalse),
+      (d->offsetFlagErrStore ? sTrue : sFalse),
           (d->offsetI0 ? sTrue : sFalse) );
   fprintf(fp, " />\n");
 }
@@ -1443,36 +1443,36 @@ void CQdoasConfigWriter::writeNonLinear(FILE *fp, const struct anlyswin_nonlinea
   CPathMgr *pathMgr = CPathMgr::instance();
 
   fprintf(fp, "      <nonlinear solfit=\"%s\" solinit=\"%.3f\" soldelt=\"%.3f\" solfstr=\"%s\" solestr=\"%s\"\n",
-	  (d->solFlagFit ? sTrue : sFalse), d->solInitial, d->solDelta,
-	  (d->solFlagFitStore ? sTrue : sFalse), (d->solFlagErrStore ? sTrue : sFalse));
+      (d->solFlagFit ? sTrue : sFalse), d->solInitial, d->solDelta,
+      (d->solFlagFitStore ? sTrue : sFalse), (d->solFlagErrStore ? sTrue : sFalse));
 
   fprintf(fp, "                 o0fit=\"%s\" o0init=\"%.3f\" o0delt=\"%.3f\" o0fstr=\"%s\" o0estr=\"%s\"\n",
-	  (d->off0FlagFit ? sTrue : sFalse), d->off0Initial, d->off0Delta,
-	  (d->off0FlagFitStore ? sTrue : sFalse), (d->off0FlagErrStore ? sTrue : sFalse));
+      (d->off0FlagFit ? sTrue : sFalse), d->off0Initial, d->off0Delta,
+      (d->off0FlagFitStore ? sTrue : sFalse), (d->off0FlagErrStore ? sTrue : sFalse));
 
   fprintf(fp, "                 o1fit=\"%s\" o1init=\"%.3f\" o1delt=\"%.3f\" o1fstr=\"%s\" o1estr=\"%s\"\n",
-	  (d->off1FlagFit ? sTrue : sFalse), d->off1Initial, d->off1Delta,
-	  (d->off1FlagFitStore ? sTrue : sFalse), (d->off1FlagErrStore ? sTrue : sFalse));
+      (d->off1FlagFit ? sTrue : sFalse), d->off1Initial, d->off1Delta,
+      (d->off1FlagFitStore ? sTrue : sFalse), (d->off1FlagErrStore ? sTrue : sFalse));
 
   fprintf(fp, "                 o2fit=\"%s\" o2init=\"%.3f\" o2delt=\"%.3f\" o2fstr=\"%s\" o2estr=\"%s\"\n",
-	  (d->off2FlagFit ? sTrue : sFalse), d->off2Initial, d->off2Delta,
-	  (d->off2FlagFitStore ? sTrue : sFalse), (d->off2FlagErrStore ? sTrue : sFalse));
+      (d->off2FlagFit ? sTrue : sFalse), d->off2Initial, d->off2Delta,
+      (d->off2FlagFitStore ? sTrue : sFalse), (d->off2FlagErrStore ? sTrue : sFalse));
 
   fprintf(fp, "                 comfit=\"%s\" cominit=\"%.3f\" comdelt=\"%.3f\" comstr=\"%s\" comestr=\"%s\"\n",
-	  (d->comFlagFit ? sTrue : sFalse), d->comInitial, d->comDelta,
-	  (d->comFlagFitStore ? sTrue : sFalse), (d->comFlagErrStore ? sTrue : sFalse));
+      (d->comFlagFit ? sTrue : sFalse), d->comInitial, d->comDelta,
+      (d->comFlagFitStore ? sTrue : sFalse), (d->comFlagErrStore ? sTrue : sFalse));
 
   fprintf(fp, "                 u1fit=\"%s\" u1init=\"%.3f\" u1delt=\"%.3f\" u1str=\"%s\" u1estr=\"%s\"\n",
-	  (d->usamp1FlagFit ? sTrue : sFalse), d->usamp1Initial, d->usamp1Delta,
-	  (d->usamp1FlagFitStore ? sTrue : sFalse), (d->usamp1FlagErrStore ? sTrue : sFalse));
+      (d->usamp1FlagFit ? sTrue : sFalse), d->usamp1Initial, d->usamp1Delta,
+      (d->usamp1FlagFitStore ? sTrue : sFalse), (d->usamp1FlagErrStore ? sTrue : sFalse));
 
   fprintf(fp, "                 u2fit=\"%s\" u2init=\"%.3f\" u2delt=\"%.3f\" u2str=\"%s\" u2estr=\"%s\"\n",
-	  (d->usamp2FlagFit ? sTrue : sFalse), d->usamp2Initial, d->usamp2Delta,
-	  (d->usamp2FlagFitStore ? sTrue : sFalse), (d->usamp2FlagErrStore ? sTrue : sFalse));
+      (d->usamp2FlagFit ? sTrue : sFalse), d->usamp2Initial, d->usamp2Delta,
+      (d->usamp2FlagFitStore ? sTrue : sFalse), (d->usamp2FlagErrStore ? sTrue : sFalse));
 
   fprintf(fp, "                 resolfit=\"%s\" resolinit=\"%.3f\" resoldelt=\"%.3f\" resolstr=\"%s\" resolestr=\"%s\"\n",
-	  (d->resolFlagFit ? sTrue : sFalse), d->resolInitial, d->resolDelta,
-	  (d->resolFlagFitStore ? sTrue : sFalse), (d->resolFlagErrStore ? sTrue : sFalse));
+      (d->resolFlagFit ? sTrue : sFalse), d->resolInitial, d->resolDelta,
+      (d->resolFlagFitStore ? sTrue : sFalse), (d->resolFlagErrStore ? sTrue : sFalse));
 
   tmpStr = pathMgr->simplifyPath(QString(d->comFile));
   fprintf(fp, "                 comfile=\"%s\"\n", tmpStr.toUtf8().constData());
@@ -1505,17 +1505,17 @@ void CQdoasConfigWriter::writeShiftStretchList(FILE *fp, const shift_stretch_lis
     default: fprintf(fp, "\"none\"");
     }
     fprintf(fp, " shstr=\"%s\" ststr=\"%s\" errstr=\"%s\"",
-	    (d->shStore ? sTrue : sFalse),
-	    (d->stStore ? sTrue : sFalse),
-	    (d->errStore ? sTrue : sFalse));
+        (d->shStore ? sTrue : sFalse),
+        (d->stStore ? sTrue : sFalse),
+        (d->errStore ? sTrue : sFalse));
     fprintf(fp, " shini=\"%.3e\" stini=\"%.3e\" stini2=\"%.3e\"",
-	    d->shInit,
-	    d->stInit, d->stInit2);
+        d->shInit,
+        d->stInit, d->stInit2);
     fprintf(fp, " shdel=\"%.4e\" stdel=\"%.4e\" stdel2=\"%.4e\"",
-	    d->shDelta,
-	    d->stDelta, d->stDelta2);
+        d->shDelta,
+        d->stDelta, d->stDelta2);
     fprintf(fp, " shmin=\"%.3e\" shmax=\"%.3e\" >\n",
-	    d->shMin, d->shMax);
+        d->shMin, d->shMax);
 
     k = 0;
     while (k < d->nSymbol) {
@@ -1540,7 +1540,7 @@ void CQdoasConfigWriter::writeGapList(FILE *fp, const gap_list_t *d)
 
   while (j < d->nGap) {
     fprintf(fp, "        <gap min=\"%.2f\" max=\"%.2f\" />\n",
-	    d->gap[j].minimum, d->gap[j].maximum);
+        d->gap[j].minimum, d->gap[j].maximum);
     ++j;
   }
   fprintf(fp, "      </gaps>\n");
@@ -1554,16 +1554,16 @@ void CQdoasConfigWriter::writeOutputList(FILE *fp, const output_list_t *d)
 
   while (j < d->nOutput) {
     fprintf(fp, "        <output sym=\"%s\" amf=\"%s\" scol=\"%s\" serr=\"%s\" sfact=\"%.3f\"",
-	    d->output[j].symbol,
-	    (d->output[j].amf ? sTrue : sFalse),
-	    (d->output[j].slantCol ? sTrue : sFalse),
-	    (d->output[j].slantErr ? sTrue : sFalse),
-	    d->output[j].slantFactor);
+        d->output[j].symbol,
+        (d->output[j].amf ? sTrue : sFalse),
+        (d->output[j].slantCol ? sTrue : sFalse),
+        (d->output[j].slantErr ? sTrue : sFalse),
+        d->output[j].slantFactor);
     fprintf(fp, " rescol=\"%.6le\" vcol=\"%s\" verr=\"%s\" vfact=\"%.3f\" />\n",
      d->output[j].resCol,
-	    (d->output[j].vertCol ? sTrue : sFalse),
-	    (d->output[j].vertErr ? sTrue : sFalse),
-	    d->output[j].vertFactor);
+        (d->output[j].vertCol ? sTrue : sFalse),
+        (d->output[j].vertErr ? sTrue : sFalse),
+        d->output[j].vertFactor);
 
     ++j;
   }
@@ -1576,9 +1576,9 @@ void CQdoasConfigWriter::writeSfps(FILE *fp, const struct calibration_sfp *d)
 
   for (int i=0; i<NSFP; ++i) {
     fprintf(fp, "        <sfp index=\"%d\" fit=\"%s\" init=\"%.3f\" delta=\"%.3f\" fstr=\"%s\" estr=\"%s\" />\n",
-	    i+1, (d->fitFlag ? sTrue : sFalse),
-	    d->initialValue, d->deltaValue,
-	    (d->fitStore ? sTrue : sFalse), (d->errStore ? sTrue : sFalse));
+        i+1, (d->fitFlag ? sTrue : sFalse),
+        d->initialValue, d->deltaValue,
+        (d->fitStore ? sTrue : sFalse), (d->errStore ? sTrue : sFalse));
     ++d;
   }
 

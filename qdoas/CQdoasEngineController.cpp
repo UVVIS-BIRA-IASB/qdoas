@@ -134,7 +134,7 @@ void CQdoasEngineController::notifyPlotData(QList<SPlotData> &plotDataList, QLis
       // need a new page
       CPlotPageData *newPage = new CPlotPageData(pageNo,PLOTPAGE_IMAGE);
       CPlotImage myImage=*plotImageList.front().plotImage;
-      QString	 str=myImage.GetFile();
+      QString     str=myImage.GetFile();
       QString titleStr=myImage.GetTitle();
 
       if (plotImageList.front().plotImage != NULL)
@@ -288,36 +288,36 @@ void CQdoasEngineController::slotNextFile()
       // check for a change in project
       if (m_currentProject != m_currentIt.project()) {
 
-	int opMode = THREAD_TYPE_NONE;
-	switch (m_session->mode()) {
-	case CSession::Browse: opMode = THREAD_TYPE_SPECTRA; break;
-	case CSession::Export: opMode = THREAD_TYPE_EXPORT; break;
-	case CSession::Calibrate: opMode = THREAD_TYPE_KURUCZ; break;
-	case CSession::Analyse: opMode = THREAD_TYPE_ANALYSIS; break;
-	}
-	m_currentProject = m_currentIt.project();
-	req->addRequest(new CEngineRequestSetProject(m_currentProject, opMode));
-	// might also need to replace the analysis windows
-	if (m_session->mode() == CSession::Calibrate || m_session->mode() == CSession::Analyse) {
-	  int nWindows;
-	  const mediate_analysis_window_t *anlysWinList = m_currentIt.analysisWindowList(nWindows);
-	  req->addRequest(new CEngineRequestSetAnalysisWindows(anlysWinList, nWindows, opMode));
-	}
+    int opMode = THREAD_TYPE_NONE;
+    switch (m_session->mode()) {
+    case CSession::Browse: opMode = THREAD_TYPE_SPECTRA; break;
+    case CSession::Export: opMode = THREAD_TYPE_EXPORT; break;
+    case CSession::Calibrate: opMode = THREAD_TYPE_KURUCZ; break;
+    case CSession::Analyse: opMode = THREAD_TYPE_ANALYSIS; break;
+    }
+    m_currentProject = m_currentIt.project();
+    req->addRequest(new CEngineRequestSetProject(m_currentProject, opMode));
+    // might also need to replace the analysis windows
+    if (m_session->mode() == CSession::Calibrate || m_session->mode() == CSession::Analyse) {
+      int nWindows;
+      const mediate_analysis_window_t *anlysWinList = m_currentIt.analysisWindowList(nWindows);
+      req->addRequest(new CEngineRequestSetAnalysisWindows(anlysWinList, nWindows, opMode));
+    }
       }
 
       switch (m_session->mode()) {
       case CSession::Browse:
-	req->addRequest(new CEngineRequestBeginBrowseFile(m_currentIt.file().filePath()));
-	break;
+    req->addRequest(new CEngineRequestBeginBrowseFile(m_currentIt.file().filePath()));
+    break;
       case CSession::Export:
-	req->addRequest(new CEngineRequestBeginExportFile(m_currentIt.file().filePath()));
-	break;
+    req->addRequest(new CEngineRequestBeginExportFile(m_currentIt.file().filePath()));
+    break;
       case CSession::Calibrate:
-	req->addRequest(new CEngineRequestBeginCalibrateFile(m_currentIt.file().filePath()));
-	break;
+    req->addRequest(new CEngineRequestBeginCalibrateFile(m_currentIt.file().filePath()));
+    break;
       case CSession::Analyse:
-	req->addRequest(new CEngineRequestBeginAnalyseFile(m_currentIt.file().filePath()));
-	break;
+    req->addRequest(new CEngineRequestBeginAnalyseFile(m_currentIt.file().filePath()));
+    break;
       }
     }
 
@@ -347,9 +347,9 @@ void CQdoasEngineController::slotGotoFile(int number)
       req->addRequest(new CEngineRequestSetProject(m_currentProject, opMode));
       // might also need to replace the analysis windows
       if (m_session->mode() == CSession::Calibrate || m_session->mode() == CSession::Analyse) {
-	int nWindows;
-	const mediate_analysis_window_t *anlysWinList = m_currentIt.analysisWindowList(nWindows);
-	req->addRequest(new CEngineRequestSetAnalysisWindows(anlysWinList, nWindows, opMode));
+    int nWindows;
+    const mediate_analysis_window_t *anlysWinList = m_currentIt.analysisWindowList(nWindows);
+    req->addRequest(new CEngineRequestSetAnalysisWindows(anlysWinList, nWindows, opMode));
       }
     }
 
@@ -543,11 +543,11 @@ void CQdoasEngineController::slotStartSession(const RefCountPtr<CSession> &sessi
     // mode dependent parts of the request
     if ((m_session->mode() == CSession::Browse) || (m_session->mode() == CSession::Export)) {
 
-    	 int nSites;
-    	 mediate_site_t *sites = m_session->takeSiteList(nSites);                  // Added by Caroline : need observation sites for spectra selection (overpasses)
+         int nSites;
+         mediate_site_t *sites = m_session->takeSiteList(nSites);                  // Added by Caroline : need observation sites for spectra selection (overpasses)
 
-    	 if (sites)
-	      req->addRequest(new CEngineRequestSetSites(sites, nSites));
+         if (sites)
+          req->addRequest(new CEngineRequestSetSites(sites, nSites));
 
       if (m_session->mode() == CSession::Browse)
        {
@@ -556,7 +556,7 @@ void CQdoasEngineController::slotStartSession(const RefCountPtr<CSession> &sessi
        }
       else
        {
-       	req->addRequest(new CEngineRequestSetProject(m_currentProject, THREAD_TYPE_EXPORT));
+           req->addRequest(new CEngineRequestSetProject(m_currentProject, THREAD_TYPE_EXPORT));
         req->addRequest(new CEngineRequestBeginExportFile(m_currentIt.file().filePath()));
        }
     }
@@ -568,20 +568,20 @@ void CQdoasEngineController::slotStartSession(const RefCountPtr<CSession> &sessi
       const mediate_analysis_window_t *anlysWinList = m_currentIt.analysisWindowList(nWindows);
 
       if (symbols)
-	req->addRequest(new CEngineRequestSetSymbols(symbols, nSymbols));
+    req->addRequest(new CEngineRequestSetSymbols(symbols, nSymbols));
       if (sites)
-	req->addRequest(new CEngineRequestSetSites(sites, nSites));
+    req->addRequest(new CEngineRequestSetSites(sites, nSites));
 
 
       if (m_session->mode() == CSession::Analyse) {
-	req->addRequest(new CEngineRequestSetProject(m_currentProject, THREAD_TYPE_ANALYSIS));
-	req->addRequest(new CEngineRequestSetAnalysisWindows(anlysWinList, nWindows, THREAD_TYPE_ANALYSIS));
-	req->addRequest(new CEngineRequestBeginAnalyseFile(m_currentIt.file().filePath()));
+    req->addRequest(new CEngineRequestSetProject(m_currentProject, THREAD_TYPE_ANALYSIS));
+    req->addRequest(new CEngineRequestSetAnalysisWindows(anlysWinList, nWindows, THREAD_TYPE_ANALYSIS));
+    req->addRequest(new CEngineRequestBeginAnalyseFile(m_currentIt.file().filePath()));
       }
       else if (m_session->mode() == CSession::Calibrate) {
-	req->addRequest(new CEngineRequestSetProject(m_currentProject, THREAD_TYPE_KURUCZ));
-	req->addRequest(new CEngineRequestSetAnalysisWindows(anlysWinList, nWindows, THREAD_TYPE_KURUCZ));
-	req->addRequest(new CEngineRequestBeginCalibrateFile(m_currentIt.file().filePath()));
+    req->addRequest(new CEngineRequestSetProject(m_currentProject, THREAD_TYPE_KURUCZ));
+    req->addRequest(new CEngineRequestSetAnalysisWindows(anlysWinList, nWindows, THREAD_TYPE_KURUCZ));
+    req->addRequest(new CEngineRequestBeginCalibrateFile(m_currentIt.file().filePath()));
       }
     }
 

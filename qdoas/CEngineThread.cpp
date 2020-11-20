@@ -118,11 +118,11 @@ void CEngineThread::run()
   // m_reqQueueMutex
 
   // set the locale to "C" to avoid parsing problems when the system locale uses a different decimal separator
-	// to avoid that a thousands comma separator (QT 4.7.3)
+    // to avoid that a thousands comma separator (QT 4.7.3)
 
-	   QLocale qlocale=QLocale::system();
-	   qlocale.setNumberOptions(QLocale::OmitGroupSeparator);
-	   QLocale::setDefault(qlocale);
+       QLocale qlocale=QLocale::system();
+       qlocale.setNumberOptions(QLocale::OmitGroupSeparator);
+       QLocale::setDefault(qlocale);
 
   setlocale(LC_NUMERIC, "C");
 

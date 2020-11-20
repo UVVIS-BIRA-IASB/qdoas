@@ -36,7 +36,7 @@ class CRingConfigHandler : public CConfigHandler
   CRingConfigHandler();
 
   virtual bool startElement(const QString &namespaceURI, const QString &localName,
-			    const QString &qName, const QXmlAttributes &atts);
+                const QString &qName, const QXmlAttributes &atts);
 
   const mediate_ring_t* properties(void) const;
 

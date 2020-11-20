@@ -267,7 +267,7 @@ void String2Date(char *stringDate,STRING2DATE *pDate)
 
 char *Date2String(STRING2DATE *pDate,char *stringDate)
  {
- 	// Declaration
+     // Declaration
 
   double fracDay;
 

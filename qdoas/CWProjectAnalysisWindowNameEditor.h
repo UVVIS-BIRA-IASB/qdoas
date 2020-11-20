@@ -33,7 +33,7 @@ class CWProjectAnalysisWindowNameEditor : public CWEditor
 Q_OBJECT
  public:
   CWProjectAnalysisWindowNameEditor(CWProjectTree *projectTree, QTreeWidgetItem *item,
-				    const QString &preceedingWindowName, bool newAnalysisWindow,
+                    const QString &preceedingWindowName, bool newAnalysisWindow,
                                     QWidget *parent = 0);
 
   virtual bool actionOk(void);

@@ -399,7 +399,7 @@ double ZEN_NbSec(struct date *pToday,struct time *pNow,int flag)
 
   if (flag)
    {
-   	// Local declarations
+       // Local declarations
 
     time_t today;                                                               // current date and time as a time_t number
     char datetime[20];                                                          // current date and time as a string

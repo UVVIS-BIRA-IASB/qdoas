@@ -115,7 +115,7 @@ Q_OBJECT
   bool apply(cross_section_list_t *d) const;
 
   void addRow(int height, const QString &label, QList<QVariant> &cellData,
-	      const QString &csFilename, const QString &amfFilename);
+          const QString &csFilename, const QString &amfFilename);
 
   virtual void addRow(int height, const QString &label, QList<QVariant> &cellData);
   virtual void removeRow(int rowIndex);

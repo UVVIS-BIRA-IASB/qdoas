@@ -71,12 +71,12 @@ class CConfigHandler : public QXmlDefaultHandler
   virtual bool characters(const QString &ch);
   virtual bool endDocument();
   virtual bool endElement(const QString &namespaceURI, const QString &localName,
-			  const QString &qName);
+              const QString &qName);
   virtual QString errorString() const;
   virtual bool ignorableWhitespace(const QString &ch);
   virtual bool startDocument();
   virtual bool startElement(const QString &namespaceURI, const QString &localName,
-			    const QString &qName, const QXmlAttributes &atts);
+                const QString &qName, const QXmlAttributes &atts);
 
   bool installSubHandler(CConfigSubHandler *newHandler, const QXmlAttributes &atts);
 

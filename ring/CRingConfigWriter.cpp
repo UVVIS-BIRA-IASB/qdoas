@@ -63,7 +63,7 @@ QString CRingConfigWriter::write(const QString &fileName)
   const mediate_ring_t *d = m_properties; // convenience
 
   fprintf(fp, "  <general temp=\"%.1f\" normalize=\"%s\" rmhdr=\"%s\" save_raman=\"%s\"", d->temperature,(d->normalize ? sTrue : sFalse),
-	  (d->noheader ? sTrue : sFalse),(d->saveraman ? sTrue : sFalse));
+      (d->noheader ? sTrue : sFalse),(d->saveraman ? sTrue : sFalse));
 
   tmpStr = pathMgr->simplifyPath(QString(d->outputFile));
   fprintf(fp, " output=\"%s\"", tmpStr.toLocal8Bit().data());

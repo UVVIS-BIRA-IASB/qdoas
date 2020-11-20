@@ -39,7 +39,7 @@ class CQdoasConfigHandler : public CConfigHandler
   virtual ~CQdoasConfigHandler();
 
   virtual bool startElement(const QString &namespaceURI, const QString &localName,
-			    const QString &qName, const QXmlAttributes &atts);
+                const QString &qName, const QXmlAttributes &atts);
 
   void addProjectItem(CProjectConfigItem *item);             // takes ownership of item
   QList<const CProjectConfigItem*> projectItems(void) const; // items in returned list have the same lifetime as 'this'

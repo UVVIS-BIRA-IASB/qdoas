@@ -126,12 +126,12 @@ Q_OBJECT
 
  protected:
   void helperConstructFileWidget(QLineEdit **fileEdit, QGridLayout *gridLayout, int &row,
-				 const char *str, int len,
-				 const char *label, const char *slot);
+                 const char *str, int len,
+                 const char *label, const char *slot);
 
   void helperConstructCalInsFileWidgets(QGridLayout *gridLayout, int &row,
-					const char *calib, int lenCalib,
-					const char *instr, int lenInstr);
+                    const char *calib, int lenCalib,
+                    const char *instr, int lenInstr);
 
  public slots:
   void slotCalibOneBrowse();
@@ -171,14 +171,14 @@ Q_OBJECT
 
  protected:
   void helperConstructIpvDnlFileWidgets(QGridLayout *gridLayout, int &row,
-					const char *ipv, int lenIpv,
-					const char *dnl, int lenDnl);
+                    const char *ipv, int lenIpv,
+                    const char *dnl, int lenDnl);
 
   void helperConstructFileWidgets(QGridLayout *gridLayout, int &row,
-				  const char *calib, int lenCalib,
-				  const char *instr, int lenInstr,
-				  const char *ipv, int lenIpv,
-				  const char *dnl, int lenDnl);
+                  const char *calib, int lenCalib,
+                  const char *instr, int lenInstr,
+                  const char *ipv, int lenIpv,
+                  const char *dnl, int lenDnl);
 
  public slots:
   void slotInterPixelVariabilityThreeBrowse();

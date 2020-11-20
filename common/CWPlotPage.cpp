@@ -73,28 +73,28 @@ bool CWPlot::getImageSaveNameAndFormat(QWidget *parent, QString &fileName, QStri
 
       // attempt to determine the format from the tail of the filename - otherwise the filter selected.
       if (fileName.endsWith(".jpg", Qt::CaseInsensitive) || fileName.endsWith(".jpeg", Qt::CaseInsensitive)) {
-	saveFormat = "JPEG";
+    saveFormat = "JPEG";
       }
       else if (fileName.endsWith(".bmp", Qt::CaseInsensitive)) {
-	saveFormat = "BMP";
+    saveFormat = "BMP";
       }
       else if (fileName.endsWith(".png", Qt::CaseInsensitive)) {
-	saveFormat = "PNG";
+    saveFormat = "PNG";
       }
       else {
-	// not a known extension ... append based on the filter
-	if (format.startsWith("BMP")) {
-	  saveFormat = "BMP";
-	  fileName += ".bmp";
-	}
-	else if (format.startsWith("JPEG")) {
-	  saveFormat = "JPEG";
-	  fileName += ".jpeg";
-	}
-	else { // default to PNG
-	  saveFormat = "PNG";
-	  fileName += ".png";
-	}
+    // not a known extension ... append based on the filter
+    if (format.startsWith("BMP")) {
+      saveFormat = "BMP";
+      fileName += ".bmp";
+    }
+    else if (format.startsWith("JPEG")) {
+      saveFormat = "JPEG";
+      fileName += ".jpeg";
+    }
+    else { // default to PNG
+      saveFormat = "PNG";
+      fileName += ".png";
+    }
       }
 
       return true;
@@ -105,7 +105,7 @@ bool CWPlot::getImageSaveNameAndFormat(QWidget *parent, QString &fileName, QStri
 }
 
 CWPlot::CWPlot(const RefCountConstPtr<CPlotDataSet> &dataSet,
-	       CPlotProperties &plotProperties, QWidget *parent) :
+           CPlotProperties &plotProperties, QWidget *parent) :
   QwtPlot(parent),
   m_dataSet(dataSet),
 //  m_dataImage(""),
@@ -155,11 +155,11 @@ CWPlot::CWPlot(const RefCountConstPtr<CPlotDataSet> &dataSet,
        curve->setPen(m_plotProperties.pen((curveData.curveNumber()%4)+1));
       else if (curveData.curveType() == DashLine)
        {
-       	curve->setPen(m_plotProperties.pen((curveData.curveNumber()%4)+1));
-       	QPen newpen=curve->pen();
-       	QBrush newBrush=QBrush(Qt::gray,Qt::Dense4Pattern);
-       	newpen.setStyle(Qt::DashLine);
-       	curve->setPen(newpen);
+           curve->setPen(m_plotProperties.pen((curveData.curveNumber()%4)+1));
+           QPen newpen=curve->pen();
+           QBrush newBrush=QBrush(Qt::gray,Qt::Dense4Pattern);
+           newpen.setStyle(Qt::DashLine);
+           curve->setPen(newpen);
 
         QwtPlotZoneItem *zoneItem=new QwtPlotZoneItem;
 
@@ -198,8 +198,8 @@ CWPlot::CWPlot(const RefCountConstPtr<CPlotDataSet> &dataSet,
 
     if (m_plotProperties.scaleControl(m_dataSet->scaleType()).isFixedScale()) {
       setAxisScale(QwtPlot::yLeft,
-		   m_plotProperties.scaleControl(m_dataSet->scaleType()).minimum(),
-		   m_plotProperties.scaleControl(m_dataSet->scaleType()).maximum());
+           m_plotProperties.scaleControl(m_dataSet->scaleType()).minimum(),
+           m_plotProperties.scaleControl(m_dataSet->scaleType()).maximum());
 
     }
   }
@@ -210,7 +210,7 @@ CWPlot::CWPlot(const RefCountConstPtr<CPlotDataSet> &dataSet,
 }
 
 CWPlot::CWPlot(const RefCountConstPtr<CPlotImage> &dataImage,
-	       CPlotProperties &plotProperties, QWidget *parent) :
+           CPlotProperties &plotProperties, QWidget *parent) :
   QwtPlot(parent),
   m_dataImage(dataImage),
   m_plotProperties(plotProperties),
@@ -252,7 +252,7 @@ CWPlot::CWPlot(const RefCountConstPtr<CPlotImage> &dataImage,
 
 void CWPlot::imageresize(QSize visibleSize,int row,int column)
  {
- 	int cBorderSize=15;
+     int cBorderSize=15;
 
   m_dataView->setGeometry(QRect(row-cBorderSize,column+5,visibleSize.width(), visibleSize.height()));
   m_dataView->setSceneRect (QRect(0,0,m_dataView->width()-5, m_dataView->height()-5));
@@ -401,18 +401,18 @@ void CWPlot::slotSaveAs() {
          {
           for (i=0;i<nCurves;i++)
            {
-           	const CXYPlotData &curveData = m_dataSet->rawData(i);
-           	nPoints = curveData.size();
-	           if (nPoints > j)
-	            fprintf(fp, "%-22.14le %-22.14le ", *(curveData.xRawData() + j), *(curveData.yRawData() + j));
-	           else
-	            fprintf(fp,"%-22.14le %-22.14le ",(double)0.,(double)0.);
-	          }
-	         fprintf(fp,"\n");
-	        }
+               const CXYPlotData &curveData = m_dataSet->rawData(i);
+               nPoints = curveData.size();
+               if (nPoints > j)
+                fprintf(fp, "%-22.14le %-22.14le ", *(curveData.xRawData() + j), *(curveData.yRawData() + j));
+               else
+                fprintf(fp,"%-22.14le %-22.14le ",(double)0.,(double)0.);
+              }
+             fprintf(fp,"\n");
+            }
 
-	       fclose(fp);
-	      }
+           fclose(fp);
+          }
       else
        {
         QString msg = "Failed to create ASCII plot file ";
@@ -420,9 +420,9 @@ void CWPlot::slotSaveAs() {
 
         QMessageBox::warning(this, "Failed file write", msg);
        }
-	    }
-	  }
-	}
+        }
+      }
+    }
 
 void CWPlot::slotPrint()
 {
@@ -502,7 +502,7 @@ CWPlotPage::CWPlotPage(CPlotProperties &plotProperties, QWidget *parent) :
 }
 
 CWPlotPage::CWPlotPage(CPlotProperties &plotProperties,
-		       const RefCountConstPtr<CPlotPageData> &page, QWidget *parent) :
+               const RefCountConstPtr<CPlotPageData> &page, QWidget *parent) :
   QFrame(parent),
   m_plotProperties(plotProperties),
   m_pageType(page->type())
@@ -654,9 +654,9 @@ void CWPlotPage::slotPrintAllPlots()
       int row = 0;
       QList<CWPlot*>::iterator it = m_plots.begin();
       while (it != m_plots.end()) {
-	tmp = QRect(cPageBorder + cPlotBorder + col * (cPlotBorder + unitWidth),
-		    cPageBorder + cPlotBorder + row * (cPlotBorder + unitHeight),
-		    unitWidth, unitHeight);
+    tmp = QRect(cPageBorder + cPlotBorder + col * (cPlotBorder + unitWidth),
+            cPageBorder + cPlotBorder + row * (cPlotBorder + unitHeight),
+            unitWidth, unitHeight);
 
         renderer.render(*it,&p,tmp);
 

@@ -70,19 +70,19 @@
 // DEFINITION OF CONSTANTS
 // =======================
 
-#define	MaxNumGaps	  		 30
-#define MaxNumPnt		  	1024
-#define MaxBandNum	  		 31
+#define    MaxNumGaps               30
+#define MaxNumPnt              1024
+#define MaxBandNum               31
 
 #define NOAA_OFFSET   4854L                                                     // the offset in bytes for observations
 
-enum	   DataRecordGenerationType	{Suitcase,Hybrid,Hybrid2,Suitcase2,Kludge,Import,Hybrid3,Kludge2};
-enum	   DataClassType        		  {FixedPattern,RawData,Crossection,Spectrum,Residual,DetResponse,SGResponse,Deviation,FitResidual,LeakCurrent};
-enum	   ObservationType          {Field,Air,Lab};
-enum	   LightSourceType          {DirectSun,DirectMoon,Sky,TungstenStrip,QuartzHalogen,
-					   	  	                      XeArc,Helium,Neon,Argon,Xenon,Krypton,Mercury,
-					   	  	                      Dark,Tritium,Flashlight,OffAxisSky,S16,S17,S18,S19,S20};
-enum	   PreselectorNameType      {None,TripleFilter,DoubleJY,T3,T4,T5,T6,T7,T8,T9,T10};
+enum       DataRecordGenerationType    {Suitcase,Hybrid,Hybrid2,Suitcase2,Kludge,Import,Hybrid3,Kludge2};
+enum       DataClassType                  {FixedPattern,RawData,Crossection,Spectrum,Residual,DetResponse,SGResponse,Deviation,FitResidual,LeakCurrent};
+enum       ObservationType          {Field,Air,Lab};
+enum       LightSourceType          {DirectSun,DirectMoon,Sky,TungstenStrip,QuartzHalogen,
+                                                       XeArc,Helium,Neon,Argon,Xenon,Krypton,Mercury,
+                                                       Dark,Tritium,Flashlight,OffAxisSky,S16,S17,S18,S19,S20};
+enum       PreselectorNameType      {None,TripleFilter,DoubleJY,T3,T4,T5,T6,T7,T8,T9,T10};
 
 // ========================
 // DEFINITION OF STRUCTURES
@@ -94,152 +94,152 @@ enum	   PreselectorNameType      {None,TripleFilter,DoubleJY,T3,T4,T5,T6,T7,T8,T
 
 typedef struct TimeRecordType
  {
-		unsigned int macTime;			                                                      // {seconds since 1904}
-		float zone;			                                                                // {Hours to add to macTime to obtain GMT}
-	}
+        unsigned int macTime;                                                                  // {seconds since 1904}
+        float zone;                                                                            // {Hours to add to macTime to obtain GMT}
+    }
 NOAA_TimeRecordType;
 
 typedef struct PlaceRecordType
  {
-		char name[256];
-		float latitude;		                                                             //	{degrees, North positive }
-		float longitude;	                                                             //	{degrees, East positive  }
-		float height;				                                                             //	{meters above sea level }
-		float zone;	                                                                  //	{hours to ADD to local time to produce universal time (GMT)}
-	}
+        char name[256];
+        float latitude;                                                                     //    {degrees, North positive }
+        float longitude;                                                                 //    {degrees, East positive  }
+        float height;                                                                             //    {meters above sea level }
+        float zone;                                                                      //    {hours to ADD to local time to produce universal time (GMT)}
+    }
 NOAA_PlaceRecordType;
 
-typedef struct	FieldRecordType
+typedef struct    FieldRecordType
  {
-		char observingConditions[256];
-		short lightSource;                                                            // LightSourceType
-		NOAA_PlaceRecordType placeRecord;
-		float pressure;                                                               // {millibars               }
-		float temperature;                                                            // {degrees centigrade      }
-		float humidity;                                                               // {percent relative        }
-		float windSpeed;                                                              // {meters per second       }
-		float windDirection;                                                          // {degrees, East positive  }
-		float sunAzimuth;                                                             // {degrees, East positive  }
-		float sunZenith;                                                              // {degrees, from vertical  }
-		float moonAzimuth;                                                            // {degrees, East positive  }
-		float moonZenith;                                                             // {degrees, from vertical  }
-		float viewAzimuth;                                                            // {degrees, East positive  }
-		float viewZenith;                                                             // {degrees, from vertical  }
-		float spare1;                                                                 //
-		float spare2;                                                                 //
-		float spare3;                                                                 //
-		float spare4;                                                                 //
-	}
+        char observingConditions[256];
+        short lightSource;                                                            // LightSourceType
+        NOAA_PlaceRecordType placeRecord;
+        float pressure;                                                               // {millibars               }
+        float temperature;                                                            // {degrees centigrade      }
+        float humidity;                                                               // {percent relative        }
+        float windSpeed;                                                              // {meters per second       }
+        float windDirection;                                                          // {degrees, East positive  }
+        float sunAzimuth;                                                             // {degrees, East positive  }
+        float sunZenith;                                                              // {degrees, from vertical  }
+        float moonAzimuth;                                                            // {degrees, East positive  }
+        float moonZenith;                                                             // {degrees, from vertical  }
+        float viewAzimuth;                                                            // {degrees, East positive  }
+        float viewZenith;                                                             // {degrees, from vertical  }
+        float spare1;                                                                 //
+        float spare2;                                                                 //
+        float spare3;                                                                 //
+        float spare4;                                                                 //
+    }
 NOAA_FieldRecordType;
 
-typedef struct	AircraftRecordType
+typedef struct    AircraftRecordType
  {
-		char observingConditions[256];
-		short lightSource;                                                            // LightSourceType
-		float latitude;                                                               // {degrees, North positive }
-		float longitude;                                                              // {degrees, East positive  }
-		float heading;                                                                // {degrees, clockwise from north}
-		float pitch;                                                                  // {degrees, Nose up positive}
-		float roll;                                                                   // {Right wing down positive}
-		float yaw;                                                                    // {Right of heading positive}
-		float trueAirSpeed;                                                           // {meters per second       }
-		float altitude;                                                               // {meters, Above sea level }
-		float pressure;                                                               // {millibars               }
-		float temperature;                                                            // {degrees centigrade      }
-		float humidity;                                                               // {percent relative        }
-		float windSpeed;                                                              // {meters per second       }
-		float windDirection;                                                          // {degrees, East positive  }
-		float sunAzimuth;                                                             // {degrees, East positive  }
-		float sunZenith;                                                              // {degrees, from vertical  }
-		float moonAzimuth;                                                            // {degrees, East positive  }
-		float moonZenith;                                                             // {degrees, from vertical  }
-		float viewAzimuth;                                                            // {degrees, East positive  }
-		float viewZenith;                                                             // {degrees, from vertical  }
-	}
+        char observingConditions[256];
+        short lightSource;                                                            // LightSourceType
+        float latitude;                                                               // {degrees, North positive }
+        float longitude;                                                              // {degrees, East positive  }
+        float heading;                                                                // {degrees, clockwise from north}
+        float pitch;                                                                  // {degrees, Nose up positive}
+        float roll;                                                                   // {Right wing down positive}
+        float yaw;                                                                    // {Right of heading positive}
+        float trueAirSpeed;                                                           // {meters per second       }
+        float altitude;                                                               // {meters, Above sea level }
+        float pressure;                                                               // {millibars               }
+        float temperature;                                                            // {degrees centigrade      }
+        float humidity;                                                               // {percent relative        }
+        float windSpeed;                                                              // {meters per second       }
+        float windDirection;                                                          // {degrees, East positive  }
+        float sunAzimuth;                                                             // {degrees, East positive  }
+        float sunZenith;                                                              // {degrees, from vertical  }
+        float moonAzimuth;                                                            // {degrees, East positive  }
+        float moonZenith;                                                             // {degrees, from vertical  }
+        float viewAzimuth;                                                            // {degrees, East positive  }
+        float viewZenith;                                                             // {degrees, from vertical  }
+    }
 NOAA_AircraftRecordType;
 
-typedef struct	LaboratoryRecordType
+typedef struct    LaboratoryRecordType
  {
-		char observingConditions[256];
-		char gasName[256];
-		short lightSource;                                                            // LightSourceType
-		float concentration;                                                          // {Number per cubic cm     }
-		float pathLength;                                                             // {Centimeters             }
-		float pressure;                                                               // {Millibars               }
-		float temperature;                                                            // {Degrees centigrade      }
-		float flow;                                                                   // {Cubic CM. per second    }
-		float crossectScaleFactor;                                                    // {Crossections only       }
+        char observingConditions[256];
+        char gasName[256];
+        short lightSource;                                                            // LightSourceType
+        float concentration;                                                          // {Number per cubic cm     }
+        float pathLength;                                                             // {Centimeters             }
+        float pressure;                                                               // {Millibars               }
+        float temperature;                                                            // {Degrees centigrade      }
+        float flow;                                                                   // {Cubic CM. per second    }
+        float crossectScaleFactor;                                                    // {Crossections only       }
  }
 NOAA_LaboratoryRecordType;
 
-typedef struct	ForeOpticsRecordType
+typedef struct    ForeOpticsRecordType
  {
-		short preselectorName; //	PreselectorNameType;
-		short filterNumber;
-		float dialSetting;
-		float lambdaMax;
-		float lambdaMin;
-		char  polarizerInUse;
-		char  foDummy;
-		short polarizerAngle;
-	}
+        short preselectorName; //    PreselectorNameType;
+        short filterNumber;
+        float dialSetting;
+        float lambdaMax;
+        float lambdaMin;
+        char  polarizerInUse;
+        char  foDummy;
+        short polarizerAngle;
+    }
 NOAA_ForeOpticsRecordType;
 
-typedef struct	SpectrometerRecordType
+typedef struct    SpectrometerRecordType
  {
-		short spectrometerNumber;
-		short orderNumber;
-		float dialSetting;
-		float gratingLinesPerMM;
-		float gratingInputAngle;
-		float gratingOutputAngle;
-		float cameraFocalLength;
-		short spacer;                                                                 // {unused - defaulted to $3F80 **}
-		short band;
-		float wavelengthAtDetCenter;                                                  // {nanometers**}
-		float dispersion;                                                             // {nm/diode**}
-		float entranceSlitWidth;                                                      // {microns                 }
-		float spectrometerTempTop;                                                    // {¡C at top of spectrometer (inner) case*}
-		float spectrometerTempBot;                                                    // {¡C at bottom of spectrometer (inner) case*}
-	}
+        short spectrometerNumber;
+        short orderNumber;
+        float dialSetting;
+        float gratingLinesPerMM;
+        float gratingInputAngle;
+        float gratingOutputAngle;
+        float cameraFocalLength;
+        short spacer;                                                                 // {unused - defaulted to $3F80 **}
+        short band;
+        float wavelengthAtDetCenter;                                                  // {nanometers**}
+        float dispersion;                                                             // {nm/diode**}
+        float entranceSlitWidth;                                                      // {microns                 }
+        float spectrometerTempTop;                                                    // {¡C at top of spectrometer (inner) case*}
+        float spectrometerTempBot;                                                    // {¡C at bottom of spectrometer (inner) case*}
+    }
 NOAA_SpectrometerRecordType;
 
-//	{*Note: After a int32_t hiatus, temperature measurements were resumed, starting with
-//	 BlackSG2.23. The "Bottom" temp is now the ROOM temperature outside the instrument case!}
-//	 {**Until13 Apr 93, the space used by 'spacer' and 'band' was used for a Real named
-//	  'finalMagnification'. This was never properly used, and was always defaulted to 1.00,
-//	  so we took the $0000 half for band.  The 'spacer' half is $3F80 = 16256 (bit pattern
-//	  from writing 1.00 in all four bytes). When 'band' > zero, the definitions for
-//	  'wavelengthAtDetCenter' and 'dispersion' should be looked up (using GetBandInfo2),
-//	  rather than using the values directly.}
+//    {*Note: After a int32_t hiatus, temperature measurements were resumed, starting with
+//     BlackSG2.23. The "Bottom" temp is now the ROOM temperature outside the instrument case!}
+//     {**Until13 Apr 93, the space used by 'spacer' and 'band' was used for a Real named
+//      'finalMagnification'. This was never properly used, and was always defaulted to 1.00,
+//      so we took the $0000 half for band.  The 'spacer' half is $3F80 = 16256 (bit pattern
+//      from writing 1.00 in all four bytes). When 'band' > zero, the definitions for
+//      'wavelengthAtDetCenter' and 'dispersion' should be looked up (using GetBandInfo2),
+//      rather than using the values directly.}
 
-typedef struct	DetectorRecordType
+typedef struct    DetectorRecordType
  {
-		short detectorNumber;
-		short numberOfDiodes;
-		float diodeWidth;                                                             // {microns                 }
-		float detectorTemperature;                                                    // {degrees Centigrade      }
+        short detectorNumber;
+        short numberOfDiodes;
+        float diodeWidth;                                                             // {microns                 }
+        float detectorTemperature;                                                    // {degrees Centigrade      }
  }
 NOAA_DetectorRecordType;
 
-typedef struct	ExposureDiodeRecordType
+typedef struct    ExposureDiodeRecordType
  {
-		char  xdInUse;                                                                //
-		char  xdNewDarkCountRate;                                                     // {true = not just a copy of earlier measurement}
-		float xdDarkCountRate	;	                                                      // {counts/second}
-		int   xdTerminalCount;
+        char  xdInUse;                                                                //
+        char  xdNewDarkCountRate;                                                     // {true = not just a copy of earlier measurement}
+        float xdDarkCountRate    ;                                                          // {counts/second}
+        int   xdTerminalCount;
  }
 NOAA_ExposureDiodeRecordType;
 
-typedef struct	WavelengthRecordType
+typedef struct    WavelengthRecordType
  {
-		char  wlExists;
-		char  wlSpareBool;
-		float wlDispToCenter;
-		float wlCoeff[4];
-		char wlMethod[12];                                                           // {Program/version used to calibrate.}
-		int   wlID0;                                                                  // {These fields identify the calibration standard,É    }
-		int   wlID1;                                                                  // {using pointers,times, or recNums (to be determined).}
+        char  wlExists;
+        char  wlSpareBool;
+        float wlDispToCenter;
+        float wlCoeff[4];
+        char wlMethod[12];                                                           // {Program/version used to calibrate.}
+        int   wlID0;                                                                  // {These fields identify the calibration standard,É    }
+        int   wlID1;                                                                  // {using pointers,times, or recNums (to be determined).}
  }
 NOAA_WavelengthRecordType;
 
@@ -251,84 +251,84 @@ NOAA_WavelengthRecordType;
 //  programs (which index "spectralArray" from 0..1023) K0 = wlDispToCenter. This info is
 //  added to support development of LabVIEW routines prior to adoption of a proper data base.}
 
-typedef struct	DataRecordType
+typedef struct    DataRecordType
  {
- 	char dataClass;			                                                            // DataClassType
-		char generation;		                                                            // DataRecordGenerationType
+     char dataClass;                                                                        // DataClassType
+        char generation;                                                                    // DataRecordGenerationType
 
-		// {Fields in this section must total 256 bytes exactly!
-		//  They replace "fileNameOfStandard :Str255".}
+        // {Fields in this section must total 256 bytes exactly!
+        //  They replace "fileNameOfStandard :Str255".}
 
-		char  patternApplied;
-		char  detResponseApplied;
-		char  sgResponseApplied;
-		char  exitSlitApplied;
-		float dcOffset;                                                               // {Offset & clock noise Fourier components for aÉ}
-		float f2;                                                                     // {Ésingle read. These fields are filled by BlackSGÉ}
-		float f4Sin;                                                                  // {Éwhen pattern applied is "clock" or "clk + offset.}
-		float f4Cos;                                                                  // {Amplitude is in DN's.}
-		short patternRecNum;                                                          // {Originally intended to be a record number of
-									                                                                       //  FixedPattern applied. Now it indicates the
-									                                                                       //  method selected for pattern removal. 0=none,
-									                                                                       //  1=bkgd,2=clock,3=offset,4=clk+offset.
-									                                                                       //  -1=cleared value when the field meant recNum.}
-		short detResponseRecNum;                                                      // {recNum in file ReticonNN.rsp--never used}
-		short sgResponseRecNum;                                                       // {recNum in file SpectrographMM.rsp--never used}
-		short numberOfReads;
-		char  strayLightRemoved;                                                      // {true=scattered sunlight spectrum was subtracted; used only by Jerry.}
-		char  dataFlipped;                                                            // {spectralData has been turned end-for-end, probably
-									                                                                       //  because detector was mounted upside-down. This field
-									                                                                       //  is needed to indicate that data from "bad" diode J will
-									                                                                       //  appear in spectralData[1025 - J].}
-		short strayLightRecNum;                                                       // {recNum in the SAME .spc file--used only by Jerry}
-		short firstSaturated;                                                         //
-		short lastSaturated; 			                                                      // {diode number}
-		char  progVersion[12];                                                        // {String[x]; total storage is x+1 bytes!}
-		short externalMod; 			                                                        // {mods made by "external" programs, 0=no mods}
-		short internalMod;			                                                         // {mods made by "official" programs, 0=no mods}
+        char  patternApplied;
+        char  detResponseApplied;
+        char  sgResponseApplied;
+        char  exitSlitApplied;
+        float dcOffset;                                                               // {Offset & clock noise Fourier components for aÉ}
+        float f2;                                                                     // {Ésingle read. These fields are filled by BlackSGÉ}
+        float f4Sin;                                                                  // {Éwhen pattern applied is "clock" or "clk + offset.}
+        float f4Cos;                                                                  // {Amplitude is in DN's.}
+        short patternRecNum;                                                          // {Originally intended to be a record number of
+                                                                                                           //  FixedPattern applied. Now it indicates the
+                                                                                                           //  method selected for pattern removal. 0=none,
+                                                                                                           //  1=bkgd,2=clock,3=offset,4=clk+offset.
+                                                                                                           //  -1=cleared value when the field meant recNum.}
+        short detResponseRecNum;                                                      // {recNum in file ReticonNN.rsp--never used}
+        short sgResponseRecNum;                                                       // {recNum in file SpectrographMM.rsp--never used}
+        short numberOfReads;
+        char  strayLightRemoved;                                                      // {true=scattered sunlight spectrum was subtracted; used only by Jerry.}
+        char  dataFlipped;                                                            // {spectralData has been turned end-for-end, probably
+                                                                                                           //  because detector was mounted upside-down. This field
+                                                                                                           //  is needed to indicate that data from "bad" diode J will
+                                                                                                           //  appear in spectralData[1025 - J].}
+        short strayLightRecNum;                                                       // {recNum in the SAME .spc file--used only by Jerry}
+        short firstSaturated;                                                         //
+        short lastSaturated;                                                                   // {diode number}
+        char  progVersion[12];                                                        // {String[x]; total storage is x+1 bytes!}
+        short externalMod;                                                                     // {mods made by "external" programs, 0=no mods}
+        short internalMod;                                                                     // {mods made by "official" programs, 0=no mods}
 
-		NOAA_ExposureDiodeRecordType  exposureDiodeRecord;                             //  ExposureDiodeRecordType
-		NOAA_WavelengthRecordType  wavelengthRecord;                                   //  WavelengthRecordType
+        NOAA_ExposureDiodeRecordType  exposureDiodeRecord;                             //  ExposureDiodeRecordType
+        NOAA_WavelengthRecordType  wavelengthRecord;                                   //  WavelengthRecordType
 
-		short exposureTime;                                                           // {seconds elapsed during summation (incl. dead time)}
-		float aveDeviation;
-		short spare[73];
-		                     // {End of size-sensitive section}
+        short exposureTime;                                                           // {seconds elapsed during summation (incl. dead time)}
+        float aveDeviation;
+        short spare[73];
+                             // {End of size-sensitive section}
 
-		short  integrationCycles;
-		float integrationTime;	   	                                                   // {seconds				}
-		float centerOfBrightness;		                                                   // {seconds				}
-		float shift;             		                                                   // {diodes					}
-		float stretch;           		                                                   // {diodes					}
-		float diodesInExitSlit;  		                                                   // {diodes applied as exit slit, or recommended value}
-		float maxData;           		                                                   // {Maximum data value		}
-		float minData;           		                                                   // {Minimum data value		}
-		float aveData;           		                                                   // {Average value of data	}
-		short numberOfGapsInteger;
-		short startGap[MaxNumGaps];
-		short endGap[MaxNumGaps];
-		float spectralData[MaxNumPnt];
+        short  integrationCycles;
+        float integrationTime;                                                              // {seconds                }
+        float centerOfBrightness;                                                           // {seconds                }
+        float shift;                                                                        // {diodes                    }
+        float stretch;                                                                      // {diodes                    }
+        float diodesInExitSlit;                                                             // {diodes applied as exit slit, or recommended value}
+        float maxData;                                                                      // {Maximum data value        }
+        float minData;                                                                      // {Minimum data value        }
+        float aveData;                                                                      // {Average value of data    }
+        short numberOfGapsInteger;
+        short startGap[MaxNumGaps];
+        short endGap[MaxNumGaps];
+        float spectralData[MaxNumPnt];
  }
 NOAA_DataRecordType;
 
 typedef union ObservationCaseType
  {
- 	NOAA_FieldRecordType Field;
- 	NOAA_AircraftRecordType Air;
- 	NOAA_LaboratoryRecordType Lab;
+     NOAA_FieldRecordType Field;
+     NOAA_AircraftRecordType Air;
+     NOAA_LaboratoryRecordType Lab;
  }
 NOAA_ObservationCaseType;
 
 typedef struct InputDataRecordType
  {
-		char generalMessage[256];
-		NOAA_TimeRecordType timeRecord;
-		NOAA_ForeOpticsRecordType	foreOpticsRecord;
-		NOAA_SpectrometerRecordType spectrometerRecord;
-		NOAA_DetectorRecordType detectorRecord;
-		NOAA_DataRecordType dataRecord;
-		short observationType;
-		NOAA_ObservationCaseType observationCase;
+        char generalMessage[256];
+        NOAA_TimeRecordType timeRecord;
+        NOAA_ForeOpticsRecordType    foreOpticsRecord;
+        NOAA_SpectrometerRecordType spectrometerRecord;
+        NOAA_DetectorRecordType detectorRecord;
+        NOAA_DataRecordType dataRecord;
+        short observationType;
+        NOAA_ObservationCaseType observationCase;
  }
 NOAA_InputDataRecordType;
 
@@ -392,41 +392,41 @@ RC SetNOAA(ENGINE_CONTEXT *pEngineContext,FILE *specFp)
    rc=ERROR_ID_ALLOC;
   else
    {
-   	// Get the number of records (the size of records depend on the observation type)
+       // Get the number of records (the size of records depend on the observation type)
 
-   	for (pEngineContext->recordNumber=0,offset=0L;
-   	    (pEngineContext->recordNumber<pEngineContext->recordIndexesSize) && (offset<fileLength);
-   	     pEngineContext->recordNumber++)
-   	 {
-   	 	pEngineContext->buffers.recordIndexes[pEngineContext->recordNumber]=offset;
+       for (pEngineContext->recordNumber=0,offset=0L;
+           (pEngineContext->recordNumber<pEngineContext->recordIndexesSize) && (offset<fileLength);
+            pEngineContext->recordNumber++)
+        {
+            pEngineContext->buffers.recordIndexes[pEngineContext->recordNumber]=offset;
 
-   	 	fseek(specFp,offset+NOAA_OFFSET,0L);
-   	 	fread(&observationType,sizeof(short),1,specFp);
+            fseek(specFp,offset+NOAA_OFFSET,0L);
+            fread(&observationType,sizeof(short),1,specFp);
 
-   	 	offset+=NOAA_OFFSET+sizeof(short);
+            offset+=NOAA_OFFSET+sizeof(short);
 
-   	 	switch(observationType)
-   	 	 {
-  	 	// ------------------------------------------------------------------------
-   	 	 	case Field :
-   	 	 	 offset+=sizeof(NOAA_FieldRecordType);
-   	 	 	break;
-   	 // ------------------------------------------------------------------------
-   	 	 	case Air :
-   	 	 	 offset+=sizeof(NOAA_AircraftRecordType);
-   	 	 	break;
-   	 // ------------------------------------------------------------------------
-   	 	 	case Lab :
-   	 	 	 offset+=sizeof(NOAA_LaboratoryRecordType);
-   	 	 	break;
+            switch(observationType)
+             {
+           // ------------------------------------------------------------------------
+                 case Field :
+                  offset+=sizeof(NOAA_FieldRecordType);
+                 break;
+        // ------------------------------------------------------------------------
+                 case Air :
+                  offset+=sizeof(NOAA_AircraftRecordType);
+                 break;
+        // ------------------------------------------------------------------------
+                 case Lab :
+                  offset+=sizeof(NOAA_LaboratoryRecordType);
+                 break;
      // ------------------------------------------------------------------------
-   	 	 }
-   	 }
+             }
+        }
 
-   	pEngineContext->buffers.recordIndexes[pEngineContext->recordNumber]=offset;
+       pEngineContext->buffers.recordIndexes[pEngineContext->recordNumber]=offset;
 
-   	if (!pEngineContext->recordNumber)
-   	 rc=ERROR_SetLast("SetNOAA",ERROR_TYPE_WARNING,ERROR_ID_FILE_EMPTY,pEngineContext->fileInfo.fileName);
+       if (!pEngineContext->recordNumber)
+        rc=ERROR_SetLast("SetNOAA",ERROR_TYPE_WARNING,ERROR_ID_FILE_EMPTY,pEngineContext->fileInfo.fileName);
    }
 
   // Debugging
@@ -537,192 +537,192 @@ RC ReliNOAA(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int localDa
   else if ((pRecordNoaa=(NOAA_InputDataRecordType *)MEMORY_AllocBuffer("ReliNOAA","pRecordNoaa",sizeof(NOAA_InputDataRecordType),1,0,MEMORY_TYPE_STRUCT))==NULL)
    rc=ERROR_ID_ALLOC;
    {
-   	fseek(specFp,pBuffers->recordIndexes[recordNo-1],SEEK_SET);
-   	fread(pRecordNoaa,pBuffers->recordIndexes[recordNo]-pBuffers->recordIndexes[recordNo-1],1,specFp);
+       fseek(specFp,pBuffers->recordIndexes[recordNo-1],SEEK_SET);
+       fread(pRecordNoaa,pBuffers->recordIndexes[recordNo]-pBuffers->recordIndexes[recordNo-1],1,specFp);
 
-   	obsType=pRecordNoaa->observationType;
+       obsType=pRecordNoaa->observationType;
 
     // swap bytes
 
     swap_bytes_float((unsigned char *)&pRecordNoaa->timeRecord.macTime);
-		  swap_bytes_short((unsigned char *)&pRecordNoaa->timeRecord.zone);
+          swap_bytes_short((unsigned char *)&pRecordNoaa->timeRecord.zone);
 
     swap_bytes_short((unsigned char *)&pRecordNoaa->foreOpticsRecord.filterNumber);
-		  swap_bytes_float((unsigned char *)&pRecordNoaa->foreOpticsRecord.dialSetting);
-		  swap_bytes_float((unsigned char *)&pRecordNoaa->foreOpticsRecord.lambdaMax);
-		  swap_bytes_float((unsigned char *)&pRecordNoaa->foreOpticsRecord.lambdaMin);
-		  swap_bytes_short((unsigned char *)&pRecordNoaa->foreOpticsRecord.polarizerAngle);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->foreOpticsRecord.dialSetting);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->foreOpticsRecord.lambdaMax);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->foreOpticsRecord.lambdaMin);
+          swap_bytes_short((unsigned char *)&pRecordNoaa->foreOpticsRecord.polarizerAngle);
 
-		  swap_bytes_short((unsigned char *)&pRecordNoaa->spectrometerRecord.spectrometerNumber);
-		  swap_bytes_short((unsigned char *)&pRecordNoaa->spectrometerRecord.orderNumber);
-		  swap_bytes_float((unsigned char *)&pRecordNoaa->spectrometerRecord.dialSetting);
-		  swap_bytes_float((unsigned char *)&pRecordNoaa->spectrometerRecord.gratingLinesPerMM);
-		  swap_bytes_float((unsigned char *)&pRecordNoaa->spectrometerRecord.gratingInputAngle);
-		  swap_bytes_float((unsigned char *)&pRecordNoaa->spectrometerRecord.gratingOutputAngle);
-		  swap_bytes_float((unsigned char *)&pRecordNoaa->spectrometerRecord.cameraFocalLength);
-		  swap_bytes_short((unsigned char *)&pRecordNoaa->spectrometerRecord.spacer);
-		  swap_bytes_short((unsigned char *)&pRecordNoaa->spectrometerRecord.band);
-		  swap_bytes_float((unsigned char *)&pRecordNoaa->spectrometerRecord.wavelengthAtDetCenter);
-		  swap_bytes_float((unsigned char *)&pRecordNoaa->spectrometerRecord.dispersion);
-		  swap_bytes_float((unsigned char *)&pRecordNoaa->spectrometerRecord.entranceSlitWidth);
-		  swap_bytes_float((unsigned char *)&pRecordNoaa->spectrometerRecord.spectrometerTempTop);
-		  swap_bytes_float((unsigned char *)&pRecordNoaa->spectrometerRecord.spectrometerTempBot);
+          swap_bytes_short((unsigned char *)&pRecordNoaa->spectrometerRecord.spectrometerNumber);
+          swap_bytes_short((unsigned char *)&pRecordNoaa->spectrometerRecord.orderNumber);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->spectrometerRecord.dialSetting);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->spectrometerRecord.gratingLinesPerMM);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->spectrometerRecord.gratingInputAngle);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->spectrometerRecord.gratingOutputAngle);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->spectrometerRecord.cameraFocalLength);
+          swap_bytes_short((unsigned char *)&pRecordNoaa->spectrometerRecord.spacer);
+          swap_bytes_short((unsigned char *)&pRecordNoaa->spectrometerRecord.band);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->spectrometerRecord.wavelengthAtDetCenter);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->spectrometerRecord.dispersion);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->spectrometerRecord.entranceSlitWidth);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->spectrometerRecord.spectrometerTempTop);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->spectrometerRecord.spectrometerTempBot);
 
-  		swap_bytes_short((unsigned char *)&pRecordNoaa->detectorRecord.detectorNumber);
-  		swap_bytes_short((unsigned char *)&pRecordNoaa->detectorRecord.numberOfDiodes);
-  		swap_bytes_float((unsigned char *)&pRecordNoaa->detectorRecord.diodeWidth);
-  		swap_bytes_float((unsigned char *)&pRecordNoaa->detectorRecord.detectorTemperature);
+          swap_bytes_short((unsigned char *)&pRecordNoaa->detectorRecord.detectorNumber);
+          swap_bytes_short((unsigned char *)&pRecordNoaa->detectorRecord.numberOfDiodes);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->detectorRecord.diodeWidth);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->detectorRecord.detectorTemperature);
 
-  		swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.dcOffset);
-  		swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.f2);
-  		swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.f4Sin);
-  		swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.f4Cos);
-  		swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.patternRecNum);
-  		swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.detResponseRecNum);
-  		swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.sgResponseRecNum);
-  		swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.numberOfReads);
-  		swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.strayLightRecNum);
-  		swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.firstSaturated);
-  		swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.lastSaturated);
-  		swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.externalMod);
-  		swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.internalMod);
-  		swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.exposureDiodeRecord.xdDarkCountRate);
-  		swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.exposureDiodeRecord.xdTerminalCount);
-  		swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.wavelengthRecord.wlDispToCenter);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.dcOffset);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.f2);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.f4Sin);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.f4Cos);
+          swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.patternRecNum);
+          swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.detResponseRecNum);
+          swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.sgResponseRecNum);
+          swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.numberOfReads);
+          swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.strayLightRecNum);
+          swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.firstSaturated);
+          swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.lastSaturated);
+          swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.externalMod);
+          swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.internalMod);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.exposureDiodeRecord.xdDarkCountRate);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.exposureDiodeRecord.xdTerminalCount);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.wavelengthRecord.wlDispToCenter);
 
-  		for (i=0;i<4;i++)
-  		 swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.wavelengthRecord.wlCoeff[i]);
+          for (i=0;i<4;i++)
+           swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.wavelengthRecord.wlCoeff[i]);
 
-   	swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.wavelengthRecord.wlID0);
-  		swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.wavelengthRecord.wlID1);
-  		swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.exposureTime);
-  		swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.aveDeviation);
+       swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.wavelengthRecord.wlID0);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.wavelengthRecord.wlID1);
+          swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.exposureTime);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.aveDeviation);
 
-  		for (i=0;i<73;i++)
-  		 swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.spare[i]);
+          for (i=0;i<73;i++)
+           swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.spare[i]);
 
-  		swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.integrationCycles);
-  		swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.integrationTime);
-  		swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.centerOfBrightness);
-  		swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.shift);
-  		swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.stretch);
-  		swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.diodesInExitSlit);
-  		swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.maxData);
-  		swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.minData);
-  		swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.aveData);
-  		swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.numberOfGapsInteger);
+          swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.integrationCycles);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.integrationTime);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.centerOfBrightness);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.shift);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.stretch);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.diodesInExitSlit);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.maxData);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.minData);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.aveData);
+          swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.numberOfGapsInteger);
 
-  		for (i=0;i<MaxNumGaps;i++)
-  		 swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.startGap[i]);
-  		for (i=0;i<MaxNumGaps;i++)
-  		 swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.endGap[i]);
-  		for (i=0;i<MaxNumPnt;i++)
-  		 swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.spectralData[i]);
+          for (i=0;i<MaxNumGaps;i++)
+           swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.startGap[i]);
+          for (i=0;i<MaxNumGaps;i++)
+           swap_bytes_short((unsigned char *)&pRecordNoaa->dataRecord.endGap[i]);
+          for (i=0;i<MaxNumPnt;i++)
+           swap_bytes_float((unsigned char *)&pRecordNoaa->dataRecord.spectralData[i]);
 
-  		switch(obsType)
-  		 {
-	 	// --------------------------------------------------------------------------
- 	 	 	case Field :
+          switch(obsType)
+           {
+         // --------------------------------------------------------------------------
+               case Field :
 
-   	   swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.placeRecord.latitude);
-   	   swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.placeRecord.longitude);
-	 	    swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.placeRecord.height);
-  	    swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.placeRecord.zone);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.placeRecord.latitude);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.placeRecord.longitude);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.placeRecord.height);
+          swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.placeRecord.zone);
 
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.pressure);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.temperature);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.humidity);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.windSpeed);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.windDirection);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.sunAzimuth);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.sunZenith);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.moonAzimuth);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.moonZenith);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.viewAzimuth);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.viewZenith);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.spare1);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.spare2);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.spare3);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.spare4);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.pressure);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.temperature);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.humidity);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.windSpeed);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.windDirection);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.sunAzimuth);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.sunZenith);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.moonAzimuth);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.moonZenith);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.viewAzimuth);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.viewZenith);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.spare1);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.spare2);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.spare3);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Field.spare4);
 
- 	 	 	break;
-	 	// --------------------------------------------------------------------------
- 	 	 	case Air :
+               break;
+         // --------------------------------------------------------------------------
+               case Air :
 
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.latitude);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.longitude);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.heading);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.pitch);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.roll);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.yaw);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.trueAirSpeed);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.altitude);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.pressure);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.temperature);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.humidity);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.windSpeed);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.windDirection);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.sunAzimuth);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.sunZenith);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.moonAzimuth);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.moonZenith);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.viewAzimuth);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.viewZenith);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.latitude);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.longitude);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.heading);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.pitch);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.roll);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.yaw);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.trueAirSpeed);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.altitude);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.pressure);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.temperature);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.humidity);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.windSpeed);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.windDirection);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.sunAzimuth);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.sunZenith);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.moonAzimuth);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.moonZenith);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.viewAzimuth);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Air.viewZenith);
 
- 	 	 	break;
-	 	// --------------------------------------------------------------------------
- 	 	 	case Lab :
+               break;
+         // --------------------------------------------------------------------------
+               case Lab :
 
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Lab.concentration);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Lab.pathLength);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Lab.pressure);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Lab.temperature);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Lab.flow);
-		     swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Lab.crossectScaleFactor);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Lab.concentration);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Lab.pathLength);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Lab.pressure);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Lab.temperature);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Lab.flow);
+             swap_bytes_float((unsigned char *)&pRecordNoaa->observationCase.Lab.crossectScaleFactor);
 
- 	 	 	break;
+               break;
    // --------------------------------------------------------------------------
      }
 
-   	switch(obsType)
-   	 {
-  	 	// ------------------------------------------------------------------------
-   	 	 	case Field :
+       switch(obsType)
+        {
+           // ------------------------------------------------------------------------
+                 case Field :
 
-   	 	 	 pRecord->Zm=(double)pRecordNoaa->observationCase.Field.sunZenith;
-   	 	 	 pRecord->Azimuth=(double)pRecordNoaa->observationCase.Field.sunAzimuth;
-   	 	 	 pRecord->elevationViewAngle=(float)pRecordNoaa->observationCase.Field.viewZenith;
-   	 	 	 pRecord->azimuthViewAngle=(float)pRecordNoaa->observationCase.Field.viewAzimuth;
-   	 	 	 pRecord->latitude=(float)pRecordNoaa->observationCase.Field.placeRecord.latitude;
-   	 	 	 pRecord->longitude=(float)pRecordNoaa->observationCase.Field.placeRecord.longitude;
-   	 	 	 pRecord->maxdoas.measurementType=(pRecord->elevationViewAngle<(double)80.)?PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS:PRJCT_INSTR_MAXDOAS_TYPE_ZENITH;
+                  pRecord->Zm=(double)pRecordNoaa->observationCase.Field.sunZenith;
+                  pRecord->Azimuth=(double)pRecordNoaa->observationCase.Field.sunAzimuth;
+                  pRecord->elevationViewAngle=(float)pRecordNoaa->observationCase.Field.viewZenith;
+                  pRecord->azimuthViewAngle=(float)pRecordNoaa->observationCase.Field.viewAzimuth;
+                  pRecord->latitude=(float)pRecordNoaa->observationCase.Field.placeRecord.latitude;
+                  pRecord->longitude=(float)pRecordNoaa->observationCase.Field.placeRecord.longitude;
+                  pRecord->maxdoas.measurementType=(pRecord->elevationViewAngle<(double)80.)?PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS:PRJCT_INSTR_MAXDOAS_TYPE_ZENITH;
 
-   	 	 	break;
-   	 // ------------------------------------------------------------------------
-   	 	 	case Air :
+                 break;
+        // ------------------------------------------------------------------------
+                 case Air :
 
-   	 	 	 pRecord->Zm=(double)pRecordNoaa->observationCase.Air.sunZenith;
-   	 	 	 pRecord->Azimuth=(double)pRecordNoaa->observationCase.Air.sunAzimuth;
-   	 	 	 pRecord->elevationViewAngle=(float)90.-pRecordNoaa->observationCase.Air.viewZenith;
-   	 	 	 pRecord->azimuthViewAngle=(float)pRecordNoaa->observationCase.Air.viewAzimuth;
-   	 	 	 pRecord->latitude=(float)pRecordNoaa->observationCase.Air.latitude;
-   	 	 	 pRecord->longitude=(float)pRecordNoaa->observationCase.Air.longitude;
-   	 	 	 pRecord->maxdoas.measurementType=(pRecord->elevationViewAngle<(double)80.)?PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS:PRJCT_INSTR_MAXDOAS_TYPE_ZENITH;
+                  pRecord->Zm=(double)pRecordNoaa->observationCase.Air.sunZenith;
+                  pRecord->Azimuth=(double)pRecordNoaa->observationCase.Air.sunAzimuth;
+                  pRecord->elevationViewAngle=(float)90.-pRecordNoaa->observationCase.Air.viewZenith;
+                  pRecord->azimuthViewAngle=(float)pRecordNoaa->observationCase.Air.viewAzimuth;
+                  pRecord->latitude=(float)pRecordNoaa->observationCase.Air.latitude;
+                  pRecord->longitude=(float)pRecordNoaa->observationCase.Air.longitude;
+                  pRecord->maxdoas.measurementType=(pRecord->elevationViewAngle<(double)80.)?PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS:PRJCT_INSTR_MAXDOAS_TYPE_ZENITH;
 
-   	 	 	break;
-   	 // ------------------------------------------------------------------------
-   	 	 	case Lab :
+                 break;
+        // ------------------------------------------------------------------------
+                 case Lab :
 
-   	 	 	 pRecord->Zm=pRecord->Azimuth=(double)-1.;
-   	 	 	 pRecord->elevationViewAngle=pRecord->azimuthViewAngle=-1.;
-   	 	 	 pRecord->maxdoas.measurementType=PRJCT_INSTR_MAXDOAS_TYPE_NONE;
+                  pRecord->Zm=pRecord->Azimuth=(double)-1.;
+                  pRecord->elevationViewAngle=pRecord->azimuthViewAngle=-1.;
+                  pRecord->maxdoas.measurementType=PRJCT_INSTR_MAXDOAS_TYPE_NONE;
 
 
-   	 	 	break;
+                 break;
      // ------------------------------------------------------------------------
-   	 }
+        }
 
-   	NOAA_Date(pRecordNoaa->timeRecord.macTime+pRecordNoaa->timeRecord.zone*3600.,&pRecord->present_datetime.thedate,&pRecord->present_datetime.thetime);
+       NOAA_Date(pRecordNoaa->timeRecord.macTime+pRecordNoaa->timeRecord.zone*3600.,&pRecord->present_datetime.thedate,&pRecord->present_datetime.thetime);
 
     // Get information on the current record
 

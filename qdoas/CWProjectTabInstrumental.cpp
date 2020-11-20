@@ -251,7 +251,7 @@ CWProjectTabInstrumental::CWProjectTabInstrumental(const mediate_project_instrum
   // ocean optics
   m_oceanOpticsEdit = new CWInstrOceanOpticsEdit(&(instr->oceanoptics));
   index = m_formatStack->addWidget(m_oceanOpticsEdit);
-  m_instrumentToStackIndexMap.insert(std::map<int,int>::value_type(PRJCT_INSTR_FORMAT_OCEAN_OPTICS	, index));
+  m_instrumentToStackIndexMap.insert(std::map<int,int>::value_type(PRJCT_INSTR_FORMAT_OCEAN_OPTICS    , index));
 
   // frm4doas
   m_frm4doasEdit = new CWInstrFrm4doasEdit(&(instr->frm4doas));
@@ -351,8 +351,8 @@ void CWCalibInstrEdit::slotCalibOneBrowse()
   CPreferences *pref = CPreferences::instance();
 
   QString filename = QFileDialog::getOpenFileName(this, "Select Calibration File",
-						  pref->directoryName("Calib"),
-						  "Calibration File (*.clb);;All Files (*)");
+                          pref->directoryName("Calib"),
+                          "Calibration File (*.clb);;All Files (*)");
 
   if (!filename.isEmpty()) {
     pref->setDirectoryNameGivenFile("Calib", filename);
@@ -366,8 +366,8 @@ void CWCalibInstrEdit::slotInstrTwoBrowse()
   CPreferences *pref = CPreferences::instance();
 
   QString filename = QFileDialog::getOpenFileName(this, "Select Instrument Function File",
-						  pref->directoryName("Instr"),
-						  "Instrument Function File (*.ins);;All Files (*)");
+                          pref->directoryName("Instr"),
+                          "Instrument Function File (*.ins);;All Files (*)");
 
   if (!filename.isEmpty()) {
     pref->setDirectoryNameGivenFile("Instr", filename);
@@ -381,8 +381,8 @@ void CWCalibInstrEdit::slotOffsetTwoBrowse()
   CPreferences *pref = CPreferences::instance();
 
   QString filename = QFileDialog::getOpenFileName(this, "Select Offset File",
-						  pref->directoryName("Offset"),
-						  "Offset File (*.txt);;All Files (*)");
+                          pref->directoryName("Offset"),
+                          "Offset File (*.txt);;All Files (*)");
 
   if (!filename.isEmpty()) {
     pref->setDirectoryNameGivenFile("Offset", filename);
@@ -392,8 +392,8 @@ void CWCalibInstrEdit::slotOffsetTwoBrowse()
 }
 
 void CWCalibInstrEdit::helperConstructFileWidget(QLineEdit **fileEdit, QGridLayout *gridLayout, int &row,
-						    const char *str, int len,
-						    const char *label, const char *slot)
+                            const char *str, int len,
+                            const char *label, const char *slot)
 {
   // Helper that constructs the fileOneEdit editing widget and place it in a grid layout.
   // row is the first 'free row' in the grid on entry and is updated to be the next
@@ -417,18 +417,18 @@ void CWCalibInstrEdit::helperConstructFileWidget(QLineEdit **fileEdit, QGridLayo
 }
 
 void CWCalibInstrEdit::helperConstructCalInsFileWidgets(QGridLayout *gridLayout, int &row,
-							const char *calib, int lenCalib,
-							const char *instr, int lenInstr)
+                            const char *calib, int lenCalib,
+                            const char *instr, int lenInstr)
 {
   // Helper that constructs the file editing widgets and places them in a grid layout.
   // row is the first 'free row' in the grid on entry and is updated to be the next
   // 'free row' on exit.
 
   helperConstructFileWidget(&m_fileOneEdit, gridLayout, row, calib, lenCalib,
-			    "Calibration File", SLOT(slotCalibOneBrowse()));
+                "Calibration File", SLOT(slotCalibOneBrowse()));
 
   helperConstructFileWidget(&m_fileTwoEdit, gridLayout, row, instr, lenInstr,
-			    "Transmission file", SLOT(slotInstrTwoBrowse()));
+                "Transmission file", SLOT(slotInstrTwoBrowse()));
 }
 
 //--------------------------------------------------------
@@ -443,8 +443,8 @@ void CWAllFilesEdit::slotInterPixelVariabilityThreeBrowse()
   CPreferences *pref = CPreferences::instance();
 
   QString filename = QFileDialog::getOpenFileName(this, "Select Inter-Pixel Variability File",
-						  pref->directoryName("IntPixVar"),
-						  "Inter-Pixel Variability File (*.ipv);;All Files (*)");
+                          pref->directoryName("IntPixVar"),
+                          "Inter-Pixel Variability File (*.ipv);;All Files (*)");
 
   if (!filename.isEmpty()) {
     pref->setDirectoryNameGivenFile("IntPixVar", filename);
@@ -458,8 +458,8 @@ void CWAllFilesEdit::slotDarkCurrentThreeBrowse()
   CPreferences *pref = CPreferences::instance();
 
   QString filename = QFileDialog::getOpenFileName(this, "Select Dark Current File",
-						  pref->directoryName("Dark"),
-						  "Dark Current File (*.drk);;All Files (*)");
+                          pref->directoryName("Dark"),
+                          "Dark Current File (*.drk);;All Files (*)");
 
   if (!filename.isEmpty()) {
     pref->setDirectoryNameGivenFile("Dark", filename);
@@ -473,8 +473,8 @@ void CWAllFilesEdit::slotStraylightCorrectionThreeBrowse()
   CPreferences *pref = CPreferences::instance();
 
   QString filename = QFileDialog::getOpenFileName(this, "Select Stray-Light File",
-						  pref->directoryName("Stray"),
-						  "Stray-Light File (*.str);;All Files (*)");
+                          pref->directoryName("Stray"),
+                          "Stray-Light File (*.str);;All Files (*)");
 
   if (!filename.isEmpty()) {
     pref->setDirectoryNameGivenFile("Stray", filename);
@@ -488,8 +488,8 @@ void CWAllFilesEdit::slotDetectorNonLinearityFourBrowse()
   CPreferences *pref = CPreferences::instance();
 
   QString filename = QFileDialog::getOpenFileName(this, "Select Detector Non-Linearity File",
-						  pref->directoryName("DetNonLin"),
-						  "Detector Non-Linearity File (*.dnl);;All Files (*)");
+                          pref->directoryName("DetNonLin"),
+                          "Detector Non-Linearity File (*.dnl);;All Files (*)");
 
   if (!filename.isEmpty()) {
     pref->setDirectoryNameGivenFile("DetNonLin", filename);
@@ -503,8 +503,8 @@ void CWAllFilesEdit::slotOffsetFourBrowse()
   CPreferences *pref = CPreferences::instance();
 
   QString filename = QFileDialog::getOpenFileName(this, "Select Offset File",
-						  pref->directoryName("Offset"),
-						  "Offset File (*.txt);;All Files (*)");
+                          pref->directoryName("Offset"),
+                          "Offset File (*.txt);;All Files (*)");
 
   if (!filename.isEmpty()) {
     pref->setDirectoryNameGivenFile("Offset", filename);
@@ -527,25 +527,25 @@ void CWAllFilesEdit::slotImagePathFiveBrowse()                                  
 }
 
 void CWAllFilesEdit::helperConstructIpvDnlFileWidgets(QGridLayout *gridLayout, int &row,
-						      const char *ipv, int lenIpv,
-						      const char *dnl, int lenDnl)
+                              const char *ipv, int lenIpv,
+                              const char *dnl, int lenDnl)
 {
   // Helper that constructs the file editing widgets and places them in a grid layout.
   // row is the first 'free row' in the grid on entry and is updated to be the next
   // 'free row' on exit.
 
   helperConstructFileWidget(&m_fileThreeEdit, gridLayout, row, ipv, lenIpv,
-			    "Interpixel Variability", SLOT(slotInterPixelVariabilityThreeBrowse()));
+                "Interpixel Variability", SLOT(slotInterPixelVariabilityThreeBrowse()));
 
   helperConstructFileWidget(&m_fileFourEdit, gridLayout, row, dnl, lenDnl,
-			    "Det. Non-Linearity", SLOT(slotDetectorNonLinearityFourBrowse()));
+                "Det. Non-Linearity", SLOT(slotDetectorNonLinearityFourBrowse()));
 }
 
 void CWAllFilesEdit::helperConstructFileWidgets(QGridLayout *gridLayout, int &row,
-						const char *calib, int lenCalib,
-						const char *instr, int lenInstr,
-						const char *ipv, int lenIpv,
-						const char *dnl, int lenDnl)
+                        const char *calib, int lenCalib,
+                        const char *instr, int lenInstr,
+                        const char *ipv, int lenIpv,
+                        const char *dnl, int lenDnl)
 {
   // Helper that constructs the file editing widgets and places them in a grid layout.
   // row is the first 'free row' in the grid on entry and is updated to be the next
@@ -620,8 +620,8 @@ CWInstrAsciiEdit::CWInstrAsciiEdit(const struct instrumental_ascii *d, QWidget *
 
   // files
   helperConstructCalInsFileWidgets(bottomLayout, row,
-				   d->calibrationFile, sizeof(d->calibrationFile),
-				   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
+                   d->calibrationFile, sizeof(d->calibrationFile),
+                   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
 
   bottomLayout->setColumnMinimumWidth(0, cSuggestedColumnZeroWidth);
   bottomLayout->setColumnMinimumWidth(2, cSuggestedColumnTwoWidth);
@@ -755,8 +755,8 @@ CWInstrLoggerEdit::CWInstrLoggerEdit(const struct instrumental_logger *d, QWidge
 
   // files
   helperConstructCalInsFileWidgets(gridLayout, row,
-				   d->calibrationFile, sizeof(d->calibrationFile),
-				   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
+                   d->calibrationFile, sizeof(d->calibrationFile),
+                   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
 
   gridLayout->setColumnMinimumWidth(0, cSuggestedColumnZeroWidth);
   gridLayout->setColumnMinimumWidth(2, cSuggestedColumnTwoWidth);
@@ -807,8 +807,8 @@ CWInstrActonEdit::CWInstrActonEdit(const struct instrumental_acton *d, QWidget *
 
   // files
   helperConstructCalInsFileWidgets(gridLayout, row,
-				   d->calibrationFile, sizeof(d->calibrationFile),
-				   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
+                   d->calibrationFile, sizeof(d->calibrationFile),
+                   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
 
   gridLayout->setColumnMinimumWidth(0, cSuggestedColumnZeroWidth);
   gridLayout->setColumnMinimumWidth(2, cSuggestedColumnTwoWidth);
@@ -952,17 +952,17 @@ CWInstrMfcEdit::CWInstrMfcEdit(const struct instrumental_mfc *d, QWidget *parent
 
   // files
   helperConstructCalInsFileWidgets(gridLayout, row,
-				   d->calibrationFile, sizeof(d->calibrationFile),
-				   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
+                   d->calibrationFile, sizeof(d->calibrationFile),
+                   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
 
   // non-standard files...
   helperConstructFileWidget(&m_fileThreeEdit, gridLayout, row,
-			    d->darkCurrentFile, sizeof(d->darkCurrentFile),
-			    "Dark Current", SLOT(slotDarkCurrentThreeBrowse()));
+                d->darkCurrentFile, sizeof(d->darkCurrentFile),
+                "Dark Current", SLOT(slotDarkCurrentThreeBrowse()));
 
   helperConstructFileWidget(&m_fileFourEdit, gridLayout, row,
-			    d->offsetFile, sizeof(d->offsetFile),
-			    "Offset", SLOT(slotOffsetFourBrowse()));
+                d->offsetFile, sizeof(d->offsetFile),
+                "Offset", SLOT(slotOffsetFourBrowse()));
 
   gridLayout->setColumnMinimumWidth(0, cSuggestedColumnZeroWidth);
   gridLayout->setColumnMinimumWidth(2, cSuggestedColumnTwoWidth);
@@ -1086,17 +1086,17 @@ CWInstrMfcStdEdit::CWInstrMfcStdEdit(const struct instrumental_mfcstd *d, QWidge
 
   // files
   helperConstructCalInsFileWidgets(gridLayout, row,
-				   d->calibrationFile, sizeof(d->calibrationFile),
-				   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
+                   d->calibrationFile, sizeof(d->calibrationFile),
+                   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
 
   // non-standard files...
   helperConstructFileWidget(&m_fileThreeEdit, gridLayout, row,
-			    d->darkCurrentFile, sizeof(d->darkCurrentFile),
-			    "Dark Current", SLOT(slotDarkCurrentThreeBrowse()));
+                d->darkCurrentFile, sizeof(d->darkCurrentFile),
+                "Dark Current", SLOT(slotDarkCurrentThreeBrowse()));
 
   helperConstructFileWidget(&m_fileFourEdit, gridLayout, row,
-			    d->offsetFile, sizeof(d->offsetFile),
-			    "Offset", SLOT(slotOffsetFourBrowse()));
+                d->offsetFile, sizeof(d->offsetFile),
+                "Offset", SLOT(slotOffsetFourBrowse()));
 
   gridLayout->setColumnMinimumWidth(0, cSuggestedColumnZeroWidth);
   gridLayout->setColumnMinimumWidth(2, cSuggestedColumnTwoWidth);
@@ -1166,8 +1166,8 @@ CWInstrMfcbiraEdit::CWInstrMfcbiraEdit(const struct instrumental_mfcbira *d, QWi
 
   // files
   helperConstructCalInsFileWidgets(gridLayout, row,
-				   d->calibrationFile, sizeof(d->calibrationFile),
-				   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
+                   d->calibrationFile, sizeof(d->calibrationFile),
+                   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
 
   mainLayout->addLayout(gridLayout);
   mainLayout->addStretch(1);
@@ -1234,8 +1234,8 @@ CWInstrFrm4doasEdit::CWInstrFrm4doasEdit(const struct instrumental_frm4doas *d, 
 
   // files
   helperConstructCalInsFileWidgets(gridLayout, row,
-				   d->calibrationFile, sizeof(d->calibrationFile),
-				   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
+                   d->calibrationFile, sizeof(d->calibrationFile),
+                   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
 
   mainLayout->addLayout(gridLayout);
   mainLayout->addStretch(1);
@@ -1300,8 +1300,8 @@ CWInstrAvantesEdit::CWInstrAvantesEdit(const struct instrumental_avantes *d, QWi
 
   // files
   helperConstructCalInsFileWidgets(gridLayout, row,
-				   d->calibrationFile, sizeof(d->calibrationFile),
-				   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
+                   d->calibrationFile, sizeof(d->calibrationFile),
+                   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
 
   mainLayout->addLayout(gridLayout);
   mainLayout->addStretch(1);
@@ -1348,8 +1348,8 @@ CWInstrMinimumEdit::CWInstrMinimumEdit(const struct instrumental_minimum *d, QWi
 
   // files
   helperConstructCalInsFileWidgets(gridLayout, row,
-				   d->calibrationFile, sizeof(d->calibrationFile),
-				   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
+                   d->calibrationFile, sizeof(d->calibrationFile),
+                   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
 
   gridLayout->setColumnMinimumWidth(0, cSuggestedColumnZeroWidth);
   gridLayout->setColumnMinimumWidth(2, cSuggestedColumnTwoWidth);
@@ -1386,10 +1386,10 @@ CWInstrCcdEdit::CWInstrCcdEdit(const struct instrumental_ccd *d, QWidget *parent
 
   // files
   helperConstructFileWidgets(gridLayout, row,
-			     d->calibrationFile, sizeof(d->calibrationFile),
-			     d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile),
-			     d->interPixelVariabilityFile, sizeof(d->interPixelVariabilityFile),
-			     d->detectorNonLinearityFile, sizeof(d->detectorNonLinearityFile));
+                 d->calibrationFile, sizeof(d->calibrationFile),
+                 d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile),
+                 d->interPixelVariabilityFile, sizeof(d->interPixelVariabilityFile),
+                 d->detectorNonLinearityFile, sizeof(d->detectorNonLinearityFile));
 
   gridLayout->setColumnMinimumWidth(0, cSuggestedColumnZeroWidth);
   gridLayout->setColumnMinimumWidth(2, cSuggestedColumnTwoWidth);
@@ -1441,22 +1441,22 @@ CWInstrCcdEevEdit::CWInstrCcdEevEdit(const struct instrumental_ccdeev *d, QWidge
 
   // files
   helperConstructCalInsFileWidgets(gridLayout, row,
-				   d->calibrationFile, sizeof(d->calibrationFile),
-				   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
+                   d->calibrationFile, sizeof(d->calibrationFile),
+                   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
 
   // non-standard files...
 
   helperConstructFileWidget(&m_fileFiveEdit, gridLayout, row,                   // !!!!
-			    d->imagePath, sizeof(d->imagePath),
-			    "Camera pictures", SLOT(slotImagePathFiveBrowse()));
+                d->imagePath, sizeof(d->imagePath),
+                "Camera pictures", SLOT(slotImagePathFiveBrowse()));
 
   helperConstructFileWidget(&m_fileThreeEdit, gridLayout, row,
-			    d->straylightCorrectionFile, sizeof(d->straylightCorrectionFile),
-			    "Stray-Light Correction", SLOT(slotStraylightCorrectionThreeBrowse()));
+                d->straylightCorrectionFile, sizeof(d->straylightCorrectionFile),
+                "Stray-Light Correction", SLOT(slotStraylightCorrectionThreeBrowse()));
 
   helperConstructFileWidget(&m_fileFourEdit, gridLayout, row,
-			    d->detectorNonLinearityFile, sizeof(d->detectorNonLinearityFile),
-			    "Det. Non-Linearity", SLOT(slotDetectorNonLinearityFourBrowse()));
+                d->detectorNonLinearityFile, sizeof(d->detectorNonLinearityFile),
+                "Det. Non-Linearity", SLOT(slotDetectorNonLinearityFourBrowse()));
 
   gridLayout->setColumnMinimumWidth(0, cSuggestedColumnZeroWidth);
   gridLayout->setColumnMinimumWidth(2, cSuggestedColumnTwoWidth);
@@ -1539,8 +1539,8 @@ CWInstrGdpEdit::CWInstrGdpEdit(const struct instrumental_gdp *d, QWidget *parent
 
   // files
   helperConstructCalInsFileWidgets(gridLayout, row,
-				   d->calibrationFile, sizeof(d->calibrationFile),
-				   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
+                   d->calibrationFile, sizeof(d->calibrationFile),
+                   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
 
   gridLayout->setColumnMinimumWidth(0, cSuggestedColumnZeroWidth);
   gridLayout->setColumnMinimumWidth(2, cSuggestedColumnTwoWidth);
@@ -1608,8 +1608,8 @@ CWInstrGome1Edit::CWInstrGome1Edit(const struct instrumental_gdp *d, QWidget *pa
 
   // files
   helperConstructCalInsFileWidgets(gridLayout, row,
-				   d->calibrationFile, sizeof(d->calibrationFile),
-				   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
+                   d->calibrationFile, sizeof(d->calibrationFile),
+                   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
 
   gridLayout->setColumnMinimumWidth(0, cSuggestedColumnZeroWidth);
   gridLayout->setColumnMinimumWidth(2, cSuggestedColumnTwoWidth);
@@ -1667,8 +1667,8 @@ CWInstrGome2Edit::CWInstrGome2Edit(const struct instrumental_gome2 *d, QWidget *
 
   // files
   helperConstructCalInsFileWidgets(gridLayout, row,
-				   d->calibrationFile, sizeof(d->calibrationFile),
-				   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
+                   d->calibrationFile, sizeof(d->calibrationFile),
+                   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
 
   gridLayout->setColumnMinimumWidth(0, cSuggestedColumnZeroWidth);
   gridLayout->setColumnMinimumWidth(2, cSuggestedColumnTwoWidth);
@@ -1738,11 +1738,11 @@ CWInstrSciaEdit::CWInstrSciaEdit(const struct instrumental_scia *d, QWidget *par
 
   // files
   helperConstructCalInsFileWidgets(gridLayout, row,
-				   d->calibrationFile, sizeof(d->calibrationFile),
-				   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
+                   d->calibrationFile, sizeof(d->calibrationFile),
+                   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
 
   helperConstructFileWidget(&m_fileFourEdit, gridLayout, row, d->detectorNonLinearityFile, sizeof(d->detectorNonLinearityFile),
-			    "Det. Non-Linearity", SLOT(slotDetectorNonLinearityFourBrowse()));
+                "Det. Non-Linearity", SLOT(slotDetectorNonLinearityFourBrowse()));
 
   gridLayout->setColumnMinimumWidth(0, cSuggestedColumnZeroWidth);
   gridLayout->setColumnMinimumWidth(2, cSuggestedColumnTwoWidth);
@@ -1931,8 +1931,8 @@ CWInstrOmiEdit::CWInstrOmiEdit(const struct instrumental_omi *d, QWidget *parent
 
   // files
   helperConstructCalInsFileWidgets(gridLayout, row,
-				   d->calibrationFile, sizeof(d->calibrationFile),
-				   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
+                   d->calibrationFile, sizeof(d->calibrationFile),
+                   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
 
   mainLayout->addLayout(gridLayout);
   mainLayout->addStretch(1);
@@ -2050,10 +2050,10 @@ CWInstrTropomiEdit::CWInstrTropomiEdit(const struct instrumental_tropomi *pInstr
   ++row;
 
   helperConstructCalInsFileWidgets(gridLayout, row,
-				   pInstrTropomi->calibrationFile, sizeof(pInstrTropomi->calibrationFile),
-				   pInstrTropomi->instrFunctionFile, sizeof(pInstrTropomi->instrFunctionFile));
+                   pInstrTropomi->calibrationFile, sizeof(pInstrTropomi->calibrationFile),
+                   pInstrTropomi->instrFunctionFile, sizeof(pInstrTropomi->instrFunctionFile));
 
-		m_trackSelection->setText(QString(pInstrTropomi->trackSelection));
+        m_trackSelection->setText(QString(pInstrTropomi->trackSelection));
 }
 
 void CWInstrTropomiEdit::apply(struct instrumental_tropomi *pInstrTropomi) const
@@ -2089,10 +2089,10 @@ CWInstrApexEdit::CWInstrApexEdit(const struct instrumental_apex *pInstrApex, QWi
   ++row;
 
   helperConstructCalInsFileWidgets(gridLayout, row,
-				   pInstrApex->calibrationFile, sizeof(pInstrApex->calibrationFile),
-				   pInstrApex->transmissionFunctionFile, sizeof(pInstrApex->transmissionFunctionFile));
+                   pInstrApex->calibrationFile, sizeof(pInstrApex->calibrationFile),
+                   pInstrApex->transmissionFunctionFile, sizeof(pInstrApex->transmissionFunctionFile));
 
-		m_trackSelection->setText(QString(pInstrApex->trackSelection));
+        m_trackSelection->setText(QString(pInstrApex->trackSelection));
 }
 
 void CWInstrApexEdit::apply(struct instrumental_apex *pInstrApex) const
@@ -2135,8 +2135,8 @@ CWInstrOceanOpticsEdit::CWInstrOceanOpticsEdit(const struct instrumental_oceanop
 
   // files
   helperConstructCalInsFileWidgets(bottomLayout, row,
-				   d->calibrationFile, sizeof(d->calibrationFile),
-				   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
+                   d->calibrationFile, sizeof(d->calibrationFile),
+                   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
 
   bottomLayout->setColumnMinimumWidth(0, cSuggestedColumnZeroWidth);
   bottomLayout->setColumnMinimumWidth(2, cSuggestedColumnTwoWidth);
@@ -2191,10 +2191,10 @@ CWInstrGemsEdit::CWInstrGemsEdit(const struct instrumental_gems *pInstrGems, QWi
   ++row;
 
   helperConstructCalInsFileWidgets(gridLayout, row,
-				   pInstrGems->calibrationFile, sizeof(pInstrGems->calibrationFile),
-				   pInstrGems->transmissionFunctionFile, sizeof(pInstrGems->transmissionFunctionFile));
+                   pInstrGems->calibrationFile, sizeof(pInstrGems->calibrationFile),
+                   pInstrGems->transmissionFunctionFile, sizeof(pInstrGems->transmissionFunctionFile));
 
-		m_trackSelection->setText(QString(pInstrGems->trackSelection));
+        m_trackSelection->setText(QString(pInstrGems->trackSelection));
 }
 
 void CWInstrGemsEdit::apply(struct instrumental_gems *pInstrGems) const

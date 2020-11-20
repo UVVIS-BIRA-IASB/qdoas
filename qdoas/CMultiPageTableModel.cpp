@@ -146,7 +146,7 @@ QVariant CMultiPageTableModel::data(const QModelIndex &index, int role) const
     QVariant::Type type = m_currentPage->cellData(index.row(), index.column()).type();
     
     return QVariant((type == QVariant::Int || type == QVariant::Double) ?
-		    Qt::AlignRight : Qt::AlignLeft);
+            Qt::AlignRight : Qt::AlignLeft);
   }
 
   return QVariant();

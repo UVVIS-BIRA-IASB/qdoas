@@ -92,11 +92,11 @@ typedef struct _airborneData
   unsigned char receivedPosition;
   unsigned char instrumentType;                                                 // 0 for MobileDOAS, 1 for airborne measurements;
   float         outsideTemp,
-	               humidity,
-	               dewPoint,
-	               pressure,
-	               altitudeP,
-	               insideTemp;
+                   humidity,
+                   dewPoint,
+                   pressure,
+                   altitudeP,
+                   insideTemp;
 
   struct time   endMeas;
 
@@ -115,9 +115,9 @@ AIRBORNE_DATA;
 
 typedef struct _airborneDrk
  {
- 	double *darkCurrent;
- 	float   exposureTime;
- 	int     ndrk;
+     double *darkCurrent;
+     float   exposureTime;
+     int     ndrk;
  }
 AIRBORNE_DARK;
 
@@ -137,23 +137,23 @@ int airboneDarkCurrentTintN=0;                                                  
 
 void AIRBORNE_ReleaseBuffers(void)
  {
- 	// Declaration
+     // Declaration
 
- 	AIRBORNE_DARK *pDrk;
- 	char str[40];
+     AIRBORNE_DARK *pDrk;
+     char str[40];
 
- 	// Release allocated buffers
+     // Release allocated buffers
 
- 	for (int i=0;i<airboneDarkCurrentTintN;i++)
- 	 {
- 	 	pDrk=&airborneDarkCurrent[i];
- 	 	sprintf(str,"AirborneDarkCurrent_%d",i);
+     for (int i=0;i<airboneDarkCurrentTintN;i++)
+      {
+          pDrk=&airborneDarkCurrent[i];
+          sprintf(str,"AirborneDarkCurrent_%d",i);
 
- 	  if (pDrk->darkCurrent!=NULL)
- 	   MEMORY_ReleaseDVector("AIRBORNE_ReleaseBuffers ",str,pDrk->darkCurrent,0);
- 	 }
+       if (pDrk->darkCurrent!=NULL)
+        MEMORY_ReleaseDVector("AIRBORNE_ReleaseBuffers ",str,pDrk->darkCurrent,0);
+      }
 
- 	// Reinitialize buffers
+     // Reinitialize buffers
 
   memset(airborneDarkCurrent,0,sizeof(AIRBORNE_DARK)*MAX_DRK_TINT);
   for (int i=0;i<airboneDarkCurrentTintN;i++)
@@ -182,7 +182,7 @@ RC AIRBORNE_Set(ENGINE_CONTEXT *pEngineContext,FILE *specFp)
 
   AIRBORNE_DATA header;                                                         // record header
   AIRBORNE_DARK *pDrk;                                                          // pointer to dark current structure
- 	char str[40];                                                                 // name of vector to allocate
+     char str[40];                                                                 // name of vector to allocate
   const int n_wavel = NDET[0];                                                  // the size of the detector
   SZ_LEN fileLength;                                                            // the length of the file to load
   double *darkCurrent;                                                          // the dark current spectrum
@@ -214,7 +214,7 @@ RC AIRBORNE_Set(ENGINE_CONTEXT *pEngineContext,FILE *specFp)
      {
       for (nrecIndex=pEngineContext->recordNumber;!rc && (nrecIndex>0) && (airboneDarkCurrentTintN<MAX_DRK_TINT);nrecIndex--)
        {
-       	// Read the header from the end of file (dark currents should be at the end of the file)
+           // Read the header from the end of file (dark currents should be at the end of the file)
 
         fseek(specFp,(nrecIndex-1)*(sizeof(AIRBORNE_DATA)+sizeof(double)*n_wavel),SEEK_SET);
         fread(&header,sizeof(AIRBORNE_DATA),1,specFp);
@@ -240,10 +240,10 @@ RC AIRBORNE_Set(ENGINE_CONTEXT *pEngineContext,FILE *specFp)
 
         if (tintIndex<airboneDarkCurrentTintN)
          {
-         	pDrk=&airborneDarkCurrent[tintIndex];
-         	for (int i=0;i<n_wavel;i++)
-         	 pDrk->darkCurrent[i]+=darkCurrent[i];
-         	pDrk->ndrk++;
+             pDrk=&airborneDarkCurrent[tintIndex];
+             for (int i=0;i<n_wavel;i++)
+              pDrk->darkCurrent[i]+=darkCurrent[i];
+             pDrk->ndrk++;
          }
 
         // New integration time found, allocate a new buffer
@@ -258,11 +258,11 @@ RC AIRBORNE_Set(ENGINE_CONTEXT *pEngineContext,FILE *specFp)
           else
            {
             for (int i=0;i<n_wavel;i++)
-         	   pDrk->darkCurrent[i]=darkCurrent[i];
+                pDrk->darkCurrent[i]=darkCurrent[i];
 
-         	  pDrk->ndrk++;
-         	  pDrk->exposureTime=header.exposureTime*0.001;
-         	  airboneDarkCurrentTintN++;
+               pDrk->ndrk++;
+               pDrk->exposureTime=header.exposureTime*0.001;
+               airboneDarkCurrentTintN++;
            }
          }
        }
@@ -272,15 +272,15 @@ RC AIRBORNE_Set(ENGINE_CONTEXT *pEngineContext,FILE *specFp)
         pDrk=&airborneDarkCurrent[tintIndex];
         if (pDrk->ndrk>1)
          for (int i=0;i<n_wavel;i++)
-         	pDrk->darkCurrent[i]/=pDrk->ndrk;
+             pDrk->darkCurrent[i]/=pDrk->ndrk;
        }
      }
    }
 
   // Release allocated local buffer
 
- 	if (darkCurrent!=NULL)
- 	 MEMORY_ReleaseDVector("AIRBORNE_Set","DarkCurrent",darkCurrent,0);
+     if (darkCurrent!=NULL)
+      MEMORY_ReleaseDVector("AIRBORNE_Set","DarkCurrent",darkCurrent,0);
 
   // Return
 
@@ -359,28 +359,28 @@ RC AIRBORNE_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
     pRecord->uavBira.outsideTemp=(float)header.outsideTemp;
 
     pRecord->uavBira.pressure=(float)header.pressure;
- 	  pRecord->uavBira.dewPoint=(float)header.dewPoint;
- 	  pRecord->uavBira.humidity=(float)header.humidity;
- 	  pRecord->uavBira.altitudeP=(float)header.altitudeP;
- 	  pRecord->uavBira.longitudeEnd=(float)header.longitudeEnd;
- 	  pRecord->uavBira.latitudeEnd=(float)header.latitudeEnd;
- 	  pRecord->uavBira.altitudeEnd=(float)header.altitudeEnd;
- 	  pRecord->uavBira.pitch=(float)header.pitch;
- 	  pRecord->uavBira.roll=(float)header.roll;
- 	  pRecord->uavBira.heading=(float)header.heading;
+       pRecord->uavBira.dewPoint=(float)header.dewPoint;
+       pRecord->uavBira.humidity=(float)header.humidity;
+       pRecord->uavBira.altitudeP=(float)header.altitudeP;
+       pRecord->uavBira.longitudeEnd=(float)header.longitudeEnd;
+       pRecord->uavBira.latitudeEnd=(float)header.latitudeEnd;
+       pRecord->uavBira.altitudeEnd=(float)header.altitudeEnd;
+       pRecord->uavBira.pitch=(float)header.pitch;
+       pRecord->uavBira.roll=(float)header.roll;
+       pRecord->uavBira.heading=(float)header.heading;
 
- 	  if (header.useNexstarFlag)
- 	   {
- 	    pRecord->elevationViewAngle=(double)header.viewElev;
- 	    pRecord->azimuthViewAngle=(double)header.viewAzim;
- 	   }
+       if (header.useNexstarFlag)
+        {
+         pRecord->elevationViewAngle=(double)header.viewElev;
+         pRecord->azimuthViewAngle=(double)header.viewAzim;
+        }
 
- 	  memcpy(&pRecord->uavBira.startTime.thetime,&header.now,sizeof(struct time));
- 	  memcpy(&pRecord->uavBira.endTime.thetime,&header.endMeas,sizeof(struct time));
+       memcpy(&pRecord->uavBira.startTime.thetime,&header.now,sizeof(struct time));
+       memcpy(&pRecord->uavBira.endTime.thetime,&header.endMeas,sizeof(struct time));
 
- 	  pRecord->uavBira.startTime.millis=(int)header.msBegin;
- 	  pRecord->uavBira.endTime.millis=(int)header.msEnd;
- 	  pRecord->uavBira.startTime.microseconds=0;
+       pRecord->uavBira.startTime.millis=(int)header.msBegin;
+       pRecord->uavBira.endTime.millis=(int)header.msEnd;
+       pRecord->uavBira.startTime.microseconds=0;
     pRecord->uavBira.endTime.microseconds=0;
 
     nsec1=pRecord->uavBira.startTime.thetime.ti_hour*3600+pRecord->uavBira.startTime.thetime.ti_min*60+pRecord->uavBira.startTime.thetime.ti_sec;
@@ -389,16 +389,16 @@ RC AIRBORNE_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
     if (nsec2<nsec1)
      nsec2+=86400;
 
- 	  // memcpy(&pRecord->uavBira.gpsStartTime,&header.gpsTime,sizeof(struct time));           // to delete -> to confirm by Alexis
- 	  // memcpy(&pRecord->uavBira.gpsEndTime,&header.gpsTimeEnd,sizeof(struct time));
+       // memcpy(&pRecord->uavBira.gpsStartTime,&header.gpsTime,sizeof(struct time));           // to delete -> to confirm by Alexis
+       // memcpy(&pRecord->uavBira.gpsEndTime,&header.gpsTimeEnd,sizeof(struct time));
 
- 	  double longitude=-pRecord->longitude;
+       double longitude=-pRecord->longitude;
 
-	   pRecord->Tm=(double)(ZEN_NbSec(&pRecord->present_datetime.thedate,&header.now,0)+0.001*header.msBegin+ZEN_NbSec(&pRecord->present_datetime.thedate,&header.endMeas,0)+0.001*header.msEnd)*0.5;
+       pRecord->Tm=(double)(ZEN_NbSec(&pRecord->present_datetime.thedate,&header.now,0)+0.001*header.msBegin+ZEN_NbSec(&pRecord->present_datetime.thedate,&header.endMeas,0)+0.001*header.msEnd)*0.5;
     pRecord->Zm=(double)ZEN_FNTdiz(ZEN_FNCrtjul(&pRecord->Tm),&longitude,&pRecord->latitude,&pRecord->Azimuth);
     pRecord->TotalAcqTime=(double)header.totalTime;
     pRecord->TotalExpTime=(double)nsec2-nsec1;
-	   pRecord->maxdoas.measurementType=(header.measType!=0)?(char)header.measType:PRJCT_INSTR_MAXDOAS_TYPE_ZENITH;
+       pRecord->maxdoas.measurementType=(header.measType!=0)?(char)header.measType:PRJCT_INSTR_MAXDOAS_TYPE_ZENITH;
 
     if (header.endMeas.ti_hour || header.endMeas.ti_min || header.endMeas.ti_sec)
      pRecord->TimeDec=(double)(header.now.ti_hour+header.now.ti_min/60.+(header.now.ti_sec+0.001*header.msBegin)/3600.+header.endMeas.ti_hour+header.endMeas.ti_min/60.+(header.endMeas.ti_sec+0.001*header.msEnd)/3600.)*0.5;
@@ -409,12 +409,12 @@ RC AIRBORNE_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
 
     if (!header.endMeas.ti_hour && !header.endMeas.ti_min && !header.endMeas.ti_sec)
      {
- 	    memcpy(&header.endMeas,&header.now,sizeof(struct time));
- 	    memcpy(&pRecord->present_datetime.thetime,&header.now,sizeof(struct time));
- 	    pRecord->present_datetime.millis=0;
- 	   }
- 	  else
- 	   {
+         memcpy(&header.endMeas,&header.now,sizeof(struct time));
+         memcpy(&pRecord->present_datetime.thetime,&header.now,sizeof(struct time));
+         pRecord->present_datetime.millis=0;
+        }
+       else
+        {
       pRecord->present_datetime.thetime.ti_hour=(int)floor(timeDec);
       timeDec=(timeDec-(double)pRecord->present_datetime.thetime.ti_hour)*60.;
       pRecord->present_datetime.thetime.ti_min=(int)floor(timeDec);
@@ -433,9 +433,9 @@ RC AIRBORNE_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
 
     if (pEngineContext->maxdoasFlag)
      {
-     	INDEX tintIndex,i;
+         INDEX tintIndex,i;
 
-     	// Check for the integration time in already loaded dark currents
+         // Check for the integration time in already loaded dark currents
 
       for (tintIndex=0;tintIndex<airboneDarkCurrentTintN;tintIndex++)
        if (fabs((double)pRecord->Tint-airborneDarkCurrent[tintIndex].exposureTime)<(double)1.e-6)
@@ -443,7 +443,7 @@ RC AIRBORNE_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
 
       if (tintIndex<airboneDarkCurrentTintN)
        {
-       	pDrk=&airborneDarkCurrent[tintIndex];
+           pDrk=&airborneDarkCurrent[tintIndex];
         for (i=0;i<n_wavel;i++)
          spectrum[i]-=pDrk->darkCurrent[i];
        }

@@ -13,9 +13,9 @@ void writePaths(FILE *fp)
 
   // paths
   fprintf(fp, "  <paths>\n"
-	  "    <!-- upto 10 paths can be specified (index 0 to 9). Any file or directory name in the  -->\n"
-	  "    <!-- raw_spectra tree that begins with %%? (where ? is a single digit) is expanded with -->\n"
-	  "    <!-- the correponding path.                                                            -->\n\n");
+      "    <!-- upto 10 paths can be specified (index 0 to 9). Any file or directory name in the  -->\n"
+      "    <!-- raw_spectra tree that begins with %%? (where ? is a single digit) is expanded with -->\n"
+      "    <!-- the correponding path.                                                            -->\n\n");
 
   for (int i=0; i<10; ++i) {
     QString path = pathMgr->path(i);
@@ -65,35 +65,35 @@ void writeFilter(FILE *fp, size_t nIndent, const char *passband, const mediate_f
   fprintf(fp, ">\n");
 
   fprintf(fp, "%s  <kaiser cutoff=\"%f\" tolerance=\"%f\" passband=\"%f\" iterations=\"%d\" cal=\"%s\" fit=\"%s\" div=\"%s\" />\n", buf,
-	  d->kaiser.cutoffFrequency, d->kaiser.tolerance, d->kaiser.passband, d->kaiser.iterations,
-	  (d->kaiser.usage.calibrationFlag ? sTrue : sFalse),
-	  (d->kaiser.usage.fittingFlag ? sTrue : sFalse),
-	  (d->kaiser.usage.divide ? sTrue : sFalse));
+      d->kaiser.cutoffFrequency, d->kaiser.tolerance, d->kaiser.passband, d->kaiser.iterations,
+      (d->kaiser.usage.calibrationFlag ? sTrue : sFalse),
+      (d->kaiser.usage.fittingFlag ? sTrue : sFalse),
+      (d->kaiser.usage.divide ? sTrue : sFalse));
   fprintf(fp, "%s  <boxcar width=\"%d\" iterations=\"%d\" cal=\"%s\" fit=\"%s\" div=\"%s\" />\n", buf,
-	  d->boxcar.width, d->boxcar.iterations,
-	  (d->boxcar.usage.calibrationFlag ? sTrue : sFalse),
-	  (d->boxcar.usage.fittingFlag ? sTrue : sFalse),
-	  (d->boxcar.usage.divide ? sTrue : sFalse));
+      d->boxcar.width, d->boxcar.iterations,
+      (d->boxcar.usage.calibrationFlag ? sTrue : sFalse),
+      (d->boxcar.usage.fittingFlag ? sTrue : sFalse),
+      (d->boxcar.usage.divide ? sTrue : sFalse));
   fprintf(fp, "%s  <gaussian fwhm=\"%f\" iterations=\"%d\" cal=\"%s\" fit=\"%s\" div=\"%s\" />\n", buf,
-	  d->gaussian.fwhm, d->gaussian.iterations,
-	  (d->gaussian.usage.calibrationFlag ? sTrue : sFalse),
-	  (d->gaussian.usage.fittingFlag ? sTrue : sFalse),
-	  (d->gaussian.usage.divide ? sTrue : sFalse));
+      d->gaussian.fwhm, d->gaussian.iterations,
+      (d->gaussian.usage.calibrationFlag ? sTrue : sFalse),
+      (d->gaussian.usage.fittingFlag ? sTrue : sFalse),
+      (d->gaussian.usage.divide ? sTrue : sFalse));
   fprintf(fp, "%s  <triangular width=\"%d\" iterations=\"%d\" cal=\"%s\" fit=\"%s\" div=\"%s\" />\n", buf,
-	  d->triangular.width, d->triangular.iterations,
-	  (d->triangular.usage.calibrationFlag ? sTrue : sFalse),
-	  (d->triangular.usage.fittingFlag ? sTrue : sFalse),
-	  (d->triangular.usage.divide ? sTrue : sFalse));
+      d->triangular.width, d->triangular.iterations,
+      (d->triangular.usage.calibrationFlag ? sTrue : sFalse),
+      (d->triangular.usage.fittingFlag ? sTrue : sFalse),
+      (d->triangular.usage.divide ? sTrue : sFalse));
   fprintf(fp, "%s  <savitzky_golay width=\"%d\" order=\"%d\" iterations=\"%d\" cal=\"%s\" fit=\"%s\" div=\"%s\" />\n", buf,
-	  d->savitzky.width, d->savitzky.order, d->savitzky.iterations,
-	  (d->savitzky.usage.calibrationFlag ? sTrue : sFalse),
-	  (d->savitzky.usage.fittingFlag ? sTrue : sFalse),
-	  (d->savitzky.usage.divide ? sTrue : sFalse));
+      d->savitzky.width, d->savitzky.order, d->savitzky.iterations,
+      (d->savitzky.usage.calibrationFlag ? sTrue : sFalse),
+      (d->savitzky.usage.fittingFlag ? sTrue : sFalse),
+      (d->savitzky.usage.divide ? sTrue : sFalse));
   fprintf(fp, "%s  <binomial width=\"%d\" iterations=\"%d\" cal=\"%s\" fit=\"%s\" div=\"%s\" />\n", buf,
-	  d->binomial.width, d->binomial.iterations,
-	  (d->binomial.usage.calibrationFlag ? sTrue : sFalse),
-	  (d->binomial.usage.fittingFlag ? sTrue : sFalse),
-	  (d->binomial.usage.divide ? sTrue : sFalse));
+      d->binomial.width, d->binomial.iterations,
+      (d->binomial.usage.calibrationFlag ? sTrue : sFalse),
+      (d->binomial.usage.fittingFlag ? sTrue : sFalse),
+      (d->binomial.usage.divide ? sTrue : sFalse));
   fprintf(fp, "%s</%spass_filter>\n", buf, passband);
 }
 
@@ -157,7 +157,7 @@ void writeSlitFunction(FILE *fp, size_t nIndent, const mediate_slit_function_t *
   tmpStr = pathMgr->simplifyPath(QString(d->voigt.filename));
   tmpStr2 = pathMgr->simplifyPath(QString(d->voigt.filename2));
   fprintf(fp, "%s  <voigt fwhmleft=\"%.3f\" fwhmright=\"%.3f\" glrleft=\"%.3f\" glrright=\"%.3f\" wveDptFlag=\"%s\" file=\"%s\" file2=\"%s\" />\n",
-	  buf, d->voigt.fwhmL, d->voigt.fwhmR, d->voigt.glRatioL, d->voigt.glRatioR,(d->voigt.wveDptFlag ? sTrue : sFalse),tmpStr.toLocal8Bit().data(), tmpStr2.toLocal8Bit().data());
+      buf, d->voigt.fwhmL, d->voigt.fwhmR, d->voigt.glRatioL, d->voigt.glRatioR,(d->voigt.wveDptFlag ? sTrue : sFalse),tmpStr.toLocal8Bit().data(), tmpStr2.toLocal8Bit().data());
   tmpStr = pathMgr->simplifyPath(QString(d->error.filename));
   tmpStr2 = pathMgr->simplifyPath(QString(d->error.filename2));
   fprintf(fp, "%s  <error fwhm=\"%.3f\" width=\"%.3f\" wveDptFlag=\"%s\" file=\"%s\" file2=\"%s\" />\n", buf, d->error.fwhm, d->error.width,(d->error.wveDptFlag ? sTrue : sFalse),tmpStr.toLocal8Bit().data(), tmpStr2.toLocal8Bit().data());
@@ -169,9 +169,9 @@ void writeSlitFunction(FILE *fp, size_t nIndent, const mediate_slit_function_t *
   tmpStr3 = pathMgr->simplifyPath(QString(d->supergauss.filename3));
   fprintf(fp, "%s  <supergauss fwhm=\"%.3f\" expTerm=\"%.3f\" asym=\"%.3f\" wveDptFlag=\"%s\" file=\"%s\" file2=\"%s\" file3=\"%s\" />\n", buf, d->supergauss.fwhm, d->supergauss.exponential,d->supergauss.asym,(d->supergauss.wveDptFlag ? sTrue : sFalse),tmpStr.toLocal8Bit().data(), tmpStr2.toLocal8Bit().data(), tmpStr3.toLocal8Bit().data());
   fprintf(fp, "%s  <boxcarapod resolution=\"%.3f\" phase=\"%.3f\" />\n", buf,
-	  d->boxcarapod.resolution, d->boxcarapod.phase);
+      d->boxcarapod.resolution, d->boxcarapod.phase);
   fprintf(fp, "%s  <nbsapod resolution=\"%.3f\" phase=\"%.3f\" />\n", buf,
-	  d->nbsapod.resolution, d->nbsapod.phase);
+      d->nbsapod.resolution, d->nbsapod.phase);
 
   fprintf(fp, "%s</slit_func>\n", buf);
 }

@@ -76,7 +76,7 @@ bool CEngineRequestSetProject::process(CEngineThread *engineThread)
   CEngineResponse *resp = new CEngineResponseVisual;
 
   int rc = mediateRequestSetProject(engineThread->engineContext(),
-				    &m_project, m_opMode, resp);
+                    &m_project, m_opMode, resp);
 
 
   // post the response
@@ -88,7 +88,7 @@ bool CEngineRequestSetProject::process(CEngineThread *engineThread)
 //------------------------------------------------------------
 
 CEngineRequestSetAnalysisWindows::CEngineRequestSetAnalysisWindows(const mediate_analysis_window_t *windowList, int nWindows,
-								   int opMode) :
+                                   int opMode) :
   m_windowList(NULL),
   m_nWindows(0),
   m_opMode(opMode)
@@ -114,7 +114,7 @@ bool CEngineRequestSetAnalysisWindows::process(CEngineThread *engineThread)
   CEngineResponse *resp = new CEngineResponseVisual;
 
   int rc = mediateRequestSetAnalysisWindows(engineThread->engineContext(),
-					    m_nWindows, m_windowList, m_opMode, resp);
+                        m_nWindows, m_windowList, m_opMode, resp);
 
   // post the response
   engineThread->respond(resp);
@@ -144,7 +144,7 @@ bool CEngineRequestSetSymbols::process(CEngineThread *engineThread)
   CEngineResponse *resp = new CEngineResponseVisual;
 
   int rc = mediateRequestSetSymbols(engineThread->engineContext(),
-				    m_nSymbols, m_symbolList, resp);
+                    m_nSymbols, m_symbolList, resp);
 
   // post the response
   engineThread->respond(resp);
@@ -174,7 +174,7 @@ bool CEngineRequestSetSites::process(CEngineThread *engineThread)
   CEngineResponse *resp = new CEngineResponseVisual;
 
   int rc = mediateRequestSetSites(engineThread->engineContext(),
-				  m_nSites, m_siteList, resp);
+                  m_nSites, m_siteList, resp);
 
   // post the response
   engineThread->respond(resp);
@@ -192,7 +192,7 @@ bool CEngineRequestBeginBrowseFile::process(CEngineThread *engineThread)
   CEngineResponseBeginAccessFile *resp = new CEngineResponseBeginAccessFile(m_fileName);
 
   int rc = mediateRequestBeginBrowseSpectra(engineThread->engineContext(),
-					    m_fileName.toLocal8Bit().constData(), resp);
+                        m_fileName.toLocal8Bit().constData(), resp);
 
   resp->setNumberOfRecords(rc); // -1 if an error occurred
 
@@ -210,7 +210,7 @@ bool CEngineRequestBrowseNextRecord::process(CEngineThread *engineThread)
   CEngineResponseSpecificRecord *resp = new CEngineResponseSpecificRecord;
 
   int rc = mediateRequestNextMatchingBrowseSpectrum(engineThread->engineContext(),
-						    resp);
+                            resp);
 
   resp->setRecordNumber(rc); // -1 if an error occurred
 
@@ -228,12 +228,12 @@ bool CEngineRequestBrowseSpecificRecord::process(CEngineThread *engineThread)
   CEngineResponseSpecificRecord *resp = new CEngineResponseSpecificRecord;
 
   int rc = mediateRequestGotoSpectrum(engineThread->engineContext(),
-				      m_recordNumber, resp);
+                      m_recordNumber, resp);
 
   if (rc > 0) {
     // successfully positioned .. now browse
     rc = mediateRequestNextMatchingBrowseSpectrum(engineThread->engineContext(),
-						  resp);
+                          resp);
 
     resp->setRecordNumber(rc); // -1 if an error occurred
   }
@@ -254,7 +254,7 @@ bool CEngineRequestBeginExportFile::process(CEngineThread *engineThread)
   CEngineResponseBeginAccessFile *resp = new CEngineResponseBeginAccessFile(m_fileName);
 
   int rc = mediateRequestBeginExportSpectra(engineThread->engineContext(),
-					    m_fileName.toLocal8Bit().constData(), resp);
+                        m_fileName.toLocal8Bit().constData(), resp);
 
   resp->setNumberOfRecords(rc); // -1 if an error occurred
 
@@ -272,7 +272,7 @@ bool CEngineRequestExportNextRecord::process(CEngineThread *engineThread)
   CEngineResponseSpecificRecord *resp = new CEngineResponseSpecificRecord;
 
   int rc = mediateRequestNextMatchingBrowseSpectrum(engineThread->engineContext(),
-						    resp);
+                            resp);
 
   resp->setRecordNumber(rc); // -1 if an error occurred
 
@@ -290,12 +290,12 @@ bool CEngineRequestExportSpecificRecord::process(CEngineThread *engineThread)
   CEngineResponseSpecificRecord *resp = new CEngineResponseSpecificRecord;
 
   int rc = mediateRequestGotoSpectrum(engineThread->engineContext(),
-				      m_recordNumber, resp);
+                      m_recordNumber, resp);
 
   if (rc > 0) {
     // successfully positioned .. now Export
     rc = mediateRequestNextMatchingBrowseSpectrum(engineThread->engineContext(),
-						  resp);
+                          resp);
 
     resp->setRecordNumber(rc); // -1 if an error occurred
   }
@@ -317,7 +317,7 @@ bool CEngineRequestBeginAnalyseFile::process(CEngineThread *engineThread)
 
   int rc = mediateRequestBeginAnalyseSpectra(engineThread->engineContext(),
                                              CWorkSpace::instance()->getConfigFile().toLocal8Bit().constData(),
-					     m_fileName.toLocal8Bit().constData(), resp);
+                         m_fileName.toLocal8Bit().constData(), resp);
 
   resp->setNumberOfRecords(rc); // -1 if an error occurred
 
@@ -335,7 +335,7 @@ bool CEngineRequestAnalyseNextRecord::process(CEngineThread *engineThread)
   CEngineResponseSpecificRecord *resp = new CEngineResponseSpecificRecord;
 
   int rc = mediateRequestNextMatchingAnalyseSpectrum(engineThread->engineContext(),
-						     resp);
+                             resp);
 
   resp->setRecordNumber(rc); // -1 if an error occurred
 
@@ -353,12 +353,12 @@ bool CEngineRequestAnalyseSpecificRecord::process(CEngineThread *engineThread)
   CEngineResponseSpecificRecord *resp = new CEngineResponseSpecificRecord;
 
   int rc = mediateRequestGotoSpectrum(engineThread->engineContext(),
-				      m_recordNumber, resp);
+                      m_recordNumber, resp);
 
   if (rc > 0) {
     // successfully positioned .. now analyse
     rc = mediateRequestNextMatchingAnalyseSpectrum(engineThread->engineContext(),
-						   resp);
+                           resp);
 
     resp->setRecordNumber(rc); // -1 if an error occurred
   }
@@ -379,7 +379,7 @@ bool CEngineRequestBeginCalibrateFile::process(CEngineThread *engineThread)
   CEngineResponseBeginAccessFile *resp = new CEngineResponseBeginAccessFile(m_fileName);
 
   int rc = mediateRequestBeginCalibrateSpectra(engineThread->engineContext(),
-					    m_fileName.toLocal8Bit().constData(), resp);
+                        m_fileName.toLocal8Bit().constData(), resp);
 
   resp->setNumberOfRecords(rc); // -1 if an error occurred
 
@@ -397,7 +397,7 @@ bool CEngineRequestCalibrateNextRecord::process(CEngineThread *engineThread)
   CEngineResponseSpecificRecord *resp = new CEngineResponseSpecificRecord;
 
   int rc = mediateRequestNextMatchingCalibrateSpectrum(engineThread->engineContext(),
-						    resp);
+                            resp);
 
   resp->setRecordNumber(rc); // -1 if an error occurred
 
@@ -415,12 +415,12 @@ bool CEngineRequestCalibrateSpecificRecord::process(CEngineThread *engineThread)
   CEngineResponseSpecificRecord *resp = new CEngineResponseSpecificRecord;
 
   int rc = mediateRequestGotoSpectrum(engineThread->engineContext(),
-				      m_recordNumber, resp);
+                      m_recordNumber, resp);
 
   if (rc > 0) {
     // successfully positioned .. now analyse
     rc = mediateRequestNextMatchingCalibrateSpectrum(engineThread->engineContext(),
-						   resp);
+                           resp);
 
     resp->setRecordNumber(rc); // -1 if an error occurred
   }

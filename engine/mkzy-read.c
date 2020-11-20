@@ -108,24 +108,24 @@ MKZY_HEADER;
 
 typedef struct MKZY_RECORDINFO
  {
- 	        //! \details
- 	        //! The checksum is calculated on the uncompressed data; it is used to check that the compression worked properly. \n
- 	        //! The checksum can be calculated with the following routine in C :\n\n
- 	        //! \code
- 	        //!      MKZY_RECORDINFO mkzy;
- 	        //!      uint32_t spec[];              // containing the spectral data points
- 	        //!      int speclen;                 // containing the number of datapoints stored in the previous vector
- 	        //!      int i;
- 	        //!      unsigned short checksum;
- 	        //!      unsigned short *p;
- 	        //!
- 	        //!      checksum=0L;
- 	        //!      for (i=0;i<speclen;i++)
- 	        //!       checksum += spec[i];
- 	        //!
- 	        //!      p=(unsigned short *)&checksum;
- 	        //!      mkzy.checksum=p[0]+p[1];
- 	        //! \endcode
+             //! \details
+             //! The checksum is calculated on the uncompressed data; it is used to check that the compression worked properly. \n
+             //! The checksum can be calculated with the following routine in C :\n\n
+             //! \code
+             //!      MKZY_RECORDINFO mkzy;
+             //!      uint32_t spec[];              // containing the spectral data points
+             //!      int speclen;                 // containing the number of datapoints stored in the previous vector
+             //!      int i;
+             //!      unsigned short checksum;
+             //!      unsigned short *p;
+             //!
+             //!      checksum=0L;
+             //!      for (i=0;i<speclen;i++)
+             //!       checksum += spec[i];
+             //!
+             //!      p=(unsigned short *)&checksum;
+             //!      mkzy.checksum=p[0]+p[1];
+             //! \endcode
 
   unsigned short checksum;
 
@@ -198,7 +198,7 @@ MKZY_RECORDINFO;
 
 int MKZY_UnPack(unsigned char *inpek,int kvar,int *ut)
  {
- 	// Declarations
+     // Declarations
 
   int *utpek=NULL;
   short len,curr;
@@ -384,7 +384,7 @@ RC MKZY_ReadRecord(ENGINE_CONTEXT *pEngineContext,int recordNo,FILE *specFp)
    rc=ERROR_ID_ALLOC;
   else
    {
-   	// Goto the requested record
+       // Goto the requested record
 
     fseek(specFp,(int32_t)pBuffers->recordIndexes[recordNo-1],SEEK_SET);
 
@@ -568,9 +568,9 @@ RC MKZY_SearchForOffset(ENGINE_CONTEXT *pEngineContext,FILE *specFp) {
    for (i=0;i<n_wavel;i++)
     darkCurrent[i]-=(double)offset[i]*pEngineContext->recordInfo.mkzy.darkScans/pEngineContext->recordInfo.mkzy.offsetScans;
 
- 	// Return
+     // Return
 
- 	return rc;
+     return rc;
  }
 
 // -----------------------------------------------------------------------------
@@ -682,22 +682,22 @@ RC MKZY_Set(ENGINE_CONTEXT *pEngineContext,FILE *specFp)
    rc=ERROR_ID_ALLOC;
   else
    {
-   	// load the buffer in one operation
+       // load the buffer in one operation
 
-   	fread(buffer,fileLength,1,specFp);
+       fread(buffer,fileLength,1,specFp);
 
-   	// search for the "magic" sequence of characters : MKZY
+       // search for the "magic" sequence of characters : MKZY
 
-   	for (ptr=buffer;(ptr-buffer<fileLength-4) && (pEngineContext->recordInfo.mkzy.recordNumber<pEngineContext->recordIndexesSize);ptr++)
-   	 if ((ptr[0]=='M') && (ptr[1]=='K') && (ptr[2]=='Z') && (ptr[3]=='Y'))
-  	  	recordIndexes[pEngineContext->recordInfo.mkzy.recordNumber++]=ptr-buffer;
+       for (ptr=buffer;(ptr-buffer<fileLength-4) && (pEngineContext->recordInfo.mkzy.recordNumber<pEngineContext->recordIndexesSize);ptr++)
+        if ((ptr[0]=='M') && (ptr[1]=='K') && (ptr[2]=='Z') && (ptr[3]=='Y'))
+            recordIndexes[pEngineContext->recordInfo.mkzy.recordNumber++]=ptr-buffer;
 
-  	 recordIndexes[pEngineContext->recordInfo.mkzy.recordNumber]=fileLength;
+       recordIndexes[pEngineContext->recordInfo.mkzy.recordNumber]=fileLength;
 
-  	 pEngineContext->recordNumber=pEngineContext->recordInfo.mkzy.recordNumber;  // !!!
+       pEngineContext->recordNumber=pEngineContext->recordInfo.mkzy.recordNumber;  // !!!
 
     if (!(rc=MKZY_SearchForOffset(pEngineContext,specFp)))
-  	  rc=MKZY_SearchForSky(pEngineContext,specFp);
+        rc=MKZY_SearchForSky(pEngineContext,specFp);
    }
 
   // Release allocated buffers
@@ -746,19 +746,19 @@ RC MKZY_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int localD
    rc=ERROR_ID_ALLOC;
   else
    {
-   	for (i=0;i<n_wavel;i++)
-   	 cumSpectrum[i]=(double)0;
-   	nRecord=0;
-   	indexRecord=recordNo;
+       for (i=0;i<n_wavel;i++)
+        cumSpectrum[i]=(double)0;
+       nRecord=0;
+       indexRecord=recordNo;
 
     //for (indexRecord=0;indexRecord<pEngineContext->recordInfo.mkzy.recordNumber;indexRecord++)
-   	 {
+        {
       if (!(rc=MKZY_ReadRecord(pEngineContext,indexRecord,specFp)))
        {
-       	if ((THRD_id!=THREAD_TYPE_SPECTRA) && (THRD_id!=THREAD_TYPE_EXPORT) &&
-       	   (!strncasecmp(pEngineContext->recordInfo.Nom,"dark",4) ||
-       	    !strncasecmp(pEngineContext->recordInfo.Nom,"sky",3) ||
-       	    !strncasecmp(pEngineContext->recordInfo.Nom,"offset",6)))
+           if ((THRD_id!=THREAD_TYPE_SPECTRA) && (THRD_id!=THREAD_TYPE_EXPORT) &&
+              (!strncasecmp(pEngineContext->recordInfo.Nom,"dark",4) ||
+               !strncasecmp(pEngineContext->recordInfo.Nom,"sky",3) ||
+               !strncasecmp(pEngineContext->recordInfo.Nom,"offset",6)))
 
          rc=ERROR_ID_FILE_RECORD;
 
@@ -767,18 +767,18 @@ RC MKZY_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int localD
         else if (!strncasecmp(pEngineContext->recordInfo.Nom,"offset",4))
          memcpy(spectrum,offset,sizeof(double)*n_wavel);
 
-  	 	   // Correct by offset and dark current
+              // Correct by offset and dark current
 
-  	     else if (pEngineContext->recordInfo.mkzy.darkFlag && pEngineContext->recordInfo.mkzy.offsetFlag) // similar MFC correction
-  	     {
+           else if (pEngineContext->recordInfo.mkzy.darkFlag && pEngineContext->recordInfo.mkzy.offsetFlag) // similar MFC correction
+           {
          for (i=0;i<n_wavel;i++)
           spectrum[i]-=(double)pEngineContext->recordInfo.NSomme*(offset[i]/pEngineContext->recordInfo.mkzy.offsetScans+
                                                       dark[i]*pEngineContext->recordInfo.Tint/(pEngineContext->recordInfo.mkzy.darkTint*pEngineContext->recordInfo.mkzy.darkScans));
         }
 
-  	 	   // Correct by the dark current only (used as offset
+              // Correct by the dark current only (used as offset
 
-  	     else if (pEngineContext->recordInfo.mkzy.darkFlag)
+           else if (pEngineContext->recordInfo.mkzy.darkFlag)
          for (i=0;i<n_wavel;i++)
           spectrum[i]-=(double)dark[i]*pEngineContext->recordInfo.NSomme/pEngineContext->recordInfo.mkzy.darkScans;
 

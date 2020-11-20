@@ -99,48 +99,48 @@ QValidator::State CDoubleExpFmtValidator::validate(QString &input, int &pos) con
   while (i < len) {
     if (i == 0) {
       if (input[0] == '.') {
-	havePoint = true;
+    havePoint = true;
       }
       else if (input[0].isDigit()) {
-	++lenMantisa;
+    ++lenMantisa;
       }
       else
-	return QValidator::Invalid;
+    return QValidator::Invalid;
     }
     else {
       if (input[i] == '.') {
-	if (havePoint) return QValidator::Invalid;
-	havePoint = true;
+    if (havePoint) return QValidator::Invalid;
+    havePoint = true;
       }
       else if (input[i] == 'e' || input[i] == 'E') {
-	if (haveExp || lenMantisa == 0) return QValidator::Invalid;
-	if (lenMantisa > m_sigFigures) return QValidator::Invalid;
-	haveExp = true;
-	++i;
-	if (i < len) {
-	  if (input[i].isDigit()) {
-	    ++lenExp;
-	    expMag = input[i].digitValue();
-	  }
-	  else if (input[i] != '+' && input[i] != '-')
-	    return QValidator::Invalid;
-	}
+    if (haveExp || lenMantisa == 0) return QValidator::Invalid;
+    if (lenMantisa > m_sigFigures) return QValidator::Invalid;
+    haveExp = true;
+    ++i;
+    if (i < len) {
+      if (input[i].isDigit()) {
+        ++lenExp;
+        expMag = input[i].digitValue();
+      }
+      else if (input[i] != '+' && input[i] != '-')
+        return QValidator::Invalid;
+    }
       }
       else if (input[i].isDigit()) {
-	if (haveExp) {
-	  ++lenExp;
-	  if (lenExp > 3) return QValidator::Invalid;
-	  expMag *= 10;
-	  expMag += input[i].digitValue();
-	  if (expMag > 307) return QValidator::Invalid;
-	}
-	else {
-	  ++lenMantisa;
-	  if (lenMantisa > m_sigFigures && input[i] != '0') return QValidator::Invalid;
-	}
+    if (haveExp) {
+      ++lenExp;
+      if (lenExp > 3) return QValidator::Invalid;
+      expMag *= 10;
+      expMag += input[i].digitValue();
+      if (expMag > 307) return QValidator::Invalid;
+    }
+    else {
+      ++lenMantisa;
+      if (lenMantisa > m_sigFigures && input[i] != '0') return QValidator::Invalid;
+    }
       }
       else
-	return QValidator::Invalid;
+    return QValidator::Invalid;
     }
     ++i;
   }
@@ -229,34 +229,34 @@ QValidator::State CDoubleFixedFmtValidator::validate(QString &input, int &pos) c
   while (i < len) {
     if (i == 0) {
       if (input[0] == '+' && m_top > 0.0) {
-	haveSign = true;
+    haveSign = true;
       }
       else if (input[0] == '-' && m_bottom < 0.0) {
-	haveSign = true;
+    haveSign = true;
       }
       else if (input[0] == '.') {
-	havePoint = true;
+    havePoint = true;
       }
       else if (input[0] == '.') {
-	havePoint = true;
+    havePoint = true;
       }
       else if (!input[0].isDigit()) {
-	return QValidator::Invalid;
+    return QValidator::Invalid;
       }
     }
     else {
       if (input[i] == '.') {
-	if (havePoint) return QValidator::Invalid;
-	havePoint = true;
+    if (havePoint) return QValidator::Invalid;
+    havePoint = true;
       }
       else if (input[i].isDigit()) {
-	if (havePoint) {
-	  ++lenDec;
-	  if (lenDec > m_decimals) return QValidator::Invalid;
-	}
+    if (havePoint) {
+      ++lenDec;
+      if (lenDec > m_decimals) return QValidator::Invalid;
+    }
       }
       else
-	return QValidator::Invalid;
+    return QValidator::Invalid;
     }
     ++i;
   }

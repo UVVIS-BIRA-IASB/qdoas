@@ -72,10 +72,10 @@ Q_OBJECT
   CPlotProperties &m_plotProperties;
   QwtPlotZoomer *m_zoomer;   
   int m_type;                
-	 QGraphicsView *m_dataView; 
-	 QGraphicsScene *m_dataScene;
-	 QPixmap m_dataPixmap,m_dataPixmapScaled;  
-	 QGraphicsPixmapItem *m_dataPixmapItem;
+     QGraphicsView *m_dataView; 
+     QGraphicsScene *m_dataScene;
+     QPixmap m_dataPixmap,m_dataPixmapScaled;  
+     QGraphicsPixmapItem *m_dataPixmapItem;
 };
 
 class CWPlotPage : public QFrame
@@ -84,7 +84,7 @@ Q_OBJECT
  public:
   CWPlotPage(CPlotProperties &plotProperties, QWidget *parent = 0);
   CWPlotPage(CPlotProperties &plotProperties,
-	     const RefCountConstPtr<CPlotPageData> &page, QWidget *parent = 0);
+         const RefCountConstPtr<CPlotPageData> &page, QWidget *parent = 0);
   virtual ~CWPlotPage() {};
 
   void layoutPlots(const QSize &visibleSize);

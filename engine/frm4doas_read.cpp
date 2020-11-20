@@ -441,10 +441,10 @@ RC FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
 
     // Later : add the selection of the measurement type in the instrumental page else if (!dateFlag && (measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_NONE))
     // Later : add the selection of the measurement type in the instrumental page  {
-    // Later : add the selection of the measurement type in the instrumental page  	if (((measurementType==PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS) && (pRecordInfo->maxdoas.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS) && (pRecordInfo->maxdoas.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_ZENITH)) ||
-    // Later : add the selection of the measurement type in the instrumental page  	    ((measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS) && (pRecordInfo->maxdoas.measurementType!=measurementType)))
+    // Later : add the selection of the measurement type in the instrumental page      if (((measurementType==PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS) && (pRecordInfo->maxdoas.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS) && (pRecordInfo->maxdoas.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_ZENITH)) ||
+    // Later : add the selection of the measurement type in the instrumental page          ((measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS) && (pRecordInfo->maxdoas.measurementType!=measurementType)))
     // Later : add the selection of the measurement type in the instrumental page
-    // Later : add the selection of the measurement type in the instrumental page  	 rc=ERROR_ID_FILE_RECORD;
+    // Later : add the selection of the measurement type in the instrumental page       rc=ERROR_ID_FILE_RECORD;
     // Later : add the selection of the measurement type in the instrumental page  }
    }
 

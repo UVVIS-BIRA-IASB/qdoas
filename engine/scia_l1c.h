@@ -86,7 +86,7 @@ typedef struct SPH_SCI_NLC_1C {
     char stop_long[12];
         /* Since Version 6, spare is replaced bin init_version, decont flag */
     char init_version[5]; /* Version init files (Version 6 onwards)           */
-    char decont[9];			/* Decontamination flag */
+    char decont[9];            /* Decontamination flag */
         /*  Spare (no longer used since Version 6) */
     char spare_1[50];
         /*  Key Data version (pattern XX.XX, e.g. 01.25) */
@@ -260,7 +260,7 @@ typedef struct ClCon
 
     /* These fields are calculated : both are usually equal integration time */
     /*   but in case of extreme short pets different */
-    // unsigned short meas_time;  	/* real used measurement time */
+    // unsigned short meas_time;      /* real used measurement time */
     // float true_int_time;
 }
 ClCon;

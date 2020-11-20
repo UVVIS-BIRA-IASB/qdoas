@@ -72,7 +72,7 @@ class CProjectAnalysisSubHandler : public CConfigSubHandler
 {
  public:
   CProjectAnalysisSubHandler(CConfigHandler *master,
-			    mediate_project_analysis_t *analysis);
+                mediate_project_analysis_t *analysis);
 
   virtual bool start(const QXmlAttributes &atts);
 
@@ -86,7 +86,7 @@ class CProjectRawSpectraSubHandler : public CConfigSubHandler
 {
  public:
   CProjectRawSpectraSubHandler(CConfigHandler *master,
-			      CProjectConfigTreeNode *node);
+                  CProjectConfigTreeNode *node);
 
   virtual bool start(const QString &element, const QXmlAttributes &atts);
 
@@ -100,7 +100,7 @@ class CProjectCalibrationSubHandler : public CConfigSubHandler
 {
  public:
   CProjectCalibrationSubHandler(CConfigHandler *master,
-			   mediate_project_calibration_t *calibration);
+               mediate_project_calibration_t *calibration);
 
   virtual bool start(const QXmlAttributes &atts);
   virtual bool start(const QString &element, const QXmlAttributes &atts);
@@ -115,7 +115,7 @@ class CProjectUndersamplingSubHandler : public CConfigSubHandler
 {
  public:
   CProjectUndersamplingSubHandler(CConfigHandler *master,
-			   mediate_project_undersampling_t *undersampling);
+               mediate_project_undersampling_t *undersampling);
 
   virtual bool start(const QXmlAttributes &atts);
 
@@ -129,7 +129,7 @@ class CProjectInstrumentalSubHandler : public CConfigSubHandler
 {
  public:
   CProjectInstrumentalSubHandler(CConfigHandler *master,
-			   mediate_project_instrumental_t *instrumental);
+               mediate_project_instrumental_t *instrumental);
 
   virtual bool start(const QXmlAttributes &atts);
   virtual bool start(const QString &element, const QXmlAttributes &atts);
@@ -154,7 +154,7 @@ class CProjectSlitSubHandler : public CConfigSubHandler
 {
  public:
   CProjectSlitSubHandler(CConfigHandler *master,
-			 mediate_project_slit_t *slit);
+             mediate_project_slit_t *slit);
 
   virtual bool start(const QXmlAttributes &atts);
   virtual bool start(const QString &element, const QXmlAttributes &atts);
@@ -169,7 +169,7 @@ class CProjectOutputSubHandler : public CSelectorSubHandler
 {
  public:
   CProjectOutputSubHandler(CConfigHandler *master,
-			   mediate_project_output_t *output);
+               mediate_project_output_t *output);
 
   virtual bool start(const QXmlAttributes &atts);
 
@@ -183,7 +183,7 @@ class CProjectExportSubHandler : public CSelectorSubHandler
 {
  public:
   CProjectExportSubHandler(CConfigHandler *master,
-			   mediate_project_export_t *exportSpectra);
+               mediate_project_export_t *exportSpectra);
 
   virtual bool start(const QXmlAttributes &atts);
 

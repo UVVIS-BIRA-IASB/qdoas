@@ -106,17 +106,17 @@
 
 char *STD_StrTrim(char *str)
  {
- 	// Declaration
+     // Declaration
 
- 	int i;
+     int i;
 
- 	// Browse characters from the end of the string
+     // Browse characters from the end of the string
 
- 	for (i=strlen(str)-1;i>=0;i--)
- 	 if ((str[i]=='\n') || (str[i]=='\r') || (str[i]=='\t') || (str[i]==' '))
- 	  str[i]='\0';
- 	 else
- 	  break;
+     for (i=strlen(str)-1;i>=0;i--)
+      if ((str[i]=='\n') || (str[i]=='\r') || (str[i]=='\t') || (str[i]==' '))
+       str[i]='\0';
+      else
+       break;
 
   // Return
 
@@ -321,7 +321,7 @@ char *STD_Strupr(char *n)
  {
   int i;
   for (i=0;n[i];i++)
-  	n[i] = (char)toupper(n[i]);
+      n[i] = (char)toupper(n[i]);
   return n;
  }
 
@@ -329,7 +329,7 @@ char *STD_Strlwr(char *n)
  {
   int i;
   for (i=0;n[i];i++)
-  	n[i] = (char)tolower(n[i]);
+      n[i] = (char)tolower(n[i]);
   return n;
  }
 
@@ -352,7 +352,7 @@ char *STD_StrRep(char *n,char oldchar,char newchar)
   int i;
   for (i=0;n[i];i++)
    if (n[i]==oldchar)
-  	 n[i] = newchar;
+       n[i] = newchar;
   return n;
  }
 
@@ -384,7 +384,7 @@ int STD_IsDir(char *filename)
    rc=-1;
   else
    {
-   	if ( ( fileinfo.st_mode & S_IFMT ) == S_IFDIR )
+       if ( ( fileinfo.st_mode & S_IFMT ) == S_IFDIR )
      rc=1;
     else
      rc=0;
@@ -409,7 +409,7 @@ int STD_IsDir(char *filename)
 
 long STD_FileLength(FILE *fp)
  {
- 	// Declarations
+     // Declarations
 
   int32_t fileSize=0L;                                                             // the size of the file
   int32_t oldPos;                                                                  // the position of the file pointer

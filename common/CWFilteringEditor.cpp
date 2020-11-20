@@ -35,9 +35,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <stdio.h>
 
 CWFilteringEditor::CWFilteringEditor(const mediate_filter_t *lowpass,
-				     const mediate_filter_t *highpass,
-				     enum UsageType highPassUsage,
-				     QWidget *parent) :
+                     const mediate_filter_t *highpass,
+                     enum UsageType highPassUsage,
+                     QWidget *parent) :
   QFrame(parent)
 {
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -230,7 +230,7 @@ void CWFilteringEditor::apply(mediate_filter_t *lowpass, mediate_filter_t *highp
 // FilterUsage helper ...
 
 CWFilterUsageEdit::CWFilterUsageEdit(const struct filter_usage *d, CWFilteringEditor::UsageType type,
-				     QWidget *parent) :
+                     QWidget *parent) :
   QFrame(parent)
 {
   m_state = *d; // blot copy state

@@ -61,8 +61,8 @@ typedef struct User_File_Info
     char *init_version ;     /* Version Initialisation files */
     char *decont ;           /* Decontamination flag */
     /* GADS calibration options */
-    char *l1b_product_name; 	/* L1b product name */
-    char cal_applied[17];	/* Numbers [0-7] of applied calibrations as string */
+    char *l1b_product_name;     /* L1b product name */
+    char cal_applied[17];    /* Numbers [0-7] of applied calibrations as string */
 } User_File_Info;
 
 
@@ -76,26 +76,26 @@ typedef struct user_data_pmd
 
 typedef struct user_data
 {
-    unsigned int n_wl;		/* number of spectral points */
-    unsigned short *pixel_nr;	/* pixel numbers */
-    unsigned short *pixel_ch;	/* channel of pixels */
-    unsigned short *pixel_cls;	/* cluster */
+    unsigned int n_wl;        /* number of spectral points */
+    unsigned short *pixel_nr;    /* pixel numbers */
+    unsigned short *pixel_ch;    /* channel of pixels */
+    unsigned short *pixel_cls;    /* cluster */
     unsigned short *pixel_coadd; /* co-adding, applied by reading routine */
-    float *wl;			/* wavelength */
-    float *wl_err;		/* wavelength error */
-    float *signal;		/* signal science channel */
-    float *signal_err;		/* signal error */
-    float int_time;		/* integration time (seconds) */
-    MJD mjd;			/* Date (Julian days after 1.1.2000 */
-    char date[29];		/* Date string */
-    L1_MDS_TYPE type;		/* which kind of data (nadir/limb/occ/monit?) */
-    GeoN  geo_nadir;		/* Structure for Geolocation */
+    float *wl;            /* wavelength */
+    float *wl_err;        /* wavelength error */
+    float *signal;        /* signal science channel */
+    float *signal_err;        /* signal error */
+    float int_time;        /* integration time (seconds) */
+    MJD mjd;            /* Date (Julian days after 1.1.2000 */
+    char date[29];        /* Date string */
+    L1_MDS_TYPE type;        /* which kind of data (nadir/limb/occ/monit?) */
+    GeoN  geo_nadir;        /* Structure for Geolocation */
     GeoL  geo_limb;
     GeoCal geo_cal;
-    unsigned int n_pmd;		/*  */
-    user_data_pmd *pmd;		/* integrated PMD readouts (if available)*/
-				/* orbit*/
-    GeoN   *pmd_geo_nadir;	/* Array for PMD - Geolocation */
+    unsigned int n_pmd;        /*  */
+    user_data_pmd *pmd;        /* integrated PMD readouts (if available)*/
+                /* orbit*/
+    GeoN   *pmd_geo_nadir;    /* Array for PMD - Geolocation */
     GeoL   *pmd_geo_limb;
 
     int n_readout;              /* Number of readout */
@@ -117,23 +117,23 @@ typedef struct user_data
     char *init_version ;     /* Version Initialisation files */
     char *decont ;           /* Decontamination flag */
     /* gads calibration options */
-    char *l1b_product_name; 	/* L1b product name */
-    char *cal_applied;	/* Numbers [0-7] of applied calibrations as string */
+    char *l1b_product_name;     /* L1b product name */
+    char *cal_applied;    /* Numbers [0-7] of applied calibrations as string */
 } user_data;
 
 /* structure for solar data in user format */
 
 typedef struct user_data_solar
 {
-    char sun_spect_id[3];	/* String with id of solar spectrum */
-    unsigned int n_wl;		/* number of spectral points */
-    unsigned short *pixel_nr;	/* pixel numbers */
-    unsigned short *pixel_ch;	/* channel of pixels */
-    float *wl;			/* wavelength */
-    float *signal;		/* signal science channel */
-    float *signal_err;		/* signal error */
+    char sun_spect_id[3];    /* String with id of solar spectrum */
+    unsigned int n_wl;        /* number of spectral points */
+    unsigned short *pixel_nr;    /* pixel numbers */
+    unsigned short *pixel_ch;    /* channel of pixels */
+    float *wl;            /* wavelength */
+    float *signal;        /* signal science channel */
+    float *signal_err;        /* signal error */
     MJD mjd;                    /* Date (Julian days after 1.1.2000 */
-    char date[28];		/* Date string */
+    char date[28];        /* Date string */
 /* information about the product
    (same for each readout)*/
     /* MPH */
@@ -146,8 +146,8 @@ typedef struct user_data_solar
     char *init_version ;     /* Version Initialisation files */
     char *decont ;           /* Decontamination flag */
     /* GADS calibration options */
-    char *l1b_product_name; 	/* L1b product name */
-    char *cal_applied;	/* Numbers [0-7] of applied calibrations as string */
+    char *l1b_product_name;     /* L1b product name */
+    char *cal_applied;    /* Numbers [0-7] of applied calibrations as string */
 } user_data_solar;
 
 
@@ -176,12 +176,12 @@ typedef struct state_cluster_data
 /* Sub structure to info_l1c to store info of used cluster */
 typedef struct cur_used_cluster
 {
-    short id;			/* cluster id */
-    int coadd;  		/* coadding factor to reach integration time */
-				/* of window */
-    int pix_start;		/* absolut start pix of cluster (0-8191)*/
-    int pix_length;		/*  length of cluster */
-    int pix_n;			/*  number of pixels really used */
+    short id;            /* cluster id */
+    int coadd;          /* coadding factor to reach integration time */
+                /* of window */
+    int pix_start;        /* absolut start pix of cluster (0-8191)*/
+    int pix_length;        /*  length of cluster */
+    int pix_n;            /*  number of pixels really used */
 } cur_used_cluster;
 
 typedef struct _stateClconMeastime
@@ -193,30 +193,30 @@ STATE_CLCON_MEASTIME;
 /* (DSD) info structure */
 typedef struct info_l1c
 {
-  FILE *FILE_l1c;		/* File handler for Lv1C - file */
+  FILE *FILE_l1c;        /* File handler for Lv1C - file */
   MPH mph;
   SPH_SCI_NLC_1C sph;
   User_File_Info user_file_info; /* Store user important information of product */
-  int num_dsd;		/* No. of DSDs */
-  DSD states;		/* state summary DSD */
+  int num_dsd;        /* No. of DSDs */
+  DSD states;        /* state summary DSD */
   DSD states_geolocation; /* geolocation of states DSD */
-  DSD nadir;		/* nadir DSD */
-  DSD limb;		/* limb DSD */
-  DSD occ;	        /* occultation  DSD */
-  DSD mon;	        /* monitoring DSD */
-  DSD nadir_pmd;	/* nadir PMD DSD */
-  DSD limb_pmd;		/* limb PMD DSD */
-  DSD occ_pmd;	        /* occultation PMD DSD */
-  DSD nadir_pol;	/* nadir fract. polarisaton DSD */
-  DSD limb_pol;		/* limb fract. polarisaton DSD */
-  DSD occ_pol;	        /* occultation fract. polarisaton DSD */
-  DSD sun_ref;	        /* sun reference DSD */
-  DSD specbas;	        /* spectral calibration basis DSD */
-  DSD specpar;	        /* spectral calibration paramters DSD */
-  DSD cal_options;	/* calibration options DSD */
+  DSD nadir;        /* nadir DSD */
+  DSD limb;        /* limb DSD */
+  DSD occ;            /* occultation  DSD */
+  DSD mon;            /* monitoring DSD */
+  DSD nadir_pmd;    /* nadir PMD DSD */
+  DSD limb_pmd;        /* limb PMD DSD */
+  DSD occ_pmd;            /* occultation PMD DSD */
+  DSD nadir_pol;    /* nadir fract. polarisaton DSD */
+  DSD limb_pol;        /* limb fract. polarisaton DSD */
+  DSD occ_pol;            /* occultation fract. polarisaton DSD */
+  DSD sun_ref;            /* sun reference DSD */
+  DSD specbas;            /* spectral calibration basis DSD */
+  DSD specpar;            /* spectral calibration paramters DSD */
+  DSD cal_options;    /* calibration options DSD */
   /* other DSDs may be added */
   int n_mds[MAX_MDS_TYPES]; /* No. of Measurem. data sets
-				 (previous 4 numbers); */
+                 (previous 4 numbers); */
   int n_pmd_mds[MAX_MDS_TYPES]; /* No of PMD datasets for each type; */
 
   ADS_STATES *ads_states;    /* Complete State info (Clusterdefs!)*/
@@ -243,59 +243,59 @@ typedef struct info_l1c
   float wl[NPIXEL];  /* Fixed wawelength grid */
   CAL_OPTIONS_GADS cal_options_GADS;   /*Calibration Options GADS*/
 
-  int cluster_ids[MAX_MDS_TYPES][64];	/* List of clusterids in File */
-  int max_cluster_ids[MAX_MDS_TYPES];	/* Number of clusterids */
+  int cluster_ids[MAX_MDS_TYPES][64];    /* List of clusterids in File */
+  int max_cluster_ids[MAX_MDS_TYPES];    /* Number of clusterids */
 
-  int cur_cluster_ids[64];	/* List of clusterids in this state */
-  int cur_max_cluster_ids;	/* Number of current clusterids */
+  int cur_cluster_ids[64];    /* List of clusterids in this state */
+  int cur_max_cluster_ids;    /* Number of current clusterids */
 
   int cur_state_nr[MAX_MDS_TYPES]; /* index to current state */
 
   int cur_mds_read[MAX_MDS_TYPES]; /* counter for MDS already read */
 
-  int cur_readout_in_state;	/* Actual readout for window in state */
+  int cur_readout_in_state;    /* Actual readout for window in state */
   int cur_max_readout_in_state; /* Max readouts in state */
-  int cur_pix_start;		/* Actual pix_window */
-  int cur_pix_end;		/* Actual pix_window */
-  int cur_pix_start_arr[64];	/* Actual pix_windows */
-  int cur_pix_end_arr[64];	/* Actual pix_windows */
-  int n_cur_pix;		/* number of pix_windows */
+  int cur_pix_start;        /* Actual pix_window */
+  int cur_pix_end;        /* Actual pix_window */
+  int cur_pix_start_arr[64];    /* Actual pix_windows */
+  int cur_pix_end_arr[64];    /* Actual pix_windows */
+  int n_cur_pix;        /* number of pix_windows */
 
-  float cur_wl_start;		/* Actual wl_window */
-  float cur_wl_end;		/* Actual wl_window */
-  float cur_wl_start_arr[64];	/* Actual wl_windows */
-  float cur_wl_end_arr[64];	/* Actual wl_windows */
-  float cur_wl_channel_arr[64];	/* Actual wl_windows */
-  int n_cur_wl;		/* number of wl_windows */
-				/* flag for real output */
+  float cur_wl_start;        /* Actual wl_window */
+  float cur_wl_end;        /* Actual wl_window */
+  float cur_wl_start_arr[64];    /* Actual wl_windows */
+  float cur_wl_end_arr[64];    /* Actual wl_windows */
+  float cur_wl_channel_arr[64];    /* Actual wl_windows */
+  int n_cur_wl;        /* number of wl_windows */
+                /* flag for real output */
   int cur_pix_output_flag[MAX_PIXELS];
 
-  int wanted_clusters[64];	/* User may define cluster only */
-  int n_wanted_clusters;	/* Number of user defined clusters */
+  int wanted_clusters[64];    /* User may define cluster only */
+  int n_wanted_clusters;    /* Number of user defined clusters */
 
-  int set_int_time;		/* wanted integration time for larger pixels */
+  int set_int_time;        /* wanted integration time for larger pixels */
   int max_int_time;           /* largest integration time in cluster set */
 
 //    short cur_used_clusters[64];/* List of really used clusters in current state */
-				/* actual cluster data */
-				/* coadding factor to reach integration time */
-				/* of window */
+                /* actual cluster data */
+                /* coadding factor to reach integration time */
+                /* of window */
 //    int coadd_cur_used_clusters[64];
-				/*  absolut start pix of cluster (0-8191)*/
+                /*  absolut start pix of cluster (0-8191)*/
 //    int pix_start_cur_used_clusters[64];
-				/*  length of cluster */
+                /*  length of cluster */
 //    int pix_end_cur_used_clusters[64];
-				/*  number of pixels really used */
+                /*  number of pixels really used */
 //    int pix_n_cur_used_clusters[64];
-				/*  list of really used clusters in current state*/
+                /*  list of really used clusters in current state*/
   cur_used_cluster cur_used_cl[64];
-				/*  total number of really used pixels */
+                /*  total number of really used pixels */
   int sum_pix_cur_used_clusters;
-  int geo_cur_used_clusters;	/* geolocation to use for output */
+  int geo_cur_used_clusters;    /* geolocation to use for output */
   int max_cur_used_clusters;  /* number of used clusters */
-  int cur_it;			/* Integration time currently used */
+  int cur_it;            /* Integration time currently used */
   int cur_num_pmd;
-				/* Data in one state */
+                /* Data in one state */
   state_cluster_data st_cl_data[64];
   Nadir_Pmd nadir_pmd_data;
     /* flag for recaculating limb TH */
@@ -309,38 +309,38 @@ typedef struct info_l1c
  *************************************************************/
 
 
-				/* Open L1c, specify what to read */
+                /* Open L1c, specify what to read */
 SCIA_err openL1c (char* FILE_name, info_l1c *info);
 
-				/* Close L1c */
+                /* Close L1c */
 SCIA_err closeL1c (info_l1c *info);
 
 
-				/* Read Solar spectrum */
+                /* Read Solar spectrum */
 SCIA_err read_solar (info_l1c *info,
-		      char *sun_spec_id,
-		      user_data_solar *ud);
-				/* Read nadir measurements one by one */
+              char *sun_spec_id,
+              user_data_solar *ud);
+                /* Read nadir measurements one by one */
 SCIA_err read_next_mds (info_l1c *info,
-			 user_data *ud, L1_MDS_TYPE type);
+             user_data *ud, L1_MDS_TYPE type);
 
-				/* Select wavelength window */
+                /* Select wavelength window */
 SCIA_err set_wl_window (info_l1c *info, float wl_start, float wl_end,
-			 int channel);
-				/* Select multiple wavelength windows */
+             int channel);
+                /* Select multiple wavelength windows */
 SCIA_err set_wl_window_multi (info_l1c *info, float* wl_start, float* wl_end,
-			       int *channel, int n_window);
-			  /* Select wavelength window (with pixels) */
+                   int *channel, int n_window);
+              /* Select wavelength window (with pixels) */
 SCIA_err set_pix_window (info_l1c *info, int pix_start, int pix_end);
 
                            /* Select clusters for output */
 SCIA_err set_clusters (info_l1c *info, int* cluster_id, int n_cluster);
 
-				/* select additional co-adding */
+                /* select additional co-adding */
 SCIA_err set_int_time (info_l1c *info, int set_int_time);
-				/* skip further reading of current state*/
-				/* next call to read_next_mds will start with */
-				/*  start with next state */
+                /* skip further reading of current state*/
+                /* next call to read_next_mds will start with */
+                /*  start with next state */
 SCIA_err skip_cur_state (info_l1c *info, L1_MDS_TYPE type);
 
 
@@ -352,24 +352,24 @@ SCIA_err free_user_data_solar (user_data_solar *ud);
 /* make pixel id ranges from wavelengt windows */
 
 SCIA_err get_pixel_range_wl (info_l1c *info, int nwl_window,
-			      float *wlstart, float *wlend ,
-			      int *idx0, int *idx1);
+                  float *wlstart, float *wlend ,
+                  int *idx0, int *idx1);
 
 /* new routine for defining wl-window */
 SCIA_err set_wl_window_multi_new (info_l1c *info,
-				   float* wl_start, float* wl_end,
-				   int* wl_clus,
-				   int n_window);
+                   float* wl_start, float* wl_end,
+                   int* wl_clus,
+                   int n_window);
 /*************************************************************
  * Internal routines
  ************************************************************/
 
 /* rea solar spectrum */
 SCIA_err read_solar_complete (info_l1c *info,
-			       solar_type sol,
-			       float *wl[],
-			       float *irr[],
-			       float *irr_err[]);
+                   solar_type sol,
+                   float *wl[],
+                   float *irr[],
+                   float *irr_err[]);
 
 
 
@@ -385,10 +385,10 @@ SCIA_err Read_cal_options_GADS (info_l1c *info);
 SCIA_err calc_cluster_window (info_l1c *info, L1_MDS_TYPE type);
 
 SCIA_err coadd_signal (unsigned int n_wl, unsigned int n_coadd,
-			float *signal,           /* Input: rad[n_coadd*n_wl] */
-			float *signal_err,       /* Input: rad_err[n_coadd*n_wl] */
-			float *add_signal,       /* Output: rad[n_wl] */
-			float *add_signal_err);   /* Output: rad_err[n_wl] */
+            float *signal,           /* Input: rad[n_coadd*n_wl] */
+            float *signal_err,       /* Input: rad_err[n_coadd*n_wl] */
+            float *add_signal,       /* Output: rad[n_wl] */
+            float *add_signal_err);   /* Output: rad_err[n_wl] */
 
 
 /* Read MPH. SPH, DSD */

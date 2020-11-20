@@ -41,8 +41,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "debugutil.h"
 
 CWAnalysisWindowPropertyEditor::CWAnalysisWindowPropertyEditor(const QString &projectName,
-							       const QString &analysisWindowName,
-							       QWidget *parent) :
+                                   const QString &analysisWindowName,
+                                   QWidget *parent) :
   CWEditor(parent),
   CProjectObserver(),
   m_projectName(projectName),
@@ -383,13 +383,13 @@ CWAnalysisWindowPropertyEditor::CWAnalysisWindowPropertyEditor(const QString &pr
 
   connect(m_fitsCheck, SIGNAL(stateChanged(int)),  m_moleculesTab, SLOT(slotFitColumnCheckable(int)));
   connect(m_shiftAndStretchTab, SIGNAL(signalLockSymbol(const QString &, const QObject *)),
-	  m_moleculesTab, SLOT(slotLockSymbol(const QString &, const QObject *)));
+      m_moleculesTab, SLOT(slotLockSymbol(const QString &, const QObject *)));
   connect(m_shiftAndStretchTab, SIGNAL(signalUnlockSymbol(const QString &, const QObject *)),
-	  m_moleculesTab, SLOT(slotUnlockSymbol(const QString &, const QObject *)));
+      m_moleculesTab, SLOT(slotUnlockSymbol(const QString &, const QObject *)));
   connect(m_moleculesTab, SIGNAL(signalSymbolListChanged(const QStringList&)),
-	  m_shiftAndStretchTab, SLOT(slotSymbolListChanged(const QStringList&)));
+      m_shiftAndStretchTab, SLOT(slotSymbolListChanged(const QStringList&)));
   connect(m_moleculesTab, SIGNAL(signalSymbolListChanged(const QStringList&)),
-	  m_outputTab, SLOT(slotSymbolListChanged(const QStringList&)));
+      m_outputTab, SLOT(slotSymbolListChanged(const QStringList&)));
 
   mainLayout->addWidget(m_tabs, 1);
 
@@ -589,12 +589,12 @@ bool CWAnalysisWindowPropertyEditor::actionOk(void)
 
 void CWAnalysisWindowPropertyEditor::actionHelp(void)
 {
-	const char *analysisPages[]={"Analysis_Molecules",
-	                       "Analysis_Polynomial",
-	                       "Analysis_Predefined",
-	                       "Analysis_Shift",
-	                       "Analysis_Gaps",
-	                       "Analysis_Output"};
+    const char *analysisPages[]={"Analysis_Molecules",
+                           "Analysis_Polynomial",
+                           "Analysis_Predefined",
+                           "Analysis_Shift",
+                           "Analysis_Gaps",
+                           "Analysis_Output"};
 
  CHelpSystem::showHelpTopic("Analysis",((m_selectedPage>=0) && (m_selectedPage<6))?analysisPages[m_selectedPage]:"Analysis");
 }
@@ -651,8 +651,8 @@ void CWAnalysisWindowPropertyEditor::projectPropertiesChanged()
      }
     else
      {
-     	m_maxdoasFrame->hide();
-     	m_refTwoSzaFrame->hide();
+         m_maxdoasFrame->hide();
+         m_refTwoSzaFrame->hide();
      }
 
     // satellite instruments
@@ -675,7 +675,7 @@ void CWAnalysisWindowPropertyEditor::projectPropertiesChanged()
     // -------------------------------------------------------------------------
        default:
         {
-	        m_satelliteFrame->hide();
+            m_satelliteFrame->hide();
         }
        break;
     // -------------------------------------------------------------------------
@@ -748,8 +748,8 @@ void CWAnalysisWindowPropertyEditor::slotBrowseRefOne()
   CPreferences *pref = CPreferences::instance();
 
   QString filename = QFileDialog::getOpenFileName(this, "Select Reference 1",
-						  pref->directoryName("Ref"),
-						  "Reference File (*.ref *.he4 *.he5 *.nc);;All Files (*)");
+                          pref->directoryName("Ref"),
+                          "Reference File (*.ref *.he4 *.he5 *.nc);;All Files (*)");
 
   if (!filename.isEmpty()) {
     pref->setDirectoryNameGivenFile("Ref", filename);
@@ -763,8 +763,8 @@ void CWAnalysisWindowPropertyEditor::slotBrowseRefTwo()
   CPreferences *pref = CPreferences::instance();
 
   QString filename = QFileDialog::getOpenFileName(this, "Select Reference 2",
-						  pref->directoryName("Ref"),
-						  "Reference File (*.ref *.he4 *.he5 *.nc);;All Files (*)");
+                          pref->directoryName("Ref"),
+                          "Reference File (*.ref *.he4 *.he5 *.nc);;All Files (*)");
 
   if (!filename.isEmpty()) {
     pref->setDirectoryNameGivenFile("Ref", filename);
@@ -778,8 +778,8 @@ void CWAnalysisWindowPropertyEditor::slotBrowseResidual()
   CPreferences *pref = CPreferences::instance();
 
   QString filename = QFileDialog::getSaveFileName(this, "Select Residual",
-						  pref->directoryName("Residual"),
-						  "All Files (*)");
+                          pref->directoryName("Residual"),
+                          "All Files (*)");
 
   if (!filename.isEmpty()) {
     pref->setDirectoryNameGivenFile("Residual", filename);

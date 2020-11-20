@@ -92,23 +92,23 @@ QString CPathMgr::simplifyPath(const QString &name) const
       // matches ... but must match either perfectly or on a path separator boundary
       int len = it->path.length();  // certain that name.length() > path.length()
       if (name.length() == len) {
-	// one-to-one match
-	QString tmp;
-	QTextStream stream(&tmp);
-	
-	stream << '%' << it->index;
+    // one-to-one match
+    QString tmp;
+    QTextStream stream(&tmp);
+    
+    stream << '%' << it->index;
 
-	return tmp;
+    return tmp;
       }
       else if (name.at(len) == '/' || name.at(len) == '\\') {
-	// matches on separator boundary
-	QString tmp;
-	QTextStream stream(&tmp);
-	
-	stream << '%' << it->index << name.right(name.length() - len);
+    // matches on separator boundary
+    QString tmp;
+    QTextStream stream(&tmp);
+    
+    stream << '%' << it->index << name.right(name.length() - len);
 
-	return tmp;
-	
+    return tmp;
+    
       }
     }
     ++it;

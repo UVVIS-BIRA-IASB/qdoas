@@ -55,13 +55,13 @@ extern "C" {
   /* Slits */
 
   struct slit_file {
-  	 int wveDptFlag;
+       int wveDptFlag;
     char filename[FILENAME_BUFFER_LENGTH];
     char filename2[FILENAME_BUFFER_LENGTH];
   };
 
   struct slit_gaussian {
-  	 int wveDptFlag;
+       int wveDptFlag;
     double fwhm;
     char filename[FILENAME_BUFFER_LENGTH];
   };
@@ -74,7 +74,7 @@ extern "C" {
   };
 
   struct slit_voigt {
-  	 int wveDptFlag;
+       int wveDptFlag;
     double fwhmL, fwhmR;
     double glRatioL, glRatioR;
     char filename[FILENAME_BUFFER_LENGTH];
@@ -82,7 +82,7 @@ extern "C" {
   };
 
   struct slit_error {
-  	 int wveDptFlag;
+       int wveDptFlag;
     double fwhm;
     double width;
     char filename[FILENAME_BUFFER_LENGTH];
@@ -90,21 +90,21 @@ extern "C" {
   };
 
   struct slit_agauss {
-  	 int wveDptFlag;
-  	 double fwhm;
-  	 double asym;
-  	 char filename[FILENAME_BUFFER_LENGTH];
-  	 char filename2[FILENAME_BUFFER_LENGTH];
+       int wveDptFlag;
+       double fwhm;
+       double asym;
+       char filename[FILENAME_BUFFER_LENGTH];
+       char filename2[FILENAME_BUFFER_LENGTH];
   };
 
   struct slit_supergauss {
-  	 int wveDptFlag;
-  	 double fwhm;
-  	 double exponential;
-  	 double asym;
-  	 char filename[FILENAME_BUFFER_LENGTH];
-  	 char filename2[FILENAME_BUFFER_LENGTH];
-  	 char filename3[FILENAME_BUFFER_LENGTH];
+       int wveDptFlag;
+       double fwhm;
+       double exponential;
+       double asym;
+       char filename[FILENAME_BUFFER_LENGTH];
+       char filename2[FILENAME_BUFFER_LENGTH];
+       char filename3[FILENAME_BUFFER_LENGTH];
   };
 
   struct slit_apod {
@@ -255,15 +255,15 @@ struct anlyswin_linear
 
 // typedef struct _AnalyseNonLinearParameters
 //  {
-//  	char symbolName[MAX_ITEM_TEXT_LEN+1];
-//  	char crossFileName[MAX_ITEM_TEXT_LEN+1];
-//  	int fitFlag;
-//  	double initialValue;
-//  	double deltaValue;
-//  	double minValue;
-//  	double maxValue;
-//  	int storeFit;
-//  	int storeError;
+//      char symbolName[MAX_ITEM_TEXT_LEN+1];
+//      char crossFileName[MAX_ITEM_TEXT_LEN+1];
+//      int fitFlag;
+//      double initialValue;
+//      double deltaValue;
+//      double minValue;
+//      double maxValue;
+//      int storeFit;
+//      int storeError;
 //  }
 // ANALYSE_NON_LINEAR_PARAMETERS;
 
@@ -367,15 +367,15 @@ struct anlyswin_linear
 
 // typedef struct _AnalyseNonLinearParameters
 //  {
-//  	char symbolName[MAX_ITEM_TEXT_LEN+1];
-//  	char crossFileName[MAX_ITEM_TEXT_LEN+1];
-//  	int fitFlag;
-//  	double initialValue;
-//  	double deltaValue;
-//  	double minValue;
-//  	double maxValue;
-//  	int storeFit;
-//  	int storeError;
+//      char symbolName[MAX_ITEM_TEXT_LEN+1];
+//      char crossFileName[MAX_ITEM_TEXT_LEN+1];
+//      int fitFlag;
+//      double initialValue;
+//      double deltaValue;
+//      double minValue;
+//      double maxValue;
+//      int storeFit;
+//      int storeError;
 //  }
 // ANALYSE_NON_LINEAR_PARAMETERS;
 

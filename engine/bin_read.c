@@ -30,22 +30,22 @@ void swap_bytes_int(unsigned char *var)
 
 void ushort_array_getbin (FILE* unit, unsigned short *var, int nr)
  {
- 	int i;
+     int i;
 
- 	fread(var,sizeof(unsigned short)*nr,1,unit);
+     fread(var,sizeof(unsigned short)*nr,1,unit);
 
- 	for (i=0;i<nr;i++)
- 	 swap_bytes_short((unsigned char *)&var[i]);
+     for (i=0;i<nr;i++)
+      swap_bytes_short((unsigned char *)&var[i]);
  }
 
 void float_array_getbin (FILE* unit, float *var, int nr)
  {
- 	int i;
+     int i;
 
- 	fread(var,sizeof(float)*nr,1,unit);
+     fread(var,sizeof(float)*nr,1,unit);
 
- 	for (i=0;i<nr;i++)
- 	 swap_bytes_float((unsigned char *)&var[i]);
+     for (i=0;i<nr;i++)
+      swap_bytes_float((unsigned char *)&var[i]);
  }
 
 void GeoN_array_getbin (FILE* unit, GeoN *var, int nr)

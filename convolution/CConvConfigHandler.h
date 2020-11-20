@@ -37,7 +37,7 @@ class CConvConfigHandler : public CConfigHandler
   virtual ~CConvConfigHandler();
 
   virtual bool startElement(const QString &namespaceURI, const QString &localName,
-			    const QString &qName, const QXmlAttributes &atts);
+                const QString &qName, const QXmlAttributes &atts);
 
   const mediate_convolution_t* properties(void) const;
 

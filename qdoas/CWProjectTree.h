@@ -75,10 +75,10 @@ Q_OBJECT
   QString editInsertNewFolder(QTreeWidgetItem *parent, const QString &folderName, CSpectraFolderItem **itemCreated = NULL);
   QString editRenameFolder(QTreeWidgetItem *item, const QString &folderName);
   QString editInsertNewAnalysisWindow(QTreeWidgetItem *parent, const QString &windowName,
-				      const QString &preceedingWindowName, CAnalysisWindowItem **itemCreated = NULL);
+                      const QString &preceedingWindowName, CAnalysisWindowItem **itemCreated = NULL);
   QString editRenameAnalysisWindow(QTreeWidgetItem *item, const QString &windowName);
   QString editInsertDirectory(QTreeWidgetItem *parent, const QString &directoryPath,
-			      const QString &fileFilters, bool includeSubDirs, CSpectraDirectoryItem **itemCreated = NULL);
+                  const QString &fileFilters, bool includeSubDirs, CSpectraDirectoryItem **itemCreated = NULL);
   QString editChangeDirectoryProperties(QTreeWidgetItem *item, const QString &fileFilters, bool includeSubDirs);
 
   // static methods

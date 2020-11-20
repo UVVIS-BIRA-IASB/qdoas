@@ -31,7 +31,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 static const int cStandardEditWidth = 75;
 
 CWProjectTabAnalysis::CWProjectTabAnalysis(const mediate_project_analysis_t *properties,
-					   QWidget *parent) :
+                       QWidget *parent) :
   QFrame(parent)
 {
   int index;
@@ -48,9 +48,9 @@ CWProjectTabAnalysis::CWProjectTabAnalysis(const mediate_project_analysis_t *pro
   mainLayout->addWidget(new QLabel("Analysis Method", this), row , 1);
   m_methodCombo = new QComboBox(this);
   m_methodCombo->addItem("Optical density fitting",
-			 QVariant(OPTICAL_DENSITY_FIT));
+             QVariant(OPTICAL_DENSITY_FIT));
   m_methodCombo->addItem("Intensity fitting (Marquardt-Levenberg+SVD)",
-			 QVariant(INTENSITY_FIT));
+             QVariant(INTENSITY_FIT));
   mainLayout->addWidget(m_methodCombo, row, 2);
   ++row;
 

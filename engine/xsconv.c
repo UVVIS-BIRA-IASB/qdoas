@@ -163,7 +163,7 @@ double Voigtx(double x,double y);
 
 const char *XSCONV_slitTypes[SLIT_TYPE_MAX]=
  {
- 	"None",
+     "None",
   "File",
   "Gaussian (FTS)",
   "2n-Lorentz",
@@ -681,13 +681,13 @@ RC XSCONV_LoadSlitFunction(MATRIX_OBJECT *slitXs,SLIT *pSlit,double *pGaussWidth
         for (i=0;i<pSlitXs->nl;i++)
          pSlitXs->matrix[1][i]/=sumPoly;
 
-       	if (!(rc=SPLINE_Deriv2(pSlitXs->matrix[0],pSlitXs->matrix[1],pSlitXs->deriv2[1],pSlitXs->nl,"XSCONV_LoadSlitFunction")))
-       	 rc=XSCONV_GetFwhm(pSlitXs->matrix[0],pSlitXs->matrix[1],pSlitXs->deriv2[1],pSlitXs->nl,slitType,pGaussWidth);
+           if (!(rc=SPLINE_Deriv2(pSlitXs->matrix[0],pSlitXs->matrix[1],pSlitXs->deriv2[1],pSlitXs->nl,"XSCONV_LoadSlitFunction")))
+            rc=XSCONV_GetFwhm(pSlitXs->matrix[0],pSlitXs->matrix[1],pSlitXs->deriv2[1],pSlitXs->nl,slitType,pGaussWidth);
        }
       else if (pSlitXs->nc>2)
        {
-       	if (!(rc=SPLINE_Deriv2(pSlitXs->matrix[0]+1,pSlitXs->matrix[1]+1,pSlitXs->deriv2[1]+1,pSlitXs->nl-1,"XSCONV_LoadSlitFunction")))
-       	 rc=XSCONV_GetFwhm(pSlitXs->matrix[0]+1,pSlitXs->matrix[1]+1,pSlitXs->deriv2[1]+1,pSlitXs->nl-1,slitType,pGaussWidth);
+           if (!(rc=SPLINE_Deriv2(pSlitXs->matrix[0]+1,pSlitXs->matrix[1]+1,pSlitXs->deriv2[1]+1,pSlitXs->nl-1,"XSCONV_LoadSlitFunction")))
+            rc=XSCONV_GetFwhm(pSlitXs->matrix[0]+1,pSlitXs->matrix[1]+1,pSlitXs->deriv2[1]+1,pSlitXs->nl-1,slitType,pGaussWidth);
        }
      }
    }
@@ -698,7 +698,7 @@ RC XSCONV_LoadSlitFunction(MATRIX_OBJECT *slitXs,SLIT *pSlit,double *pGaussWidth
 
   else if ((slitType!=SLIT_TYPE_APOD) && (slitType!=SLIT_TYPE_APODNBS))
    {
-   	fwhm=(slitType!=SLIT_TYPE_ERF)?pSlit->slitParam:sqrt(pSlit->slitParam*pSlit->slitParam+pSlit->slitParam2*pSlit->slitParam2);
+       fwhm=(slitType!=SLIT_TYPE_ERF)?pSlit->slitParam:sqrt(pSlit->slitParam*pSlit->slitParam+pSlit->slitParam2*pSlit->slitParam2);
     slitStep=fwhm/nFwhm;                               // number of points /FWHM
 
  //   slitSize=(int)(ceil((nFwhm*pSlit->slitParam)/slitStep)+1.);
@@ -710,7 +710,7 @@ RC XSCONV_LoadSlitFunction(MATRIX_OBJECT *slitXs,SLIT *pSlit,double *pGaussWidth
 
     if ((pSlitType!=NULL) && !MATRIX_Allocate(pSlitXs,slitSize,2,0,0,1,"XSCONV_LoadSlitFunction"))
      {
-     	// use sigma2=fwhm/2 because in the S/W user manual sigma=fwhm
+         // use sigma2=fwhm/2 because in the S/W user manual sigma=fwhm
 
       sigma2=pSlit->slitParam*0.5;
       a=((slitType!=SLIT_TYPE_SUPERGAUSS) || (fabs(pSlit->slitParam2)<EPSILON))?sigma2/sqrt(log(2.)):sigma2/pow(log(2.),(double)1./pSlit->slitParam2);
@@ -740,12 +740,12 @@ RC XSCONV_LoadSlitFunction(MATRIX_OBJECT *slitXs,SLIT *pSlit,double *pGaussWidth
          pSlitXs->matrix[1][i]=(double)(ERF_GetValue((x+delta)/a)-ERF_GetValue((x-delta)/a))/(4.*delta)*slitStep;
         else if (slitType==SLIT_TYPE_AGAUSS)
          {
-         	a2=(x<(double)0.)?a*(1.-pSlit->slitParam2):a*(1.+pSlit->slitParam2);
+             a2=(x<(double)0.)?a*(1.-pSlit->slitParam2):a*(1.+pSlit->slitParam2);
           pSlitXs->matrix[1][i]=(double)exp(-(x*x)/(a2*a2));
          }
         else if (slitType==SLIT_TYPE_SUPERGAUSS)
          {
-         	a2=(x<(double)0.)?a*(1.-pSlit->slitParam3):a*(1.+pSlit->slitParam3);     // for super gaussian, asymmetry factor is the third one
+             a2=(x<(double)0.)?a*(1.-pSlit->slitParam3):a*(1.+pSlit->slitParam3);     // for super gaussian, asymmetry factor is the third one
           pSlitXs->matrix[1][i]=(double)exp(-pow(fabs(x/a2),pSlit->slitParam2));
          }
         else if (slitType==SLIT_TYPE_GAUSS)
@@ -784,13 +784,13 @@ RC XSCONV_LoadSlitFunction(MATRIX_OBJECT *slitXs,SLIT *pSlit,double *pGaussWidth
    *pGaussWidth=pSlit->slitParam;
 
 // {
-// 	FILE *fp;
-// 	fp=fopen("slit.dat","w+t");
-// 	fprintf(fp,"; slitSize %d\n",slitSize);
-// 	// for (i=0;i<pSlitXs->nl;i++)
-// 	for (i=0;(i<slitSize) && !rc;i++)
-// 	 fprintf(fp,"%g %g %g\n",pSlitXs->matrix[0][i],pSlitXs->matrix[1][i],pSlitXs->deriv2[1][i]);
-// 	fclose(fp);
+//     FILE *fp;
+//     fp=fopen("slit.dat","w+t");
+//     fprintf(fp,"; slitSize %d\n",slitSize);
+//     // for (i=0;i<pSlitXs->nl;i++)
+//     for (i=0;(i<slitSize) && !rc;i++)
+//      fprintf(fp,"%g %g %g\n",pSlitXs->matrix[0][i],pSlitXs->matrix[1][i],pSlitXs->deriv2[1][i]);
+//     fclose(fp);
 // }
 
   // Return
@@ -1140,22 +1140,22 @@ RC XSCONV_TypeStandard(MATRIX_OBJECT *pXsnew,INDEX indexLambdaMin,INDEX indexLam
 
   if (slitMatrix!=NULL)
    {
-   	fwhm=(double)0.;    // will be calculated later
+       fwhm=(double)0.;    // will be calculated later
 
-   	for (i=0;i<NSFP;i++)
-   	 {
-   	 	if ((slitNDET[i]=slitMatrix[i].nl)>0)
-   	 	 {
-   	    slitLambda[i]=slitMatrix[i].matrix[0];
-   	    slitVector[i]=slitMatrix[i].matrix[1];
-   	    slitDeriv2[i]=slitMatrix[i].deriv2[1];
-   	   }
-   	  else
-   	   slitLambda[i]=slitVector[i]=slitDeriv2[i]=NULL;
-   	 }
+       for (i=0;i<NSFP;i++)
+        {
+            if ((slitNDET[i]=slitMatrix[i].nl)>0)
+             {
+           slitLambda[i]=slitMatrix[i].matrix[0];
+           slitVector[i]=slitMatrix[i].matrix[1];
+           slitDeriv2[i]=slitMatrix[i].deriv2[1];
+          }
+         else
+          slitLambda[i]=slitVector[i]=slitDeriv2[i]=NULL;
+        }
 
-   	if ((slitType!=SLIT_TYPE_FILE) || (slitMatrix[0].nc==2))
-   	 {
+       if ((slitType!=SLIT_TYPE_FILE) || (slitMatrix[0].nc==2))
+        {
       if (wveDptFlag)
        {
         if ((rc=MATRIX_Allocate(&slitTmp,slitMatrix[0].nl,2,0,0,1,"XSCONV_TypeStandard"))!=0)
@@ -1650,7 +1650,7 @@ RC XsconvRebuildSlitFunction(double *lambda,double *slit,int nslit,SLIT *pSlit,M
   else if (pSlit->slitType==SLIT_TYPE_AGAUSS)
     for (i=0;i<nslit;i++)
      {
-     	a2=(lambda[i]<(double)0.)?a*(1.-pSlit->slitParam2):a*(1+pSlit->slitParam2);
+         a2=(lambda[i]<(double)0.)?a*(1.-pSlit->slitParam2):a*(1+pSlit->slitParam2);
       slit[i]=(double)exp(-4.*log(2.)*(lambda[i]*lambda[i])/(a2*a2));                                                 // normalization -4*log(2.) is correct ????
      }
 
@@ -1770,7 +1770,7 @@ RC XSCONV_NewSlitFunction(SLIT *pSlitOptions,MATRIX_OBJECT *pSlit,double slitPar
       }
     else
      {
-     	rc=ERROR_SetLast("XSCONV_NewSlitFunction",ERROR_TYPE_FATAL,ERROR_ID_GAUSSIAN,slitParam,slitParam2);
+         rc=ERROR_SetLast("XSCONV_NewSlitFunction",ERROR_TYPE_FATAL,ERROR_ID_GAUSSIAN,slitParam,slitParam2);
       goto EndNewSlit;
      }
    }
@@ -1797,7 +1797,7 @@ RC XSCONV_NewSlitFunction(SLIT *pSlitOptions,MATRIX_OBJECT *pSlit,double slitPar
 
     if (norm2==(double)0.)
      {
-     	rc=ERROR_SetLast("XSCONV_NewSlitFunction",ERROR_TYPE_WARNING,ERROR_ID_DIVISION_BY_0,"calculation of a norm");
+         rc=ERROR_SetLast("XSCONV_NewSlitFunction",ERROR_TYPE_WARNING,ERROR_ID_DIVISION_BY_0,"calculation of a norm");
       goto EndNewSlit;
      }
 
@@ -1901,7 +1901,7 @@ RC XSCONV_NewSlitFunction(SLIT *pSlitOptions,MATRIX_OBJECT *pSlit,double slitPar
 
     if ((norm==(double)0.) || (norm2==(double)0.))
      {
-     	rc=ERROR_SetLast("XSCONV_NewSlitFunction",ERROR_TYPE_WARNING,ERROR_ID_DIVISION_BY_0,"calculation of a norm");
+         rc=ERROR_SetLast("XSCONV_NewSlitFunction",ERROR_TYPE_WARNING,ERROR_ID_DIVISION_BY_0,"calculation of a norm");
       goto EndNewSlit;
      }
 

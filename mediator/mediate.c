@@ -254,10 +254,10 @@ int mediateRequestDisplaySpecInfo(void *engineContext,int page,void *responseHan
 
     if (pSpectra->fieldsFlag[PRJCT_RESULTS_PRECALCULATED_FLUXES])
      {
-     	char str1[80],str2[80];
+         char str1[80],str2[80];
 
-     	sprintf(str1,"Flux (%g)",pRecord->ccd.wve1);
-     	sprintf(str2,"Flux (%g)",pRecord->ccd.wve2);
+         sprintf(str1,"Flux (%g)",pRecord->ccd.wve1);
+         sprintf(str2,"Flux (%g)",pRecord->ccd.wve2);
 
       mediateResponseCellInfo(page,indexLine++,indexColumn,responseHandle,str1,"%.3f",pRecord->ccd.flux1);
       mediateResponseCellInfo(page,indexLine++,indexColumn,responseHandle,str2,"%.3f",pRecord->ccd.flux2);
@@ -526,7 +526,7 @@ void mediateRequestPlotSpectra(ENGINE_CONTEXT *pEngineContext,void *responseHand
          (pBuffers->specMax!=NULL) &&
          (pRecord->NSomme>1))
       {
-      	sprintf(tmpString,"SpecMax (%d/%d)",pEngineContext->indexRecord,pEngineContext->recordNumber);
+          sprintf(tmpString,"SpecMax (%d/%d)",pEngineContext->indexRecord,pEngineContext->recordNumber);
 
        mediateAllocateAndSetPlotData(&spectrumData, "SpecMax",pBuffers->specMaxx, pBuffers->specMax,pRecord->rejected+pRecord->NSomme, Line);
        mediateResponsePlotData(plotPageSpecMax, &spectrumData, 1, SpecMax, allowFixedScale, "SpecMax", "Scans number", "Signal Maximum", responseHandle);
@@ -536,7 +536,7 @@ void mediateRequestPlotSpectra(ENGINE_CONTEXT *pEngineContext,void *responseHand
 
     if ((pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_CCD_EEV) && (strlen(pInstrumental->imagePath)>0))
      {
-     	sprintf(tmpString,"Sky picture (%d/%d)",pEngineContext->indexRecord,pEngineContext->recordNumber);
+         sprintf(tmpString,"Sky picture (%d/%d)",pEngineContext->indexRecord,pEngineContext->recordNumber);
       mediateResponsePlotImage(plotPageImage,(pRecord->ccd.indexImage!=ITEM_NONE)?CCD_GetImageFile(pRecord->ccd.indexImage):"./no-image-available.jpg","Sky picture",responseHandle);
       mediateResponseLabelPage(plotPageImage, fileName, tmpString, responseHandle);
      }
@@ -756,8 +756,8 @@ void setMediateProjectCalibration(PRJCT_KURUCZ *pEngineCalibration,CALIB_FENO *p
    if (pEngineCalibration->divisionMode==PRJCT_CALIB_WINDOWS_CUSTOM)
     for (int i=0;i<pEngineCalibration->windowsNumber;i++)
      {
-     	pEngineCalibration->customLambdaMin[i]=pMediateCalibration->customLambdaMin[i];
-     	pEngineCalibration->customLambdaMax[i]=pMediateCalibration->customLambdaMax[i];
+         pEngineCalibration->customLambdaMin[i]=pMediateCalibration->customLambdaMin[i];
+         pEngineCalibration->customLambdaMax[i]=pMediateCalibration->customLambdaMax[i];
      }
 
    pEngineCalibration->invPolyDegree=2*pMediateCalibration->lorentzOrder;       // degree of the lorentzian
@@ -1319,10 +1319,10 @@ void setMediateProjectOutput(PRJCT_RESULTS *pEngineOutput,const mediate_project_
 
 void setMediateProjectExport(PRJCT_EXPORT *pEngineExport,const mediate_project_export_t *pMediateExport)
  {
- 	strcpy(pEngineExport->path,pMediateExport->path);
+     strcpy(pEngineExport->path,pMediateExport->path);
 
- 	pEngineExport->titlesFlag=pMediateExport->titlesFlag;
- 	pEngineExport->directoryFlag=pMediateExport->directoryFlag;
+     pEngineExport->titlesFlag=pMediateExport->titlesFlag;
+     pEngineExport->directoryFlag=pMediateExport->directoryFlag;
 
   if (!(pEngineExport->fieldsNumber=pMediateExport->selection.nSelected))
    memset(pEngineExport->fieldsFlag,0,PRJCT_RESULTS_MAX*sizeof(int));
@@ -1349,9 +1349,9 @@ void setMediateProjectExport(PRJCT_EXPORT *pEngineExport,const mediate_project_e
 // -----------------------------------------------------------------------------
 
 int mediateRequestSetProject(void *engineContext,
-			     const mediate_project_t *project,
-			     int operatingMode,
-			     void *responseHandle)
+                 const mediate_project_t *project,
+                 int operatingMode,
+                 void *responseHandle)
  {
    // Initializations
 
@@ -1456,15 +1456,15 @@ RC mediateRequestSetAnalysisLinear(const struct anlyswin_linear *pLinear,INDEX i
 
 // typedef struct _AnalyseNonLinearParameters
 //  {
-//  	char symbolName[MAX_ITEM_TEXT_LEN];
-//  	char crossFileName[MAX_ITEM_TEXT_LEN];
-//  	int fitFlag;
-//  	double initialValue;
-//  	double deltaValue;
-//  	double minValue;
-//  	double maxValue;
-//  	int storeFit;
-//  	int storeError;
+//      char symbolName[MAX_ITEM_TEXT_LEN];
+//      char crossFileName[MAX_ITEM_TEXT_LEN];
+//      int fitFlag;
+//      double initialValue;
+//      double deltaValue;
+//      double minValue;
+//      double maxValue;
+//      int storeFit;
+//      int storeError;
 //  }
 // ANALYSE_NON_LINEAR_PARAMETERS;
 
@@ -1619,10 +1619,10 @@ RC mediateRequestSetAnalysisNonLinearDoas(ENGINE_CONTEXT *pEngineContext, const 
  }
 
 int mediateRequestSetAnalysisWindows(void *engineContext,
-				     int numberOfWindows,
-				     const mediate_analysis_window_t *analysisWindows,
-				     int operatingMode,
-				     void *responseHandle)
+                     int numberOfWindows,
+                     const mediate_analysis_window_t *analysisWindows,
+                     int operatingMode,
+                     void *responseHandle)
  {
    // Declarations
 
@@ -2033,9 +2033,9 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
 // ===============================================================
 
 int mediateRequestSetSymbols(void *engineContext,
-			     int numberOfSymbols,
-			     const mediate_symbol_t *symbols,
-			     void *responseHandle)
+                 int numberOfSymbols,
+                 const mediate_symbol_t *symbols,
+                 void *responseHandle)
  {
    // Declarations
 
@@ -2067,9 +2067,9 @@ int mediateRequestSetSymbols(void *engineContext,
 // =========================================================================
 
 int mediateRequestSetSites(void *engineContext,
-			   int numberOfSites,
-			   const mediate_site_t *sites,
-			   void *responseHandle)
+               int numberOfSites,
+               const mediate_site_t *sites,
+               void *responseHandle)
  {
    // Declarations
 
@@ -2101,8 +2101,8 @@ int mediateRequestSetSites(void *engineContext,
 // ==================
 
 int mediateRequestGotoSpectrum(void *engineContext,
-			       int recordNumber,
-			       void *responseHandle)
+                   int recordNumber,
+                   void *responseHandle)
  {
    ENGINE_CONTEXT *pEngineContext = (ENGINE_CONTEXT *)engineContext;
 
@@ -2278,16 +2278,16 @@ int mediateRequestNextMatchingSpectrum(ENGINE_CONTEXT *pEngineContext,void *resp
 
    else if (THRD_id==THREAD_TYPE_EXPORT)
     {
-    	int indexFenoColumn=(pEngineContext->recordNumber - 1) % ANALYSE_swathSize;
-    	OUTPUT_SaveResults(pEngineContext,indexFenoColumn);
+        int indexFenoColumn=(pEngineContext->recordNumber - 1) % ANALYSE_swathSize;
+        OUTPUT_SaveResults(pEngineContext,indexFenoColumn);
     }
 
    return pEngineContext->indexRecord;
  }
 
 int mediateRequestBeginBrowseSpectra(void *engineContext,
-				     const char *spectraFileName,
-				     void *responseHandle)
+                     const char *spectraFileName,
+                     void *responseHandle)
  {
    ENGINE_CONTEXT *pEngineContext = (ENGINE_CONTEXT *)engineContext;
    int rc;
@@ -2315,7 +2315,7 @@ int mediateRequestBeginBrowseSpectra(void *engineContext,
 //    mediateResponseErrorMessage(functionName, messageString, errorLevel, responseHandle);
 
 int mediateRequestNextMatchingBrowseSpectrum(void *engineContext,
-					     void *responseHandle)
+                         void *responseHandle)
  {
    // Declarations
 
@@ -2332,8 +2332,8 @@ int mediateRequestNextMatchingBrowseSpectrum(void *engineContext,
  }
 
 int mediateRequestBeginExportSpectra(void *engineContext,
-				     const char *spectraFileName,
-				     void *responseHandle)
+                     const char *spectraFileName,
+                     void *responseHandle)
  {
    ENGINE_CONTEXT *pEngineContext = (ENGINE_CONTEXT *)engineContext;
    int rc;
@@ -2362,8 +2362,8 @@ int mediateRequestBeginExportSpectra(void *engineContext,
 
 int mediateRequestBeginAnalyseSpectra(void *engineContext,
                                       const char *configFileName,
-				      const char *spectraFileName,
-				      void *responseHandle)
+                      const char *spectraFileName,
+                      void *responseHandle)
  {
    ENGINE_CONTEXT *pEngineContext = (ENGINE_CONTEXT *)engineContext;
    RC rc = ERROR_ID_NO;
@@ -2381,7 +2381,7 @@ int mediateRequestBeginAnalyseSpectra(void *engineContext,
  }
 
 int mediateRequestNextMatchingAnalyseSpectrum(void *engineContext,
-					      void *responseHandle)
+                          void *responseHandle)
  {
    // Declarations
 
@@ -2431,14 +2431,14 @@ int mediateRequestNextMatchingAnalyseSpectrum(void *engineContext,
  }
 
 int mediateRequestPrevMatchingAnalyseSpectrum(void *engineContext,
-					      void *responseHandle)
+                          void *responseHandle)
  {
    return 0;
  }
 
 int mediateRequestBeginCalibrateSpectra(void *engineContext,
-					const char *spectraFileName,
-					void *responseHandle)
+                    const char *spectraFileName,
+                    void *responseHandle)
  {
    ENGINE_CONTEXT *pEngineContext = (ENGINE_CONTEXT *)engineContext;
    RC rc;
@@ -2450,7 +2450,7 @@ int mediateRequestBeginCalibrateSpectra(void *engineContext,
  }
 
 int mediateRequestNextMatchingCalibrateSpectrum(void *engineContext,
-						void *responseHandle)
+                        void *responseHandle)
  {
    // Declarations
 
@@ -2489,13 +2489,13 @@ int mediateRequestNextMatchingCalibrateSpectrum(void *engineContext,
  }
 
 int mediateRequestPrevMatchingCalibrateSpectrum(void *engineContext,
-						void *responseHandle)
+                        void *responseHandle)
  {
    return 0;
  }
 
 int mediateRequestStop(void *engineContext,
-		       void *responseHandle)
+               void *responseHandle)
  {
    // Close open files and release allocated buffers to reset the engine context
 

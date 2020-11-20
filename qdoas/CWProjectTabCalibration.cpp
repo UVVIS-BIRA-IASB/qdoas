@@ -251,13 +251,13 @@ CWProjectTabCalibration::CWProjectTabCalibration(const mediate_project_calibrati
   // tabel interconnections - MUST be connected before populating the tables ....
   connect(m_fitsCheck, SIGNAL(stateChanged(int)),  m_moleculesTab, SLOT(slotFitColumnCheckable(int)));
   connect(m_shiftAndStretchTab, SIGNAL(signalLockSymbol(const QString &, const QObject *)),
-	  m_moleculesTab, SLOT(slotLockSymbol(const QString &, const QObject *)));
+      m_moleculesTab, SLOT(slotLockSymbol(const QString &, const QObject *)));
   connect(m_shiftAndStretchTab, SIGNAL(signalUnlockSymbol(const QString &, const QObject *)),
-	  m_moleculesTab, SLOT(slotUnlockSymbol(const QString &, const QObject *)));
+      m_moleculesTab, SLOT(slotUnlockSymbol(const QString &, const QObject *)));
   connect(m_moleculesTab, SIGNAL(signalSymbolListChanged(const QStringList&)),
-	  m_shiftAndStretchTab, SLOT(slotSymbolListChanged(const QStringList&)));
+      m_shiftAndStretchTab, SLOT(slotSymbolListChanged(const QStringList&)));
   connect(m_moleculesTab, SIGNAL(signalSymbolListChanged(const QStringList&)),
-	  m_outputTab, SLOT(slotSymbolListChanged(const QStringList&)));
+      m_outputTab, SLOT(slotSymbolListChanged(const QStringList&)));
 
   // set the current values
   m_refFileEdit->setText(QString(properties->solarRefFile));
@@ -340,7 +340,7 @@ CWProjectTabCalibration::CWProjectTabCalibration(const mediate_project_calibrati
 
 void CWProjectTabCalibration::apply(mediate_project_calibration_t *properties) const
 {
-	 // a safe text length is assured.
+     // a safe text length is assured.
   strcpy(properties->solarRefFile, m_refFileEdit->text().toLocal8Bit().data());
   strcpy(properties->slfFile, m_slfFileEdit->text().toLocal8Bit().data());
 
@@ -407,7 +407,7 @@ void CWProjectTabCalibration::slotLineShapeSelectionChanged(int index)
 }
 
 CWProjectTabCalibrationCustomWindowsDialog::CWProjectTabCalibrationCustomWindowsDialog(const double *lambdaMin, const double *lambdaMax, const int nWindows,
-						 QWidget *parent) :
+                         QWidget *parent) :
   QDialog(parent)
 {
   setWindowTitle("Define calibration subwindows");
@@ -457,23 +457,23 @@ CWProjectTabCalibrationCustomWindowsDialog::CWProjectTabCalibrationCustomWindows
 
 void CWProjectTabCalibrationCustomWindowsDialog::GetLambdaMin(double *lambdaMin)
  {
- 	for (int i=0;i<m_nWindows;i++)
- 	 lambdaMin[i]=m_customLambdaMinEdit[i]->text().toDouble();
+     for (int i=0;i<m_nWindows;i++)
+      lambdaMin[i]=m_customLambdaMinEdit[i]->text().toDouble();
  }
 
 void CWProjectTabCalibrationCustomWindowsDialog::GetLambdaMax(double *lambdaMax)
  {
- 	for (int i=0;i<m_nWindows;i++)
- 	 lambdaMax[i]=m_customLambdaMaxEdit[i]->text().toDouble();
+     for (int i=0;i<m_nWindows;i++)
+      lambdaMax[i]=m_customLambdaMaxEdit[i]->text().toDouble();
  }
 
 void CWProjectTabCalibration::slotDefineCustomWindows(void)
  {
- 	int nWindows=m_subWindowsSpinBox->value();
+     int nWindows=m_subWindowsSpinBox->value();
 
   // Check windows before entering dialog box
 
- 	CheckCustomWindows((double *)m_customLambdaMin,(double *)m_customLambdaMax,nWindows);
+     CheckCustomWindows((double *)m_customLambdaMin,(double *)m_customLambdaMax,nWindows);
 
   CWProjectTabCalibrationCustomWindowsDialog dialog((const double *)m_customLambdaMin,(const double *)m_customLambdaMax,nWindows, this);
 
@@ -490,7 +490,7 @@ void CWProjectTabCalibration::slotDefineCustomWindows(void)
 
 void CWProjectTabCalibration::CheckCustomWindows(double *customLambdaMin,double *customLambdaMax,int nWindows) const
  {
- 	double calibIntervalMin=m_lambdaMinEdit->text().toDouble();
+     double calibIntervalMin=m_lambdaMinEdit->text().toDouble();
   double calibIntervalMax = m_lambdaMaxEdit->text().toDouble();
   double windowSize;
 
@@ -501,12 +501,12 @@ void CWProjectTabCalibration::CheckCustomWindows(double *customLambdaMin,double 
 
   for (int i=0;i<nWindows-1;i++)
    {
-   	if (customLambdaMax[i]<customLambdaMin[i])
-   	 customLambdaMax[i]=customLambdaMin[i]+windowSize;
-   	if (customLambdaMax[i]>calibIntervalMax)
-   	 customLambdaMax[i]=calibIntervalMax;
-   	if (customLambdaMin[i+1]<calibIntervalMin)
-   	 customLambdaMin[i+1]=customLambdaMax[i];
+       if (customLambdaMax[i]<customLambdaMin[i])
+        customLambdaMax[i]=customLambdaMin[i]+windowSize;
+       if (customLambdaMax[i]>calibIntervalMax)
+        customLambdaMax[i]=calibIntervalMax;
+       if (customLambdaMin[i+1]<calibIntervalMin)
+        customLambdaMin[i+1]=customLambdaMax[i];
    }
  }
 
@@ -530,7 +530,7 @@ void CWProjectTabCalibration::slotDivisionModeChanged(int index)
    }
   else
    {
-   	m_subWindowsSizeLabel->hide();
+       m_subWindowsSizeLabel->hide();
     m_subWindowsSizeEdit->hide();
     m_subWindowsCustomButton->hide();
    }
@@ -541,7 +541,7 @@ void CWProjectTabCalibration::slotBrowseSolarRefFile()
   CPreferences *pref = CPreferences::instance();
 
   QString filename = QFileDialog::getOpenFileName(this, "Open Solar Reference File",
-						  pref->directoryName("Ref"),
+                          pref->directoryName("Ref"),
                                                   "Kurucz File (*.ktz);;All Files (*)");
 
   if (!filename.isEmpty()) {
@@ -556,7 +556,7 @@ void CWProjectTabCalibration::slotBrowseSlfFile()
   CPreferences *pref = CPreferences::instance();
 
   QString filename = QFileDialog::getOpenFileName(this, "Open Slit Function File",
-						  pref->directoryName("Slf"),
+                          pref->directoryName("Slf"),
                                                   "Slit function File (*.slf);;All Files (*)");
 
   if (!filename.isEmpty()) {

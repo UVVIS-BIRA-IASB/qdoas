@@ -58,8 +58,8 @@ CWAboutDialog::CWAboutDialog(QWidget *parent) :
   QString blurb("is copyright ");
   blurb.append(Qt::Key_copyright);
   blurb.append(" 2007\n\nBelgian Institute for Space Aeronomy (BIRA-IASB)\n"
-	       "Avenue Circulaire 3,  1180 Uccle,  Belgium\n\nand\n\n"
-	       "Science [&] Technology BV,\nDelft, Netherlands.");
+           "Avenue Circulaire 3,  1180 Uccle,  Belgium\n\nand\n\n"
+           "Science [&] Technology BV,\nDelft, Netherlands.");
 
   QLabel *blurbLabel = new QLabel(blurb);
   blurbLabel->setAlignment(Qt::AlignCenter);

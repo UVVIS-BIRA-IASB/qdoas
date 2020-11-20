@@ -229,10 +229,10 @@ enum _maxdoasRefSelectionMode {
 // Additional options for the reference of the scan selection mode
 
 enum _maxdoasScanMode {
-	 ANLYS_MAXDOAS_REF_SCAN_BEFORE,                                                // use the zenith before the scan
-	 ANLYS_MAXDOAS_REF_SCAN_AFTER,                                                 // use the zenith after the scan
-	 ANLYS_MAXDOAS_REF_SCAN_AVERAGE,                                               // average the zenith spectra before and after the scan
-	 ANLYS_MAXDOAS_REF_SCAN_INTERPOLATE                                            // interpolate the zenith spectra before and after the scan at the current measurement time
+     ANLYS_MAXDOAS_REF_SCAN_BEFORE,                                                // use the zenith before the scan
+     ANLYS_MAXDOAS_REF_SCAN_AFTER,                                                 // use the zenith after the scan
+     ANLYS_MAXDOAS_REF_SCAN_AVERAGE,                                               // average the zenith spectra before and after the scan
+     ANLYS_MAXDOAS_REF_SCAN_INTERPOLATE                                            // interpolate the zenith spectra before and after the scan at the current measurement time
 };
 
 enum _kuruczMode {
@@ -345,9 +345,9 @@ enum _prjctFwhmTypes {
 };
 
 enum _prjctCalibWindows {
-	  PRJCT_CALIB_WINDOWS_CONTIGUOUS,
-	  PRJCT_CALIB_WINDOWS_SLIDING,
-	  PRJCT_CALIB_WINDOWS_CUSTOM
+      PRJCT_CALIB_WINDOWS_CONTIGUOUS,
+      PRJCT_CALIB_WINDOWS_SLIDING,
+      PRJCT_CALIB_WINDOWS_CUSTOM
 };
 
 // ----------------------

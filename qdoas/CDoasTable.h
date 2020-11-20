@@ -234,7 +234,7 @@ class CDoasTableColumnDoubleEdit : public CDoasTableColumnEdit
 {
  public:
   CDoasTableColumnDoubleEdit(double minimum, double maximum, int decimals,
-			     const QString &label, CDoasTable *owner, int width);
+                 const QString &label, CDoasTable *owner, int width);
 
   virtual QVariant getCellData(int rowIndex) const;
 

@@ -328,7 +328,7 @@ RC OUTPUT_GetWveAmf(CROSS_RESULTS *pResults,double Zm,double *lambda,double *xs,
 
   if ((pResults->indexAmf!=ITEM_NONE) && (OUTPUT_AmfSpace!=NULL))
    {
-   	pAmfSymbol=&OUTPUT_AmfSpace[pResults->indexAmf];
+       pAmfSymbol=&OUTPUT_AmfSpace[pResults->indexAmf];
 
     for (i=0;i<n_wavel;i++)
      xs[i]*=(double)VECTOR_Table2_Index1(pAmfSymbol->Phi,pAmfSymbol->PhiLines,pAmfSymbol->PhiColumns,(double)lambda[i],(double)Zm);
@@ -585,7 +585,7 @@ void OUTPUT_ResetData(void)
    {
     for (int indexFeno=0;indexFeno<MAX_FENO;indexFeno++)
      {
-     	FENO *pTabFeno=&TabFeno[indexFenoColumn][indexFeno];
+         FENO *pTabFeno=&TabFeno[indexFenoColumn][indexFeno];
 
       for (int indexTabCross=0;indexTabCross<MAX_FIT;indexTabCross++)
        {

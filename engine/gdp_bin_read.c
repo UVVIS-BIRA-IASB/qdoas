@@ -101,7 +101,7 @@
 #define PARAMETER 5000.0
 #define SCIENCE_DATA_DEFINED          10                                        // number of bands
 #define SPECTRAL_FITT_ORDER            5                                        // degree of polynomial used for building wavelength scale
-#define MAX_FITT_ORDER	                6
+#define MAX_FITT_ORDER                    6
 #define GDP_BIN_ERROR_ID_MASK       0x01
 
 // reference for each pixel type: east, center, west, backscan
@@ -293,7 +293,7 @@ static int gdpBinLoadReferenceFlag=0;
 **  References:
 **  Libraries:
 **  Created:    22.3.94
-**  Author: 	Diego Loyola, DLR/WT-DA-BS
+**  Author:     Diego Loyola, DLR/WT-DA-BS
 \*----------------------------------------------------------------------------*/
 static double EvalPolynom_d(double X, const double *Coefficient, short Grad) {
   double Result = 0.0, Mult = 1.0;

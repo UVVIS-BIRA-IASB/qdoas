@@ -180,24 +180,24 @@ int SYMB_itemCrossN;                                                            
 
 RC SYMB_Add(char *symbolName,char *symbolDescription)
  {
- 	// Declaration
+     // Declaration
 
- 	RC rc;
+     RC rc;
 
- 	// Initialization
+     // Initialization
 
- 	rc=ERROR_ID_NO;
+     rc=ERROR_ID_NO;
 
- 	// Check for the buffer limits
+     // Check for the buffer limits
 
   if (SYMB_itemCrossN==MAX_SYMBOL_CROSS)
    rc=ERROR_SetLast("SYMB_Add",ERROR_TYPE_FATAL,ERROR_ID_BUFFER_FULL,"symbols");
   else
    {
-   	strcpy(SYMB_itemCrossList[SYMB_itemCrossN].name,symbolName);
-   	strcpy(SYMB_itemCrossList[SYMB_itemCrossN].description,symbolDescription);
+       strcpy(SYMB_itemCrossList[SYMB_itemCrossN].name,symbolName);
+       strcpy(SYMB_itemCrossList[SYMB_itemCrossN].description,symbolDescription);
 
-   	SYMB_itemCrossN++;
+       SYMB_itemCrossN++;
    }
 
   // Return

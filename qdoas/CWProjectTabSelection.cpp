@@ -263,10 +263,10 @@ void CWProjectTabSelection::apply(mediate_project_selection_t *properties) const
 
 void CWProjectTabSelection::slotInstrumentChanged(int instrument)
 {
-	if (instrument==PRJCT_INSTR_FORMAT_GOME2)
-	 m_cloudFractionGroup->show();
-	else
-	 m_cloudFractionGroup->hide();
+    if (instrument==PRJCT_INSTR_FORMAT_GOME2)
+     m_cloudFractionGroup->show();
+    else
+     m_cloudFractionGroup->hide();
 }
 
 void CWProjectTabSelection::slotInstrumentTypeChanged(int instrumentType)

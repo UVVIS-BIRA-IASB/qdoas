@@ -476,9 +476,9 @@ RC ASCII_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int local
       if (dateSaveFlag) {
         tempValue=asciiMatrix.matrix[ndataRecord][count++];
 
-       	day=(int)floor(tempValue*1e-6);
-       	mon=(int)floor((tempValue-day*1.e6)*1e-4);
-       	year=(int)(tempValue-day*1.e6-mon*1.e4);
+           day=(int)floor(tempValue*1e-6);
+           mon=(int)floor((tempValue-day*1.e6)*1e-4);
+           year=(int)(tempValue-day*1.e6-mon*1.e4);
       }
       if (timeFlag)
         pRecordInfo->TimeDec=asciiMatrix.matrix[ndataRecord][count++];

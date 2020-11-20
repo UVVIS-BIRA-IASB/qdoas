@@ -77,8 +77,8 @@ void CWSlitFileBase::slotBrowseFile()
 
   CPreferences *pref = CPreferences::instance();
   QString filename = QFileDialog::getOpenFileName(this, "Select Slit Function File",
-						  pref->directoryName("Slit"),
-						  "Slit Function File (*.slf);;All Files (*)");
+                          pref->directoryName("Slit"),
+                          "Slit Function File (*.slf);;All Files (*)");
 
   if (!filename.isEmpty()) {
     pref->setDirectoryNameGivenFile("Slit", filename);
@@ -670,7 +670,7 @@ CWSlitSuperGaussEdit::CWSlitSuperGaussEdit(const struct slit_supergauss *d, QWid
 
   // exponential term
 
-  QLabel *labelExp = new QLabel(	"Exponential term", fwhmFrame);
+  QLabel *labelExp = new QLabel(    "Exponential term", fwhmFrame);
   labelExp->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
   labelExp->setMinimumSize(cSuggestedColumnZeroWidth, 0);
 

@@ -407,41 +407,41 @@ void OMI_TrackSelection(const char *omiTrackSelection,bool *use_row)
   else
     {
       for (const char *ptr=omiTrackSelection;(int)(ptr-omiTrackSelection)<=256;ptr++)
-	{
-	  if (resetFlag)
-	    {
-	      memset(str,0,256);
-	      n=0;
-	      resetFlag=0;
-	    }
+    {
+      if (resetFlag)
+        {
+          memset(str,0,256);
+          n=0;
+          resetFlag=0;
+        }
 
-	  if ((*ptr>='0') && (*ptr<='9'))
-	    str[n++]=*ptr;
-	  else if ((*ptr==':') || (*ptr=='-'))
-	    {
-	      number1=atoi(str);
-	      rangeFlag=1;
-	      resetFlag=1;
-	    }
-	  else if ((*ptr==',') || (*ptr==';') || (*ptr=='\0'))
-	    {
-	      number2=atoi(str);
+      if ((*ptr>='0') && (*ptr<='9'))
+        str[n++]=*ptr;
+      else if ((*ptr==':') || (*ptr=='-'))
+        {
+          number1=atoi(str);
+          rangeFlag=1;
+          resetFlag=1;
+        }
+      else if ((*ptr==',') || (*ptr==';') || (*ptr=='\0'))
+        {
+          number2=atoi(str);
 
-	      if (!rangeFlag)
-		number1=number2;
+          if (!rangeFlag)
+        number1=number2;
 
-	      if ((number1>0) && (number1<MAX_SWATHSIZE) && (number2>0) && (number2<MAX_SWATHSIZE))
-		for (i=number1-1;i<number2;i++)
-		  use_row[i]=true;
+          if ((number1>0) && (number1<MAX_SWATHSIZE) && (number2>0) && (number2<MAX_SWATHSIZE))
+        for (i=number1-1;i<number2;i++)
+          use_row[i]=true;
 
-	      number1=number2=-1;
-	      rangeFlag=0;
-	      resetFlag=1;
+          number1=number2=-1;
+          rangeFlag=0;
+          resetFlag=1;
 
-	      if (*ptr=='\0')
-		break;
-	    }
-	}
+          if (*ptr=='\0')
+        break;
+        }
+    }
     }
 }
 
@@ -799,7 +799,7 @@ static RC setup_automatic_reference(ENGINE_CONTEXT *pEngineContext, void *respon
         if(reflist != NULL) {
           average_spectrum(pTabFeno->Sref, pTabFeno->SrefSigma, reflist, pTabFeno->LambdaRef);
           VECTOR_NormalizeVector(pTabFeno->Sref-1,n_wavel,&pTabFeno->refNormFact, __func__);
-	  pTabFeno->ref_description = automatic_reference_info(reflist);
+      pTabFeno->ref_description = automatic_reference_info(reflist);
         } else{
           char errormessage[250];
           sprintf( errormessage, "Can not find reference spectra for row %d and analysis window_%s", row, pTabFeno->windowName);

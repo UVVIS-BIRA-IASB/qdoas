@@ -36,7 +36,7 @@ class CUsampConfigHandler : public CConfigHandler
   CUsampConfigHandler();
 
   virtual bool startElement(const QString &namespaceURI, const QString &localName,
-			    const QString &qName, const QXmlAttributes &atts);
+                const QString &qName, const QXmlAttributes &atts);
 
   const mediate_usamp_t* properties(void) const;
 
