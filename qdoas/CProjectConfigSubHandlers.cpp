@@ -1861,8 +1861,8 @@ bool CProjectOutputSubHandler::start(const QXmlAttributes &atts)
   str = atts.value("fileFormat");
   if (!str.isEmpty()) {
     enum output_format format = output_get_format(str.toLocal8Bit().data());
-    if (format != -1)
-      m_output->file_format = format;
+//    if (format != -1)   -> by default, output_get_format returns ASCII
+//      m_output->file_format = format;
   }
 
   return true;

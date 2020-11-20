@@ -1781,7 +1781,7 @@ static int register_cross_results(const PRJCT_RESULTS *pResults, const FENO *pTa
         { pTabCrossResults->indexAmf!=ITEM_NONE && pTabCrossResults->StoreVrtErr, symbolName,
           { .basic_fieldname = "VErr", .format = FORMAT_DOUBLE, .resulttype = PRJCT_RESULTS_VERT_ERR, .memory_type = OUTPUT_DOUBLE, .get_data = (func_void) &get_vrt_err} },
         { pTabCrossResults->StoreSlntCol, symbolName,
-          { .basic_fieldname = "SlCol", .format = FORMAT_DOUBLE, .resulttype = PRJCT_RESULTS_SLANT_COL, .memory_type = OUTPUT_DOUBLE, .get_data = (func_void) &get_slant_column, .attributes = has_file ? cross_attribs_file : NULL, .num_attributes = has_file ? 1 : 0} },
+          { .basic_fieldname = "SlCol", .format = FORMAT_DOUBLE, .resulttype = PRJCT_RESULTS_SLANT_COL, .memory_type = OUTPUT_DOUBLE, .get_data = (func_void) &get_slant_column, .attributes = has_file ? (char *)cross_attribs_file : NULL, .num_attributes = has_file ? 1 : 0} },
         { pTabCrossResults->StoreSlntErr, symbolName,
           { .basic_fieldname = "SlErr", .format = FORMAT_DOUBLE, .resulttype = PRJCT_RESULTS_SLANT_ERR, .memory_type = OUTPUT_DOUBLE, .get_data = (func_void) &get_slant_err} },
         { pTabCrossResults->StoreShift, symbolName,
@@ -2172,13 +2172,13 @@ RC open_output_file(const ENGINE_CONTEXT *pEngineContext, const char *outputFile
 
   switch(selected_format) {
   case ASCII:
-    return ascii_open(pEngineContext, outputFileName);
+    return ascii_open(pEngineContext, (char *)outputFileName);
     break;
   case HDFEOS5:
-    return hdfeos5_open(pEngineContext, outputFileName);
+    return hdfeos5_open(pEngineContext, (char *)outputFileName);
     break;
   case NETCDF:
-    return netcdf_open(pEngineContext, outputFileName,outputNbRecords);
+    return netcdf_open(pEngineContext, (char *)outputFileName,outputNbRecords);
     break;
   default:
     return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_FILE_BAD_FORMAT);
@@ -2495,7 +2495,7 @@ RC OUTPUT_SaveResults(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
       Spectrum[i]/=(double)pRecordInfo->Tint;
   }
 
-  if (outputNbRecords<pEngineContext->recordNumber)
+  if ((int)outputNbRecords<pEngineContext->recordNumber)
     OutputSaveRecord(pEngineContext,indexFenoColumn);
 
   // Results safe keeping
@@ -2752,7 +2752,7 @@ enum output_format output_get_format(const char *fileext) {
   if (array_offset)
     return array_offset - output_file_extensions; // offset in the array output_file_extensions corresponds to the enum value
   else
-    return -1; // not found
+    return ASCII;
 }
 
 /*! \brief Make a deep copy of an attribute list. */

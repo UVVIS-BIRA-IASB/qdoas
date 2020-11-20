@@ -790,7 +790,7 @@ static RC setup_automatic_reference(ENGINE_CONTEXT *pEngineContext, void *respon
       const int n_wavel = NDET[row];
       for(int analysis_window = 0; analysis_window < NFeno; analysis_window++) {
         FENO *pTabFeno = &TabFeno[row][analysis_window];
-        if(pTabFeno->hidden || !pTabFeno->refSpectrumSelectionMode==ANLYS_REF_SELECTION_MODE_AUTOMATIC ) {
+        if(pTabFeno->hidden || (pTabFeno->refSpectrumSelectionMode!=ANLYS_REF_SELECTION_MODE_AUTOMATIC) ) {
           continue;
         }
 

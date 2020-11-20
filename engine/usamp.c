@@ -220,7 +220,7 @@ RC USAMP_Build(double *phase1,                                                  
   slitParam[0]=pSlit->slitParam;
   slitParam[1]=pSlit->slitParam2;
   slitParam[2]=pSlit->slitParam3;
-  slitParam[3]=pSlit->slitParam4;
+  // shouldn't be used anymore slitParam[3]=pSlit->slitParam4;
 
   // Buffers allocation
 

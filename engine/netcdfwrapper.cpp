@@ -8,7 +8,7 @@
 
 using std::string;
 using std::vector;
-using std::stringstream;
+using std::stringstream; 
 
 int NetCDFGroup::groupID(const string& groupName) const {
   int grpid;
@@ -37,6 +37,7 @@ bool NetCDFGroup::hasAttr(const string& attrName, int varid) const {
   } else {
     return false;
   }
+  return false;
 }
 
 int NetCDFGroup::varID(const string& varName) const {
@@ -74,6 +75,7 @@ vector<int> NetCDFGroup::dimIDs(int varid) const {
   } else {
     throw std::runtime_error("Cannot get dimension ids for variable '" + varName(varid) + "'");
   }
+  return {};
 }
 
 string NetCDFGroup::varName(int varid) const {
@@ -85,6 +87,7 @@ string NetCDFGroup::varName(int varid) const {
     ss << "Cannot find netCDF variable with id '" << varid << "' in group '"  << name << "'";
     throw std::runtime_error(ss.str());
   }
+  return {};
 }
 
 int NetCDFGroup::dimID(const string& dimName) const {
@@ -95,6 +98,7 @@ int NetCDFGroup::dimID(const string& dimName) const {
   } else {
     throw std::runtime_error("Cannot find netCDF dimension '"+dimName+"' in group '"+name+"'");
   }
+  return -1;
 }
 
 
@@ -120,6 +124,7 @@ string NetCDFGroup::dimName(int dimid) const {
     ss << "Cannot get name of netCDF dimension '" << dimid << "' in group '" << name << "'";
     throw std::runtime_error(ss.str());
   }
+  return NULL;
 }
 
 void NetCDFFile::close() {
@@ -173,9 +178,11 @@ static int openNetCDF(const string &filename, int mode) {
     if (rc == NC_NOERR) {
       return groupid;
     } else {
+      rc=1;
       throw std::runtime_error("Error opening netCDF file '" + filename + "'");
     }
   }
+  return rc;
 }
 
 NetCDFFile::NetCDFFile(const string& filename, int mode) : NetCDFGroup(openNetCDF(filename, mode)),
@@ -197,6 +204,8 @@ NetCDFGroup NetCDFGroup::getGroup(const string& groupname) const {
     return NetCDFGroup(groupID(groupname), groupname);
   else
     throw std::runtime_error("Cannot open netCDF group '" + groupname + "'");
+  
+  return {};
 }
 
 NetCDFGroup NetCDFGroup::defGroup(const string& groupname) {
@@ -219,6 +228,7 @@ NetCDFGroup NetCDFGroup::defGroup(const string& groupname) {
     }
     throw std::runtime_error("Error creating group '" + groupname + "'" + err);
   }
+  return {};
 }
 
 int NetCDFGroup::defDim(const string& dimname, size_t len) {
@@ -230,6 +240,7 @@ int NetCDFGroup::defDim(const string& dimname, size_t len) {
   } else {
     throw std::runtime_error("Error creating dimension '" + dimname + "'");
   }
+  return -1;
 }
 
 int NetCDFGroup::defVar(const string& varname, const vector<int>& dimids, nc_type xtype) {
@@ -240,6 +251,7 @@ int NetCDFGroup::defVar(const string& varname, const vector<int>& dimids, nc_typ
   } else {
     throw std::runtime_error("Error creating variable '" + varname + "' in group '" + name + "'");
   }
+  return -1;
 }
 
 int NetCDFGroup::defVar(const string& name, const vector<string>& dimnames, nc_type xtype) {

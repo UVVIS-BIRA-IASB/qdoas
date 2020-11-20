@@ -676,7 +676,7 @@ RC AnalysePukiteConvoluteI0(const FENO *pTabFeno,double conc,double lambda0,
 
       // Covolve the Pukite terms separately
 
-          !(rc=XSCONV_TypeI0Correction(&xsNewI0,&xshr,&hrSolar,conc,slitType,slitMatrix,(double *)slitParam,wveDptFlag)) &&
+          !(rc=XSCONV_TypeI0Correction((MATRIX_OBJECT *)&xsNewI0,(MATRIX_OBJECT *)&xshr,(MATRIX_OBJECT *)&hrSolar,conc,slitType,(MATRIX_OBJECT *)slitMatrix,(double *)slitParam,wveDptFlag)) &&
           !(rc=XSCONV_TypeStandard(&xsNew0,indexlambdaMin,indexlambdaMax,&xshr0,&xshr0,NULL,slitType,slitMatrix,(double *)slitParam,wveDptFlag)) &&
           !(rc=XSCONV_TypeStandard(&xsNew1,indexlambdaMin,indexlambdaMax,&xshr1,&xshr1,NULL,slitType,slitMatrix,(double *)slitParam,wveDptFlag)))
        {
@@ -718,8 +718,9 @@ RC AnalysePukiteConvoluteI0(const FENO *pTabFeno,double conc,double lambda0,
              {
               for (j=indexlambdaMin;(j<indexlambdaMax) && !rc;j++)
                {
+                // to MVR : check if we need to use central pixel
                 // int j0=FNPixel((double *)newlambda,lambda0,n_wavel,PIXEL_CLOSEST);
-                int j0=FNPixel((double *)pXs->matrix[0],lambda0,pXs->nl,PIXEL_CLOSEST);
+                // int j0=FNPixel((double *)pXs->matrix[0],lambda0,pXs->nl,PIXEL_CLOSEST);
 
                 if (fabs(xsNew0.matrix[1][j])<(double)1.e-260)
                  {
@@ -967,7 +968,7 @@ RC Analyse_Molecular_Ring_Calculate(FENO *pFeno,double *lambda,int n_wavel,doubl
   CROSS_REFERENCE *pTabCross,*pTabCrossMolec;
   INDEX indexTabCross;
   double ns,ns0,lambda0;
-  double *lambdaEff,*sigmaEff;
+  // MVR : to see later double *lambdaEff,*sigmaEff;
   int i,j0;
   RC rc;
 
@@ -1989,7 +1990,7 @@ RC AnalyseLoadVector(const char *function, const char *fileName, double *lambda,
           }
         }
       } else if (n_scan > 2) {
-          rc = MATRIX_Load(&fullFileName,&fileMatrix,0,0,0.,0.,0,0,__func__);
+          rc = MATRIX_Load(fullFileName,&fileMatrix,0,0,0.,0.,0,0,__func__);
           for (int i = 0; i < n_wavel && fgets(string,MAX_ITEM_TEXT_LEN,fp) && !rc; ++i){
               lambda[i]=fileMatrix.matrix[0][i*(fileMatrix.nl-1)/(n_wavel-1)];
               vector[i]=fileMatrix.matrix[n_col+1][i*(fileMatrix.nl-1)/(n_wavel-1)];
@@ -3172,7 +3173,7 @@ RC ANALYSE_Function(double *spectrum_orig, double *reference, const double *Sigm
         }
       }
       LINEAR_free(fitprops->linfit);
-      fitprops->linfit = LINEAR_from_matrix(fitprops->P, Npts,fitprops->DimP,DECOMP_QR);
+      fitprops->linfit = LINEAR_from_matrix((const double **)fitprops->P, Npts,fitprops->DimP,DECOMP_QR);
       if (SigmaY != NULL) {
         LINEAR_set_weight(fitprops->linfit, SigmaY);
         for (int i=0; i<fitprops->DimP; ++i) {
@@ -4713,7 +4714,7 @@ RC ANALYSE_LoadSlit(const PRJCT_SLIT *pSlit,int kuruczFlag)
   // Return
 
   return rc;
-}
+} 
 
 RC ANALYSE_CheckLambda(WRK_SYMBOL *pWrkSymbol, const double *lambda, const int n_wavel)
 {
@@ -4790,7 +4791,7 @@ RC ANALYSE_LoadCross(ENGINE_CONTEXT *pEngineContext, const ANALYSIS_CROSS *cross
   const int n_wavel = NDET[indexFenoColumn];
   pWrkSymbol=NULL;
   pTabFeno=&TabFeno[indexFenoColumn][NFeno];
-  strcpy(diffOrtho,"Differential XS");
+  strcpy((char *)diffOrtho,(char *)"Differential XS");
   firstTabCross=pTabFeno->NTabCross;
   rc=ERROR_ID_NO;
 
@@ -5001,9 +5002,9 @@ RC ANALYSE_LoadCross(ENGINE_CONTEXT *pEngineContext, const ANALYSIS_CROSS *cross
 
       if ((pEngineCross->crossCorrection==ANLYS_CORRECTION_TYPE_SLOPE) || (pEngineCross->crossCorrection==ANLYS_CORRECTION_TYPE_PUKITE) || (pEngineCross->crossCorrection==ANLYS_CORRECTION_TYPE_MOLECULAR_RING_SLOPE))
        {
-        if ((pEngineCross->indexPukite1=AnalyseGetPukiteIndex(&TabCross[firstTabCross],endTabCross,pCross->symbol,1))!=ITEM_NONE)
+        if ((pEngineCross->indexPukite1=AnalyseGetPukiteIndex(&TabCross[firstTabCross],endTabCross,(char *)pCross->symbol,1))!=ITEM_NONE)
          TabCross[pEngineCross->indexPukite1].isPukite=2;
-        if ((pEngineCross->indexPukite2=AnalyseGetPukiteIndex(&TabCross[firstTabCross],endTabCross,pCross->symbol,2))!=ITEM_NONE)
+        if ((pEngineCross->indexPukite2=AnalyseGetPukiteIndex(&TabCross[firstTabCross],endTabCross,(char *)pCross->symbol,2))!=ITEM_NONE)
          TabCross[pEngineCross->indexPukite2].isPukite=2;
 
         // !!! Pukite, check the different cases and generate error messages for inconsistency
@@ -5027,7 +5028,7 @@ RC ANALYSE_LoadCross(ENGINE_CONTEXT *pEngineContext, const ANALYSIS_CROSS *cross
       if (((pEngineCross->crossCorrection==ANLYS_CORRECTION_TYPE_MOLECULAR_RING) ||(pEngineCross->crossCorrection==ANLYS_CORRECTION_TYPE_MOLECULAR_RING_SLOPE)) && (pRingSymbol[indexTabCross]!=NULL))
        {
         int molecularCrossIndex;
-        if (((molecularCrossIndex=pEngineCross->molecularCrossIndex=AnalyseGetSymbolIndex(TabCross,firstTabCross,endTabCross,indexTabCross,pRingSymbol[indexTabCross]))!=ITEM_NONE) &&
+        if (((molecularCrossIndex=pEngineCross->molecularCrossIndex=AnalyseGetSymbolIndex(TabCross,firstTabCross,endTabCross,indexTabCross,(char *)pRingSymbol[indexTabCross]))!=ITEM_NONE) &&
            (((TabCross[molecularCrossIndex].molecularCrossSection=(double *)MEMORY_AllocDVector((char *)__func__,"molecularCrossSection",0,n_wavel-1))==NULL) )) // lambdaEff,sigmaEff ||
 // lambdaEff,sigmaEff            ((TabCross[molecularCrossIndex].crossCorrection==ANLYS_CORRECTION_TYPE_PUKITE) &&
 // lambdaEff,sigmaEff             (TabCross[molecularCrossIndex].crossAction==ANLYS_CROSS_ACTION_CONVOLUTE_I0) &&
@@ -5054,7 +5055,7 @@ RC ANALYSE_LoadCross(ENGINE_CONTEXT *pEngineContext, const ANALYSIS_CROSS *cross
 
       else if (!pEngineCross->isPukite)
        {
-        indexSymbol=AnalyseGetSymbolIndex(TabCross,firstTabCross,endTabCross,indexTabCross,pOrthoDiffSymbol[indexTabCross]);
+        indexSymbol=AnalyseGetSymbolIndex(TabCross,firstTabCross,endTabCross,indexTabCross,(char *)pOrthoDiffSymbol[indexTabCross]);
 
         if ((indexSymbol!=ITEM_NONE) && (indexSymbol<endTabCross))
          {

@@ -312,7 +312,7 @@ namespace {
       for(int j=0; j<NFeno; ++j) {
         FENO *pTabFeno = &TabFeno[i][j];
 
-        if(pTabFeno->hidden || !pTabFeno->refSpectrumSelectionMode==ANLYS_REF_SELECTION_MODE_AUTOMATIC)
+        if(pTabFeno->hidden || (pTabFeno->refSpectrumSelectionMode!=ANLYS_REF_SELECTION_MODE_AUTOMATIC))
           continue;
 
         vector<double> refLambda(currentOrbit.nLambda);

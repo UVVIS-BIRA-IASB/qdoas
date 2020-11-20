@@ -459,7 +459,7 @@ RC XsconvFctBuild(double *slitLambda,double *slitVector,int slitSize,int slitTyp
      {
       if (sum==(double)0.)
        rc=ERROR_SetLast("XsconvFctBuild",ERROR_TYPE_FATAL,ERROR_ID_DIVISION_BY_0,"the type of line shape is not supported");
-      else if ((slitType==SLIT_TYPE_APOD))
+      else if (slitType==SLIT_TYPE_APOD)
        for (invSum=(double)1./sum,i=0;i<slitSize;i++)
         slitVector[i]*=invSum;
      }

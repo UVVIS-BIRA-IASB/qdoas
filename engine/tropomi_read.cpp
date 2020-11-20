@@ -1008,7 +1008,7 @@ int tropomi_prepare_automatic_reference(ENGINE_CONTEXT *pEngineContext, void *re
       for(int window=0; window < NFeno; ++window) {
         FENO *pTabFeno = &TabFeno[row][window];
         if (!pTabFeno->useRefRow) continue;
-        if (pTabFeno->hidden || !pTabFeno->refSpectrumSelectionMode == ANLYS_REF_SELECTION_MODE_AUTOMATIC) continue;
+        if (pTabFeno->hidden || (pTabFeno->refSpectrumSelectionMode!=ANLYS_REF_SELECTION_MODE_AUTOMATIC)) continue;
         const vector<earth_ref>& refs = earth_spectra[window][row];
 //        if (!(rc=tropomi_get_reference(pTabFeno->ref2,row,pTabFeno->LambdaRef,pTabFeno->Sref,pTabFeno->SrefSigma,&n_wavel,0))){
            if (refs.size()) {

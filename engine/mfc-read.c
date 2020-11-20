@@ -720,6 +720,8 @@ RC ReliMFC(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int localDay
         pRecord->latitude=MFC_header.latitude;
         pRecord->altitude=(double)0.;
         pRecord->elevationViewAngle=(float)MFC_header.elevation;
+        pRecord->azimuthViewAngle=999.;
+        pRecord->maxdoas.measurementType=((pRecord->elevationViewAngle>80.) && (pRecord->elevationViewAngle<100.))?PRJCT_INSTR_MAXDOAS_TYPE_ZENITH:PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS;  // Not the possibility to separate almucantar, horizon and direct sun from off-axis measurements
 
         if (strlen(pRecord->Nom))
          {
@@ -728,9 +730,15 @@ RC ReliMFC(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int localDay
           else
            sscanf(pRecord->Nom,"%f",&pRecord->elevationViewAngle);
          }
-
+        else
+         pRecord->elevationViewAngle=999.;
+        
         if (pRecord->elevationViewAngle>100.)
-         pRecord->elevationViewAngle=180.-pRecord->elevationViewAngle;
+         {
+          pRecord->elevationViewAngle=180.-pRecord->elevationViewAngle;
+          if (pRecord->azimuthViewAngle<900.)
+           pRecord->azimuthViewAngle=fmod(pRecord->azimuthViewAngle+180.,360.);
+         }
 
         pRecord->Tm=(double)ZEN_NbSec(&pRecord->present_datetime.thedate,&pRecord->present_datetime.thetime,0);
         pRecord->Zm=ZEN_FNTdiz(ZEN_FNCrtjul(&pRecord->Tm),&pRecord->longitude,&pRecord->latitude,&pRecord->Azimuth);
@@ -741,8 +749,6 @@ RC ReliMFC(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int localDay
         tmLocal=pRecord->Tm+timeshift*3600.;
         pRecord->localCalDay=ZEN_FNCaljda(&tmLocal);
         pRecord->localTimeDec=fmod(pRecord->TimeDec+24.+timeshift,(double)24.);
-
-        pRecord->maxdoas.measurementType=(pRecord->elevationViewAngle>80.)?PRJCT_INSTR_MAXDOAS_TYPE_ZENITH:PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS;  // Not the possibility to separate almucantar, horizon and direct sun from off-axis measurements
 
         // User constraints
 
@@ -817,6 +823,7 @@ RC MFC_ReadRecordStd(ENGINE_CONTEXT *pEngineContext,char *fileName,
 
   pRecord=&pEngineContext->recordInfo;
   pInstrumental=&pEngineContext->project.instrumental;
+  
   memset(mfcDate,0,sizeof(int)*3);
   iDay=iMon=iYear=-1;
   yearN=sepN=0;
@@ -967,8 +974,14 @@ RC MFC_ReadRecordStd(ENGINE_CONTEXT *pEngineContext,char *fileName,
           }
      }
 
-    pRecord->maxdoas.measurementType=(pRecord->elevationViewAngle>80.)?PRJCT_INSTR_MAXDOAS_TYPE_ZENITH:PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS;  // Not the possibility to separate almucantar, horizon and direct sun from off-axis measurements
-
+    pRecord->maxdoas.measurementType=((pRecord->elevationViewAngle>80.)&&(pRecord->elevationViewAngle<100.))?PRJCT_INSTR_MAXDOAS_TYPE_ZENITH:PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS;  // Not the possibility to separate almucantar, horizon and direct sun from off-axis measurements
+    
+    if (pRecord->elevationViewAngle>100.)
+     {
+      pRecord->elevationViewAngle=180.-pRecord->elevationViewAngle;
+      pRecord->azimuthViewAngle=fmod(pRecord->azimuthViewAngle+180,360);
+     }
+     
     if ((pRecord->Tint<(double)1.e-3) && (pRecord->TotalAcqTime>(double)1.e-3))
      pRecord->Tint=pRecord->TotalAcqTime;
 
@@ -1345,7 +1358,14 @@ RC MFCBIRA_Reli(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int loc
     pRecord->TDet=header.temperature;
 
     strcpy(pRecord->mfcBira.originalFileName,header.fileName);
-    pRecord->maxdoas.measurementType=header.measurementType;
+    
+    pRecord->maxdoas.measurementType=((pRecord->elevationViewAngle>80.)&&(pRecord->elevationViewAngle<100.))?PRJCT_INSTR_MAXDOAS_TYPE_ZENITH:PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS;  // Not the possibility to separate almucantar, horizon and direct sun from off-axis measurements
+    
+    if (pRecord->elevationViewAngle>100.)
+     {
+      pRecord->elevationViewAngle=180.-pRecord->elevationViewAngle;
+      pRecord->azimuthViewAngle=fmod(pRecord->azimuthViewAngle+180,360);
+     }
 
     // Calculate the date and time at half of the measurement
 

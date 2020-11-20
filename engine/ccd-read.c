@@ -169,7 +169,7 @@ static double predTint[MAXTPS] =
   38.00,  46.00,  55.00,  66.00,  80.00,  95.00, 115.00, 140.00, 160.00, 200.00,
   240.00, 280.00, 340.00, 410.00, 490.00, 590.00 };
 
-static uint32_t ccdDarkCurrentOffset[MAXTPS];                                      // offset of measured dark currents for each integration time
+static int ccdDarkCurrentOffset[MAXTPS];                                      // offset of measured dark currents for each integration time
 
 CAMERA_PICTURE ccdImageFilesList[MAX_CAMERA_PICTURES];
 char ccdCurrentImagePath[MAX_ITEM_TEXT_LEN];
@@ -298,10 +298,10 @@ RC SetCCD_EEV(ENGINE_CONTEXT *pEngineContext,FILE *specFp,FILE *darkFp)
   // Declarations
 
   CCD_DATA header;                                                              // header of a record
-  uint32_t   *recordIndexes;                                                       // indexes of records for direct access
+  int   *recordIndexes;                                                       // indexes of records for direct access
   int      ccdX,ccdY,dataSize;                                                  // size of the detector
   INDEX    indexTps;                                                            // browse the predefined integration time
-  uint32_t    offset;                                                              // offset to remove from the spectrum
+  int    offset;                                                              // offset to remove from the spectrum
   RC       rc;                                                                  // return code
 
   // Debugging
@@ -314,7 +314,7 @@ RC SetCCD_EEV(ENGINE_CONTEXT *pEngineContext,FILE *specFp,FILE *darkFp)
 
   recordIndexes=pEngineContext->buffers.recordIndexes;
 
-  memset(ccdDarkCurrentOffset,-1L,sizeof(uint32_t)*MAXTPS);
+  memset(ccdDarkCurrentOffset,-1,sizeof(int)*MAXTPS);
   pEngineContext->recordIndexesSize=2001;
   pEngineContext->recordNumber=0;
   ENGINE_refStartDate=1;
@@ -330,7 +330,7 @@ RC SetCCD_EEV(ENGINE_CONTEXT *pEngineContext,FILE *specFp,FILE *darkFp)
     // Read the header of the first record
 
     fseek(specFp,0L,SEEK_SET);
-    memset(recordIndexes,0L,sizeof(uint32_t)*pEngineContext->recordIndexesSize);
+    memset(recordIndexes,0L,sizeof(int)*pEngineContext->recordIndexesSize);
 
     fread(&header,sizeof(CCD_DATA),1,specFp);                             // Get date and time of the first record
 
@@ -350,7 +350,7 @@ RC SetCCD_EEV(ENGINE_CONTEXT *pEngineContext,FILE *specFp,FILE *darkFp)
 
       pEngineContext->recordNumber++;
 
-      recordIndexes[pEngineContext->recordNumber]=(uint32_t)
+      recordIndexes[pEngineContext->recordNumber]=(int)
         recordIndexes[pEngineContext->recordNumber-1]+
         sizeof(CCD_DATA)+((header.saveTracks)?ccdX*ccdY*dataSize:ccdX*dataSize);
 
@@ -748,7 +748,7 @@ RC ReliCCD_EEV(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int loca
                  if ((j>0) && (predTint[j]!=ccdTabTint[k]) && (predTint[j]-ccdTabTint[k]>ccdTabTint[k]-predTint[j-1]))
                   j--;
 
-                 if (ccdDarkCurrentOffset[j]!=-1L)
+                 if (ccdDarkCurrentOffset[j]!=-1)
                   {
                    fseek(darkFp,ccdDarkCurrentOffset[j],SEEK_SET);
 
@@ -917,7 +917,7 @@ RC SetCCD (ENGINE_CONTEXT *pEngineContext,FILE *specFp,int flag)
  {
   // Declarations
 
-  uint32_t  recordSize,                                                            // the size of one record in bytes (without SpecMax)
+  int  recordSize,                                                            // the size of one record in bytes (without SpecMax)
         *recordIndexes;                                                         // the position of spectra in bytes from the beginning of the file
   short *indexes,                                                               // the number of accumulations per spectrum (give by the same way,
                                                                                 // the size of the SpecMax vectors)

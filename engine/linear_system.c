@@ -117,7 +117,7 @@ struct linear_system*LINEAR_alloc(int m, int n, enum linear_fit_mode mode) {
 }
 
 // linear system of m equations in n variables
-struct linear_system *LINEAR_from_matrix(const double * const *a, int m, int n, enum linear_fit_mode mode) {
+struct linear_system *LINEAR_from_matrix(const double **a, int m, int n, enum linear_fit_mode mode) {
   struct linear_system *s = LINEAR_alloc(m, n, mode);
   switch (mode) {
   case DECOMP_SVD:

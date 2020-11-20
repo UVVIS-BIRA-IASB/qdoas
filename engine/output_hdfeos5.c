@@ -414,7 +414,7 @@ static RC initialize_data_buffer(void **datbuf, size_t len, const char *he5_fiel
     short fill_short;
     short *shortbuf = malloc(len * sizeof(*shortbuf));
     *datbuf = shortbuf;
-    result = HE5_SWgetfillvalue(swath_id, he5_fieldname, &fill_short);
+    result = HE5_SWgetfillvalue(swath_id, (char *)he5_fieldname, &fill_short);
     for (unsigned int i=0; i< len; ++i) {
       shortbuf[i] = fill_short;
     }
@@ -424,7 +424,7 @@ static RC initialize_data_buffer(void **datbuf, size_t len, const char *he5_fiel
     unsigned short fill_ushort;
     unsigned short *ushortbuf = malloc(len * sizeof(*ushortbuf));
     *datbuf = ushortbuf;
-    result = HE5_SWgetfillvalue(swath_id, he5_fieldname, &fill_ushort);
+    result = HE5_SWgetfillvalue(swath_id, (char *)he5_fieldname, &fill_ushort);
     for (unsigned int i=0; i< len; ++i) {
       ushortbuf[i] = fill_ushort;
     }
@@ -434,7 +434,7 @@ static RC initialize_data_buffer(void **datbuf, size_t len, const char *he5_fiel
     float fill_float;
     float *floatbuf = malloc(len * sizeof(*floatbuf));
     *datbuf = floatbuf;
-    result = HE5_SWgetfillvalue(swath_id, he5_fieldname, &fill_float);
+    result = HE5_SWgetfillvalue(swath_id, (char *)he5_fieldname, &fill_float);
     for (unsigned int i=0; i< len; ++i) {
       floatbuf[i] = fill_float;
     }
@@ -444,7 +444,7 @@ static RC initialize_data_buffer(void **datbuf, size_t len, const char *he5_fiel
     int fill_int;
     int *intbuf = malloc(len * sizeof(*intbuf));
     *datbuf = intbuf;
-    result = HE5_SWgetfillvalue(swath_id, he5_fieldname, &fill_int);
+    result = HE5_SWgetfillvalue(swath_id, (char *)he5_fieldname, &fill_int);
     for (unsigned int i=0; i< len; ++i) {
       intbuf[i] = fill_int;
     }
@@ -454,7 +454,7 @@ static RC initialize_data_buffer(void **datbuf, size_t len, const char *he5_fiel
     double fill_double;
     double *doublebuf = malloc(len * sizeof(*doublebuf));
     *datbuf = doublebuf;
-    result = HE5_SWgetfillvalue(swath_id, he5_fieldname, &fill_double);
+    result = HE5_SWgetfillvalue(swath_id, (char *)he5_fieldname, &fill_double);
     for (unsigned int i=0; i< len; ++i) {
       doublebuf[i] = fill_double;
     }
@@ -465,7 +465,7 @@ static RC initialize_data_buffer(void **datbuf, size_t len, const char *he5_fiel
     unsigned char fill_uchar;
     unsigned char *ucharbuf = malloc(3 * len * sizeof(*ucharbuf));
     *datbuf = ucharbuf;
-    result = HE5_SWgetfillvalue(swath_id, he5_fieldname, &fill_uchar);
+    result = HE5_SWgetfillvalue(swath_id, (char *)he5_fieldname, &fill_uchar);
     for (unsigned int i=0; i< 3*len; ++i) {
       ucharbuf[i] = fill_uchar;
     }
@@ -476,7 +476,7 @@ static RC initialize_data_buffer(void **datbuf, size_t len, const char *he5_fiel
     int fill_int;
     int *intbuf = malloc(3 * len * sizeof(*intbuf));
     *datbuf = intbuf;
-    result = HE5_SWgetfillvalue(swath_id, he5_fieldname, &fill_int);
+    result = HE5_SWgetfillvalue(swath_id, (char *)he5_fieldname, &fill_int);
     for (unsigned int i=0; i< 3*len; ++i) {
       intbuf[i] = fill_int;
     }
@@ -486,7 +486,7 @@ static RC initialize_data_buffer(void **datbuf, size_t len, const char *he5_fiel
     int fill_int;
     int *intbuf = malloc(7 * len * sizeof(*intbuf));
     *datbuf = intbuf;
-    result = HE5_SWgetfillvalue(swath_id, he5_fieldname, &fill_int);
+    result = HE5_SWgetfillvalue(swath_id, (char *)he5_fieldname, &fill_int);
     for (unsigned int i=0; i< 7*len; ++i) {
       intbuf[i] = fill_int;
     }
