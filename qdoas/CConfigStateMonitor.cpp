@@ -59,6 +59,6 @@ void CConfigStateMonitor::slotInvalidate()
   if (m_valid) {
     m_valid = false;
     emit signalStateChanged(m_valid);
-  }    
+  }
 }
 

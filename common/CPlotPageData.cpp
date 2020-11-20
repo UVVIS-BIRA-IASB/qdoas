@@ -37,9 +37,9 @@ int CPlotPageData::pageNumber(void) const
 }
 
 int CPlotPageData::size(void) const
-{                   
+{
   return (m_pageType==PLOTPAGE_DATASET)?m_dataSets.size():m_dataImages.size();
-}       
+}
 
 const QString& CPlotPageData::title(void) const
 {
@@ -49,12 +49,12 @@ const QString& CPlotPageData::title(void) const
 const QString& CPlotPageData::tag(void) const
 {
   return m_tag;
-}   
+}
 
 int CPlotPageData::type(void) const
 {
       return m_pageType;
-}  
+}
 
 RefCountConstPtr<CPlotDataSet> CPlotPageData::dataSet(int index) const
 {
@@ -86,7 +86,7 @@ void CPlotPageData::addPlotDataSet(const CPlotDataSet *dataSet)
 {
   // page takes ownership responsibility, which means it is safe
   // to wrap it in a reference counting pointer
-  
+
   m_dataSets.push_back(RefCountConstPtr<CPlotDataSet>(dataSet));
 }
 
@@ -96,6 +96,6 @@ void CPlotPageData::addPlotImage(const CPlotImage *image)
   // to wrap it in a reference counting pointer
 
   m_dataImages.push_back(RefCountConstPtr<CPlotImage>(image));
-}         
+}
 
 

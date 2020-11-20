@@ -149,7 +149,7 @@ QValidator::State CDoubleExpFmtValidator::validate(QString &input, int &pos) con
   // at least potentially ok
   if (haveExp && lenExp == 0) return QValidator::Intermediate;
   if (lenMantisa == 0) return QValidator::Intermediate;
-  
+
   // should be a real value
   bool ok;
   double v = input.toDouble(&ok);

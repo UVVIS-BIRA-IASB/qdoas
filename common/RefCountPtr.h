@@ -130,7 +130,7 @@ template<typename T>
 RefCountPtr<T>::RefCountPtr(const RefCountPtr<T> &other) :
   m_d(other.m_d),
   m_rc(other.m_rc)
-{  
+{
   // increase the count if the count storage exists
   if (m_rc) ++(*m_rc);
 }
@@ -154,8 +154,8 @@ RefCountPtr<T>& RefCountPtr<T>::operator=(const RefCountPtr<T> &rhs)
     delete m_rc;
   }
   m_d = rhs.m_d;   // point to same data
-  m_rc = rhs.m_rc; // same ref count storage 
-  
+  m_rc = rhs.m_rc; // same ref count storage
+
   if (m_rc) ++(*m_rc); // increase the reference count
 
   return *this;
@@ -203,7 +203,7 @@ bool RefCountPtr<T>::operator==(const RefCountPtr<T> &rhs) const
 {
   return (m_d == rhs.m_d);
 }
- 
+
 template<typename T>
 bool RefCountPtr<T>::operator!=(const RefCountPtr<T> &rhs) const
 {
@@ -227,7 +227,7 @@ bool RefCountPtr<T>::operator==(const RefCountConstPtr<T> &rhs) const
 {
   return (m_d == rhs.m_d);
 }
- 
+
 template<typename T>
 bool RefCountPtr<T>::operator!=(const RefCountConstPtr<T> &rhs) const
 {
@@ -260,7 +260,7 @@ template<typename T>
 RefCountConstPtr<T>::RefCountConstPtr(const RefCountConstPtr<T> &other) :
   m_d(other.m_d),
   m_rc(other.m_rc)
-{  
+{
   // increase the count if the count storage exists
   if (m_rc) ++(*m_rc);
 }
@@ -269,7 +269,7 @@ template<typename T>
 RefCountConstPtr<T>::RefCountConstPtr(const RefCountPtr<T> &other) :
   m_d(other.m_d),
   m_rc(other.m_rc)
-{  
+{
   // increase the count if the count storage exists
   if (m_rc) ++(*m_rc);
 }
@@ -293,8 +293,8 @@ RefCountConstPtr<T>& RefCountConstPtr<T>::operator=(const RefCountConstPtr<T> &r
     delete m_rc;
   }
   m_d = rhs.m_d;   // point to same data
-  m_rc = rhs.m_rc; // same ref count storage 
-  
+  m_rc = rhs.m_rc; // same ref count storage
+
   if (m_rc) ++(*m_rc); // increase the reference count
 
   return *this;
@@ -309,8 +309,8 @@ RefCountConstPtr<T>& RefCountConstPtr<T>::operator=(const RefCountPtr<T> &rhs)
     delete m_rc;
   }
   m_d = rhs.m_d;   // point to same data
-  m_rc = rhs.m_rc; // same ref count storage 
-  
+  m_rc = rhs.m_rc; // same ref count storage
+
   if (m_rc) ++(*m_rc); // increase the reference count
 
   return *this;
@@ -333,7 +333,7 @@ bool RefCountConstPtr<T>::operator==(const RefCountConstPtr<T> &rhs) const
 {
   return (m_d == rhs.m_d);
 }
- 
+
 template<typename T>
 bool RefCountConstPtr<T>::operator!=(const RefCountConstPtr<T> &rhs) const
 {
@@ -357,7 +357,7 @@ bool RefCountConstPtr<T>::operator==(const RefCountPtr<T> &rhs) const
 {
   return (m_d == rhs.m_d);
 }
- 
+
 template<typename T>
 bool RefCountConstPtr<T>::operator!=(const RefCountPtr<T> &rhs) const
 {

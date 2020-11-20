@@ -23,19 +23,19 @@ void CUsampEngineController::notifyPlotData(QList<SPlotData> &plotDataList, QLis
 
     // create a page ... give it page number 0
     CPlotPageData *plotPage = new CPlotPageData(0,PLOTPAGE_DATASET);
-    
+
     while (!plotDataList.isEmpty()) {
       plotPage->addPlotDataSet(plotDataList.front().data);
       plotDataList.pop_front();
     }
 
     // built a page and emptied the plotDataList list (argument).
-    
+
     if (!titleList.isEmpty()) {
       // take the first title ...
       plotPage->setTitle(titleList.front().title);
       plotPage->setTag(titleList.front().tag);
-      
+
       // discard the rest ...
       while (!titleList.isEmpty())
     titleList.pop_front();
@@ -75,6 +75,6 @@ void CUsampEngineController::notifyErrorMessages(int highestErrorLevel, const QL
     ++it;
   }
 
-  emit signalErrorMessages(highestErrorLevel, msg);  
+  emit signalErrorMessages(highestErrorLevel, msg);
 }
 

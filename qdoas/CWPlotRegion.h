@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <QSize>
 
 #include "CPlotProperties.h"
-#include "CPlotPageData.h"  
+#include "CPlotPageData.h"
 #include "CImagePageData.h"
 #include "RefCountPtr.h"
 
@@ -40,8 +40,8 @@ class CWPlotRegion : public QScrollArea
 
   void removeAllPages();
   void removePagesExcept(const QList<int> pageNumberList);
-  void addPage(const RefCountConstPtr<CPlotPageData> &page); 
-   
+  void addPage(const RefCountConstPtr<CPlotPageData> &page);
+
   void displayPage(int pageNumber);
   void printVisiblePage(void);
   void exportVisiblePage(void);
@@ -62,7 +62,7 @@ class CWPlotRegion : public QScrollArea
   CWPlotPage *m_plotPage;
   std::map< int,RefCountConstPtr<CPlotPageData> > m_pageMap;
   int m_activePageNumber;
-  QSize m_visibleSize; 
+  QSize m_visibleSize;
 };
 
 #endif

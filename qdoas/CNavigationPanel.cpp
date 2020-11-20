@@ -179,8 +179,8 @@ void CNavigationPanel::slotSetEnabled(bool enable)
   // enable/disable state of buttons
 
   if (enable) {
-    // switch on (or stay on) - influenced by 'playing' state 
-    
+    // switch on (or stay on) - influenced by 'playing' state
+
     bool generalActive = (m_maxRecord != 0 && m_fileCombo->count() != 0);
     bool groupBackwardActive = generalActive && (m_currentRecord != 0) && !m_playing;
     bool groupForwardActive = generalActive && (m_currentRecord != m_maxRecord) && !m_playing;
@@ -196,7 +196,7 @@ void CNavigationPanel::slotSetEnabled(bool enable)
     m_recordEdit->setEnabled(generalActive && !m_playing);
     m_fileCombo->setEnabled(generalActive && !m_playing);
     m_playBtn->setEnabled(generalActive);
-    m_stopBtn->setEnabled(generalActive);    
+    m_stopBtn->setEnabled(generalActive);
   }
   else {
     // switch off
@@ -242,7 +242,7 @@ void CNavigationPanel::slotSetCurrentRecord(int record, int firstMiddleLast)
     }
     else {
       // use the firstMiddleLast flag to control the status of the buttons
-      
+
       // down + first (firstMiddleLast == -1 when at the start)
       groupActive = (m_currentRecord > 1) && (firstMiddleLast >= 0);
       m_firstBtn->setEnabled(groupActive);

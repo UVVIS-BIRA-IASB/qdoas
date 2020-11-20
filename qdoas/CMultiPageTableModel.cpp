@@ -47,7 +47,7 @@ void CMultiPageTableModel::removeAllPages(void)
   else {
     m_pageMap.clear();
   }
-} 
+}
 
 void CMultiPageTableModel::removePagesExcept(const QList<int> pageNumberList)
 {
@@ -85,10 +85,10 @@ void CMultiPageTableModel::removePagesExcept(const QList<int> pageNumberList)
   // now put the retained pages back
   while (!retained.isEmpty()) {
     RefCountConstPtr<CTablePageData> page(retained.takeFirst());
-    
+
     m_pageMap.insert(std::map< int,RefCountConstPtr<CTablePageData> >::value_type(page->pageNumber(), page));
   }
-} 
+}
 
 void CMultiPageTableModel::setActivePage(int pageNumber)
 {
@@ -144,7 +144,7 @@ QVariant CMultiPageTableModel::data(const QModelIndex &index, int role) const
   }
   else if (role == Qt::TextAlignmentRole) {
     QVariant::Type type = m_currentPage->cellData(index.row(), index.column()).type();
-    
+
     return QVariant((type == QVariant::Int || type == QVariant::Double) ?
             Qt::AlignRight : Qt::AlignLeft);
   }
@@ -162,7 +162,7 @@ void CMultiPageTableModel::slotTablePages(const QList< RefCountConstPtr<CTablePa
   // build a list of the pages to be retained (empty pages)
   QList< RefCountConstPtr<CTablePageData> >::const_iterator it = pageList.begin();
   while (it != pageList.end()) {
-    
+
     if ((*it)->isEmpty()) {
       retainedList.push_back((*it)->pageNumber());
     }

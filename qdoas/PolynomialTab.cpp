@@ -47,7 +47,7 @@ static void add_widget(QGridLayout *grid_layout, QWidget *w, int row, int col, Q
   add_layout(grid_layout, layout, row, col);
 }
 
-PolynomialTab::PolynomialTab(QWidget *parent) : 
+PolynomialTab::PolynomialTab(QWidget *parent) :
   QFrame(parent) {
 
   store_fit_poly = new QCheckBox(this);
@@ -58,7 +58,7 @@ PolynomialTab::PolynomialTab(QWidget *parent) :
   poly_order = new QComboBox(this);
   offset_order = new QComboBox(this);
   orthobase_order = new QComboBox(this);
-  
+
   QGridLayout *layout = new QGridLayout(this);
   layout->setMargin(0);
   layout->setSpacing(0);
@@ -77,7 +77,7 @@ PolynomialTab::PolynomialTab(QWidget *parent) :
   add_widget(layout, store_err_offset, 2, 3, Qt::AlignCenter);
 
   QStringList comboItems;
-  comboItems << "None" << "Order 0" << "Order 1" << "Order 2" << "Order 3" 
+  comboItems << "None" << "Order 0" << "Order 1" << "Order 2" << "Order 3"
              << "Order 4" << "Order 5" << "Order 6" << "Order 7" << "Order 8";
   poly_order->addItems(comboItems);
   offset_order->addItems(comboItems);

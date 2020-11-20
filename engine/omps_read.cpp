@@ -303,7 +303,7 @@ namespace {
       try {
         find_matching_spectra(directory + "/" + filename, refSpectra, offsets);
       } catch (H5::Exception &e) {
-        cerr << "invalid file '" << directory << "/" << filename << "', " << endl; // << e.getDetailMsg() 
+        cerr << "invalid file '" << directory << "/" << filename << "', " << endl; // << e.getDetailMsg()
       }
     }
 

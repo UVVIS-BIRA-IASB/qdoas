@@ -33,7 +33,7 @@ Q_OBJECT
   virtual ~CConvEngineController();
 
   // only need to worry about plot data and erro messages
- 
+
   virtual void notifyPlotData(QList<SPlotData> &plotDataList, QList<STitleTag> &titleList,QList<SPlotImage> &plotDataImage);
   virtual void notifyErrorMessages(int highestErrorLevel, const QList<CEngineError> &errorMessages);
 

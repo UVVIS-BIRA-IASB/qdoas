@@ -37,7 +37,7 @@ class CWPlotArea : public QScrollArea
   CWPlotArea(QWidget *parent = 0);
 
   void setPage(const RefCountConstPtr<CPlotPageData> &page);
-  
+
   void printPage(void);
   void exportPage(void);
 

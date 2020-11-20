@@ -50,7 +50,7 @@ CWPlotPropertiesEditor::CWPlotPropertiesEditor(CWPlotRegion *plotRegion, QWidget
   mainLayout->setColumnStretch(2, 1);
   mainLayout->setRowStretch(1, 1);
 
-  // Update the caption and create a context tag 
+  // Update the caption and create a context tag
   m_captionStr = "Edit Plot Properties";
   m_contextTag = "PlotProperties"; // only ever want one of these active at once
 

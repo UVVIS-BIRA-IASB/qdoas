@@ -306,7 +306,7 @@ void getValidFieldFlags(int *validFlags, int instrument,int selectorOrigin)
    int format=(int)static_cast<enum _prjctInstrFormat>(instrument);
    int satelliteFlag = is_satellite(static_cast<enum _prjctInstrFormat>(instrument));
    int maxdoasFlag = is_maxdoas(static_cast<enum _prjctInstrFormat>(instrument));
-   
+
   // validFlags is indexed by the PRJCT_RESULTS_* enumerated values. A non-zero
   // value means that the corresponding field is valid for the instrument. The value of
   // instrument should correspond to a PRJCT_INSTR_* enumerated value.

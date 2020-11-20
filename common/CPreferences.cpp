@@ -43,7 +43,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 // initialise static data
 
 CPreferences *CPreferences::m_instance = NULL;
- 
+
 CPreferences* CPreferences::instance(void)
 {
   if (m_instance == NULL)
@@ -99,7 +99,7 @@ void CPreferences::setDirectoryName(const QString &key, const QString &directory
 {
   m_settings->beginGroup("Directory");
   m_settings->setValue(key, directory);
-  m_settings->endGroup();  
+  m_settings->endGroup();
 }
 
 void CPreferences::setDirectoryNameGivenFile(const QString &key, const QString &fileName)
@@ -112,13 +112,13 @@ QString CPreferences::fileExtension(const QString &key, int index, const QString
 {
   QString tmp(key);
   QTextStream stream(&tmp);
-  
+
   stream << index;
 
   m_settings->beginGroup("FileExtension");
   tmp = m_settings->value(tmp, fallback).toString();
   m_settings->endGroup();
-  
+
   return tmp;
 }
 
@@ -126,14 +126,14 @@ void CPreferences::setFileExtension(const QString &key, int index, const QString
 {
   QString tmp(key);
   QTextStream stream(&tmp);
-  
+
   stream << index;
 
   m_settings->beginGroup("FileExtension");
   m_settings->setValue(tmp, extension);
   m_settings->endGroup();
 }
-  
+
 void CPreferences::setFileExtensionGivenFile(const QString &key, int index, const QString &fileName)
 {
   int pos = fileName.lastIndexOf('.');
@@ -156,7 +156,7 @@ QList<int> CPreferences::columnWidthList(const QString &key, const QList<int> &f
 
   m_settings->beginGroup("ColumnWidth");
   int n = m_settings->beginReadArray(key);
-  
+
   if (n > 0) {
     int i = 0;
     while (i<n) {
@@ -190,7 +190,7 @@ void CPreferences::setColumnWidthList(const QString &key, const QList<int> &widt
     m_settings->setValue("width", widthList.at(i));
     ++i;
   }
-  
+
   m_settings->endArray();
   m_settings->endGroup();
 }
@@ -200,11 +200,11 @@ QPen CPreferences::plotPen(const QString &key, const QPen &fallback) const
   QPen result(fallback);
 
   m_settings->beginGroup("PlotProperties");
-  
+
   QVariant v = m_settings->value(key);
   if (v.canConvert(QVariant::Pen))
     result = v.value<QPen>();
-    
+
   m_settings->endGroup();
 
   return result;
@@ -213,11 +213,11 @@ QPen CPreferences::plotPen(const QString &key, const QPen &fallback) const
 void CPreferences::setPlotPen(const QString &key, const QPen &pen)
 {
   m_settings->beginGroup("PlotProperties");
-  
+
   QVariant v = pen;
   m_settings->setValue(key, v);
 
-  m_settings->endGroup();  
+  m_settings->endGroup();
 }
 
 QColor CPreferences::plotColour(const QString &key, const QColor &fallback) const
@@ -225,11 +225,11 @@ QColor CPreferences::plotColour(const QString &key, const QColor &fallback) cons
   QColor result(fallback);
 
   m_settings->beginGroup("PlotProperties");
-  
+
   QVariant v = m_settings->value(key);
   if (v.canConvert(QVariant::Color))
     result = v.value<QColor>();
-    
+
   m_settings->endGroup();
 
   return result;
@@ -238,11 +238,11 @@ QColor CPreferences::plotColour(const QString &key, const QColor &fallback) cons
 void CPreferences::setPlotColour(const QString &key, const QColor &colour)
 {
   m_settings->beginGroup("PlotProperties");
-  
+
   QVariant v = colour;
   m_settings->setValue(key, v);
 
-  m_settings->endGroup();  
+  m_settings->endGroup();
 }
 
 CScaleControl CPreferences::plotScale(const QString &key, const CScaleControl &fallback) const
@@ -250,28 +250,28 @@ CScaleControl CPreferences::plotScale(const QString &key, const CScaleControl &f
   CScaleControl retValue;
 
   m_settings->beginGroup("PlotProperties");
-  
+
   QVariant v = m_settings->value(key);
   if (v.isValid()) {
     QString str = v.toString();
     QTextStream stream(&str, QIODevice::ReadOnly);
     int tmpFixed;
     double tmpMin, tmpMax;
-    
+
     stream >> tmpFixed >> tmpMin >> tmpMax;
 
-    retValue = CScaleControl(tmpFixed, tmpMin, tmpMax); 
+    retValue = CScaleControl(tmpFixed, tmpMin, tmpMax);
   }
-  
+
   m_settings->endGroup();
-  
+
   return retValue;
 }
 
 void CPreferences::setPlotScale(const QString &key, const CScaleControl &scaleControl)
 {
   m_settings->beginGroup("PlotProperties");
-  
+
   QString str;
   QTextStream stream(&str);
 
@@ -279,17 +279,17 @@ void CPreferences::setPlotScale(const QString &key, const CScaleControl &scaleCo
 
   m_settings->setValue(key, QVariant(str));
 
-  m_settings->endGroup();  
+  m_settings->endGroup();
 }
 
 int CPreferences::plotLayout(const QString &key, int fallback) const
 {
   m_settings->beginGroup("PlotProperties");
-  
+
   QVariant v = m_settings->value(key);
   if (v.isValid())
     fallback = v.toInt();
-    
+
   m_settings->endGroup();
 
   return fallback;
@@ -298,11 +298,11 @@ int CPreferences::plotLayout(const QString &key, int fallback) const
 void CPreferences::setPlotLayout(const QString &key, int layoutValue)
 {
   m_settings->beginGroup("PlotProperties");
-  
+
   QVariant v(layoutValue);
   m_settings->setValue(key, v);
 
-  m_settings->endGroup();  
+  m_settings->endGroup();
 }
 
 

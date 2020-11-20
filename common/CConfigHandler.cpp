@@ -134,7 +134,7 @@ QString CConfigHandler::errorString() const
 bool CConfigHandler::ignorableWhitespace(const QString &ch)
 {
   return true;
-} 
+}
 
 bool CConfigHandler::startDocument()
 {
@@ -157,7 +157,7 @@ bool CConfigHandler::installSubHandler(CConfigSubHandler *newHandler,
 {
   m_subHandlerStack.push_back(SSubHandlerItem(newHandler, m_elementStack.count()));
   m_activeSubHandler = newHandler;
- 
+
   return m_activeSubHandler->start(atts);
 }
 

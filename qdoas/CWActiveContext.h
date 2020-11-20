@@ -26,7 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <QTabBar>
 #include <QList>
 
-#include "CPlotPageData.h"  
+#include "CPlotPageData.h"
 #include "CImagePageData.h"
 #include "RefCountPtr.h"
 
@@ -41,7 +41,7 @@ Q_OBJECT
   virtual ~CWActiveContext() {};
 
   void addEditor(CWEditor *editor); // reparents and takes ownership of editor.
-  
+
   void savePreferences(void) const;
 
  protected:
@@ -55,7 +55,7 @@ Q_OBJECT
   void slotOkButtonClicked();
   void slotCancelButtonClicked();
   void slotHelpButtonClicked();
-  
+
   void slotAcceptOk(bool canDoOk);
 
   void slotPlotPages(const QList< RefCountConstPtr<CPlotPageData> > &pageList);

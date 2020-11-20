@@ -69,7 +69,7 @@ CWProjectTabUndersampling::CWProjectTabUndersampling(const mediate_project_under
   topLayout->addWidget(m_shiftEdit, 2, 1);
 
   mainLayout->addLayout(topLayout);
-  
+
   mainLayout->addStretch(1);
 
   // set initial values
@@ -85,7 +85,7 @@ CWProjectTabUndersampling::CWProjectTabUndersampling(const mediate_project_under
 
   // connections
   connect(browseBtn, SIGNAL(clicked()), this, SLOT(slotBrowseSolarRefFile()));
-  
+
 }
 
 void CWProjectTabUndersampling::apply(mediate_project_undersampling_t *properties) const
@@ -94,7 +94,7 @@ void CWProjectTabUndersampling::apply(mediate_project_undersampling_t *propertie
   strcpy(properties->solarRefFile, m_refFileEdit->text().toLocal8Bit().data());
 
   properties->method = m_methodCombo->itemData(m_methodCombo->currentIndex()).toInt();
-  
+
   properties->shift = m_shiftEdit->text().toDouble();
 }
 
@@ -105,10 +105,10 @@ void CWProjectTabUndersampling::slotBrowseSolarRefFile()
   QString filename = QFileDialog::getOpenFileName(this, "Open Solar Reference File",
                           pref->directoryName("Ref"),
                                                   "Kurucz File (*.ktz);;All Files (*)");
-  
+
   if (!filename.isEmpty()) {
     pref->setDirectoryNameGivenFile("Ref", filename);
-    
+
     m_refFileEdit->setText(filename);
   }
 }

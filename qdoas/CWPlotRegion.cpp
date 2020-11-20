@@ -45,9 +45,9 @@ CWPlotRegion::CWPlotRegion(QWidget *parent) :
 }
 
 void CWPlotRegion::removeAllPages()
-{        
+{
   m_pageMap.clear();
-  
+
   m_plotPage = NULL;
   //setWidget(m_plotPage); // deletes the current 'viewport widget'
 }
@@ -55,8 +55,8 @@ void CWPlotRegion::removeAllPages()
 void CWPlotRegion::removePagesExcept(const QList<int> pageNumberList)
 {
   QList< RefCountConstPtr<CPlotPageData> > retained;
-  std::map< int,RefCountConstPtr<CPlotPageData> >::iterator it;   
-  
+  std::map< int,RefCountConstPtr<CPlotPageData> >::iterator it;
+
   // create a list of the pages to be retained
   QList<int>::const_iterator pIt = pageNumberList.begin();
   while (pIt != pageNumberList.end()) {
@@ -82,38 +82,38 @@ void CWPlotRegion::removePagesExcept(const QList<int> pageNumberList)
 }
 
 void CWPlotRegion::addPage(const RefCountConstPtr<CPlotPageData> &page)
-{                 
+{
   // the page must not already exist
-  std::map< int,RefCountConstPtr<CPlotPageData> >::iterator it = m_pageMap.find(page->pageNumber());  
-  
-  if (it == m_pageMap.end()) 
-   {          
-    m_pageMap.insert(std::map< int,RefCountConstPtr<CPlotPageData> >::value_type(page->pageNumber(), page));   
-   }   
-   
+  std::map< int,RefCountConstPtr<CPlotPageData> >::iterator it = m_pageMap.find(page->pageNumber());
+
+  if (it == m_pageMap.end())
+   {
+    m_pageMap.insert(std::map< int,RefCountConstPtr<CPlotPageData> >::value_type(page->pageNumber(), page));
+   }
+
   // else just quietly allow page to be discarded
-} 
+}
 
 // Display active page
 void CWPlotRegion::displayPage(int pageNumber)
 {
-  std::map< int,RefCountConstPtr<CPlotPageData> >::iterator it = m_pageMap.find(pageNumber);  
-  
+  std::map< int,RefCountConstPtr<CPlotPageData> >::iterator it = m_pageMap.find(pageNumber);
+
   if (it != m_pageMap.end()) {
-    m_activePageNumber = pageNumber;                      
-    
-    m_plotPage = new CWPlotPage(m_properties, it->second); 
-    setWidget(m_plotPage); // takes care of deleting the old widget    
-    m_plotPage->layoutPlots(m_visibleSize); 
-    
+    m_activePageNumber = pageNumber;
+
+    m_plotPage = new CWPlotPage(m_properties, it->second);
+    setWidget(m_plotPage); // takes care of deleting the old widget
+    m_plotPage->layoutPlots(m_visibleSize);
+
     m_plotPage->show();
   }
   else {
     m_activePageNumber = -1; // invalid page number
     m_plotPage = NULL;
     setWidget(m_plotPage);
-  }    
-  
+  }
+
 }
 
 void CWPlotRegion::printVisiblePage(void)

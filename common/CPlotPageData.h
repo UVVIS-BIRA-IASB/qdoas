@@ -24,9 +24,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <QList>
 
-#include "CPlotDataSet.h"  
+#include "CPlotDataSet.h"
 #include "CPlotImage.h"
-#include "RefCountPtr.h"      
+#include "RefCountPtr.h"
 
 #define PLOTPAGE_DATASET 0
 #define PLOTPAGE_IMAGE   1
@@ -38,23 +38,23 @@ class CPlotPageData
 
   bool isEmpty(void) const;
   int pageNumber(void) const;
-  int size(void) const;    
+  int size(void) const;
   const QString& title(void) const;
-  const QString& tag(void) const; 
+  const QString& tag(void) const;
   int type(void) const;
   RefCountConstPtr<CPlotDataSet> dataSet(int index) const;
   RefCountConstPtr<CPlotImage> dataImage(int index) const;
 
   void setTitle(const QString &title);
   void setTag(const QString &tag);
-  void addPlotDataSet(const CPlotDataSet *dataSet); // page takes ownership responsibility    
-  void addPlotImage(const CPlotImage *dataImage);    
+  void addPlotDataSet(const CPlotDataSet *dataSet); // page takes ownership responsibility
+  void addPlotImage(const CPlotImage *dataImage);
 
  private:
-  int m_pageNumber;  
+  int m_pageNumber;
   int m_pageType;
   QString m_title, m_tag;
-  QList< RefCountConstPtr<CPlotDataSet> > m_dataSets;  
+  QList< RefCountConstPtr<CPlotDataSet> > m_dataSets;
   QList< RefCountConstPtr<CPlotImage> > m_dataImages;
 };
 

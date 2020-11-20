@@ -40,7 +40,7 @@ Q_OBJECT
 
  private:
   CMultiPageTableModel *m_model;
-  
+
 };
 
 #endif

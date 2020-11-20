@@ -77,7 +77,7 @@ void CImagePageData::addPlotImage(const CPlotImage *image)
   // to wrap it in a reference counting pointer
 
   m_images.push_back(RefCountConstPtr<CPlotImage>(image));
-}         
+}
 
 
 

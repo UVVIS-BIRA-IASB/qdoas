@@ -38,7 +38,7 @@ Q_OBJECT
   virtual void updateNewSite(const QString &newSiteName);
   virtual void updateModifySite(const QString &siteName);
   virtual void updateDeleteSite(const QString &siteName);
-  
+
  protected:
   virtual void contextMenuEvent(QContextMenuEvent *e);
   virtual void showEvent(QShowEvent *e);

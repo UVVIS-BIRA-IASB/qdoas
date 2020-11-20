@@ -32,7 +32,7 @@ class CUsampConfigWriter
   ~CUsampConfigWriter();
 
   QString write(const QString &fileName);
-  
+
  private:
   const mediate_usamp_t *m_properties;
 };

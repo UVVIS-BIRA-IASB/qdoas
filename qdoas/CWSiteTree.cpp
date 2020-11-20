@@ -47,7 +47,7 @@ CWSiteTree::CWSiteTree(CWActiveContext *activeContext, QWidget *parent) :
   QList<int> widthList;
   widthList.push_back(130);
   widthList.push_back(130);
-  
+
   widthList = CPreferences::instance()->columnWidthList("SiteTree", widthList);
 
   for (int i=0; i<2; ++i) {
@@ -79,32 +79,32 @@ void CWSiteTree::createSiteItem(const mediate_site_t *site)
 {
   QString tmpStr;
   QStringList labelList;
-  
+
   // make the tree items
   QTreeWidgetItem *siteItem = new  QTreeWidgetItem(QStringList(QString(site->name)));
-  
+
   // add Children for the site details
-  
+
   // Abbreviation
   labelList << "Abbreviaton" << site->abbreviation;
   new  QTreeWidgetItem(siteItem, labelList);
   labelList.clear();
-  
-  // Longitude  
-  labelList << "Longitude" << tmpStr.setNum(site->longitude, 'f', 3); 
+
+  // Longitude
+  labelList << "Longitude" << tmpStr.setNum(site->longitude, 'f', 3);
   new  QTreeWidgetItem(siteItem, labelList);
   labelList.clear();
-  
+
   // Latitude
-  labelList << "Latitude" << tmpStr.setNum(site->latitude, 'f', 3); 
+  labelList << "Latitude" << tmpStr.setNum(site->latitude, 'f', 3);
   new  QTreeWidgetItem(siteItem, labelList);
   labelList.clear();
-  
+
   // Altitude
   labelList << "Altitude" << tmpStr.setNum(site->altitude, 'f', 3);
   new  QTreeWidgetItem(siteItem, labelList);
   labelList.clear();
-  
+
   addTopLevelItem(siteItem);
 }
 
@@ -114,7 +114,7 @@ void CWSiteTree::updateNewSite(const QString &newSiteName)
 
   if (site != NULL) {
     createSiteItem(site);
-  }  
+  }
 }
 
 void CWSiteTree::updateModifySite(const QString &siteName)
@@ -125,13 +125,13 @@ void CWSiteTree::updateModifySite(const QString &siteName)
 
     QTreeWidgetItem *siteItem;
     int i = 0;
-    
+
     while ((siteItem = topLevelItem(i)) != NULL && siteItem->text(0) != siteName) ++i;
     if (siteItem != NULL) {
       // located the existing item - update it's children
-      
+
       assert(siteItem->childCount() == 4);
-      
+
       QTreeWidgetItem *child;
       QString tmpStr;
 
@@ -148,7 +148,7 @@ void CWSiteTree::updateModifySite(const QString &siteName)
       child = siteItem->child(3);
       child->setText(1, tmpStr.setNum(site->altitude, 'f', 3));
     }
-  }   
+  }
 }
 
 void CWSiteTree::updateDeleteSite(const QString &siteName)
@@ -159,14 +159,14 @@ void CWSiteTree::updateDeleteSite(const QString &siteName)
 
     QTreeWidgetItem *siteItem;
     int i = 0;
-    
+
     while ((siteItem = topLevelItem(i)) != NULL && siteItem->text(0) != siteName) ++i;
     if (siteItem != NULL) {
       delete takeTopLevelItem(i);
     }
   }
 }
-  
+
 
 void CWSiteTree::showEvent(QShowEvent *e)
 {

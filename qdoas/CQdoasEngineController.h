@@ -84,7 +84,7 @@ Q_OBJECT
   void signalCurrentFileChanged(const QString &filename);
   void signalCurrentRecordChanged(int recordNumber, int firstMiddleLast);
 
-  void signalPlotPages(const QList< RefCountConstPtr<CPlotPageData> > &pageList);  
+  void signalPlotPages(const QList< RefCountConstPtr<CPlotPageData> > &pageList);
   void signalTablePages(const QList< RefCountConstPtr<CTablePageData> > &pageList);
 
   void signalErrorMessages(int highestErrorLevel, const QString &messages);

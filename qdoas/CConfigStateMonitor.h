@@ -37,7 +37,7 @@ Q_OBJECT
   virtual ~CConfigStateMonitor();
 
   bool isValid(void) const;
-  
+
   virtual void updateNewSite(const QString &newSiteName);
   virtual void updateModifySite(const QString &siteName);
   virtual void updateDeleteSite(const QString &siteName);

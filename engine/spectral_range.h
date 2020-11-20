@@ -3,7 +3,7 @@
 
 /*! \file spectral_range.h \brief A linked list describing the valid
  * intervals of the spectrum.
- *  
+ *
  * Parts of the spectrum may be excluded for many reasons (not
  * relevant for the analysis, measurement error, ...).  spectral_range
  * describes the part of the spectrum which is to be used in the
@@ -25,7 +25,7 @@
  * spectrum_append(my_spectrum, 200, 278); // add the interval (200, 278) to the list of valid regions
  * spectrum_append(my_spectrum, 280, 300); // my_spectrum now contains pixels 200-300, excluding 279.
  *
- * // loop over the spectrum 
+ * // loop over the spectrum
  * doas_iterator my_iterator;
  * for(int i = iterator_start(&my_iterator, my_spectrum); i != ITERATOR_FINISHED; i = iterator_next(&my_iterator)) {
  *   do_something(i); // 279 will be skipped
@@ -75,7 +75,7 @@ extern "C" {
 bool spectrum_remove_pixel(doas_spectrum *spectrum, int pixel);
 
 /*! Adds a new interval at the end of a spectrum.
- * 
+ *
  * \param spectrum Existing spectrum the interval will be added to.
  * \param start, end Interval to be added.
  */
@@ -87,10 +87,10 @@ doas_spectrum *spectrum_new(void);
 /*! Creates a separate copy of an existing range.*/
 doas_spectrum *spectrum_copy(const doas_spectrum *source);
 
-/*! Cleans up memory 
+/*! Cleans up memory
  *
  * Traverses the list starting at \a range and frees all memory.
- * 
+ *
  */
 void spectrum_destroy(doas_spectrum *spectrum);
 
@@ -106,7 +106,7 @@ int spectrum_end(const doas_spectrum *spectrum);
 /*! Returns the first pixel of the spectrum */
 int spectrum_start(const doas_spectrum *spectrum);
 
-/*! Initializes an iterator to point at the first pixel of a range. 
+/*! Initializes an iterator to point at the first pixel of a range.
  *
  * Prepares \a theiterator to loop over the pixels in \a
  * spectrum.  The first pixel is returned.

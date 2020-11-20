@@ -42,7 +42,7 @@ Q_OBJECT
   CWMain(QWidget *parent = 0);
 
   virtual void closeEvent(QCloseEvent *e);
- 
+
  protected:
   void writeConfiguration(FILE *fp);
   bool checkStateAndConsiderSaveFile(void);
@@ -64,7 +64,7 @@ Q_OBJECT
   void slotAboutQt();
   void slotErrorMessages(int highestLevel, const QString &messages);
   void slotRunRing();
-  
+
   void slotPlotPage(const RefCountConstPtr<CPlotPageData> &page);
 
  private:
@@ -76,7 +76,7 @@ Q_OBJECT
   CWPlotArea *m_plotArea;
 
   QString m_configFile;
-  
+
   CRingEngineController *m_controller;
 
   // actions ...

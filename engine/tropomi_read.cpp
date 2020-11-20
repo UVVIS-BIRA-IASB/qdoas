@@ -39,7 +39,7 @@
 #include "tropomi_read.h"
 #include "netcdfwrapper.h"
 #include "dir_iter.h"
- 
+
 extern "C" {
 #include "winthrd.h"
 #include "comdefs.h"
@@ -330,7 +330,7 @@ int tropomi_read(ENGINE_CONTEXT *pEngineContext,int record) {
 
     const refspec& ref = irradiance_reference.at(indexPixel);
     n_wavel = NDET[indexPixel] = ref.lambda.size(); // 20/04/2020 : it's better to set NDET to the size of the irradiance
-    
+
     for (size_t i=0; i<ref.lambda.size(); ++i) {
       pEngineContext->buffers.lambda_irrad[i] = ref.lambda[i];
       pEngineContext->buffers.irrad[i] = ref.irradiance[i];
@@ -362,7 +362,7 @@ int tropomi_read(ENGINE_CONTEXT *pEngineContext,int record) {
           obsGroup.getVar("radiance_scaling",start_scale,onecount,scale.data() ) ;
           const int fill_rad_int16 = obsGroup.getFillValue<int>("radiance_int16");
           tempfill = obsGroup.getFillValue<double>("radiance_scaling");
-          for(int i = 0; i < size_spectral ;i++){ 
+          for(int i = 0; i < size_spectral ;i++){
               rad[i] = scale[0]*rad_int16[i];
               if(rad_int16[i]==65535){
                   rad[i]=tempfill;
@@ -375,7 +375,7 @@ int tropomi_read(ENGINE_CONTEXT *pEngineContext,int record) {
           obsGroup.getVar("radiance", start, count, rad.data());
       }
       const double fill_rad=tempfill;
-   
+
     const double fill_noise = obsGroup.getFillValue<double>("radiance_noise");
     const vector<double>& lambda = nominal_wavelengths.at(indexPixel);
     // copy non-fill values to buffers:
@@ -384,7 +384,7 @@ int tropomi_read(ENGINE_CONTEXT *pEngineContext,int record) {
       double li = lambda[i];
       double ri = rad[i];
       double ni = rad_noise[i];
-      
+
       pEngineContext->buffers.lambda[i]=li;
       if (li != fill_nominal_wavelengths && ri != fill_rad && ni != fill_noise)
        {
@@ -394,7 +394,7 @@ int tropomi_read(ENGINE_CONTEXT *pEngineContext,int record) {
        }
       else
        pEngineContext->buffers.spectrum[i]=pEngineContext->buffers.sigmaSpec[i]=0.;
-        
+
 //       if (li != fill_nominal_wavelengths && ri != fill_rad && ni != fill_noise) {
 //         pEngineContext->buffers.lambda[j]=li;
 //         pEngineContext->buffers.spectrum[j]=ri;
@@ -409,13 +409,13 @@ int tropomi_read(ENGINE_CONTEXT *pEngineContext,int record) {
     }
     else if (THRD_id!=THREAD_TYPE_ANALYSIS)
      NDET[indexPixel] = size_spectral;
-    
+
     // check if the earthshine spectrum is shorter than the reference
     // spectrum (e.g.due to different number of fill values).
     // if (j<n_wavel) {
       // This is not a very clean solution, but we assume that
       // reducing NDET[i] is always safe:
-     
+
      // NDET[indexPixel] = j; -> 20/04/2020 : this causes a big issue in ANALYSE_Spectrum
      //                             for example, memcpy(Sref,Feno->Sref,sizeof(double)*n_wavel);
      //                          in fact, we should keep the original NDET[indexPixel] and manage the
@@ -874,7 +874,7 @@ static vector<std::array<vector<earth_ref>, MAX_GROUNDPIXEL>> find_matching_spec
                       obsGroup.getVar("radiance_scaling",start_scale,onecount,scale.data() ) ;
                       const int fill_rad_int16 = obsGroup.getFillValue<int>("radiance_int16");
                       tempfill = obsGroup.getFillValue<double>("radiance_scaling");
-                      for(int i = 0; i < size_spectral ;i++){ 
+                      for(int i = 0; i < size_spectral ;i++){
                           spec[i] = scale[0]*rad_int16[i];
                           if(rad_int16[i]==65535){
                               spec[i]=tempfill;
@@ -885,7 +885,7 @@ static vector<std::array<vector<earth_ref>, MAX_GROUNDPIXEL>> find_matching_spec
                       obsGroup.getVar("radiance", start, count, spec.data() );
                       obsGroup.getVar("radiance_noise", start, count, err.data() );
                   }
-                 
+
                   //                 std::cout << "; scan " << scan << " row " << row << " lat " << lat << " long " << lon << " sza " << sza << std::endl;
 //                 for (auto i = spec.begin(); i != spec.end(); ++i)
 //                    std::cout << *i << ' ';
@@ -894,7 +894,7 @@ static vector<std::array<vector<earth_ref>, MAX_GROUNDPIXEL>> find_matching_spec
                 i_spec = cache.insert(std::move(spec)).first;
                 i_err = cache.insert(std::move(err)).first;
               }
-              
+
 
               // std::cout << "assert" << std::endl;
               // At this point, i_spec and i_err must point to valid elements of our cache.

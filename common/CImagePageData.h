@@ -43,15 +43,15 @@ class CImagePageData
   void setTitle(const QString &title);
   void setTag(const QString &tag);
   void addPlotImage(const CPlotImage *dataImage); // page takes ownership responsibility 4
-  
+
  private:
   int m_pageNumber;
   QString m_title, m_tag;
-  QList< RefCountConstPtr<CPlotImage> > m_images;   
+  QList< RefCountConstPtr<CPlotImage> > m_images;
 };
 
 inline bool CImagePageData::isEmpty(void) const { return m_images.isEmpty(); }
-                                     
-#endif     
+
+#endif
 
 

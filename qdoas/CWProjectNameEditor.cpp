@@ -38,7 +38,7 @@ CWProjectNameEditor::CWProjectNameEditor(CWProjectTree *projectTree, QTreeWidget
 
   if (item && item->parent() == NULL) {
     // renaming a project
-    m_oldProjectName = item->text(0);  // also acts as the flag for new/rename 
+    m_oldProjectName = item->text(0);  // also acts as the flag for new/rename
     mainLayout->addWidget(new QLabel("Modify the Project name", this), 0, 1);
   }
   else

@@ -19,7 +19,7 @@ extern "C" {
 
   int  GEMS_get_orbit_date(int *orbit_year, int *orbit_month, int *orbit_day);
   RC GEMS_LoadCalib(ENGINE_CONTEXT *pEngineContext,int indexFenoColumn,void *responseHandle);
-  
+
   void gems_clean(void);
   RC GEMS_LoadReference(char *filename,int indexFenoColumn,double *lambda,double *spectrum,int *nwve);
   void GEMS_CloseReferences(void);

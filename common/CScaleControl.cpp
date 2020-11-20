@@ -36,7 +36,7 @@ CScaleControl::CScaleControl(bool fixedScale, double minimum, double maximum) :
   if (m_maximum < m_minimum) {
     m_minimum = maximum;
     m_maximum = minimum;
-  } 
+  }
 }
 
 CScaleControl::CScaleControl(const CScaleControl &other) :
@@ -44,7 +44,7 @@ CScaleControl::CScaleControl(const CScaleControl &other) :
   m_minimum(other.m_minimum),
   m_maximum(other.m_maximum)
 {
-}  
+}
 
 CScaleControl& CScaleControl::operator=(const CScaleControl &rhs)
 {

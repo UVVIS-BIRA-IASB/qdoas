@@ -24,9 +24,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "CEngineError.h"
 
-#include "CPlotDataSet.h"  
+#include "CPlotDataSet.h"
 #include "CPlotImage.h"
-#include "CPlotPageData.h" 
+#include "CPlotPageData.h"
 #include "CImagePageData.h"
 #include "CTablePageData.h"
 

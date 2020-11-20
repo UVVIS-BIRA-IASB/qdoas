@@ -65,7 +65,7 @@ public:
   CQdoasConfigSubHandler(CQdoasConfigHandler *master) : CConfigSubHandler(master) {};
 
   virtual CQdoasConfigHandler *master() { return static_cast<CQdoasConfigHandler *>(m_master); };
-  
+
 };
 
 //-------------------------------------------------------------------

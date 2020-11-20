@@ -50,7 +50,7 @@ Q_OBJECT
   CWMain(QWidget *parent = 0);
 
   virtual void closeEvent(QCloseEvent *e);
- 
+
   bool isMessageFileLogging(void) const;
 
  protected:
@@ -77,7 +77,7 @@ Q_OBJECT
   void slotSetMessageFileLogging(bool logToFile);
   void slotErrorMessages(int highestLevel, const QString &messages);
   void slotOpenRecent();
-  
+
  private:
   QMenuBar *m_menuBar;
   QToolBar *m_toolBar;
@@ -96,11 +96,11 @@ Q_OBJECT
   QStatusBar *m_statusBar;
 
   CQdoasEngineController *m_controller;
-  
+
   CConfigStateMonitor *m_stateMonitor;
 
   QString m_projectFile;
-  
+
   // actions ...
   QAction *m_saveAction;
   QAction *m_saveAsAction;

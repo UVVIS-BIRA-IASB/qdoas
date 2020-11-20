@@ -263,7 +263,7 @@ enum RunMode parseCommandLine(int argc, char **argv, commands_t *cmd)
 
     ++i;
   }
-  
+
   if ((runMode==None) && calibSaveSwitch && !calibSwitch)
    std::cout << "Warning : -new_irrad switch to use only with -k option; ignored " << std::endl;
 
@@ -594,7 +594,7 @@ int analyseProjectQdoasPrepare(void **engineContext, const CProjectConfigItem *p
   }
 
   projectData.output.newcalibFlag=calibSaveSwitch;
-  
+
   if (!calibDir.isEmpty() && calibDir.size() < FILENAME_BUFFER_LENGTH-1) {
     // override the output directory
     strcpy(projectData.output.newCalibPath, calibDir.toLocal8Bit().data());

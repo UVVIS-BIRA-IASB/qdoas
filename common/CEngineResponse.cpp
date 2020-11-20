@@ -64,15 +64,15 @@ CEngineResponseVisual::~CEngineResponseVisual()
     delete m_plotDataList.front().data;
     m_plotDataList.pop_front();
   }
-  
+
   while (!m_plotImageList.isEmpty()) {
     m_plotImageList.pop_front();
-  }  
+  }
 }
 
 void CEngineResponseVisual::process(CEngineController *engineController)
 {
-  if (!hasFatalError() 
+  if (!hasFatalError()
       && !(m_cellList.isEmpty() && m_plotDataList.isEmpty() && m_plotImageList.isEmpty() ) ) {
     engineController->notifyTableData(m_cellList);
     engineController->notifyPlotData(m_plotDataList, m_titleList, m_plotImageList);
@@ -87,7 +87,7 @@ void CEngineResponseVisual::addDataSet(int pageNumber, const CPlotDataSet *dataS
 }
 
 void CEngineResponseVisual::addImage(int pageNumber, const CPlotImage *plotImage)
-{ 
+{
   m_plotImageList.push_back(SPlotImage(pageNumber, plotImage));
 }
 
@@ -145,7 +145,7 @@ void CEngineResponseSpecificRecord::process(CEngineController *engineController)
       // display ... table data MUST be before plot data
       engineController->notifyTableData(m_cellList);
       engineController->notifyPlotData(m_plotDataList, m_titleList, m_plotImageList);
-      
+
       engineController->notifyCurrentRecord(m_recordNumber);
     }
   }

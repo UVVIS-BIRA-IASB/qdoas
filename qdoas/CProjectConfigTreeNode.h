@@ -57,7 +57,7 @@ class CProjectConfigFile : public CProjectConfigTreeNode
 
   virtual Type type(void) const;
 };
-  
+
 class CProjectConfigFolder : public CProjectConfigTreeNode
 {
  public:
@@ -65,7 +65,7 @@ class CProjectConfigFolder : public CProjectConfigTreeNode
 
   virtual Type type(void) const;
 };
-  
+
 class CProjectConfigDirectory : public CProjectConfigTreeNode
 {
  public:

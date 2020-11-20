@@ -35,7 +35,7 @@ class CConvConfigWriter
 
  private:
   void writeGeneral(FILE *fp, const mediate_conv_general_t *d);
-  
+
  private:
   const mediate_convolution_t *m_properties;
 };

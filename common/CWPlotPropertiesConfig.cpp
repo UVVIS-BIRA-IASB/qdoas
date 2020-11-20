@@ -69,7 +69,7 @@ void CWPlotPropertySample::paintEvent(QPaintEvent *e)
 {
   QFrame::paintEvent(e);
 
-  QPainter p(this);  
+  QPainter p(this);
   p.setPen(m_pen);
 
   int y = height() / 2;
@@ -80,7 +80,7 @@ void CWPlotPropertySample::mousePressEvent(QMouseEvent *e)
 {
   // popup a color selection dialog to set the colour of m_pen
   QColor result = QColorDialog::getColor(m_pen.color(), this);
-  
+
   if (result.isValid()) {
     m_pen.setColor(result);
     update();
@@ -127,7 +127,7 @@ CWPlotPropertyScale::CWPlotPropertyScale(const CScaleControl &scaleControl, cons
   m_minEdit->setText(tmpStr.setNum(scaleControl.minimum()));
   m_maxEdit->setText(tmpStr.setNum(scaleControl.maximum()));
   slotFixedCheckChanged(m_fixedCheck->checkState());
-  
+
   // connections
   connect(m_fixedCheck, SIGNAL(stateChanged(int)), this, SLOT(slotFixedCheckChanged(int)));
 }
@@ -139,7 +139,7 @@ const CScaleControl& CWPlotPropertyScale::scaleControl(void) const
 
   tmpMin = m_minEdit->text().toDouble(&okMin);
   tmpMax = m_maxEdit->text().toDouble(&okMax);
-  
+
   fixed = (m_fixedCheck->checkState() == Qt::Checked);
 
   if (!fixed || (okMin && okMax && tmpMin != tmpMax)) {
@@ -250,7 +250,7 @@ CWPlotPropertiesConfig::CWPlotPropertiesConfig(const CPlotProperties &prop, QWid
   // scale group ...
 
   QGroupBox *scaleGroup = new QGroupBox("Fixed Scale", this);
-  
+
   QVBoxLayout *scaleLayout = new QVBoxLayout(scaleGroup);
   m_scaleEdit[0] = new CWPlotPropertyScale(prop.scaleControl(Spectrum), "Spectrum", scaleGroup);
   scaleLayout->addWidget(m_scaleEdit[0]);
@@ -260,10 +260,10 @@ CWPlotPropertiesConfig::CWPlotPropertiesConfig(const CPlotProperties &prop, QWid
   scaleLayout->addWidget(m_scaleEdit[2]);
 
   mainLayout->addWidget(scaleGroup, 0, 1);
-  
+
 
   // Layout group ...
-  
+
   QGroupBox *layoutGroup = new QGroupBox("Layout", this);
 
   QGridLayout *layoutLayout = new QGridLayout(layoutGroup);
@@ -306,7 +306,7 @@ void CWPlotPropertiesConfig::slotSelectBackgroundColour()
 {
   // popup a color selection dialog to set the colour of the background
   QColor result = QColorDialog::getColor(m_bgColour, this);
-  
+
   if (result.isValid()) {
     m_bgColour = result;
 

@@ -23,17 +23,17 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include <QFrame>
 #include <QList>
-#include <QSize>  
-#include <QPixmap>  
-#include <QGraphicsView>   
-#include <QGraphicsScene>  
+#include <QSize>
+#include <QPixmap>
+#include <QGraphicsView>
+#include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
 
 #include <qwt_plot.h>
 #include <qwt_plot_zoomer.h>
 
 #include "CPlotProperties.h"
-#include "CPlotDataSet.h"     
+#include "CPlotDataSet.h"
 #include "CPlotImage.h"
 #include "CPlotPageData.h"
 #include "RefCountPtr.h"
@@ -53,7 +53,7 @@ Q_OBJECT
   CWPlot(const RefCountConstPtr<CPlotImage> &dataImage, CPlotProperties &plotProperties, QWidget *parent = 0);
   virtual ~CWPlot() {};
 
-  static bool getImageSaveNameAndFormat(QWidget *parent, QString &fileName, QString &saveFormat);     
+  static bool getImageSaveNameAndFormat(QWidget *parent, QString &fileName, QString &saveFormat);
   void imageresize(QSize visibleSize,int row,int column);
 
  protected:
@@ -68,13 +68,13 @@ Q_OBJECT
 
  private:
   RefCountConstPtr<CPlotDataSet> m_dataSet;
-  RefCountConstPtr<CPlotImage> m_dataImage;    
+  RefCountConstPtr<CPlotImage> m_dataImage;
   CPlotProperties &m_plotProperties;
-  QwtPlotZoomer *m_zoomer;   
-  int m_type;                
-     QGraphicsView *m_dataView; 
+  QwtPlotZoomer *m_zoomer;
+  int m_type;
+     QGraphicsView *m_dataView;
      QGraphicsScene *m_dataScene;
-     QPixmap m_dataPixmap,m_dataPixmapScaled;  
+     QPixmap m_dataPixmap,m_dataPixmapScaled;
      QGraphicsPixmapItem *m_dataPixmapItem;
 };
 
@@ -94,10 +94,10 @@ Q_OBJECT
   void slotExportAsImageAllPlots();
 
  private:
-  CPlotProperties &m_plotProperties;  
+  CPlotProperties &m_plotProperties;
   int m_pageType;
-  
-  QList<CWPlot*> m_plots; 
+
+  QList<CWPlot*> m_plots;
 };
 
 #endif

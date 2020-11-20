@@ -36,7 +36,7 @@ bool CUsampConfigHandler::startElement(const QString &namespaceURI, const QStrin
                        const QString &qName, const QXmlAttributes &atts)
 {
   bool result;
-  
+
   if (delegateStartElement(qName, atts, result)) {
     // handled by sub handler ...
     return result;
@@ -117,7 +117,7 @@ bool CUsampGeneralSubHandler::start(const QXmlAttributes &atts)
     else
       return postErrorMessage("Solar Reference Filename too long");
   }
-  
+
   return true;
 }
 

@@ -32,7 +32,7 @@ class CRingConfigWriter
   ~CRingConfigWriter();
 
   QString write(const QString &fileName);
-  
+
  private:
   const mediate_ring_t *m_properties;
 };

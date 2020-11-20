@@ -84,19 +84,19 @@ void CWTableRegion::slotSaveAs()
     // add a .txt extension if there is no extension set
     if (!fileName.contains('.'))
       fileName += ".txt";
-    
+
     prefs->setDirectoryNameGivenFile("Table", fileName);
-   
+
     FILE *fp = fopen(fileName.toLocal8Bit().constData(), "w");
 
     if (fp != NULL) {
       int rows = m_model->rowCount();
       int cols = m_model->columnCount();
-      
+
       for (int j=0; j<rows; ++j) {
     for (int i=0; i<cols; ++i) {
       QString tmp(m_model->index(j, i, QModelIndex()).data().toString());
-    
+
       if (i != 0)
         fputc('\t', fp);
       fprintf(fp, "%s", tmp.toLocal8Bit().constData());

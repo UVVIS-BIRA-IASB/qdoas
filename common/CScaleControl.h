@@ -27,7 +27,7 @@ class CScaleControl
   CScaleControl();
   CScaleControl(bool fixedScale, double minimum, double maximum);
   CScaleControl(const CScaleControl &other);
-  
+
   CScaleControl& operator=(const CScaleControl &rhs);
 
   bool isFixedScale(void) const;

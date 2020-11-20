@@ -67,7 +67,7 @@ void CProjectTreeClipboard::beginInsertItems(void)
   m_markedAnlysWinGroup = true;
   m_markedSpectraGroup = true;
 }
-  
+
 void CProjectTreeClipboard::endInsertItems(void)
 {
   // Call ONCE after the series of insert*. Removes the mark
@@ -76,26 +76,26 @@ void CProjectTreeClipboard::endInsertItems(void)
   m_markedAnlysWinGroup = false;
   m_markedSpectraGroup = false;
 }
- 
+
 // a complete project ... takes ownershift responsibility of data referenced
 // by pointer (ie. properties, AWs, tree items)
 void CProjectTreeClipboard::insertProject(const QString &projectName, mediate_project_t *properties,
                       QList<mediate_analysis_window_t*> &analysisWindows,
                       QList<QTreeWidgetItem*> &rawSpectraItems)
 {
-  // first consider the mark ... clear the group on first touch 
+  // first consider the mark ... clear the group on first touch
   if (m_markedProjectGroup) {
     clearProjectGroup();
     m_markedProjectGroup = false;
   }
-  
+
   m_projectGroup.push_back(new CProjClipBucket(projectName, properties, analysisWindows, rawSpectraItems));
 }
 
 // a single analysis window ... takes ownership of the analysisWindow
 void CProjectTreeClipboard::insertAnalysisWindow(mediate_analysis_window_t *analysisWindow)
 {
-  // first consider the mark ... clear the group on first touch 
+  // first consider the mark ... clear the group on first touch
   if (m_markedAnlysWinGroup) {
     clearAnlysWinGroup();
     m_markedAnlysWinGroup = false;
@@ -106,7 +106,7 @@ void CProjectTreeClipboard::insertAnalysisWindow(mediate_analysis_window_t *anal
 
 void CProjectTreeClipboard::insertRawSpectraItem(QTreeWidgetItem *rawSpectraItem)
 {
-  // first consider the mark ... clear the group on first touch 
+  // first consider the mark ... clear the group on first touch
   if (m_markedSpectraGroup) {
     clearSpectraGroup();
     m_markedSpectraGroup = false;
@@ -117,7 +117,7 @@ void CProjectTreeClipboard::insertRawSpectraItem(QTreeWidgetItem *rawSpectraItem
 
 void CProjectTreeClipboard::insertRawSpectraItems(QList<QTreeWidgetItem*> &rawSpectraItems)
 {
-  // first consider the mark ... clear the group on first touch 
+  // first consider the mark ... clear the group on first touch
   if (m_markedSpectraGroup) {
     clearSpectraGroup();
     m_markedSpectraGroup = false;
@@ -164,7 +164,7 @@ const mediate_project_t* CProjectTreeClipboard::projectGroupItemProperties(int p
 {
   if (projIndex >= 0 && projIndex < m_projectGroup.size())
     return m_projectGroup.at(projIndex)->properties;
-  
+
   return NULL;
 }
 
@@ -190,7 +190,7 @@ const mediate_analysis_window_t* CProjectTreeClipboard::projectGroupItemAnalysis
 QList<QTreeWidgetItem*> CProjectTreeClipboard::projectGroupItemSpectraList(int projIndex) const
 {
   QList<QTreeWidgetItem*> result;
-  
+
   if (projIndex >= 0 && projIndex < m_projectGroup.size()) {
     const QList<QTreeWidgetItem*> &tmp = m_projectGroup.at(projIndex)->spectra;
 

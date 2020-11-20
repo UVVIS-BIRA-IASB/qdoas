@@ -50,7 +50,7 @@ CWUserSymbolTree::CWUserSymbolTree(CWActiveContext *activeContext, QWidget *pare
   QList<int> widthList;
   widthList.push_back(130);
   widthList.push_back(130);
-  
+
   widthList = CPreferences::instance()->columnWidthList("UserSymbolTree", widthList);
 
   for (int i=0; i<2; ++i) {
@@ -113,14 +113,14 @@ void CWUserSymbolTree::updateDeleteSymbol(const QString &symbolName)
 
     QTreeWidgetItem *symbolItem;
     int i = 0;
-    
+
     while ((symbolItem = topLevelItem(i)) != NULL && symbolItem->text(0) != symbolName) ++i;
     if (symbolItem != NULL) {
       delete takeTopLevelItem(i);
     }
   }
 }
-  
+
 void CWUserSymbolTree::showEvent(QShowEvent *e)
 {
   QTreeWidget::showEvent(e);

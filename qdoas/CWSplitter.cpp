@@ -52,7 +52,7 @@ void CWSplitter::savePreferences(void)
 {
   // store the map as an array of settings
   QSettings &settings = CPreferences::instance()->settings();
-  
+
   settings.beginGroup(m_settingsGroupName);
 
   settings.beginWriteArray("Splitter");
@@ -72,7 +72,7 @@ void CWSplitter::savePreferences(void)
 void CWSplitter::slotSetWidthMode(int newMode)
 {
   if (count() && newMode != m_currentMode) {
-    
+
     QList<int> tmpSizes(sizes());
     int currentSize = tmpSizes.front(); // current first widget size
 
@@ -92,7 +92,7 @@ void CWSplitter::slotSetWidthMode(int newMode)
 
       setSizes(tmpSizes);
     }
-      
+
     // change the mode
     m_currentMode = newMode;
   }

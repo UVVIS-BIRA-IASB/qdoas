@@ -49,7 +49,7 @@ CWProjectDirectoryEditor::CWProjectDirectoryEditor(CWProjectTree *projectTree, Q
 
   m_directoryName = new QLineEdit(this);
   mainLayout->addWidget(m_directoryName, 0, 2);
-  
+
   QPushButton *browseButton = new QPushButton("Browse", this);
   mainLayout->addWidget(browseButton, 0, 3);
 
@@ -126,7 +126,7 @@ bool CWProjectDirectoryEditor::actionOk(void)
       msg = m_projectTree->editChangeDirectoryProperties(item, m_fileFilters->text(),
                              (m_recursiveCheckBox->checkState() == Qt::Checked));
     }
-    
+
     if (msg.isNull())
       return true;
 
@@ -159,7 +159,7 @@ void CWProjectDirectoryEditor::slotDirectoryChanged(const QString &text)
 void CWProjectDirectoryEditor::slotBrowseButtonClicked()
 {
   QString dir = CPreferences::instance()->directoryName("RawSpecDir", ".");
-  
+
   // modal dialog
   dir = QFileDialog::getExistingDirectory(0, "Select a directory containing spectra files", dir);
 

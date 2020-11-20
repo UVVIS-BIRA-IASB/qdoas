@@ -36,7 +36,7 @@ struct SCellIndex
 {
   int r, c;
 
-  SCellIndex(int row, int col) : r(row), c(col) {}  
+  SCellIndex(int row, int col) : r(row), c(col) {}
   bool operator<(const SCellIndex &rhs) const { return (r<rhs.r || (r==rhs.r && c<rhs.c)); }
 };
 
@@ -46,13 +46,13 @@ class CTablePageData
   CTablePageData(int pageNumber);
 
   void addCell(int row, int col, const QVariant &data);
-  
+
   int pageNumber(void) const;
   int rowCount(void) const;
   int columnCount(void) const;
 
   bool isEmpty(void) const;
-  
+
   QVariant cellData(int row, int col) const;
 
  private:

@@ -87,7 +87,7 @@ QString CPathMgr::simplifyPath(const QString &name) const
 
   std::set<SPathBucket>::const_iterator it = m_pathSet.begin();
   while (it != m_pathSet.end()) {
-    
+
     if (name.startsWith(it->path)) {
       // matches ... but must match either perfectly or on a path separator boundary
       int len = it->path.length();  // certain that name.length() > path.length()
@@ -95,7 +95,7 @@ QString CPathMgr::simplifyPath(const QString &name) const
     // one-to-one match
     QString tmp;
     QTextStream stream(&tmp);
-    
+
     stream << '%' << it->index;
 
     return tmp;
@@ -104,11 +104,11 @@ QString CPathMgr::simplifyPath(const QString &name) const
     // matches on separator boundary
     QString tmp;
     QTextStream stream(&tmp);
-    
+
     stream << '%' << it->index << name.right(name.length() - len);
 
     return tmp;
-    
+
       }
     }
     ++it;

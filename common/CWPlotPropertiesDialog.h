@@ -32,7 +32,7 @@ class CWPlotPropertiesDialog : public QDialog
  public:
   CWPlotPropertiesDialog(CPlotProperties &prop, QWidget *parent = 0);
 
-  virtual void accept(); 
+  virtual void accept();
 
  private:
   CPlotProperties &m_properties;

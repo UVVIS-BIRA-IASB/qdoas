@@ -61,7 +61,7 @@ CProjectConfigTreeNode::Type CProjectConfigFile::type(void) const
   return CProjectConfigTreeNode::eFile;
 }
 
-  
+
 CProjectConfigFolder::CProjectConfigFolder(const QString &name, bool enabled) :
   CProjectConfigTreeNode(name, enabled)
 {
@@ -72,7 +72,7 @@ CProjectConfigTreeNode::Type CProjectConfigFolder::type(void) const
   return CProjectConfigTreeNode::eFolder;
 }
 
-  
+
 CProjectConfigDirectory::CProjectConfigDirectory(const QString &name, const QString &filter, bool recurse, bool enabled) :
   CProjectConfigTreeNode(name, enabled),
   m_filter(filter),

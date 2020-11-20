@@ -59,12 +59,12 @@ struct SSymbolBucket
 {
   QString description;
   int useCount;
-  
+
   SSymbolBucket(const QString &descr) : description(descr), useCount(0) {}
 };
 
 // The symbol map forces unqiueness of symbols at the case-insensive level.
-  
+
 struct SymbolCmp
 {
   bool operator()(const QString &lhs, const QString &rhs) const { return (QString::compare(lhs, rhs, Qt::CaseInsensitive) < 0); }
@@ -109,14 +109,14 @@ class CWorkSpace
   mediate_site_t* siteList(int &listLength) const;
   mediate_symbol_t* symbolList(int &listLength) const;
   mediate_analysis_window_t* analysisWindowList(const QString &projectName, int &listLength) const;
-  
+
   // return deep-copied list of analysis window properties
   QList<mediate_analysis_window_t*> analysisWindowList(const QString &projectName) const;
 
   QStringList symbolList(void) const;
   QStringList analysisWindowsWithSymbol(const QString &projectName, const QString &symbol) const;
   bool setAnalysisWindowEnabled(const QString &projectName,
-                const QString &windowName, bool enabled); 
+                const QString &windowName, bool enabled);
 
   bool destroyProject(const QString &projectName);
   bool destroyAnalysisWindow(const QString &projectName, const QString &newWindowName);
@@ -131,7 +131,7 @@ class CWorkSpace
 
   void attach(CSitesObserver *observer);
   void detach(CSitesObserver *observer);
-  
+
   void attach(CSymbolObserver *observer);
   void detach(CSymbolObserver *observer);
 

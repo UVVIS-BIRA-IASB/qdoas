@@ -59,7 +59,7 @@ int apex_init(const char *reference_filename, ENGINE_CONTEXT *pEngineContext, co
          const size_t start[] = {0};
          const size_t count[] = {col_dim};
          reference_file.getVar("use_row", start, count, use_row.data());
-         if (i==idxColumn){ 
+         if (i==idxColumn){
              *useRow = use_row[i];
          }
       } else if ((pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_GOME1_NETCDF) &&
@@ -220,23 +220,23 @@ void apex_clean() {
 RC apex_load_file(char *filename,double *lambda, double *spectrum, int *n_wavel)
  {
    // Declarations
-   
+
    RC rc;
-   
+
    // Initializations
-   
+
    rc=ERROR_ID_NO;
-   
-   try 
+
+   try
     {
       NetCDFFile reference_file(filename);
-      
+
       col_dim = reference_file.dimLen("col_dim");
       spectral_dim = reference_file.dimLen("spectral_dim");
-      
+
       const size_t start[] = {0, 0, 0};
       const size_t count[] = {1, 1, spectral_dim};
-      
+
   vector<vector<double> > radiances(reference_file.dimLen("col_dim"));
   const size_t reference_spectral_dim = reference_file.dimLen("spectral_dim");
   for (size_t i=0; i<radiances.size(); ++i) {
@@ -245,15 +245,15 @@ RC apex_load_file(char *filename,double *lambda, double *spectrum, int *n_wavel)
     const size_t start[] = {i, 0};
     const size_t count[] = {1, reference_spectral_dim};
     reference_file.getVar("reference_radiance", start, count, rad.data());
-    } 
+    }
    }
-   catch(std::runtime_error& e) 
+   catch(std::runtime_error& e)
     {
      rc=ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF,
                          (string { "Can not open reference file " } + filename ).c_str());
     }
-    
+
    // Return
-   
+
    return rc;
  }

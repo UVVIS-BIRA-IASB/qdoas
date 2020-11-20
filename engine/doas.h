@@ -117,7 +117,7 @@ static inline bool is_satellite(enum _prjctInstrFormat format) {
 
 static inline bool is_maxdoas(enum _prjctInstrFormat format) {
   return (format==PRJCT_INSTR_FORMAT_ASCII ||                                                   //  0 ASCII
-          format==PRJCT_INSTR_FORMAT_BIRA_MOBILE || 
+          format==PRJCT_INSTR_FORMAT_BIRA_MOBILE ||
           format==PRJCT_INSTR_FORMAT_MFC ||                                                     // 12 MFC Heidelberg
           format==PRJCT_INSTR_FORMAT_MFC_STD ||                                                 // 13 MFC Heidelberg
           format==PRJCT_INSTR_FORMAT_MFC_BIRA ||                                                // 14 MFC BIRA-IASB

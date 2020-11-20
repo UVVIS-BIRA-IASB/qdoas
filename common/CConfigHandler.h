@@ -83,8 +83,8 @@ class CConfigHandler : public QXmlDefaultHandler
   void setPath(int index, const QString &pathPrefix);
   QString getPath(int index) const;
   QString pathExpand(const QString &name);
- 
-  QString messages(void) const; // messages collected during parsing 
+
+  QString messages(void) const; // messages collected during parsing
 
  protected:
   bool delegateStartElement(const QString &qName, const QXmlAttributes &atts, bool &result);

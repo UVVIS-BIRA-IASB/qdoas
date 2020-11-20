@@ -53,7 +53,7 @@ CWProjectFolderNameEditor::CWProjectFolderNameEditor(CWProjectTree *projectTree,
     m_captionStr = "Create new Folder in ";
   else
     m_captionStr = "Rename Folder ";
-    
+
   m_contextTag.clear();
 
   // build a path from item - will use this to locate the target point in the tree on 'Ok'
@@ -95,7 +95,7 @@ bool CWProjectFolderNameEditor::actionOk(void)
       msg = m_projectTree->editInsertNewFolder(item, m_folderName->text());
     else
       msg = m_projectTree->editRenameFolder(item, m_folderName->text());
-    
+
     if (msg.isNull())
       return true;
 

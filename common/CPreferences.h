@@ -36,7 +36,7 @@ class CPreferences
 {
  public:
   static CPreferences* instance(void);
-  
+
   ~CPreferences(); // flushes data to permanent storage
 
   // interface for saving/restoring preferences...

@@ -38,13 +38,13 @@ Q_OBJECT
   virtual void updateNewSymbol(const QString &newSymbolName);
   virtual void updateModifySymbol(const QString &symbolName);
   virtual void updateDeleteSymbol(const QString &symbolName);
-  
+
  protected:
   virtual void contextMenuEvent(QContextMenuEvent *e);
   virtual void showEvent(QShowEvent *e);
 
  private:
-  void addNewUserSymbol(const QString &userSymbolName, const QString &description); 
+  void addNewUserSymbol(const QString &userSymbolName, const QString &description);
 
  public slots:
    void slotAddNewSymbol();
