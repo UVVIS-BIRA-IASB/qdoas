@@ -721,6 +721,7 @@ RC ReliMFC(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int localDay
         pRecord->altitude=(double)0.;
         pRecord->elevationViewAngle=(float)MFC_header.elevation;
         pRecord->azimuthViewAngle=999.;
+        
         pRecord->maxdoas.measurementType=((pRecord->elevationViewAngle>80.) && (pRecord->elevationViewAngle<100.))?PRJCT_INSTR_MAXDOAS_TYPE_ZENITH:PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS;  // Not the possibility to separate almucantar, horizon and direct sun from off-axis measurements
 
         if (strlen(pRecord->Nom))
@@ -1356,10 +1357,12 @@ RC MFCBIRA_Reli(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int loc
     pRecord->elevationViewAngle=header.elevationAngle;
     pRecord->azimuthViewAngle=header.azimuthAngle;
     pRecord->TDet=header.temperature;
+    pRecord->maxdoas.measurementType=header.measurementType;
 
     strcpy(pRecord->mfcBira.originalFileName,header.fileName);
     
-    pRecord->maxdoas.measurementType=((pRecord->elevationViewAngle>80.)&&(pRecord->elevationViewAngle<100.))?PRJCT_INSTR_MAXDOAS_TYPE_ZENITH:PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS;  // Not the possibility to separate almucantar, horizon and direct sun from off-axis measurements
+    if ((pRecord->maxdoas.measurementType==PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS) && ((pRecord->elevationViewAngle>80.)&&(pRecord->elevationViewAngle<100.)))
+     pRecord->maxdoas.measurementType=PRJCT_INSTR_MAXDOAS_TYPE_ZENITH;  
     
     if (pRecord->elevationViewAngle>100.)
      {
