@@ -14,6 +14,7 @@ extern "C" {
 
   /*! \brief Supported output formats.*/
   enum output_format {
+    UNDEFINED=-1,
     ASCII,
     HDFEOS5,
     NETCDF,
