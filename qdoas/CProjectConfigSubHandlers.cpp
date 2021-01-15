@@ -757,6 +757,9 @@ bool CProjectInstrumentalSubHandler::start(const QXmlAttributes &atts)
     else
       return postErrorMessage("Instrumental Site Name too long");
   }
+  
+  str = atts.value("saa_convention");
+  m_instrumental->saaConvention=(!str.isEmpty() && (str=="0-north"))?PRJCT_INSTR_SAA_NORTH:PRJCT_INSTR_SAA_SOUTH;
 
   return true;
 }

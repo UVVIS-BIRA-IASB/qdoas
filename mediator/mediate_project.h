@@ -415,6 +415,7 @@ extern "C" {
    {
     int format;
     char siteName[SITE_NAME_BUFFER_LENGTH];
+    int  saaConvention;
     struct instrumental_ascii ascii;
     struct instrumental_logger logger;
     struct instrumental_acton acton;

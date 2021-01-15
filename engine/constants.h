@@ -410,6 +410,11 @@ enum _prjctInstrType {
   PRJCT_INSTR_TYPE_MAX
 };
 
+enum _prjctInstrSaaConvention {
+  PRJCT_INSTR_SAA_SOUTH,
+  PRJCT_INSTR_SAA_NORTH
+};
+
 enum _maxdoasSpectrumTypes {
   PRJCT_INSTR_MAXDOAS_TYPE_NONE,
   PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS,

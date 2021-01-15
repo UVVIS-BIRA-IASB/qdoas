@@ -1060,6 +1060,8 @@ RC EngineReadFile(ENGINE_CONTEXT *pEngineContext,int indexRecord,int dateFlag,in
        pRecord->altitude=pSite->altitude*0.001;
 
      pRecord->Zm=(pRecord->Tm!=(double)0.)?ZEN_FNTdiz(ZEN_FNCrtjul(&pRecord->Tm),&longit,&latit,&pRecord->Azimuth):(double)-1.;
+     if (pEngineContext->project.instrumental.saaConvention==PRJCT_INSTR_SAA_NORTH)
+      pRecord->Azimuth+=180.;
    }
 
    return pRecord->rc;

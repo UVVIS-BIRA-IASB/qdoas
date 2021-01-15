@@ -98,7 +98,7 @@ CWProjectTabInstrumental::CWProjectTabInstrumental(const mediate_project_instrum
 
   mainLayout->addSpacing(25);
 
-  QGridLayout *topLayout = new QGridLayout;
+  // QGridLayout *topLayout = new QGridLayout;
 
   m_formatStack = new QStackedWidget(this);
   // insert widgets into the stack, and store their index in the map - keyed by the instrument format
@@ -259,15 +259,43 @@ CWProjectTabInstrumental::CWProjectTabInstrumental(const mediate_project_instrum
   m_instrumentToStackIndexMap.insert(std::map<int,int>::value_type(PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF, index));
 
   // Site
-  m_siteCombo = new CWSiteListCombo(this); // automatically populated
+  
+  m_siteFrame = new QFrame(this);
+  m_siteFrame->setFrameStyle(QFrame::NoFrame);
+  
+  QHBoxLayout *siteLayout=new(QHBoxLayout),
+              *saaLayout=new(QHBoxLayout);
+  QVBoxLayout *topLayout = new QVBoxLayout(m_siteFrame);
+              
+  QLabel *siteLabel,*saaLabel;
 
-  topLayout->addWidget(new QLabel("Site", this), 1, 0);
-  topLayout->addWidget(m_siteCombo, 1, 1);
+  m_siteCombo = new CWSiteListCombo(m_siteFrame); // automatically populated
+  
+  siteLabel=new QLabel("Site", m_siteFrame);
+  siteLabel->setFixedWidth(100);
+  
+  siteLayout->addWidget(siteLabel);
+  siteLayout->addWidget(m_siteCombo);
+  
+  saaLabel=new QLabel("SAA convention", m_siteFrame);
+  saaLabel->setFixedWidth(100);
 
-  topLayout->setColumnMinimumWidth(0, 90);
-  topLayout->setColumnStretch(1, 1);
+  m_saaSRadioButton = new QRadioButton("-180..180, 0 degree South", m_siteFrame);
+  m_saaNRadioButton = new QRadioButton("0-360, 0 degree North", m_siteFrame);
+  
+  saaLayout->addWidget(saaLabel);
+  saaLayout->addWidget(m_saaSRadioButton);  
+  saaLayout->addWidget(m_saaNRadioButton);
+  saaLayout->addStretch(1);
+  
+  topLayout->addLayout(siteLayout);
+  topLayout->addLayout(saaLayout);
 
-  mainLayout->addLayout(topLayout);
+  // topLayout->setColumnMinimumWidth(0, 90);
+  // topLayout->setColumnStretch(1, 1);
+
+  mainLayout->addWidget(m_siteFrame);
+  //mainLayout->addLayout(topLayout);
   mainLayout->addWidget(m_formatStack);
   mainLayout->addStretch(1);
 
@@ -277,6 +305,11 @@ CWProjectTabInstrumental::CWProjectTabInstrumental(const mediate_project_instrum
   index = m_siteCombo->findText(QString(instr->siteName));
   if (index != -1)
     m_siteCombo->setCurrentIndex(index);
+  
+  if (instr->saaConvention == PRJCT_INSTR_SAA_SOUTH)
+    m_saaSRadioButton->setChecked(true);
+  else if (instr->saaConvention == PRJCT_INSTR_SAA_NORTH)
+    m_saaNRadioButton->setChecked(true);
  }
 
 void CWProjectTabInstrumental::apply(mediate_project_instrumental_t *instr) const
@@ -285,7 +318,9 @@ void CWProjectTabInstrumental::apply(mediate_project_instrumental_t *instr) cons
 
   QString siteName = m_siteCombo->currentText();
 //  if (siteName != "No Site Specified" && siteName.length() < (int)sizeof(instr->siteName))
-    strcpy(instr->siteName, siteName.toLocal8Bit().data());
+  strcpy(instr->siteName, siteName.toLocal8Bit().data());
+  if (m_saaSRadioButton->isChecked()) instr->saaConvention = PRJCT_INSTR_SAA_SOUTH;
+  if (m_saaNRadioButton->isChecked()) instr->saaConvention = PRJCT_INSTR_SAA_NORTH;
 
   m_asciiEdit->apply(&(instr->ascii));
   m_loggerEdit->apply(&(instr->logger));
@@ -331,7 +366,12 @@ void CWProjectTabInstrumental::slotInstrumentChanged(int instrument)
 
 void CWProjectTabInstrumental::slotInstrumentTypeChanged(int instrumentType)
 {
- m_siteCombo->setEnabled((instrumentType==PRJCT_INSTR_TYPE_SATELLITE)?0:1);
+ if (instrumentType==PRJCT_INSTR_TYPE_SATELLITE)
+  m_siteFrame->hide();
+ else
+  m_siteFrame->show();
+ // m_siteFrame->setEnabled((instrumentType==PRJCT_INSTR_TYPE_SATELLITE)?0:1);
+ // m_siteCombo->setEnabled((instrumentType==PRJCT_INSTR_TYPE_SATELLITE)?0:1);
 }
 
 //--------------------------------------------------------

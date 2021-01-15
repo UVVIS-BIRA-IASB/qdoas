@@ -74,6 +74,8 @@ Q_OBJECT
 
  private:
   QComboBox *m_siteCombo;
+  QRadioButton *m_saaSRadioButton,*m_saaNRadioButton;
+  QFrame *m_siteFrame;
   QStackedWidget *m_formatStack;
   // widgets for the configuration of each instrument file format
   CWInstrAsciiEdit *m_asciiEdit;

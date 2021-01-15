@@ -362,10 +362,6 @@ RC FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
     pRecordInfo->present_datetime.thetime.ti_sec=(char)dt[recordNo-1][5];
     pRecordInfo->present_datetime.millis=dt[recordNo-1][6];
 
-    pRecordInfo->Tm=(double)ZEN_NbSec(&pRecordInfo->present_datetime.thedate,&pRecordInfo->present_datetime.thetime,0);
-    tmLocal=pRecordInfo->Tm+THRD_localShift*3600.;
-    pRecordInfo->localCalDay=ZEN_FNCaljda(&tmLocal);
-
     auto dts = reinterpret_cast<const short(*)[7]>(current_metadata.dts.data());
 
     pRecordInfo->startDateTime.thedate.da_day=(char)dts[recordNo-1][2];
@@ -408,9 +404,14 @@ RC FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
 
     if (pRecordInfo->NSomme<0)   // -1 means that the information is not available
      pRecordInfo->NSomme=1;
+    
+    pRecordInfo->Tm=(double)ZEN_NbSec(&pRecordInfo->present_datetime.thedate,&pRecordInfo->present_datetime.thetime,0);
+    
+    tmLocal=pRecordInfo->Tm+THRD_localShift*3600.;
+    pRecordInfo->localCalDay=ZEN_FNCaljda(&tmLocal);
 
     // Recalculate solar zenith angle if necessary
-
+    
     if (std::isnan(pRecordInfo->Zm) && !std::isnan(pRecordInfo->longitude) && !std::isnan(pRecordInfo->latitude))
      {
       double longitude;

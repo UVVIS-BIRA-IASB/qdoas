@@ -452,7 +452,7 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
   default:
     fprintf(fp, "\"invalid\"");
   }
-  fprintf(fp, " site=\"%s\">\n", d->siteName);
+  fprintf(fp, " site=\"%s\" saa_convention=\"%s\" >\n", d->siteName,(d->saaConvention)?"0-north":"0-south");
 
   // ascii
   fprintf(fp, "      <ascii size=\"%d\" format=", d->ascii.detectorSize);

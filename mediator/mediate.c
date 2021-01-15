@@ -833,6 +833,7 @@ void setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const
    INDEX indexCluster;
 
    pEngineInstrumental->readOutFormat=(char)pMediateInstrumental->format;       // File format
+   pEngineInstrumental->saaConvention=pMediateInstrumental->saaConvention;      // Solar azimuth convention
    strcpy(pEngineInstrumental->observationSite,pMediateInstrumental->siteName); // Observation site
 
    switch (pEngineInstrumental->readOutFormat)

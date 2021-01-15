@@ -187,6 +187,7 @@ typedef struct _prjctInstrumental
   int         offsetFlag;
   double      lambdaMin,lambdaMax;
   float       opusTimeShift;
+  int         saaConvention;
  }
 PRJCT_INSTRUMENTAL;
 
