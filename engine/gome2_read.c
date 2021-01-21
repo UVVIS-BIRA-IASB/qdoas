@@ -180,8 +180,8 @@ typedef struct _gome2Info {
   int total_nadir_obs;
 
   uint16_t no_of_pixels;
-  uint16_t orbitStart;
-  uint16_t orbitEnd;
+  uint32_t orbitStart;
+  uint32_t orbitEnd;
   uint8_t channelIndex;
 }
 GOME2_INFO;
@@ -615,13 +615,14 @@ RC Gome2ReadOrbitInfo(GOME2_ORBIT_FILE *pOrbitFile,int bandIndex) {
 
   // Retrieve the MPHR
   int status = coda_cursor_goto_record_field_by_name(&pOrbitFile->gome2Cursor,"MPHR");          // MPHR
-
+  
   if (!status) status = coda_cursor_goto_record_field_by_name(&pOrbitFile->gome2Cursor,"ORBIT_START");    // MPHR.orbitStart
-  if (!status) status = coda_cursor_read_uint16(&pOrbitFile->gome2Cursor, &pGome2Info->orbitStart);
+  
+  if (!status) status = coda_cursor_read_uint32(&pOrbitFile->gome2Cursor, &pGome2Info->orbitStart);
   if (!status) status = coda_cursor_goto_parent(&pOrbitFile->gome2Cursor);
 
   if (!status) status = coda_cursor_goto_record_field_by_name(&pOrbitFile->gome2Cursor,"ORBIT_END");     // MPHR.ORBIT_END
-  if (!status) status = coda_cursor_read_uint16(&pOrbitFile->gome2Cursor, &pGome2Info->orbitEnd);
+  if (!status) status = coda_cursor_read_uint32(&pOrbitFile->gome2Cursor, &pGome2Info->orbitEnd);
   if (!status) status = coda_cursor_goto_parent(&pOrbitFile->gome2Cursor);
 
   if (!status) status = coda_cursor_goto_record_field_by_name(&pOrbitFile->gome2Cursor,"TOTAL_VIADR");    // MPHR.TOTAL_VIADR (Variable Internal Auxiliary Data Record)

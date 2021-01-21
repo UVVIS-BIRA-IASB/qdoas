@@ -1,3 +1,10 @@
+
+3.4.5 2021-01-21
+~~~~~~~~~~~~~~~~
+
+* update of reading routine for gome-2 due to an update of .codadef files. 
+* Ground-based measurements : add the wanted saa convention if angles are recalculated for a specific observation site
+
 3.4.4 2020-09-30
 ~~~~~~~~~~~~~~~~
 
