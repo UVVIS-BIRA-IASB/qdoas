@@ -173,6 +173,8 @@ static void getDate(int delta_t, struct datetime *date_time, int *pMs) {
   pTime->ti_sec = thedate.tm_sec;
 
   *pMs = static_cast<int>(delta_t) % 1000;
+  date_time->millis=*pMs;
+
 }
 
 static void set_reference_time(const string& utc_date) {
