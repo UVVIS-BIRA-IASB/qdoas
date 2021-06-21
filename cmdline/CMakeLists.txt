@@ -1,4 +1,4 @@
-include_directories(../common ../engine ../mediator ../qdoas ../convolution ../ring ../usamp)
+include_directories(../common ../engine ../mediator ../qdoas ../convolution ../ring ../usamp ${GSL_INCLUDE_DIRS})
 
 add_executable(doas_cl
   ../qdoas/CQdoasConfigHandler.cpp
@@ -12,7 +12,6 @@ add_executable(doas_cl
   CBatchEngineController.cpp
   CBatchEngineController.h
   cmdline.cpp
-  cmdline.pro
   convxml.cpp
   convxml.h
   qdoasxml.cpp
@@ -26,8 +25,7 @@ target_link_libraries(doas_cl
   ${CODA_LIBRARY}
   ${GSL_LIBRARIES}
   ${HDF5_LIBRARIES}
-  ${HDFEOS2_LIBRARY}
-  ${HDFEOS5_LIBRARY}
+  ${HDFEOS_LIBRARIES}
   ${netCDF_LIBRARIES}
 )
 

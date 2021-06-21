@@ -1,4 +1,4 @@
-include_directories(../common ../engine ../mediator ${QWT_INCLUDE_DIR})
+include_directories(../common ../engine ../mediator ${QWT_INCLUDE_DIR} ${GSL_INCLUDE_DIRS} ${HDF5_INCLUDE_DIRS})
 
 add_executable(qdoas MACOSX_BUNDLE
   ../common/QdoasVersion.h
@@ -102,6 +102,7 @@ add_executable(qdoas MACOSX_BUNDLE
 )
 
 add_definitions(-DAPP_QDOAS)
+link_directories(${netCDF_LIBRARY_DIR})
 
 target_compile_features(qdoas PUBLIC cxx_std_11)
 target_link_libraries(qdoas
@@ -111,8 +112,7 @@ target_link_libraries(qdoas
   ${CODA_LIBRARY}
   ${GSL_LIBRARIES}
   ${HDF5_LIBRARIES}
-  ${HDFEOS2_LIBRARY}
-  ${HDFEOS5_LIBRARY}
+  ${HDFEOS_LIBRARIES}
   ${netCDF_LIBRARIES}
 )
 set_target_properties(qdoas PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/resources/qdoas.plist)

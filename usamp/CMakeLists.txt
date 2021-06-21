@@ -1,4 +1,4 @@
-include_directories(../common ../engine ../mediator ${QWT_INCLUDE_DIR})
+include_directories(../common ../engine ../mediator ${QWT_INCLUDE_DIR} ${GSL_INCLUDE_DIRS})
 
 add_executable(usamp
   ../common/QdoasVersion.h

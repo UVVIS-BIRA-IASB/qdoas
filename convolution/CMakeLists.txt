@@ -1,4 +1,4 @@
-include_directories(../common ../engine ../mediator ${QWT_INCLUDE_DIR})
+include_directories(../common ../engine ../mediator ${QWT_INCLUDE_DIR} ${GSL_INCLUDE_DIRS} ${HDF5_INCLUDE_DIRS})
 
 add_executable(convolution
   ../common/QdoasVersion.h
@@ -32,8 +32,7 @@ target_link_libraries(convolution
   ${CODA_LIBRARY}
   ${GSL_LIBRARIES}
   ${HDF5_LIBRARIES}
-  ${HDFEOS2_LIBRARY}
-  ${HDFEOS5_LIBRARY}
+  ${HDFEOS_LIBRARIES}
   ${netCDF_LIBRARIES}
 )
 
