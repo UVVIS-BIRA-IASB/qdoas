@@ -431,7 +431,6 @@ void CWMain::openFile(const QString &fileName) {
    errMsg+="File "+fileName+" not found";
   else
    {
-    printf("Try to open file\n");
     // parse the file
     QXmlSimpleReader xmlReader;
     QXmlInputSource *source = new QXmlInputSource(&file);
@@ -562,13 +561,9 @@ void CWMain::slotOpenRecent() {
   if (!checkStateAndConsiderSaveFile())
     return;
 
-  printf("slotOpenRecent\n"); 
   QAction *action = qobject_cast<QAction *>(sender());
   if (action)
-  {
-   printf("action to do\n");
     openFile(action->data().toString());
-  }
 }
 
 void CWMain::updateRecentFileMenu() {
