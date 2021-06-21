@@ -423,74 +423,80 @@ void CWMain::slotOpenFile()
 void CWMain::openFile(const QString &fileName) {
 
   QString errMsg;
-  QFile *file = new QFile(fileName);
+  // QFile *file = new QFile(fileName);
+  QFile file(fileName);
+  QFileInfo fileInfo(file);
 
-  // parse the file
-  QXmlSimpleReader xmlReader;
-  QXmlInputSource *source = new QXmlInputSource(file);
+  if (!fileInfo.exists())
+   errMsg+="File "+fileName+" not found";
+  else
+   {
+    printf("Try to open file\n");
+    // parse the file
+    QXmlSimpleReader xmlReader;
+    QXmlInputSource *source = new QXmlInputSource(&file);
 
-  CQdoasConfigHandler *handler = new CQdoasConfigHandler;
-  xmlReader.setContentHandler(handler);
-  xmlReader.setErrorHandler(handler);
+    CQdoasConfigHandler *handler = new CQdoasConfigHandler;
+    xmlReader.setContentHandler(handler);
+    xmlReader.setErrorHandler(handler);
 
-  bool ok = xmlReader.parse(source);
+    bool ok = xmlReader.parse(source);
 
-  if (ok) {
-    setProjectFileName(fileName);
+    if (ok) {
+      setProjectFileName(fileName);
 
-    CPathMgr *pathMgr = CPathMgr::instance();
-    CWorkSpace *ws = CWorkSpace::instance();
+      CPathMgr *pathMgr = CPathMgr::instance();
+      CWorkSpace *ws = CWorkSpace::instance();
 
-    // start with a clear workspace ... clear the project tree, then the workspace
-    m_projTree->removeAllContent();
-    ws->removeAllContent();
-    pathMgr->removeAll();
+      // start with a clear workspace ... clear the project tree, then the workspace
+      m_projTree->removeAllContent();
+      ws->removeAllContent();
+      pathMgr->removeAll();
 
-    // repopulate the workspace and the project tree
+      // repopulate the workspace and the project tree
 
-    // store the paths in the pathMgr for simplification when saving ...
-    for (int i = 0; i<10; ++i) {
-      QString path = handler->getPath(i);
-      if (path.isEmpty())
-    pathMgr->removePath(i);
-      else
-    pathMgr->addPath(i, path);
+      // store the paths in the pathMgr for simplification when saving ...
+      for (int i = 0; i<10; ++i) {
+        QString path = handler->getPath(i);
+        if (path.isEmpty())
+      pathMgr->removePath(i);
+        else
+      pathMgr->addPath(i, path);
+      }
+
+      // sites
+      const QList<const CSiteConfigItem*> &siteItems = handler->siteItems();
+      QList<const CSiteConfigItem*>::const_iterator siteIt = siteItems.begin();
+      while (siteIt != siteItems.end()) {
+
+        ws->createSite((*siteIt)->siteName(), (*siteIt)->abbreviation(),
+               (*siteIt)->longitude(), (*siteIt)->latitude(), (*siteIt)->altitude());
+        ++siteIt;
+      }
+
+      // symbols
+      const QList<const CSymbolConfigItem*> &symbolItems = handler->symbolItems();
+      QList<const CSymbolConfigItem*>::const_iterator symIt = symbolItems.begin();
+      while (symIt != symbolItems.end()) {
+
+        ws->createSymbol((*symIt)->symbolName(), (*symIt)->symbolDescription());
+        ++symIt;
+      }
+
+      // projects
+      errMsg += m_projTree->loadConfiguration(handler->projectItems());
+
+      m_stateMonitor->slotValidate();
+      m_saveAction->setEnabled(false);
+      m_saveAsAction->setEnabled(true);
+
+      updateRecentFiles(fileName);
     }
-
-    // sites
-    const QList<const CSiteConfigItem*> &siteItems = handler->siteItems();
-    QList<const CSiteConfigItem*>::const_iterator siteIt = siteItems.begin();
-    while (siteIt != siteItems.end()) {
-
-      ws->createSite((*siteIt)->siteName(), (*siteIt)->abbreviation(),
-             (*siteIt)->longitude(), (*siteIt)->latitude(), (*siteIt)->altitude());
-      ++siteIt;
+    else {
+      errMsg = handler->messages();
     }
-
-    // symbols
-    const QList<const CSymbolConfigItem*> &symbolItems = handler->symbolItems();
-    QList<const CSymbolConfigItem*>::const_iterator symIt = symbolItems.begin();
-    while (symIt != symbolItems.end()) {
-
-      ws->createSymbol((*symIt)->symbolName(), (*symIt)->symbolDescription());
-      ++symIt;
-    }
-
-    // projects
-    errMsg += m_projTree->loadConfiguration(handler->projectItems());
-
-    m_stateMonitor->slotValidate();
-    m_saveAction->setEnabled(false);
-    m_saveAsAction->setEnabled(true);
-
-    updateRecentFiles(fileName);
-  }
-  else {
-    errMsg = handler->messages();
-  }
-  delete handler;
-  delete source;
-  delete file;
+    delete handler;
+   }
 
   if (!errMsg.isNull())
     QMessageBox::critical(this, "File Open", errMsg);
@@ -556,9 +562,13 @@ void CWMain::slotOpenRecent() {
   if (!checkStateAndConsiderSaveFile())
     return;
 
+  printf("slotOpenRecent\n"); 
   QAction *action = qobject_cast<QAction *>(sender());
   if (action)
+  {
+   printf("action to do\n");
     openFile(action->data().toString());
+  }
 }
 
 void CWMain::updateRecentFileMenu() {

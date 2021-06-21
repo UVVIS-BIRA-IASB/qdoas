@@ -431,14 +431,17 @@ void mediateRequestPlotSpectra(ENGINE_CONTEXT *pEngineContext,void *responseHand
      if ((tempSpectrum=(double *)MEMORY_AllocDVector("mediateRequestPlotSpectra","tempSpectrum",0,n_wavel-1))!=NULL) {
        memcpy(tempSpectrum,pBuffers->spectrum,sizeof(double)*n_wavel);
 
-       if (pEngineContext->buffers.instrFunction!=NULL) {
+        if ((pInstrumental->readOutFormat!=PRJCT_INSTR_FORMAT_MFC_BIRA) &&   
+            (pInstrumental->readOutFormat!=PRJCT_INSTR_FORMAT_MFC) &&
+            (pInstrumental->readOutFormat!=PRJCT_INSTR_FORMAT_MFC_STD) &&
+            (pEngineContext->buffers.instrFunction!=NULL)) {
          for (i=0;i<n_wavel;i++)
            if (pBuffers->instrFunction[i]==(double)0.)
              tempSpectrum[i]=(double)0.;
            else
              tempSpectrum[i]/=pBuffers->instrFunction[i];
        }
-
+       
        if ((pInstrumental->readOutFormat!=PRJCT_INSTR_FORMAT_MFC_BIRA) || ((pEngineContext->recordInfo.mfcBira.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_DARK) && (pEngineContext->recordInfo.mfcBira.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_OFFSET)))
          sprintf(tmpTitle,"Spectrum");
        else if (pEngineContext->recordInfo.mfcBira.measurementType==PRJCT_INSTR_MAXDOAS_TYPE_DARK)
@@ -1896,10 +1899,8 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
              if (pTabFeno->gomeRefFlag || pEngineContext->refFlag) {
                memcpy(pTabFeno->Lambda,pTabFeno->LambdaRef,sizeof(double)*n_wavel);
                memcpy(pTabFeno->LambdaK,pTabFeno->LambdaRef,sizeof(double)*n_wavel);
-
-               if (pTabFeno->LambdaRef[n_wavel-1]-pTabFeno->Lambda[0]+1!=n_wavel){
-                 rc=ANALYSE_XsInterpolation(pTabFeno,pTabFeno->LambdaRef,indexFenoColumn);
-               }
+               
+               rc=ANALYSE_XsInterpolation(pTabFeno,pTabFeno->LambdaRef,indexFenoColumn);
              }
            }
 
@@ -1981,6 +1982,8 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
 
        if ((THRD_id==THREAD_TYPE_KURUCZ) || useKurucz) {
          rc=KURUCZ_Alloc(&pEngineContext->project,pEngineContext->buffers.lambda,indexKurucz,lambdaMin,lambdaMax,indexFenoColumn, &hr_solar_temp);
+         
+         // the reference spectrum is corrected by the instrument function if any
 
          if (!rc && useKurucz) {
            rc=KURUCZ_Reference(pEngineContext->buffers.instrFunction,0,saveFlag,1,responseHandle,indexFenoColumn);
@@ -2408,16 +2411,16 @@ int mediateRequestNextMatchingAnalyseSpectrum(void *engineContext,
     {
      mediateRequestPlotSpectra(pEngineContext,responseHandle);
      ANALYSE_InitResults();
-
+     
      if (!pEngineContext->analysisRef.refAuto || pEngineContext->satelliteFlag || ((pEngineContext->recordInfo.rc=EngineNewRef(pEngineContext,responseHandle))==ERROR_ID_NO))
       pEngineContext->recordInfo.rc=ANALYSE_Spectrum(pEngineContext,responseHandle);
-
+     
     if ((pEngineContext->mfcDoasisFlag || (pEngineContext->lastSavedRecord!=pEngineContext->indexRecord)) &&
         (   ((THRD_id==THREAD_TYPE_ANALYSIS) && pEngineContext->project.asciiResults.analysisFlag && (!pEngineContext->project.asciiResults.successFlag || !pEngineContext->recordInfo.rc )) // (!pEngineContext->project.asciiResults.successFlag /* || nrc */))
             || ((THRD_id==THREAD_TYPE_KURUCZ) && pEngineContext->project.asciiResults.calibFlag) ) )
 
       pEngineContext->recordInfo.rc=OUTPUT_SaveResults(pEngineContext,pEngineContext->recordInfo.i_crosstrack);
-
+    
 //    if (!rc)
 //      rc=rcOutput;
 

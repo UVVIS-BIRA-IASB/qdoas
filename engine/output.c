@@ -190,9 +190,10 @@ double output_flux(const ENGINE_CONTEXT *pEngineContext, double wavelength, int 
     // Flux calculation
 
     for (int i=imin; i<=imax; i++)
-      flux+=pEngineContext->buffers.spectrum[i];
+      flux+=pEngineContext->buffers.spectrum[i];  // !!! spectra are previously divided by the integration time in OUTPUT_SaveResults
 
     flux/=(double)(imax-imin+1);
+    
    }
   return flux;
 }
@@ -2494,7 +2495,7 @@ RC OUTPUT_SaveResults(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
     for (int i=0;i<n_wavel;i++)
       Spectrum[i]/=(double)pRecordInfo->Tint;
   }
-
+  
   if ((int)outputNbRecords<pEngineContext->recordNumber)
     OutputSaveRecord(pEngineContext,indexFenoColumn);
 

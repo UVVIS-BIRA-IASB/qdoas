@@ -445,9 +445,9 @@ RC MATRIX_Load(const char *fileName,MATRIX_OBJECT *pMatrix,
   // File open
 
   if ((fp=fopen(fullPath,"rt"))==NULL)
-   rc=ERROR_SetLast(__func__,ERROR_TYPE_WARNING,ERROR_ID_FILE_NOT_FOUND,fullPath);
+   rc=ERROR_SetLast(__func__,ERROR_TYPE_FATAL,ERROR_ID_FILE_NOT_FOUND,fullPath);
   else if (!STD_FileLength(fp) )
-   rc=ERROR_SetLast(__func__,ERROR_TYPE_WARNING,ERROR_ID_FILE_EMPTY,fullPath);
+   rc=ERROR_SetLast(__func__,ERROR_TYPE_FATAL,ERROR_ID_FILE_EMPTY,fullPath);
   else {
     // The function has to determine the number of lines and columns
     if (!nl || !nc) {

@@ -359,30 +359,24 @@ RC AIRBORNE_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
     pRecord->uavBira.outsideTemp=(float)header.outsideTemp;
 
     pRecord->uavBira.pressure=(float)header.pressure;
-       pRecord->uavBira.dewPoint=(float)header.dewPoint;
-       pRecord->uavBira.humidity=(float)header.humidity;
-       pRecord->uavBira.altitudeP=(float)header.altitudeP;
-       pRecord->uavBira.longitudeEnd=(float)header.longitudeEnd;
-       pRecord->uavBira.latitudeEnd=(float)header.latitudeEnd;
-       pRecord->uavBira.altitudeEnd=(float)header.altitudeEnd;
-       pRecord->uavBira.pitch=(float)header.pitch;
-       pRecord->uavBira.roll=(float)header.roll;
-       pRecord->uavBira.heading=(float)header.heading;
+    pRecord->uavBira.dewPoint=(float)header.dewPoint;
+    pRecord->uavBira.humidity=(float)header.humidity;
+    pRecord->uavBira.altitudeP=(float)header.altitudeP;
+    pRecord->uavBira.longitudeEnd=(float)header.longitudeEnd;
+    pRecord->uavBira.latitudeEnd=(float)header.latitudeEnd;
+    pRecord->uavBira.altitudeEnd=(float)header.altitudeEnd;
+    pRecord->uavBira.pitch=(float)header.pitch;
+    pRecord->uavBira.roll=(float)header.roll;
+    pRecord->uavBira.heading=(float)header.heading;
 
-       if (header.useNexstarFlag)
-        {
-         pRecord->elevationViewAngle=(double)header.viewElev;
-         pRecord->azimuthViewAngle=(double)header.viewAzim;
-        }
+    memcpy(&pRecord->uavBira.startTime.thetime,&header.now,sizeof(struct time));
+    memcpy(&pRecord->uavBira.endTime.thetime,&header.endMeas,sizeof(struct time));
 
-       memcpy(&pRecord->uavBira.startTime.thetime,&header.now,sizeof(struct time));
-       memcpy(&pRecord->uavBira.endTime.thetime,&header.endMeas,sizeof(struct time));
-
-       pRecord->uavBira.startTime.millis=(int)header.msBegin;
-       pRecord->uavBira.endTime.millis=(int)header.msEnd;
-       pRecord->uavBira.startTime.microseconds=0;
+    pRecord->uavBira.startTime.millis=(int)header.msBegin;
+    pRecord->uavBira.endTime.millis=(int)header.msEnd;
+    pRecord->uavBira.startTime.microseconds=0;
     pRecord->uavBira.endTime.microseconds=0;
-
+    
     nsec1=pRecord->uavBira.startTime.thetime.ti_hour*3600+pRecord->uavBira.startTime.thetime.ti_min*60+pRecord->uavBira.startTime.thetime.ti_sec;
     nsec2=pRecord->uavBira.endTime.thetime.ti_hour*3600+pRecord->uavBira.endTime.thetime.ti_min*60+pRecord->uavBira.endTime.thetime.ti_sec;
 
@@ -391,14 +385,29 @@ RC AIRBORNE_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
 
        // memcpy(&pRecord->uavBira.gpsStartTime,&header.gpsTime,sizeof(struct time));           // to delete -> to confirm by Alexis
        // memcpy(&pRecord->uavBira.gpsEndTime,&header.gpsTimeEnd,sizeof(struct time));
-
-       double longitude=-pRecord->longitude;
-
-       pRecord->Tm=(double)(ZEN_NbSec(&pRecord->present_datetime.thedate,&header.now,0)+0.001*header.msBegin+ZEN_NbSec(&pRecord->present_datetime.thedate,&header.endMeas,0)+0.001*header.msEnd)*0.5;
-    pRecord->Zm=(double)ZEN_FNTdiz(ZEN_FNCrtjul(&pRecord->Tm),&longitude,&pRecord->latitude,&pRecord->Azimuth);
+    
+       if (header.instrumentType==2)
+        {
+         // if (header.useNexstarFlag)
+          {
+           pRecord->elevationViewAngle=(double)header.viewElev;
+           pRecord->azimuthViewAngle=(double)header.viewAzim;
+           pRecord->Zm=header.sza;
+           pRecord->Azimuth=header.saa;
+          }
+        }
+        
+//        else if (fabs(pRecord->longitude-pRecord->latitude)>EPSILON)
+//         {
+//          double longitude=-pRecord->longitude;
+//          pRecord->Tm=(double)(ZEN_NbSec(&pRecord->present_datetime.thedate,&header.now,0)+0.001*header.msBegin+ZEN_NbSec(&pRecord->present_datetime.thedate,&header.endMeas,0)+0.001*header.msEnd)*0.5;
+//          pRecord->Zm=(double)ZEN_FNTdiz(ZEN_FNCrtjul(&pRecord->Tm),&longitude,&pRecord->latitude,&pRecord->Azimuth);
+//         }
+    
+    
     pRecord->TotalAcqTime=(double)header.totalTime;
     pRecord->TotalExpTime=(double)nsec2-nsec1;
-       pRecord->maxdoas.measurementType=(header.measType!=0)?(char)header.measType:PRJCT_INSTR_MAXDOAS_TYPE_ZENITH;
+    pRecord->maxdoas.measurementType=(char)header.measType; // (header.measType!=0)?(char)header.measType:PRJCT_INSTR_MAXDOAS_TYPE_ZENITH;
 
     if (header.endMeas.ti_hour || header.endMeas.ti_min || header.endMeas.ti_sec)
      pRecord->TimeDec=(double)(header.now.ti_hour+header.now.ti_min/60.+(header.now.ti_sec+0.001*header.msBegin)/3600.+header.endMeas.ti_hour+header.endMeas.ti_min/60.+(header.endMeas.ti_sec+0.001*header.msEnd)/3600.)*0.5;
@@ -409,12 +418,12 @@ RC AIRBORNE_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
 
     if (!header.endMeas.ti_hour && !header.endMeas.ti_min && !header.endMeas.ti_sec)
      {
-         memcpy(&header.endMeas,&header.now,sizeof(struct time));
-         memcpy(&pRecord->present_datetime.thetime,&header.now,sizeof(struct time));
-         pRecord->present_datetime.millis=0;
-        }
-       else
-        {
+      memcpy(&header.endMeas,&header.now,sizeof(struct time));
+      memcpy(&pRecord->present_datetime.thetime,&header.now,sizeof(struct time));
+      pRecord->present_datetime.millis=0;
+     }
+    else
+     {
       pRecord->present_datetime.thetime.ti_hour=(int)floor(timeDec);
       timeDec=(timeDec-(double)pRecord->present_datetime.thetime.ti_hour)*60.;
       pRecord->present_datetime.thetime.ti_min=(int)floor(timeDec);
@@ -433,7 +442,7 @@ RC AIRBORNE_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
 
     if (pEngineContext->maxdoasFlag)
      {
-         INDEX tintIndex,i;
+      INDEX tintIndex,i;
 
          // Check for the integration time in already loaded dark currents
 
@@ -443,7 +452,7 @@ RC AIRBORNE_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
 
       if (tintIndex<airboneDarkCurrentTintN)
        {
-           pDrk=&airborneDarkCurrent[tintIndex];
+        pDrk=&airborneDarkCurrent[tintIndex];
         for (i=0;i<n_wavel;i++)
          spectrum[i]-=pDrk->darkCurrent[i];
        }

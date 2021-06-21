@@ -822,7 +822,7 @@ int batchProcessConvolution(commands_t *cmd)
     if (xmlSwitch)
      CONVXML_Parse(cmd->xmlCommands,&properties);
 
-    std::cout << "CONVXML_Parse : " << properties.conslit.file.filename << std::endl;
+    // std::cout << "CONVXML_Parse : " << properties.conslit.file.filename << std::endl;
 
     if (!cmd->outputDir.isEmpty() && cmd->outputDir.size() < FILENAME_BUFFER_LENGTH-1) {
       // override the output directory
@@ -868,7 +868,7 @@ int batchProcessConvolution(commands_t *cmd)
       }
 
       if (retCode)
-       std::cout << "Convolution tool failed, please check your input";
+       std::cout << "Convolution tool failed, please check your input" << std::endl;;
 
       if (mediateXsconvDestroyContext(engineContext, resp) != 0) {
     retCode = 1;
@@ -885,6 +885,8 @@ int batchProcessConvolution(commands_t *cmd)
   delete handler;
   delete source;
   delete file;
+  
+  
 
   return retCode;
 }

@@ -235,7 +235,7 @@ RC ERROR_DisplayMessage(void *responseHandle)
      rc=0;
 
      // Get the last error message
-
+     
      while (ERROR_GetLast(&errorDescription)!=0)
       {
        mediateResponseErrorMessage(errorDescription.errorFunction,errorDescription.errorString,errorDescription.errorType, responseHandle);
@@ -270,7 +270,7 @@ RC ERROR_SetLast(const char *callingFunction,int errorType,RC errorId,...)
 
   if (errorId!=ERROR_ID_NO)
    {
-       // Browse already registered errors
+    // Browse already registered errors
 
     for (i=0;i<errorStackN;i++)
      if (errorStack[i].errorId==errorId

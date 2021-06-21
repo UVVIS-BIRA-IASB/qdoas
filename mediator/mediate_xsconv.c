@@ -577,6 +577,9 @@ RC mediateConvolutionCalculate(void *engineContext,void *responseHandle)
 
   if (tmpVector!=NULL)
    MEMORY_ReleaseDVector("mediateConvolutionCalculate","tmpVector",tmpVector,0);
+  
+  if (rc)
+   ERROR_DisplayMessage(responseHandle);
 
   // Return
 
@@ -700,6 +703,9 @@ RC mediateRequestConvolution(void *engineContext,mediate_convolution_t *pMediate
    }
 
   // Return
+  
+  if (rc)
+   ERROR_DisplayMessage(responseHandle);
 
   return rc;
 
@@ -763,6 +769,9 @@ RC mediateRequestRing(void *engineContext,mediate_ring_t *pMediateRing,void *res
 
      rc=ERROR_SetLast("mediateRequestRing",ERROR_TYPE_FATAL,ERROR_ID_MEDIATE,"Degree","Polynomial degree should be a positive integer and a multiple of 2");
    }
+   
+  if (rc)
+   ERROR_DisplayMessage(responseHandle);
 
   // Return
 
@@ -1127,6 +1136,9 @@ RC mediateRingCalculate(void *engineContext,void *responseHandle)
   #endif
 
   // Return
+  
+  if (rc)
+   ERROR_DisplayMessage(responseHandle);
 
   return rc;
  }
@@ -1189,6 +1201,9 @@ RC mediateRequestUsamp(void *engineContext,mediate_usamp_t *pMediateUsamp,void *
 
      rc=ERROR_SetLast("mediateRequestUsamp",ERROR_TYPE_FATAL,ERROR_ID_MEDIATE,"Degree","Polynomial degree should be a positive integer and a multiple of 2");
    }
+   
+  if (rc)
+   ERROR_DisplayMessage(responseHandle);
 
   // Return
 
@@ -1419,6 +1434,9 @@ RC mediateUsampCalculate(void *engineContext,void *responseHandle)
 
   MATRIX_Free(&calibrationMatrix,"mediateUsampCalculate");
   MATRIX_Free(&kuruczMatrix,"mediateUsampCalculate");
+  
+  if (rc)
+   ERROR_DisplayMessage(responseHandle);
 
   return rc;
  }

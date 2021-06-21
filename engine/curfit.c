@@ -406,12 +406,15 @@ static RC CurfitNumDeriv(double *specX, double *srefX, const double *sigmaY, int
   // Declarations
 
   int      i;                                                                   // browse pixels
-  double  *Yfit2;                                                       // results of the fitting function evaluated for Aj+Dj
+  double  *Yfit2;                                                               // results of the fitting function evaluated for Aj+Dj
+  double  *Pj;
   RC       rc;                                                                  // return code
 
   #if defined(__DEBUG_) && __DEBUG_
   DEBUG_FunctionBegin(__func__,DEBUG_FCTTYPE_APPL|DEBUG_FCTTYPE_MEM);
   #endif
+  
+  int nP=fitprops->DimC;
 
   // Initializations
 
@@ -419,16 +422,22 @@ static RC CurfitNumDeriv(double *specX, double *srefX, const double *sigmaY, int
 
   // Buffers allocation
 
-  if ((Yfit2=MEMORY_AllocDVector(__func__,"Yfit2",0,nY-1))==NULL) {
+  if (((Yfit2=MEMORY_AllocDVector(__func__,"Yfit2",0,nY-1))==NULL) ||
+     (nP && ((Pj=MEMORY_AllocDVector(__func__,"Pj",0,nP-1))==NULL)))
+   {
+    
     rc = ERROR_ID_ALLOC;
   } else {
 
     memcpy(Yfit2,ANALYSE_zeros,sizeof(double)*nY);
-
+    
     // Get the selected non linear parameter & increment
 
-    double Aj = A[indexA];
-    double Dj = deltaA[indexA];
+    double Aj = A[indexA];              // make a backup of non linear parameter A
+    double Dj = deltaA[indexA];        
+    
+    if (nP)
+     memcpy(Pj,P,sizeof(double)*nP);    // make a backup of P because in ANALYSE_function, b=fitprops->A*fitParamsC
 
     // Evaluate function for Aj+Dj
 
@@ -445,7 +454,10 @@ static RC CurfitNumDeriv(double *specX, double *srefX, const double *sigmaY, int
      for (i=0;i<nY;i++)
       deriv[indexA][i]=(Yfit2[i]-Yfit[i])/Dj;
 
-    A[indexA]=(double)Aj;
+    A[indexA]=(double)Aj;                         // restore non linear parameter A
+    
+    if (nP)
+     memcpy(P,Pj,sizeof(double)*nP);              // restore the vector of linear parameters
    }
 
   EndNumDeriv:
@@ -454,6 +466,8 @@ static RC CurfitNumDeriv(double *specX, double *srefX, const double *sigmaY, int
 
   if (Yfit2!=NULL)
    MEMORY_ReleaseDVector(__func__,"Yfit2",Yfit2,0);
+  if (Pj!=NULL)
+   MEMORY_ReleaseDVector(__func__,"Pj",Pj,0);
 
 #if defined(__DEBUG_) && __DEBUG_
   DEBUG_FunctionStop((char *)__func__,rc);

@@ -499,7 +499,7 @@ RC EngineSetProject(ENGINE_CONTEXT *pEngineContext)
        for (i=0;i<max_ndet;i++)
          pBuffers->lambda[i] = 0.0;
      else if ((fp=fopen(pInstrumental->calibrationFile,"rt"))==NULL)
-       rc=ERROR_SetLast(__func__,ERROR_TYPE_WARNING,ERROR_ID_FILE_NOT_FOUND,pInstrumental->calibrationFile);
+       rc=ERROR_SetLast(__func__,ERROR_TYPE_FATAL,ERROR_ID_FILE_NOT_FOUND,pInstrumental->calibrationFile);
      else {
        for (i=0;i<max_ndet;) {
          if (!fgets(str,MAX_ITEM_TEXT_LEN,fp)) {
@@ -532,7 +532,7 @@ RC EngineSetProject(ENGINE_CONTEXT *pEngineContext)
          lambdaInstr=instrFunction=instrDeriv2=NULL;
 
          if ((fp=fopen(pInstrumental->instrFunction,"rt"))==NULL)
-          rc=ERROR_SetLast(__func__,ERROR_TYPE_WARNING,ERROR_ID_FILE_NOT_FOUND,pInstrumental->instrFunction);
+          rc=ERROR_SetLast(__func__,ERROR_TYPE_FATAL,ERROR_ID_FILE_NOT_FOUND,pInstrumental->instrFunction);
          else if (((pBuffers->instrFunction=MEMORY_AllocDVector(__func__,"instrFunction",0,max_ndet-1))==NULL) ||
                   ((lambdaInstr=MEMORY_AllocDVector(__func__,"lambdaInstr",0,max_ndet-1))==NULL) ||
                   ((instrFunction=MEMORY_AllocDVector(__func__,"instrFunction",0,max_ndet-1))==NULL) ||
