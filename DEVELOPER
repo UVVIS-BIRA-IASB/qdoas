@@ -1,0 +1,16 @@
+Developer Documentation
+=======================
+
+This document contains specific instructions for QDOAS developers.
+
+Release checklist
+-----------------
+- check compiler warnings
+- check documentation
+- check git tag + make release on github.
+- update CHANGES
+- check README.md
+- increase QDOAS version number in CMakeLists.txt
+
+
+
