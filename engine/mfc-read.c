@@ -722,8 +722,6 @@ RC ReliMFC(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int localDay
         pRecord->elevationViewAngle=(float)MFC_header.elevation;
         pRecord->azimuthViewAngle=999.;
         
-        pRecord->maxdoas.measurementType=((pRecord->elevationViewAngle>80.) && (pRecord->elevationViewAngle<100.))?PRJCT_INSTR_MAXDOAS_TYPE_ZENITH:PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS;  // Not the possibility to separate almucantar, horizon and direct sun from off-axis measurements
-
         if (strlen(pRecord->Nom))
          {
           if ((ptr=strchr(pRecord->Nom,','))!=NULL)
@@ -731,8 +729,10 @@ RC ReliMFC(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int localDay
           else
            sscanf(pRecord->Nom,"%f",&pRecord->elevationViewAngle);
          }
-        else
+        else 
          pRecord->elevationViewAngle=999.;
+        
+        pRecord->maxdoas.measurementType=((pRecord->elevationViewAngle>80.) && (pRecord->elevationViewAngle<100.))?PRJCT_INSTR_MAXDOAS_TYPE_ZENITH:PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS;  // Not the possibility to separate almucantar, horizon and direct sun from off-axis measurements
         
         if (pRecord->elevationViewAngle>100.)
          {
