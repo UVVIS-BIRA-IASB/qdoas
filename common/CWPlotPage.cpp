@@ -37,6 +37,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <qwt_plot_grid.h>
 #include <qwt_plot_renderer.h>
 #include <qwt_plot_zoneitem.h>
+#include <qwt_text.h>
 
 #include "CWPlotPage.h"
 #include "CPreferences.h"
