@@ -249,7 +249,8 @@ RC RasReadRecord(char *fileName,double *spe,double *drk,ENGINE_CONTEXT *pEngineC
         }
        else if (!strnicmp(keyName,"Longitud",8))
         {
-         sscanf(strBuffer,"%d° %d' %d",&field1,&field2,&field3);
+         char degree_character;
+         sscanf(strBuffer,"%d%c %d' %d",&field1,&degree_character,&field2,&field3);
          pRecord->longitude=(double)field1+1.*field2/60.+1.*field3/3600.;
         }
        else if (!strnicmp(keyName,"Altura",6))
