@@ -1,6 +1,5 @@
 name: qdoas-build
 channels:
-  - stcorp-forge
   - conda-forge
 dependencies:
   - cmake
