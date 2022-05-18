@@ -26,6 +26,7 @@ add_library(mediate STATIC
 )
 
 target_compile_features(engine PUBLIC cxx_std_11)
+set_property(TARGET mediate PROPERTY C_STANDARD 99)
 target_link_libraries(mediate
   Qt5::Core
 )
