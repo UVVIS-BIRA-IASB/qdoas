@@ -2,9 +2,9 @@ cmake_minimum_required(VERSION 3.8.0)
 
 project(qdoas)
 
-set(VERSION 3.4)
-set(QDOAS_VERSION "3.4" CACHE STRING "")
-set(QDOAS_DATE "28 February 2020" CACHE STRING "")
+set(VERSION 3.4.6)
+set(QDOAS_VERSION "3.4.6" CACHE STRING "")
+set(QDOAS_DATE "18 May 2022" CACHE STRING "")
 
 
 function(list_transform_prepend var prefix)
