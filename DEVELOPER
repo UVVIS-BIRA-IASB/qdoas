@@ -7,10 +7,8 @@ Release checklist
 -----------------
 - check compiler warnings
 - check documentation
-- check git tag + make release on github.
 - update CHANGES
-- check README.md
-- increase QDOAS version number in CMakeLists.txt
-
-
+- check README.md and update QDOAS version number
+- increase QDOAS version number in CMakeLists.txt and update QDOAS_DATE
+- check git tag + make release on github.
 
