@@ -152,18 +152,20 @@ static void define_variable(NetCDFGroup &group, const struct output_field& thefi
       chunksizes.push_back((size_t)n_crosstrack);
     }
   }
+  
 
   getDims(thefield, dimids, chunksizes);
 
   const int varid = group.defVar(varname, dimids, getNCType(thefield.memory_type));
 
+   if (thefield.memory_type!=OUTPUT_STRING){
   group.defVarChunking(varid, NC_CHUNKED, chunksizes.data());
-  group.defVarDeflate(varid);
-  group.defVarFletcher32(varid, NC_FLETCHER32);
-
+    group.defVarDeflate(varid);
+   group.defVarFletcher32(varid, NC_FLETCHER32);
+   }
   switch (thefield.memory_type) {
   case OUTPUT_STRING:
-    group.putAttr("_FillValue", QDOAS_FILL_STRING, varid);
+	   group.putAttr("_FillValue", QDOAS_FILL_STRING, varid);
     break;
   case OUTPUT_SHORT:
     group.putAttr("_FillValue", QDOAS_FILL_SHORT, varid);
