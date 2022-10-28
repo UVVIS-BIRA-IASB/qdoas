@@ -835,7 +835,7 @@ RC write_spikes(char *spikestring, unsigned int length, bool *spikes,int ndet) {
     }
 
   if (!nspikes)
-   strcpy(spikestring,"-1");
+   strcpy(spikestring,"");
 
   return rc;
 }

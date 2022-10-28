@@ -466,7 +466,7 @@ RC ASCII_QDOAS_Set(ENGINE_CONTEXT *pEngineContext,FILE *specFp)
 
   ENGINE_refStartDate=1;
   rc=ERROR_ID_NO;
-
+  
   // Check the file pointer
 
   if (specFp==NULL)
@@ -639,7 +639,8 @@ RC ASCII_QDOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int
   // Declarations
 
   RECORD_INFO *pRecordInfo;                                                     // pointer to the record part of the engine context
-  double *spectrum,*lambda,val1,val2,                                           // the spectrum and the wavelength calibration to read
+  double *spectrum,*lambda,val1,val2,val3,                                      // the spectrum and the wavelength calibration to read
+         *sigma,
           tmLocal;                                                              // the measurement time in seconds
   int day,mon,year,hour,minute,sec;                                             // decomposition of the measurement date and time
   INDEX i;                                                                      // browse items to read
@@ -650,6 +651,7 @@ RC ASCII_QDOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int
   int useDate,useTime;
   int measurementType;
   int millis;
+  int n_errors;
   RC rc;                                                                        // return code
   int n_wavel,n_args;
 
@@ -657,13 +659,19 @@ RC ASCII_QDOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int
 
   pRecordInfo=&pEngineContext->recordInfo;
   spectrum=pEngineContext->buffers.spectrum;
+  sigma=pEngineContext->buffers.sigmaSpec;
   lambda=pEngineContext->buffers.lambda;
   n_wavel=NDET[0];
   useDate=useTime=0;
+  n_errors=0;
   rc=ERROR_ID_NO;
 
   memset(&pRecordInfo->present_datetime,0,sizeof(pRecordInfo->present_datetime));
-
+  
+  if (sigma!=NULL)
+   for (i=0;i<n_wavel;i++)
+     sigma[i]=(double)1.;
+  
   if (specFp==NULL)
    rc=ERROR_SetLast(__func__,ERROR_TYPE_WARNING,ERROR_ID_FILE_NOT_FOUND,pEngineContext->fileInfo.fileName);
   else if ((recordNo<=0) || (recordNo>pEngineContext->recordNumber) || (ASCII_QDOAS_Goto(specFp,recordNo)!=ERROR_ID_NO))
@@ -849,12 +857,21 @@ RC ASCII_QDOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int
        }
       else if (lineType==ASC_LINE_TYPE_SPECTRA)
        {
-        if (sscanf(fileLine,"%lf %lf",&val1,&val2)==1)
+        int nval=sscanf(fileLine,"%lf %lf %lf",&val1,&val2,&val3);
+        
+        if (nval==1)
          spectrum[spectraSize++]=val1;
-        else
+        else 
          {
           lambda[spectraSize]=val1;
           spectrum[spectraSize]=val2;
+          
+          if ((nval==3)  && (sigma!=NULL))
+           { 
+            sigma[spectraSize]=val3;
+            n_errors++;
+           }
+          
           spectraSize++;
          }
        }
@@ -862,6 +879,9 @@ RC ASCII_QDOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int
 
      if (!rc)
       {
+       if (n_errors==n_wavel)
+        pRecordInfo->useErrors = 1;
+       
        // Force zenith for viewing elevation angles higher than 80 deg
 
        if (pRecordInfo->elevationViewAngle>80.)

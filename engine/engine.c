@@ -442,12 +442,16 @@ RC EngineSetProject(ENGINE_CONTEXT *pEngineContext)
 
         (((pBuffers->specMaxx=(double *)MEMORY_AllocDVector(__func__,"specMaxx",0,MAX_SPECMAX-1))==NULL) ||
         ((pBuffers->specMax=(double *)MEMORY_AllocDVector(__func__,"specMax",0,MAX_SPECMAX-1))==NULL))) ||
+        
         ((pEngineContext->satelliteFlag || (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF)) &&
-        ((pBuffers->sigmaSpec=MEMORY_AllocDVector(__func__,"sigmaSpec",0,max_ndet-1))==NULL ||
-         (pBuffers->lambda_irrad=MEMORY_AllocDVector(__func__,"lambda_irrad",0,max_ndet-1))==NULL ||
-         (pBuffers->irrad=MEMORY_AllocDVector(__func__,"irrad",0,max_ndet-1))==NULL
+        (((pBuffers->sigmaSpec=MEMORY_AllocDVector(__func__,"sigmaSpec",0,max_ndet-1))==NULL) ||
+         ((pBuffers->lambda_irrad=MEMORY_AllocDVector(__func__,"lambda_irrad",0,max_ndet-1))==NULL) ||
+         ((pBuffers->irrad=MEMORY_AllocDVector(__func__,"irrad",0,max_ndet-1))==NULL)
            )
          ) ||
+        
+       (((pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_ASCII) && (pInstrumental->ascii.format==PRJCT_INSTR_ASCII_FORMAT_COLUMN_EXTENDED)) &&
+        ((pBuffers->sigmaSpec=MEMORY_AllocDVector(__func__,"sigmaSpec",0,max_ndet-1))==NULL)) ||
 
        ((pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_OMI) &&
         ((pRecord->omi.omiPixelQF=(unsigned short *)MEMORY_AllocBuffer(__func__,"omiPixelQF",max_ndet,sizeof(unsigned short),0,MEMORY_TYPE_USHORT))==NULL)) ||
@@ -1602,7 +1606,7 @@ RC EngineBuildRefList(ENGINE_CONTEXT *pEngineContext)
 
     for (indexRecord=ENGINE_contextRef.lastRefRecord+1;indexRecord<=recordNumber;indexRecord++)
      {
-         if (pEngineContext->mfcDoasisFlag)
+      if (pEngineContext->mfcDoasisFlag)
        sprintf(ENGINE_contextRef.fileInfo.fileName,"%s%c%s",pMfc->filePath,PATH_SEP,&pMfc->fileNames[(indexRecord-1)*(DOAS_MAX_PATH_LEN+1)]);
 
       if (!(rc=EngineReadFile(&ENGINE_contextRef,(!pEngineContext->mfcDoasisFlag)?indexRecord:1,1,localCalDay)) &&
@@ -1996,9 +2000,9 @@ RC EngineNewRef(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
 
        if (pTabFeno->refMaxdoasSelectionMode==ANLYS_MAXDOAS_REF_SZA)
         {
-            if (newref && ((rc=EngineSZASetRefIndexes(pEngineContext,pTabFeno))!=ERROR_ID_NO))
-             break;
-            else
+         if (newref && ((rc=EngineSZASetRefIndexes(pEngineContext,pTabFeno))!=ERROR_ID_NO))
+          break;
+         else
           indexRefRecord=(pRecord->localTimeDec<=ENGINE_localNoon)?pTabFeno->indexRefMorning:pTabFeno->indexRefAfternoon;
         }
        else if (pTabFeno->refSpectrumSelectionScanMode==ANLYS_MAXDOAS_REF_SCAN_BEFORE)
@@ -2033,17 +2037,17 @@ RC EngineNewRef(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
 
          if (!pEngineContext->mfcDoasisFlag)
           {
-              if (indexRefRecord!=ITEM_NONE)
+           if (indexRefRecord!=ITEM_NONE)
             rc=EngineReadFile(&ENGINE_contextRef,indexRefRecord,0,0);
            else if (!(rc=EngineReadFile(&ENGINE_contextRef,indexScanBefore,0,0)))       // in average mode, it is better to reload reference spectra because ref contexts could have changed in previous analysis windows
             rc=EngineReadFile(&ENGINE_contextRef2,indexScanAfter,0,0);
           }
          else
           {
-              if (indexRefRecord!=ITEM_NONE)
-               rc=EngineLoadRefMFC(&ENGINE_contextRef,pEngineContext,indexRefRecord);
-              else if (!(rc=EngineLoadRefMFC(&ENGINE_contextRef,pEngineContext,indexScanBefore)))
-               rc=EngineLoadRefMFC(&ENGINE_contextRef2,pEngineContext,indexScanAfter);
+           if (indexRefRecord!=ITEM_NONE)
+            rc=EngineLoadRefMFC(&ENGINE_contextRef,pEngineContext,indexRefRecord);
+           else if (!(rc=EngineLoadRefMFC(&ENGINE_contextRef,pEngineContext,indexScanBefore)))
+            rc=EngineLoadRefMFC(&ENGINE_contextRef2,pEngineContext,indexScanAfter);
           }
 
          if (!rc)

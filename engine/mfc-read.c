@@ -955,24 +955,24 @@ RC MFC_ReadRecordStd(ENGINE_CONTEXT *pEngineContext,char *fileName,
 
     while (fgets(line,MAX_STR_SHORT_LEN,fp))
      {
-         if (strchr(line,'=')!=NULL)
-          {
-              sscanf(line,"%s = %s",keyWord,keyValue);
-              if (!strcasecmp(keyWord,"AzimuthAngle"))
-               pRecord->azimuthViewAngle=(float)atof(keyValue);
-              else if (!strcasecmp(keyWord,"ElevationAngle"))
-               pRecord->elevationViewAngle=(float)atof(keyValue);
-              else if (!strcasecmp(keyWord,"ExposureTime"))
-               pRecord->Tint=(double)atof(keyValue)*0.001;
-              else if (!strcasecmp(keyWord,"Latitude"))
-               pRecord->latitude=(double)atof(keyValue);
-              else if (!strcasecmp(keyWord,"Longitude"))
-               pRecord->longitude=(double)atof(keyValue);
-              else if (!strcasecmp(keyWord,"NumScans"))
-               pRecord->NSomme=(int)atoi(keyValue);
-              else if (!strcasecmp(keyWord,"Temperature"))
-               pRecord->TDet=(double)atof(keyValue);
-          }
+      if (strchr(line,'=')!=NULL)
+       {
+        sscanf(line,"%s = %s",keyWord,keyValue);
+        if (!strcasecmp(keyWord,"AzimuthAngle"))
+         pRecord->azimuthViewAngle=(float)atof(keyValue);
+        else if (!strcasecmp(keyWord,"ElevationAngle"))
+         pRecord->elevationViewAngle=(float)atof(keyValue);
+        else if (!strcasecmp(keyWord,"ExposureTime"))
+         pRecord->Tint=(double)atof(keyValue)*0.001;
+        else if (!strcasecmp(keyWord,"Latitude"))
+         pRecord->latitude=(double)atof(keyValue);
+        else if (!strcasecmp(keyWord,"Longitude"))
+         pRecord->longitude=(double)atof(keyValue);
+        else if (!strcasecmp(keyWord,"NumScans"))
+         pRecord->NSomme=(int)atoi(keyValue);
+        else if (!strcasecmp(keyWord,"Temperature"))
+         pRecord->TDet=(double)atof(keyValue);
+       }
      }
 
     pRecord->maxdoas.measurementType=((pRecord->elevationViewAngle>80.)&&(pRecord->elevationViewAngle<100.))?PRJCT_INSTR_MAXDOAS_TYPE_ZENITH:PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS;  // Not the possibility to separate almucantar, horizon and direct sun from off-axis measurements
@@ -1232,7 +1232,7 @@ RC MFCBIRA_Set(ENGINE_CONTEXT *pEngineContext,FILE *specFp)
 
       if (!rc && (offset!=NULL) && (darkCurrent!=NULL))
        {
-              // Initialize vectors
+        // Initialize vectors
 
         VECTOR_Init(offset,(double)0.,n_wavel);
         VECTOR_Init(darkCurrent,(double)0.,n_wavel);
@@ -1243,31 +1243,31 @@ RC MFCBIRA_Set(ENGINE_CONTEXT *pEngineContext,FILE *specFp)
 
         for (i=nOff=nDrk=0,drkTint=0.;i<pEngineContext->recordNumber;i++)
          {
-             fseek(specFp,2L*sizeof(int)+i*(sizeof(MFCBIRA_HEADER)+n_wavel*sizeof(float)),SEEK_SET);
-             fread(&header,sizeof(MFCBIRA_HEADER),1,specFp);
+          fseek(specFp,2L*sizeof(int)+i*(sizeof(MFCBIRA_HEADER)+n_wavel*sizeof(float)),SEEK_SET);
+          fread(&header,sizeof(MFCBIRA_HEADER),1,specFp);
+          
+          // Load offset
 
-             // Load offset
+          if (header.measurementType==PRJCT_INSTR_MAXDOAS_TYPE_OFFSET)
+           {
+            fread(spectrum,sizeof(float),n_wavel,specFp);
+            for (j=0;j<n_wavel;j++)
+             offset[j]+=(double)spectrum[j];
 
-             if (header.measurementType==PRJCT_INSTR_MAXDOAS_TYPE_OFFSET)
-              {
-               fread(spectrum,sizeof(float),n_wavel,specFp);
-               for (j=0;j<n_wavel;j++)
-                offset[j]+=(double)spectrum[j];
+            nOff+=header.scansNumber;                                             // all offset should have the same exposure time
+           }
 
-               nOff+=header.scansNumber;                                             // all offset should have the same exposure time
-              }
+          // Load dark current
 
-             // Load dark current
+          else if (header.measurementType==PRJCT_INSTR_MAXDOAS_TYPE_DARK)
+           {
+            fread(spectrum,sizeof(float),n_wavel,specFp);
+            for (j=0;j<n_wavel;j++)
+             darkCurrent[j]+=(double)spectrum[j];
 
-             else if (header.measurementType==PRJCT_INSTR_MAXDOAS_TYPE_DARK)
-              {
-               fread(spectrum,sizeof(float),n_wavel,specFp);
-               for (j=0;j<n_wavel;j++)
-                darkCurrent[j]+=(double)spectrum[j];
-
-               nDrk+=header.scansNumber;
-               drkTint=header.exposureTime;                                        // all dark current should have the same exposure time
-              }
+            nDrk+=header.scansNumber;
+            drkTint=header.exposureTime;                                        // all dark current should have the same exposure time
+           }
          }
 
 
@@ -1341,19 +1341,19 @@ RC MFCBIRA_Reli(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int loc
    rc=ERROR_ID_ALLOC;
   else
    {
-       // Go to the requested record
+    // Go to the requested record
 
-       fseek(specFp,2L*sizeof(int)+(recordNo-1)*(sizeof(MFCBIRA_HEADER)+n_wavel*sizeof(float)),SEEK_SET);
-       fread(&header,sizeof(MFCBIRA_HEADER),1,specFp);
-       fread(spectrum,sizeof(float),n_wavel,specFp);
+    fseek(specFp,2L*sizeof(int)+(recordNo-1)*(sizeof(MFCBIRA_HEADER)+n_wavel*sizeof(float)),SEEK_SET);
+    fread(&header,sizeof(MFCBIRA_HEADER),1,specFp);
+    fread(spectrum,sizeof(float),n_wavel,specFp);
 
-       // Retrieve the main information from the header
+    // Retrieve the main information from the header
 
-       pRecord->NSomme=header.scansNumber;
-       pRecord->Tint=header.exposureTime;
-       pRecord->latitude=header.latitude;
-       pRecord->longitude=header.longitude;
-       pRecord->TotalAcqTime=header.totalAcqTime;
+    pRecord->NSomme=header.scansNumber;
+    pRecord->Tint=header.exposureTime;
+    pRecord->latitude=header.latitude;
+    pRecord->longitude=header.longitude;
+    pRecord->TotalAcqTime=header.totalAcqTime;
     pRecord->elevationViewAngle=header.elevationAngle;
     pRecord->azimuthViewAngle=header.azimuthAngle;
     pRecord->TDet=header.temperature;
@@ -1419,25 +1419,25 @@ RC MFCBIRA_Reli(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int loc
     pRecord->localCalDay=ZEN_FNCaljda(&tmLocal);
     pRecord->localTimeDec=fmod(pRecord->TimeDec+24.+timeshift,(double)24.);
 
+    for (i=0;i<n_wavel;i++)
+     pBuffers->spectrum[i]=(double)spectrum[i];
+
+    if ((header.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_DARK) && (header.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_OFFSET))
+     {
+      // Offset correction
+
+      if (pBuffers->offset!=NULL)
        for (i=0;i<n_wavel;i++)
-        pBuffers->spectrum[i]=(double)spectrum[i];
+        pBuffers->spectrum[i]-=pBuffers->offset[i]*header.scansNumber;          // offset is already divided by its number of scans
 
-       if ((header.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_DARK) && (header.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_OFFSET))
+      // Dark current correction                                                // dark current is already divided by it integration time
+
+      if (pBuffers->varPix!=NULL)
+       for (i=0;i<n_wavel;i++)
         {
-         // Offset correction
-
-         if (pBuffers->offset!=NULL)
-          for (i=0;i<n_wavel;i++)
-           pBuffers->spectrum[i]-=pBuffers->offset[i]*header.scansNumber;          // offset is already divided by its number of scans
-
-         // Dark current correction                                                // dark current is already divided by it integration time
-
-         if (pBuffers->varPix!=NULL)
-          for (i=0;i<n_wavel;i++)
-           {
-            pBuffers->spectrum[i]-=pBuffers->varPix[i]*header.scansNumber*header.exposureTime;
-            pBuffers->spectrum[i]/=header.scansNumber;
-           }
+         pBuffers->spectrum[i]-=pBuffers->varPix[i]*header.scansNumber*header.exposureTime;
+         pBuffers->spectrum[i]/=header.scansNumber;
+        }
 
          // Average
 

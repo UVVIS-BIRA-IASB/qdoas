@@ -1265,7 +1265,7 @@ CWInstrFrm4doasEdit::CWInstrFrm4doasEdit(const struct instrumental_frm4doas *d, 
   gridLayout->addWidget(new QLabel("Spectral Type", this), row, 0);
   m_spectralTypeCombo = new QComboBox(this);
   m_spectralTypeCombo->addItem("All", QVariant(PRJCT_INSTR_MAXDOAS_TYPE_NONE));
-  m_spectralTypeCombo->addItem("Zenith", QVariant(PRJCT_INSTR_MAXDOAS_TYPE_ZENITH));
+  m_spectralTypeCombo->addItem("Zenith only", QVariant(PRJCT_INSTR_MAXDOAS_TYPE_ZENITH));
   m_spectralTypeCombo->addItem("Off-axis", QVariant(PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS));
   m_spectralTypeCombo->addItem("Direct sun", QVariant(PRJCT_INSTR_MAXDOAS_TYPE_DIRECTSUN));
   m_spectralTypeCombo->addItem("Almucantar", QVariant(PRJCT_INSTR_MAXDOAS_TYPE_ALMUCANTAR));
@@ -1473,6 +1473,7 @@ CWInstrCcdEevEdit::CWInstrCcdEevEdit(const struct instrumental_ccdeev *d, QWidge
   gridLayout->addWidget(new QLabel("Spectral Type", this), row, 0);
   m_spectralTypeCombo = new QComboBox(this);
   m_spectralTypeCombo->addItem("All", QVariant(PRJCT_INSTR_MAXDOAS_TYPE_NONE));
+  m_spectralTypeCombo->addItem("Zenith only", QVariant(PRJCT_INSTR_MAXDOAS_TYPE_ZENITH));
   m_spectralTypeCombo->addItem("Off-axis", QVariant(PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS));
   m_spectralTypeCombo->addItem("Direct sun", QVariant(PRJCT_INSTR_MAXDOAS_TYPE_DIRECTSUN));
   m_spectralTypeCombo->addItem("Almucantar", QVariant(PRJCT_INSTR_MAXDOAS_TYPE_ALMUCANTAR));

@@ -1957,7 +1957,7 @@ RC AnalyseLoadVector(const char *function, const char *fileName, double *lambda,
       MATRIX_PassCommentLines(fp);
       n_scan=MATRIX_GetColumnsNumbers(fp,NULL);
       rewind(fp);
-      if (n_scan == 2){
+      if ((n_scan == 2) && (!n_col)){
         for (i=0;  i<n_wavel && fgets(string,MAX_ITEM_TEXT_LEN,fp) && !rc; ) {
           if (strchr(string,';')==NULL && strchr(string,'*')==NULL && strchr(string,'#')==NULL) {
             int n_scan = sscanf(string,"%lf %lf",&lambda[i],&vector[i]);
@@ -1989,7 +1989,7 @@ RC AnalyseLoadVector(const char *function, const char *fileName, double *lambda,
             }
           }
         }
-      } else if (n_scan > 2) {
+      } else if (n_scan > n_col+1) { // 2) {
           rc = MATRIX_Load(fullFileName,&fileMatrix,0,0,0.,0.,0,0,__func__);
           for (int i = 0; i < n_wavel && fgets(string,MAX_ITEM_TEXT_LEN,fp) && !rc; ++i){
               lambda[i]=fileMatrix.matrix[0][i*(fileMatrix.nl-1)/(n_wavel-1)];
@@ -2459,7 +2459,7 @@ RC ANALYSE_AlignReference(ENGINE_CONTEXT *pEngineContext,int refFlag,void *respo
          (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_TROPOMI))
      &&
         !pFeno->useRefRow) continue;
-
+        
     if (!pFeno->hidden
         && (pFeno->useKurucz!=ANLYS_KURUCZ_NONE) && (pFeno->useKurucz!=ANLYS_KURUCZ_SPEC) && (pFeno->useKurucz!=ANLYS_KURUCZ_REF_AND_SPEC)
         && (pFeno->newrefFlag || pEngineContext->satelliteFlag)
@@ -2471,7 +2471,7 @@ RC ANALYSE_AlignReference(ENGINE_CONTEXT *pEngineContext,int refFlag,void *respo
      double shift, stretch, stretch2, sigma_shift, sigma_stretch, sigma_stretch2;
 
       rc=ANALYSE_fit_shift_stretch(WrkFeno, indexFenoColumn, pFeno->SrefEtalon, pFeno->Sref, &shift, &stretch, &stretch2, &sigma_shift, &sigma_stretch, &sigma_stretch2);
-
+      
       double *lambda=pFeno->Lambda; // CHECK: this used to be the global pointer 'Lambda'. changed it to a local pointer
       const double lambda0=pFeno->lambda0;
       // CHECK: changes to lambda here also change original pFeno->Lambda, because it's a pointer to the same buffer... is this ok?
@@ -3293,7 +3293,7 @@ RC ANALYSE_CurFitMethod(INDEX indexFenoColumn,  // for OMI
 
   TabCross=Feno->TabCross;                               // symbol cross reference
   useErrors=((Feno->analysisMethod==OPTICAL_DENSITY_FIT) && (pAnalysisOptions->fitWeighting!=PRJCT_ANLYS_FIT_WEIGHTING_NONE) && (SigmaSpec!=NULL) && (Feno->SrefSigma!=NULL))?1:0;
-
+  
   fitParamsC=fitParamsF=Deltap=Sigmaa=Y0=SpecTrav=RefTrav=SigmaY=NULL;          // pointers
   hFilterSpecLog=0;
   hFilterRefLog=0;
@@ -4028,7 +4028,6 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
            Analyse_Molecular_Ring_Init(Feno,Feno->LambdaK,n_wavel);
 
           do {
-
             if ((num_repeats_ring && ((rc=Analyse_Molecular_Ring_Calculate(Feno,Feno->LambdaK,n_wavel,molecularRing_a))!=ERROR_ID_NO)) ||
                ((rc=ANALYSE_CurFitMethod(indexFenoColumn,
                                     (Feno->useKurucz==ANLYS_KURUCZ_REF_AND_SPEC)?SpectreK:Spectre, // raw spectrum
@@ -5962,7 +5961,8 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
   if (((Sref=pTabFeno->Sref=(double *)MEMORY_AllocDVector((char *)__func__,"Sref",0,n_wavel-1))==NULL) ||
       ((SrefEtalon=pTabFeno->SrefEtalon=(double *)MEMORY_AllocDVector((char *)__func__,"SrefEtalon",0,n_wavel))==NULL) ||
 
-      (is_satellite(pEngineContext->project.instrumental.readOutFormat)
+      ((is_satellite(pEngineContext->project.instrumental.readOutFormat) || 
+      ((pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_ASCII) && (pEngineContext->project.instrumental.ascii.format==PRJCT_INSTR_ASCII_FORMAT_COLUMN_EXTENDED)))
         &&
        ((pTabFeno->SrefSigma=(double *)MEMORY_AllocDVector((char *)__func__,"SrefSigma",0,n_wavel))==NULL)) ||
 
@@ -5986,6 +5986,9 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
    }
   else
    {
+    if (pTabFeno->SrefSigma!=NULL)
+     memcpy(pTabFeno->SrefSigma,ANALYSE_ones,sizeof(double)*n_wavel);
+    
     // ====
     // Ref1
     // ====
@@ -6037,7 +6040,12 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
         break;
 
       default:
-        rc=AnalyseLoadVector("ANALYSE_LoadRef (SrefEtalon) ",pTabFeno->ref1,lambdaRefEtalon,SrefEtalon,n_wavel,indexFenoColumn);
+        // rc=AnalyseLoadVector("ANALYSE_LoadRef (SrefEtalon) ",pTabFeno->ref1,lambdaRefEtalon,SrefEtalon,n_wavel,indexFenoColumn);
+        
+        if (!(rc=AnalyseLoadVector("ANALYSE_LoadRef (SrefEtalon) ",pTabFeno->ref1,lambdaRefEtalon,SrefEtalon,n_wavel,indexFenoColumn)) &&
+             (pTabFeno->SrefSigma!=NULL) && !is_satellite(pEngineContext->project.instrumental.readOutFormat))
+         rc=AnalyseLoadVector("ANALYSE_LoadRef (SrefEtalon) ",pTabFeno->ref1,lambdaRefEtalon,pTabFeno->SrefSigma,n_wavel,1);
+          
         break;
       }
 
@@ -6051,7 +6059,7 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
 
       }
     }
-
+    
     // ====
     // Ref2
     // ====
@@ -6138,7 +6146,7 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
 
       if (!is_satellite(pEngineContext->project.instrumental.readOutFormat) && pTabFeno->useEtalon)
        pTabFeno->newrefFlag=1;
-
+      
       pTabFeno->displayRef=pTabFeno->useEtalon=1;
      }
 

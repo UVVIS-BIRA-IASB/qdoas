@@ -212,7 +212,7 @@ RC AIRBORNE_Set(ENGINE_CONTEXT *pEngineContext,FILE *specFp)
 
     if (pEngineContext->maxdoasFlag)
      {
-      for (nrecIndex=pEngineContext->recordNumber;!rc && (nrecIndex>0) && (airboneDarkCurrentTintN<MAX_DRK_TINT);nrecIndex--)
+      for (nrecIndex=0;!rc && (nrecIndex<pEngineContext->recordNumber) && (airboneDarkCurrentTintN<MAX_DRK_TINT);nrecIndex++)
        {
            // Read the header from the end of file (dark currents should be at the end of the file)
 
@@ -221,52 +221,50 @@ RC AIRBORNE_Set(ENGINE_CONTEXT *pEngineContext,FILE *specFp)
 
         // Exit when zenith spectra are found
 
-        if (header.measType!=PRJCT_INSTR_MAXDOAS_TYPE_DARK)
-         break;
-
-        pEngineContext->recordNumber--;
-
-        // Read the dark current
-
-        fread(darkCurrent,sizeof(double)*n_wavel,1,specFp);
-
-        // Check for the integration time in already loaded dark currents
-
-        for (tintIndex=0;tintIndex<airboneDarkCurrentTintN;tintIndex++)
-         if (fabs((double)header.exposureTime*0.001-airborneDarkCurrent[tintIndex].exposureTime)<(double)1.e-6)
-          break;
-
-        // Add dark currents with the same integration time
-
-        if (tintIndex<airboneDarkCurrentTintN)
+        if (header.measType==PRJCT_INSTR_MAXDOAS_TYPE_DARK)
          {
-             pDrk=&airborneDarkCurrent[tintIndex];
-             for (int i=0;i<n_wavel;i++)
-              pDrk->darkCurrent[i]+=darkCurrent[i];
-             pDrk->ndrk++;
-         }
+          // Read the dark current
 
-        // New integration time found, allocate a new buffer
+          fread(darkCurrent,sizeof(double)*n_wavel,1,specFp);
 
-        else
-         {
-          pDrk=&airborneDarkCurrent[airboneDarkCurrentTintN];
-          sprintf(str,"AirborneDarkCurrent_%d",airboneDarkCurrentTintN);
+          // Check for the integration time in already loaded dark currents
 
-          if ((pDrk->darkCurrent=(double *)MEMORY_AllocDVector("AIRBORNE_Set",str,0,n_wavel-1))==NULL)
-           rc=ERROR_ID_ALLOC;
+          for (tintIndex=0;tintIndex<airboneDarkCurrentTintN;tintIndex++)
+           if (fabs((double)header.exposureTime*0.001-airborneDarkCurrent[tintIndex].exposureTime)<(double)1.e-6)
+            break;
+
+          // Add dark currents with the same integration time
+
+          if (tintIndex<airboneDarkCurrentTintN)
+           {
+               pDrk=&airborneDarkCurrent[tintIndex];
+               for (int i=0;i<n_wavel;i++)
+                pDrk->darkCurrent[i]+=darkCurrent[i];
+               pDrk->ndrk++;
+           }
+
+          // New integration time found, allocate a new buffer
+
           else
            {
-            for (int i=0;i<n_wavel;i++)
-                pDrk->darkCurrent[i]=darkCurrent[i];
+            pDrk=&airborneDarkCurrent[airboneDarkCurrentTintN];
+            sprintf(str,"AirborneDarkCurrent_%d",airboneDarkCurrentTintN);
 
-               pDrk->ndrk++;
-               pDrk->exposureTime=header.exposureTime*0.001;
-               airboneDarkCurrentTintN++;
+            if ((pDrk->darkCurrent=(double *)MEMORY_AllocDVector("AIRBORNE_Set",str,0,n_wavel-1))==NULL)
+             rc=ERROR_ID_ALLOC;
+            else
+             {
+              for (int i=0;i<n_wavel;i++)
+                  pDrk->darkCurrent[i]=darkCurrent[i];
+
+                 pDrk->ndrk++;
+                 pDrk->exposureTime=header.exposureTime*0.001;
+                 airboneDarkCurrentTintN++;
+             }
            }
-         }
+         }   
        }
-
+       
       for (tintIndex=0;tintIndex<airboneDarkCurrentTintN;tintIndex++)
        {
         pDrk=&airborneDarkCurrent[tintIndex];
@@ -431,7 +429,7 @@ RC AIRBORNE_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
 
     // Dark current correction
 
-    if (pEngineContext->maxdoasFlag)
+    if (pEngineContext->maxdoasFlag && (pRecord->maxdoas.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_DARK))
      {
          INDEX tintIndex,i;
 
@@ -440,7 +438,7 @@ RC AIRBORNE_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
       for (tintIndex=0;tintIndex<airboneDarkCurrentTintN;tintIndex++)
        if (fabs((double)pRecord->Tint-airborneDarkCurrent[tintIndex].exposureTime)<(double)1.e-6)
         break;
-
+       
       if (tintIndex<airboneDarkCurrentTintN)
        {
            pDrk=&airborneDarkCurrent[tintIndex];
@@ -451,15 +449,16 @@ RC AIRBORNE_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
 
 //    if (dateFlag && (pRecord->localCalDay!=localDay))
 
-    if (rc || (dateFlag && ((pRecord->localCalDay!=localDay) ||
+    if (rc || (pRecord->maxdoas.measurementType==PRJCT_INSTR_MAXDOAS_TYPE_DARK) || (dateFlag && ((pRecord->localCalDay!=localDay) ||
             (((fabs(pRecord->elevationViewAngle+1.)>EPSILON) || (fabs(pRecord->azimuthViewAngle+1.)>EPSILON)) &&
              ((pRecord->elevationViewAngle<pEngineContext->project.spectra.refAngle-pEngineContext->project.spectra.refTol) ||
               (pRecord->elevationViewAngle>pEngineContext->project.spectra.refAngle+pEngineContext->project.spectra.refTol))))))
 
      rc=ERROR_ID_FILE_RECORD;
    }
-
+   
   // Return
 
   return rc;
  }
+   

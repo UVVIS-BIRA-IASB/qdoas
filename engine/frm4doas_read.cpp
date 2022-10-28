@@ -345,6 +345,7 @@ RC FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
        {
         pEngineContext->buffers.lambda_irrad[i]=(double)wve[i];    // Check and complete
         pEngineContext->buffers.lambda[i]=wve[i];
+
         pEngineContext->buffers.spectrum[i]=spe[i];
         pEngineContext->buffers.sigmaSpec[i]=err[i];
        }
@@ -429,12 +430,11 @@ RC FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
              ((fabs(pRecordInfo->elevationViewAngle+1.)>EPSILON) &&
              ((pRecordInfo->elevationViewAngle<pEngineContext->project.spectra.refAngle-pEngineContext->project.spectra.refTol) ||
               (pRecordInfo->elevationViewAngle>pEngineContext->project.spectra.refAngle+pEngineContext->project.spectra.refTol))))))
-
      rc=ERROR_ID_FILE_RECORD;
 
     else if (!dateFlag && (measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_NONE))
      {
-      if (((measurementType==PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS) && (pRecordInfo->maxdoas.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS) && (pRecordInfo->maxdoas.measurementType==PRJCT_INSTR_MAXDOAS_TYPE_ZENITH)) ||
+      if (((measurementType==PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS) && (pRecordInfo->maxdoas.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS) && (pRecordInfo->maxdoas.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_ZENITH)) ||
           ((measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS) && (pRecordInfo->maxdoas.measurementType!=measurementType)))
 
        rc=ERROR_ID_FILE_RECORD;

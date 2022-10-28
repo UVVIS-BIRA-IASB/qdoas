@@ -670,13 +670,13 @@ RC ReliCCD_EEV(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int loca
                   header.targetElevation=floor(header.trackerElevation+0.5);
                   header.targetAzimuth=floor(header.trackerAzimuth+0.5);
                  }
-                else
-                 {
-                     if (fabs(header.targetElevation+1.)<EPSILON)
-                         header.targetElevation=floor(header.trackerElevation+0.5);
-                     if (fabs(header.targetAzimuth+1.)<EPSILON)
-                         header.targetAzimuth=floor(header.trackerAzimuth+0.5);
-                    }
+//                 else
+//                  {
+//                      if (fabs(header.targetElevation+1.)<EPSILON)
+//                          header.targetElevation=floor(header.trackerElevation+0.5);
+//                      if (fabs(header.targetAzimuth+1.)<EPSILON)
+//                          header.targetAzimuth=floor(header.trackerAzimuth+0.5);
+//                     }
 
                    pRecord->ccd.targetElevation=header.targetElevation;
                    pRecord->ccd.targetAzimuth=header.targetAzimuth;
@@ -795,23 +795,16 @@ RC ReliCCD_EEV(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int loca
            // before 02/02/2016    (dateFlag && (((pRecord->elevationViewAngle>0.) && (pRecord->elevationViewAngle<80.)) ||
            // before 02/02/2016                  ((pRecord->maxdoas.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_NONE) && (pRecord->maxdoas.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_ZENITH)))) ||                    // reference spectra are zenith only
            // before 02/02/2016    (!dateFlag && pEngineContext->analysisRef.refScan && !pEngineContext->analysisRef.refSza && (pRecord->elevationViewAngle>80.)))    // zenith sky spectra are not analyzed in scan reference selection mode
-
-           if (rc || (dateFlag &&
-                   (((fabs(pRecord->elevationViewAngle+1.)>EPSILON) || (fabs(pRecord->azimuthViewAngle+1.)>EPSILON)) &&
-                    ((pRecord->elevationViewAngle<pEngineContext->project.spectra.refAngle-pEngineContext->project.spectra.refTol) ||
-                     (pRecord->elevationViewAngle>pEngineContext->project.spectra.refAngle+pEngineContext->project.spectra.refTol)))))
-
-                  //   ((pRecord->maxdoas.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_ZENITH) && (pRecord->elevationViewAngle<80.))))   // Bug fixed for Harestua
+           
+           if (rc || 
+            (((measurementType==PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS) && (pRecord->maxdoas.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS) && (pRecord->maxdoas.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_ZENITH)) ||
+             ((measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS) && (measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_NONE) && (pRecord->maxdoas.measurementType!=measurementType))) ||
+              (dateFlag &&
+            (((fabs(pRecord->elevationViewAngle+1.)>EPSILON) || (fabs(pRecord->azimuthViewAngle+1.)>EPSILON)) &&
+             ((pRecord->elevationViewAngle<pEngineContext->project.spectra.refAngle-pEngineContext->project.spectra.refTol) ||
+              (pRecord->elevationViewAngle>pEngineContext->project.spectra.refAngle+pEngineContext->project.spectra.refTol)))))
 
             rc=ERROR_ID_FILE_RECORD;
-
-           else if (!dateFlag && (measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_NONE))
-            {
-                if (((measurementType==PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS) && (pRecord->maxdoas.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS) && (pRecord->maxdoas.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_ZENITH)) ||
-                    ((measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS) && (pRecord->maxdoas.measurementType!=measurementType)))
-
-                 rc=ERROR_ID_FILE_RECORD;
-            }
 
           }
        }
@@ -853,7 +846,7 @@ RC ReliCCD_EEV(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int loca
   #endif
 
   // Return
-
+  
   return rc;
  }
 
