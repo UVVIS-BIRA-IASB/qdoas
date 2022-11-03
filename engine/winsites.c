@@ -155,22 +155,22 @@ INDEX SITES_GetIndex(const char *siteName)
 
 RC SITES_Add(OBSERVATION_SITE *pNewSite)
  {
-     // Declaration
+  // Declaration
 
-     RC rc;
+  RC rc;
 
-     // Initialization
+  // Initialization
 
-     rc=ERROR_ID_NO;
+  rc=ERROR_ID_NO;
 
-     // Check for the buffer limits
+  // Check for the buffer limits
 
   if (SITES_itemN==MAX_SITES)
    rc=ERROR_SetLast("SITES_Add",ERROR_TYPE_FATAL,ERROR_ID_BUFFER_FULL,"sites");
   else
    {
-       memcpy(&SITES_itemList[SITES_itemN],pNewSite,sizeof(OBSERVATION_SITE));
-       SITES_itemN++;
+    memcpy(&SITES_itemList[SITES_itemN],pNewSite,sizeof(OBSERVATION_SITE));
+    SITES_itemN++;
    }
 
   // Return

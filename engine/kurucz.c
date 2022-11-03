@@ -1124,23 +1124,37 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
 
   if ((solar=MEMORY_AllocDVector(__func__,"solar",0,n_wavel))==NULL)
     rc=ERROR_ID_ALLOC;
-  else if (!pKuruczOptions->fwhmFit) {
-    if (pSlitOptions->slitFunction.slitType==SLIT_TYPE_NONE) {
+  else if (!pKuruczOptions->fwhmFit) 
+   {
+    if (pSlitOptions->slitFunction.slitType==SLIT_TYPE_NONE) 
+     {
       if ((pKurucz->hrSolar.nl==n_wavel) && VECTOR_Equal(pKurucz->hrSolar.matrix[0],oldLambda,n_wavel,(double)1.e-7))
         memcpy(solar,pKurucz->hrSolar.matrix[1],sizeof(double)*n_wavel);
-      else
-        SPLINE_Vector(pKurucz->hrSolar.matrix[0],pKurucz->hrSolar.matrix[1],pKurucz->hrSolar.deriv2[1],pKurucz->hrSolar.nl,
-                      oldLambda,solar,n_wavel,pAnalysisOptions->interpol);
-    } else {
+      else if (!(rc=SPLINE_Vector(pKurucz->hrSolar.matrix[0],pKurucz->hrSolar.matrix[1],pKurucz->hrSolar.deriv2[1],pKurucz->hrSolar.nl,
+                                  pKurucz->hrSolarGridded.matrix[0],pKurucz->hrSolarGridded.matrix[1],pKurucz->hrSolarGridded.nl,pAnalysisOptions->interpol)))
+       rc=SPLINE_Deriv2(pKurucz->hrSolarGridded.matrix[0],pKurucz->hrSolarGridded.matrix[1],pKurucz->hrSolarGridded.deriv2[1],pKurucz->hrSolarGridded.nl,__func__);
+      //  SPLINE_Vector(pKurucz->hrSolar.matrix[0],pKurucz->hrSolar.matrix[1],pKurucz->hrSolar.deriv2[1],pKurucz->hrSolar.nl,
+      //                oldLambda,solar,n_wavel,pAnalysisOptions->interpol);
+     } 
+    else 
+     {
       // 20130208 : a high resolution spectrum is now loaded from the slit page of project properties and convolved
-      rc=ANALYSE_ConvoluteXs(NULL,ANLYS_CROSS_ACTION_CONVOLUTE,(double)0.,&pKurucz->hrSolar,
+      // 20210924 : convolved on a high resolution grid (0.01 nm)
+//       rc=ANALYSE_ConvoluteXs(NULL,ANLYS_CROSS_ACTION_CONVOLUTE,(double)0.,&pKurucz->hrSolar,
+//                              ANALYSIS_slitMatrix,slitParam,pSlitOptions->slitFunction.slitType,
+//                              oldLambda,solar,0,n_wavel,n_wavel,0,pSlitOptions->slitFunction.slitWveDptFlag);
+//      
+      if (!(rc=ANALYSE_ConvoluteXs(NULL,ANLYS_CROSS_ACTION_CONVOLUTE,(double)0.,&pKurucz->hrSolar,
                              ANALYSIS_slitMatrix,slitParam,pSlitOptions->slitFunction.slitType,
-                             oldLambda,solar,0,n_wavel,n_wavel,0,pSlitOptions->slitFunction.slitWveDptFlag);
-    }
-  } else {
+                             pKurucz->hrSolarGridded.matrix[0],pKurucz->hrSolarGridded.matrix[1],0,pKurucz->hrSolarGridded.nl,pKurucz->hrSolarGridded.nl,0,pSlitOptions->slitFunction.slitWveDptFlag)))
+       rc=SPLINE_Deriv2(pKurucz->hrSolarGridded.matrix[0],pKurucz->hrSolarGridded.matrix[1],pKurucz->hrSolarGridded.deriv2[1],pKurucz->hrSolarGridded.nl,__func__);
+     }
+   }  
+  else 
+   {
     memcpy(solar,reference,sizeof(double)*n_wavel);
-  }
-
+   }
+  
   if (rc!=ERROR_ID_NO)
     goto EndKuruczSpectrum;
 
@@ -1334,7 +1348,7 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
 
     pKurucz->KuruczFeno[indexFeno].rc=rc;
   }  // End for (indexWindow=...
-
+  
   if (rc)
     goto EndKuruczSpectrum;
 
@@ -1750,7 +1764,7 @@ RC KURUCZ_ApplyCalibration(FENO *pTabFeno,double *newLambda,INDEX indexFenoColum
         memcpy(slitMatrix[1].matrix[0],newLambda,sizeof(double)*n_wavel);
         memcpy(slitMatrix[1].matrix[1],pTabFeno->fwhmVector[0],sizeof(double)*n_wavel);
         memcpy(slitMatrix[1].matrix[2],pTabFeno->fwhmVector[1],sizeof(double)*n_wavel);
-
+        
         if (!(rc=SPLINE_Deriv2(slitMatrix[1].matrix[0],slitMatrix[1].matrix[1],slitMatrix[1].deriv2[1],slitMatrix[1].nl,__func__)))
           rc=SPLINE_Deriv2(slitMatrix[1].matrix[0],slitMatrix[1].matrix[2],slitMatrix[1].deriv2[2],slitMatrix[1].nl,__func__);
              }
@@ -1772,7 +1786,7 @@ RC KURUCZ_ApplyCalibration(FENO *pTabFeno,double *newLambda,INDEX indexFenoColum
         }
      }
    }
-
+  
   if (!rc &&
      (((pTabFeno->rcKurucz=ANALYSE_XsInterpolation(pTabFeno,newLambda,indexFenoColumn))!=ERROR_ID_NO) ||
      (((pTabFeno->useKurucz==ANLYS_KURUCZ_REF) || (pTabFeno->useKurucz==ANLYS_KURUCZ_SPEC)) &&
@@ -1781,7 +1795,7 @@ RC KURUCZ_ApplyCalibration(FENO *pTabFeno,double *newLambda,INDEX indexFenoColum
       (!pKuruczOptions->fwhmFit && ((pTabFeno->rcKurucz=ANALYSE_XsConvolution(pTabFeno,newLambda,ANALYSIS_slitMatrix,ANALYSIS_slitParam,pSlitOptions->slitFunction.slitType,indexFenoColumn,pSlitOptions->slitFunction.slitWveDptFlag))!=ERROR_ID_NO))))))
 
    rc=pTabFeno->rcKurucz;
-
+  
   // Release allocated matrix object
 
   for (i=0;i<NSFP;i++)
@@ -1952,13 +1966,11 @@ RC KURUCZ_Reference(double *instrFunction,INDEX refFlag,int saveFlag,int gomeFla
 
             MATRIX_Free(&calibratedMatrix,__func__);
           }
-
+          
           // Apply Kurucz for building new calibration for reference
           if ((rc=pTabFeno->rcKurucz=KURUCZ_Spectrum(pTabFeno->LambdaRef,pTabFeno->LambdaK,reference,pKurucz->solar,instrFunction,
                                                      1,pTabFeno->windowName,pTabFeno->fwhmPolyRef,pTabFeno->fwhmVector,pTabFeno->fwhmDeriv2,saveFlag,indexFeno,responseHandle,indexFenoColumn))!=ERROR_ID_NO)
-
             goto EndKuruczReference;
-
         }
 
         if (!rc && !pTabFeno->rcKurucz)
@@ -2111,6 +2123,7 @@ RC KURUCZ_Alloc(const PROJECT *pProject, const double *lambda,INDEX indexKurucz,
 
   memset(&pKurucz->hrSolar,0,sizeof(MATRIX_OBJECT));
   memset(&pKurucz->slitFunction,0,sizeof(MATRIX_OBJECT));
+  memset(&pKurucz->hrSolarGridded,0,sizeof(MATRIX_OBJECT));
 
   FENO *pKuruczFeno=&TabFeno[indexFenoColumn][indexKurucz]; // analysis window with Kurucz description
 
@@ -2250,6 +2263,7 @@ RC KURUCZ_Alloc(const PROJECT *pProject, const double *lambda,INDEX indexKurucz,
 
     rc=XSCONV_ConvertCrossSectionFile(&pKurucz->hrSolar,lambdaMin-7.-step*pKurucz->solarFGap,lambdaMax+7.+step*pKurucz->solarFGap,(double)0.,CONVOLUTION_CONVERSION_NONE);
   }
+  
   if( !rc) {
     // If the fwhm of the slit function is fitted, then we can use the same high resolution solar
     // spectrum.  If we do not fit the slit function, the solar spectrum has to be preconvolved.
@@ -2261,6 +2275,16 @@ RC KURUCZ_Alloc(const PROJECT *pProject, const double *lambda,INDEX indexKurucz,
         ((rc=SPLINE_Deriv2(pKurucz->hrSolar.matrix[0],pKurucz->hrSolar.matrix[1],pKurucz->hrSolar.deriv2[1],pKurucz->hrSolar.nl,__func__))!=ERROR_ID_NO))
 
      goto EndKuruczAlloc;
+    
+    if (!rc && !pKuruczOptions->fwhmFit) 
+     {
+      int hrKuruczLambdaN=ceil((pKuruczOptions->lambdaRight-pKuruczOptions->lambdaLeft)+6.)*100.; // grid of 0.01 nm; 3 nm security gap both sides
+      if (!(rc = MATRIX_Allocate(&pKurucz->hrSolarGridded,hrKuruczLambdaN, 2, 0, 0, 1, __func__)))
+       {
+        for (int i=0;i<hrKuruczLambdaN;i++)
+         pKurucz->hrSolarGridded.matrix[0][i]=pKuruczOptions->lambdaLeft-3.+0.01*i;
+       }
+     }    
 
     memcpy(pKurucz->solar,ANALYSE_zeros,sizeof(double)*n_wavel);
 
@@ -2478,6 +2502,7 @@ void KURUCZ_Free(void)
        pKurucz=&KURUCZ_buffers[indexFenoColumn];
 
     MATRIX_Free(&pKurucz->hrSolar,"KURUCZ_Free");
+    MATRIX_Free(&pKurucz->hrSolarGridded,"KURUCZ_Free");
     MATRIX_Free(&pKurucz->slitFunction,"KURUCZ_Free");
 
     if (pKurucz->solar!=NULL)

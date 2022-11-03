@@ -212,12 +212,12 @@ bool CSelectorSubHandler::start(const QString &element, const QXmlAttributes &at
     d->selected[d->nSelected] = PRJCT_RESULTS_INDEX_ALONGTRACK;
   else if (str == "omi_index_row" || str == "index_crosstrack")
     d->selected[d->nSelected] = PRJCT_RESULTS_INDEX_CROSSTRACK;
-  else if (str == "omi_groundp_qf")
-    d->selected[d->nSelected] = PRJCT_RESULTS_OMI_GROUNDP_QF;
-  else if (str == "omi_xtrack_qf")
-    d->selected[d->nSelected] = PRJCT_RESULTS_OMI_XTRACK_QF;
-  else if (str == "omi_pixels_qf")
-    d->selected[d->nSelected] = PRJCT_RESULTS_OMI_PIXELS_QF;
+  else if ((str == "groundp_qf") || (str == "omi_groundp_qf"))
+    d->selected[d->nSelected] = PRJCT_RESULTS_GROUNDP_QF;
+  else if ((str == "xtrack_qf") || (str == "omi_xtrack_qf"))
+    d->selected[d->nSelected] = PRJCT_RESULTS_XTRACK_QF;
+  else if ((str == "pixels_qf") || (str == "omi_pixels_qf"))
+    d->selected[d->nSelected] = PRJCT_RESULTS_PIXELS_QF;
   else if (str == "omi_configuration_id")
     d->selected[d->nSelected] = PRJCT_RESULTS_OMI_CONFIGURATION_ID;
   else if (str == "spike_pixels")
@@ -272,6 +272,8 @@ bool CSelectorSubHandler::start(const QString &element, const QXmlAttributes &at
     d->selected[d->nSelected] = PRJCT_RESULTS_ZENITH_AFTER;
   else if (str == "rc")
     d->selected[d->nSelected] = PRJCT_RESULTS_RC;
+  else if (str == "residual_spectrum")
+    d->selected[d->nSelected] = PRJCT_RESULTS_RESIDUAL_SPECTRUM;  
   else
     return postErrorMessage("Invalid output field " + str);
 
@@ -1363,6 +1365,9 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
         strcpy(m_instrumental->gems.trackSelection, str.toLocal8Bit().data());
       else
         return postErrorMessage("Track selection string too long");
+    str = atts.value("binning");
+    m_instrumental->gems.binning=(!str.isEmpty())?str.toInt():4; 
+     
     }
 
 

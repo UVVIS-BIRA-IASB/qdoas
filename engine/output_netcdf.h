@@ -20,6 +20,10 @@ extern "C" {
   RC netcdf_save_calib(double *lambda,double *reference,int indexFenoColumn,int n_wavel);
   RC netcdf_open_calib(const ENGINE_CONTEXT *pEngineContext, const char *filename,int col_dim,int spectral_dim);
   void netcdf_close_calib(void);
+  
+  RC netcdf_save_xs(double *lambda,double *reference,int indexFenoColumn,int n_wavel);
+  RC netcdf_open_xs(void *pEngineContext, const char *filename,int col_dim,int spectral_dim);
+  void netcdf_close_xs(void);
 
 #ifdef __cplusplus
 }

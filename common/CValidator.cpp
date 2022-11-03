@@ -17,7 +17,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <QTextStream>
+#include <QTextStream> 
 
 #include "CValidator.h"
 
@@ -65,8 +65,6 @@ void CSzaValidator::fixup(QString &input) const
   else
     input = "0.0"; // default
 }
-
-
 //--------------------------------------------------------------------------------
 
 CDoubleExpFmtValidator::CDoubleExpFmtValidator(QObject *obj) :
@@ -330,4 +328,39 @@ void CDoubleFixedFmtValidator::setDecimals(int decimals)
   m_decimals = (decimals > 0) ? decimals : 0;
 }
 
+//--------------------------------------------------------------------------------
 
+CRecordValidator::CRecordValidator(QObject *obj) :
+  QValidator(obj)
+{
+  setRange(1, 999999999);
+}
+
+QValidator::State CRecordValidator::validate(QString &input, int &pos) const
+{
+  if (input.isEmpty()) return QValidator::Intermediate;
+
+  int len = input.length();
+  int i = 0;
+
+  while (i < len) {
+    if (!input[0].isDigit()) {
+        return QValidator::Invalid;
+    }
+    ++i;
+  }
+
+  return QValidator::Acceptable;
+}
+
+void CRecordValidator::setRange(int bottom, int top)
+{
+  if (bottom < top) {
+    m_bottom = bottom;
+    m_top = top;
+  }
+  else {
+    m_bottom = top;
+    m_top = bottom;
+  }
+}

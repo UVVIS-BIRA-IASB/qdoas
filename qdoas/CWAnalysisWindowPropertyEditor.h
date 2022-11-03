@@ -64,6 +64,7 @@ Q_OBJECT
   QLineEdit *m_fitMinEdit, *m_fitMaxEdit,*m_resolEdit,*m_lambda0Edit;
   QCheckBox *m_spectrumCheck, *m_polyCheck, *m_fitsCheck;
   QCheckBox *m_residualCheck, *m_predefCheck, *m_ratioCheck;
+  QCheckBox *m_saveResidualCheck;
 
   QFrame *m_refOneFrame;
   QFrame *m_refTwoEditFrame, *m_refTwoSzaFrame, *m_satelliteFrame, *m_maxdoasFrame, *m_maxdoasSzaFrame, *m_maxdoasScanFrame;

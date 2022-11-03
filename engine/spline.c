@@ -115,7 +115,7 @@ RC SPLINE_Deriv2(const double *X, const double *Y,double *Y2,int n,const char *c
     if (yp1>(double)0.99e30)                                                    // The lower boundary condition is
      Y2[0]=u[0]=(double)0.;                                                     // set to be "natural" else to have
     else if (X[1]-X[0]<=(double)0.)
-     rc=ERROR_SetLast(callingFunction,ERROR_TYPE_FATAL,ERROR_ID_SPLINE);
+     rc=ERROR_SetLast(callingFunction,ERROR_TYPE_WARNING,ERROR_ID_SPLINE);
     else
      {
       Y2[0] = (double) -0.5;
@@ -130,7 +130,7 @@ RC SPLINE_Deriv2(const double *X, const double *Y,double *Y2,int n,const char *c
     for (i=1;(i<n-1)&&!rc;i++)
 
      if (X[i+1]-X[i]<=0)
-      rc=ERROR_SetLast(callingFunction,ERROR_TYPE_FATAL,ERROR_ID_SPLINE,i,i+1,X[i],X[i+1]);
+      rc=ERROR_SetLast(callingFunction,ERROR_TYPE_WARNING,ERROR_ID_SPLINE,i,i+1,X[i],X[i+1]);
      else {
        const double d2x = 1.0/(X[i+1]-X[i-1]);
        double sig= dx_old*d2x;
@@ -155,8 +155,8 @@ RC SPLINE_Deriv2(const double *X, const double *Y,double *Y2,int n,const char *c
        qn=un=(double)0.;
       else
        {
-    qn=(double)0.5;
-    un=(double)(3./(X[i]-X[i-1]))*(ypn-(Y[i]-Y[i-1])/(X[i]-X[i-1]));
+        qn=(double)0.5;
+        un=(double)(3./(X[i]-X[i-1]))*(ypn-(Y[i]-Y[i-1])/(X[i]-X[i-1]));
        }
 
       Y2[i]=(un-qn*u[i-1])/(qn*Y2[i-1]+1.);

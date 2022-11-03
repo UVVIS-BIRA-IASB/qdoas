@@ -200,9 +200,9 @@ char *ascFieldsNames[PRJCT_RESULTS_MAX]=
   (char *)"Saturated",                                                          // PRJCT_RESULTS_SATURATED,
   (char *)"along-track index",                                                  // PRJCT_RESULTS_INDEX_CROSSTRACK,
   (char *)"cross-track index",                                                  // PRJCT_RESULTS_INDEX_ALONGTRACK,
-  (char *)"OMI groundpixel quality flag",                                       // PRJCT_RESULTS_OMI_GROUNDP_QF,
-  (char *)"OMI xtrack quality flag",                                            // PRJCT_RESULTS_OMI_XTRACK_QF,
-  (char *)"",                                                                   // PRJCT_RESULTS_OMI_PIXELS_QF,
+  (char *)"groundpixel quality flag",                                           // PRJCT_RESULTS_GROUNDP_QF,
+  (char *)"xtrack quality flag",                                                // PRJCT_RESULTS_XTRACK_QF,
+  (char *)"pixel quality flag",                                                 // PRJCT_RESULTS_OMI_PIXELS_QF,
   (char *)"OMI instrument configuration id",                                    // PRJCT_RESULTS_OMI_CONFIGURATION_ID,
   (char *)"",                                                                   // PRJCT_RESULTS_SPIKES,
   (char *)"UAV servo sent position byte",                                       // PRJCT_RESULTS_UAV_SERVO_BYTE_SENT,
@@ -246,7 +246,8 @@ char *ascFieldsNames[PRJCT_RESULTS_MAX]=
   (char *)"Scan index",                                                         // PRJCT_RESULTS_SCANINDEX
   (char *)"Index zenith before",                                                // PRJCT_RESULTS_ZENITH_BEFORE,
   (char *)"Index zenith after",                                                 // PRJCT_RESULTS_ZENITH_AFTER,
-  (char *)"Return code"                                                         // PRJCT_RESULTS_RC
+  (char *)"Return code",                                                        // PRJCT_RESULTS_RC
+  (char *)""                                                                    // PRJCT_RESULTS_RESIDUAL_SPECTRUM
  };
 
 enum _ascLineType

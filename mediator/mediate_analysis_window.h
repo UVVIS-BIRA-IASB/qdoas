@@ -44,6 +44,7 @@ extern "C" {
     char refOneFile[FILENAME_BUFFER_LENGTH];
     char refTwoFile[FILENAME_BUFFER_LENGTH];
     char residualFile[FILENAME_BUFFER_LENGTH];
+    int    saveResidualsFlag;
     double fitMinWavelength;
     double fitMaxWavelength;
     double resolFwhm;

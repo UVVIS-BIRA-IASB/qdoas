@@ -104,6 +104,19 @@ bool CConvGeneralSubHandler::start(const QXmlAttributes &atts)
     m_d->conversionType = CONVOLUTION_CONVERSION_VAC2AIR;
   else
     m_d->conversionType = CONVOLUTION_CONVERSION_NONE;
+  
+  // output format
+  str = atts.value("output_format");
+  if (str == "ascii")
+    m_d->formatType = CONVOLUTION_FORMAT_ASCII;
+  else if (str == "netcdf")
+    m_d->formatType = CONVOLUTION_FORMAT_NETCDF;
+  else
+    m_d->formatType = CONVOLUTION_FORMAT_ASCII;
+  
+   // number of ground pixels
+  str = atts.value("pixels");
+  m_d->n_groundpixel=(!str.isEmpty())?str.toInt():1;
 
   m_d->shift = atts.value("shift").toDouble();
   m_d->conc = atts.value("conc").toDouble();

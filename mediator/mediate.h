@@ -82,4 +82,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //--------------------------------------
 #include "mediate_response.h"
 
+int mediateRequestDisplaySpecInfo(void *engineContext,int page,void *responseHandle);
+
 #endif

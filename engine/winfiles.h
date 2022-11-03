@@ -67,7 +67,7 @@ RC     FILES_LoadMatrix(FILE *fp,const char *fileName,double **matrix,int base,i
 // Select a file
 // -------------
 
-char  *FILES_BuildFileName(char *fileName,MASK fileType);
+char  *FILES_BuildFileName(char *new_fileName,char *fileName,MASK fileType);
 
 #if defined(_cplusplus) || defined(__cplusplus)
 }

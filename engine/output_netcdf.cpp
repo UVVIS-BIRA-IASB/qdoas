@@ -13,6 +13,8 @@ extern "C" {
 #include "omi_read.h"
 #include "spectral_range.h"
 #include "fit_properties.h"
+#include "engine_xsconv.h"
+#include "winfiles.h"
 }
 
 using std::string;
@@ -33,6 +35,7 @@ map<const string, size_t> dimensions = {
   { "date", 3}, // year, month, day
   { "time", 3}, // hour, min, secs
   { "datetime", 7}, // hour, min, secs, milliseconds
+  
 
   // The following numbered dimensions are used for fields with
   // different numbers of columns. for example: fields such as
@@ -65,17 +68,18 @@ static int get_dimid(const string& dim_name) {
   return output_group.defDim(dim_name, dimensions[dim_name]);
 }
 
-static void getDims(const struct output_field& thefield, vector<int>& dimids, vector<size_t>& chunksizes) {
+static void getDims(NetCDFGroup &group,const struct output_field& thefield, vector<int>& dimids, vector<size_t>& chunksizes) {
   // for dimensions simply numbered "2, 3, ... 9"
   const array<const char*, 8> dim_names { { "2", "3", "4", "5", "6", "7", "8", "9" } };
 
 
-  if (thefield.data_cols > 1) {
-    assert(thefield.data_cols < 10);
+  if ((thefield.data_cols > 1) && (thefield.memory_type!=OUTPUT_RESIDUAL)) {
+    // not suitable for residuals assert(thefield.data_cols < 10);
     dimids.push_back(get_dimid(dim_names[thefield.data_cols -2]));
     chunksizes.push_back(thefield.data_cols);
   }
   switch (thefield.memory_type) {
+  break;  
   case OUTPUT_DATE:
     dimids.push_back(get_dimid("date"));
     chunksizes.push_back(3);
@@ -110,6 +114,7 @@ static nc_type getNCType(enum output_datatype xtype) {
   case OUTPUT_INT:
     return NC_INT;
     break;
+  case OUTPUT_RESIDUAL:
   case OUTPUT_DOUBLE:
     return NC_DOUBLE;
     break;
@@ -134,7 +139,7 @@ static void define_variable(NetCDFGroup &group, const struct output_field& thefi
 
   vector<int> dimids;
   vector<size_t>chunksizes;
-
+  
   if (vtype == Calibration) {
     if (n_crosstrack > 1) {
       dimids.push_back(get_dimid("n_crosstrack"));
@@ -151,10 +156,18 @@ static void define_variable(NetCDFGroup &group, const struct output_field& thefi
       dimids.push_back(get_dimid("n_crosstrack"));
       chunksizes.push_back((size_t)n_crosstrack);
     }
+    
+    if (thefield.memory_type==OUTPUT_RESIDUAL)
+     {
+      string str=group.getName()+".n_datapoint";
+      dimensions[str]=thefield.data_cols;
+      dimids.push_back(get_dimid(str));
+      chunksizes.push_back((size_t)thefield.data_cols);      
+     }
+    
   }
   
-
-  getDims(thefield, dimids, chunksizes);
+  getDims(group,thefield, dimids, chunksizes);
 
   const int varid = group.defVar(varname, dimids, getNCType(thefield.memory_type));
 
@@ -176,6 +189,7 @@ static void define_variable(NetCDFGroup &group, const struct output_field& thefi
   case OUTPUT_FLOAT:
     group.putAttr("_FillValue", QDOAS_FILL_FLOAT, varid);
     break;
+  case OUTPUT_RESIDUAL:  
   case OUTPUT_DOUBLE:
     group.putAttr("_FillValue", QDOAS_FILL_DOUBLE, varid);
     break;
@@ -381,10 +395,12 @@ void create_subgroups(const ENGINE_CONTEXT *pEngineContext,NetCDFGroup &group) {
        }
 
    for (unsigned int i=0; i<output_num_fields; ++i) {
+    // printf("%s\n",output_data_analysis[i].fieldname);
     if (output_data_analysis[i].windowname &&
         group.groupID(output_data_analysis[i].windowname) < 0) {
 
       group.defGroup(output_data_analysis[i].windowname);
+    
     }
   }
 }
@@ -402,10 +418,12 @@ RC netcdf_open(const ENGINE_CONTEXT *pEngineContext, const char *filename,int nu
     n_calib = 0;
     if ((pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_OMI) &&
         (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_TROPOMI) &&
+        (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_GEMS) &&
         (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_GOME1_NETCDF))
         n_calib = KURUCZ_buffers[0].Nb_Win;
     else if ((pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_OMI) ||
-        (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_TROPOMI)) {
+             (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_GEMS) ||
+             (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_TROPOMI)) {
        for (int firstrow = 0; firstrow<ANALYSE_swathSize; firstrow++)
          // look up the number of calibration windows by searching the first valid entry in KURUCZ_buffers[]
          if (pEngineContext->project.instrumental.use_row[firstrow]) {
@@ -425,7 +443,7 @@ RC netcdf_open(const ENGINE_CONTEXT *pEngineContext, const char *filename,int nu
     dimensions["n_crosstrack"] = n_crosstrack;
     dimensions["n_alongtrack"] = n_alongtrack;
     dimensions["n_calib"] = n_calib;
-
+    
     create_subgroups(pEngineContext,output_group);
     write_global_attrs(pEngineContext, output_group);
     write_automatic_reference_info(pEngineContext, output_group);
@@ -434,7 +452,7 @@ RC netcdf_open(const ENGINE_CONTEXT *pEngineContext, const char *filename,int nu
    for (unsigned int i=0; i<output_num_fields; ++i) {
       NetCDFGroup group = output_data_analysis[i].windowname ?
         output_group.getGroup(output_data_analysis[i].windowname) : output_group;
-      define_variable(group, output_data_analysis[i], get_netcdf_varname(output_data_analysis[i].fieldname), Analysis);
+       define_variable(group, output_data_analysis[i], get_netcdf_varname(output_data_analysis[i].fieldname), Analysis);
     }
   } catch (std::runtime_error& e) {
     output_file.close();
@@ -514,6 +532,7 @@ static void write_data_field(const struct output_field& datafield, NetCDFGroup &
   case OUTPUT_FLOAT:
     group.putVar(varname, start.data(), count.data(), static_cast<const float *>(datafield.data));
     break;
+  case OUTPUT_RESIDUAL:    
   case OUTPUT_DOUBLE:
     group.putVar(varname, start.data(), count.data(), static_cast<const double *>(datafield.data));
     break;
@@ -635,6 +654,9 @@ RC netcdf_write_analysis_data(const bool selected_records[], int num_records, co
       case OUTPUT_DOUBLE:
         write_buffer<double>(thefield, selected_records, num_records, recordinfo);
         break;
+      case OUTPUT_RESIDUAL:
+        write_buffer<double>(thefield, selected_records, num_records, recordinfo);
+        break;                
       case OUTPUT_DATE:
         write_buffer<int, struct date>(thefield, selected_records, num_records, recordinfo);
         break;
@@ -689,13 +711,13 @@ RC netcdf_create_calib_var(const char *varname,vector<int>& dimids,vector<size_t
 
 RC netcdf_save_calib(double *lambda,double *reference,int indexFenoColumn,int n_wavel)
  {
-  const size_t start[] = {(size_t)indexFenoColumn, 0};
-  const size_t count[] = {1, (size_t)n_wavel};
+  const size_t start[] = {0,(size_t)indexFenoColumn};
+  const size_t count[] = {(size_t)n_wavel,1};
 
   try
    {
-    output_file_calib.putVar("reference_wavelength", start, count, lambda);
-    output_file_calib.putVar("reference_radiance", start, count, reference);
+    output_file_calib.putVar("wavelength", start, count, lambda);
+    output_file_calib.putVar("image_pixel_values", start, count, reference);
    }
   catch (std::runtime_error& e)
    {
@@ -708,11 +730,24 @@ RC netcdf_save_calib(double *lambda,double *reference,int indexFenoColumn,int n_
 RC netcdf_open_calib(const ENGINE_CONTEXT *pEngineContext, const char *filename,int col_dim,int spectral_dim) {
   vector<int> dimids;
   vector<size_t>chunksizes;
-
+  
+  FILE *fp;
+  
+  char new_filename[DOAS_MAX_PATH_LEN+1],error_message[DOAS_MAX_PATH_LEN+1];
+  strcpy(new_filename,filename);
+  FILES_BuildFileName(new_filename,(char *)filename,FILE_TYPE_NETCDF);
+  
+  if ((fp=fopen(new_filename,"rb"))!=NULL)
+   {
+    fclose(fp);
+    sprintf(error_message,"%s already exists",new_filename);
+    return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, error_message);
+   }
+  
   try {
     // Open the file in writing mode
 
-    output_file_calib = NetCDFFile(filename + string(output_file_extensions[NETCDF]), NC_WRITE );
+    output_file_calib = NetCDFFile(new_filename, NC_WRITE );
 
     // Create attributes
 
@@ -723,18 +758,16 @@ RC netcdf_open_calib(const ENGINE_CONTEXT *pEngineContext, const char *filename,
 
     // Create dimensions
 
-    dimids.push_back(output_file_calib.defDim("col_dim",col_dim));
-    dimids.push_back(output_file_calib.defDim("spectral_dim",spectral_dim));
+    dimids.push_back(output_file_calib.defDim("dim_image_band",spectral_dim));
+    dimids.push_back(output_file_calib.defDim("dim_image_y",col_dim));
 
     // Create variables
 
-    chunksizes.push_back(std::min<size_t>(100, pEngineContext->n_crosstrack));
+    chunksizes.push_back(pEngineContext->n_alongtrack);
+    chunksizes.push_back(pEngineContext->n_crosstrack);
 
-    chunksizes.push_back(std::min<size_t>(100, pEngineContext->n_alongtrack));
-
-    netcdf_create_calib_var("reference_wavelength",dimids,chunksizes);
-    netcdf_create_calib_var("reference_radiance",dimids,chunksizes);
-
+    netcdf_create_calib_var("wavelength",dimids,chunksizes);
+    netcdf_create_calib_var("image_pixel_values",dimids,chunksizes);
   } catch (std::runtime_error& e) {
     output_file_calib.close();
     return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, e.what() );
@@ -745,3 +778,5 @@ RC netcdf_open_calib(const ENGINE_CONTEXT *pEngineContext, const char *filename,
 void netcdf_close_calib() {
   output_file_calib.close();
 }
+
+

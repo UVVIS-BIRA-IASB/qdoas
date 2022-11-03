@@ -349,15 +349,28 @@ CWAnalysisWindowPropertyEditor::CWAnalysisWindowPropertyEditor(const QString &pr
   residualFrame->setFrameStyle(QFrame::NoFrame);
   QHBoxLayout *residualFrameLayout = new QHBoxLayout(residualFrame);
   residualFrameLayout->setMargin(0);
-  QLabel *labelRes = new QLabel(" Residual ", residualFrame);
-  labelRes->setFixedWidth(85);
-  m_residualEdit = new QLineEdit(residualFrame);
-  m_residualEdit->setMaxLength(sizeof(d->residualFile)-1);
-  QPushButton *residualBrowseBtn = new QPushButton("Browse", residualFrame);
-  residualBrowseBtn->setFixedWidth(70);
-  residualFrameLayout->addWidget(labelRes);
-  residualFrameLayout->addWidget(m_residualEdit, 1);
-  residualFrameLayout->addWidget(residualBrowseBtn);
+
+  if (p->instrumental.format==PRJCT_INSTR_FORMAT_GEMS)
+   {
+    m_saveResidualCheck = new QCheckBox("Save residuals", residualFrame);
+    displayLayout->addWidget(m_saveResidualCheck, 0, 0);   
+    m_saveResidualCheck->setChecked(d->saveResidualsFlag ? Qt::Checked : Qt::Unchecked);
+    residualFrameLayout->addWidget(m_saveResidualCheck);
+   }
+  else
+   {
+    QLabel *labelRes = new QLabel(" Residual ", residualFrame);
+    labelRes->setFixedWidth(85);    
+    m_residualEdit = new QLineEdit(residualFrame);
+    m_residualEdit->setMaxLength(sizeof(d->residualFile)-1);
+    QPushButton *residualBrowseBtn = new QPushButton("Browse", residualFrame);
+    m_residualEdit->setText(d->residualFile);
+    residualBrowseBtn->setFixedWidth(70);
+    residualFrameLayout->addWidget(labelRes);
+    residualFrameLayout->addWidget(m_residualEdit, 1);
+    residualFrameLayout->addWidget(residualBrowseBtn);
+    connect(residualBrowseBtn, SIGNAL(clicked()), this, SLOT(slotBrowseResidual()));
+   }
 
   filesLayout->addWidget(residualFrame);
 
@@ -435,7 +448,6 @@ CWAnalysisWindowPropertyEditor::CWAnalysisWindowPropertyEditor(const QString &pr
 
   m_refOneEdit->setText(d->refOneFile);
   m_refTwoEdit->setText(d->refTwoFile);
-  m_residualEdit->setText(d->residualFile);
 
   m_maxdoasSzaCenterEdit->validator()->fixup(tmpStr.setNum(d->refSzaCenter));
   m_maxdoasSzaCenterEdit->setText(tmpStr);
@@ -476,7 +488,6 @@ CWAnalysisWindowPropertyEditor::CWAnalysisWindowPropertyEditor(const QString &pr
   connect(m_calibrationCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(slotWavelengthCalibrationChanged(int)));
   connect(refOneBrowseBtn, SIGNAL(clicked()), this, SLOT(slotBrowseRefOne()));
   connect(refTwoBrowseBtn, SIGNAL(clicked()), this, SLOT(slotBrowseRefTwo()));
-  connect(residualBrowseBtn, SIGNAL(clicked()), this, SLOT(slotBrowseResidual()));
 
   connect(m_tabs,SIGNAL(currentChanged(int)),this,SLOT(slotPageChanged(int)));
 
@@ -515,7 +526,11 @@ bool CWAnalysisWindowPropertyEditor::actionOk(void)
 
     strcpy(d->refOneFile, m_refOneEdit->text().toLocal8Bit().data());
     strcpy(d->refTwoFile, m_refTwoEdit->text().toLocal8Bit().data());
-    strcpy(d->residualFile, m_residualEdit->text().toLocal8Bit().data());
+    
+    if (p->instrumental.format==PRJCT_INSTR_FORMAT_GEMS)
+     d->saveResidualsFlag = (m_saveResidualCheck->checkState() == Qt::Checked) ? 1 : 0;
+    else
+     strcpy(d->residualFile, m_residualEdit->text().toLocal8Bit().data());
 
     if (((p->instrumental.format!=PRJCT_INSTR_FORMAT_ASCII) && is_maxdoas((_prjctInstrFormat)p->instrumental.format)) ||
         ((p->instrumental.format==PRJCT_INSTR_FORMAT_ASCII) && ((p->instrumental.ascii.flagElevationAngle) || (p->instrumental.ascii.format==PRJCT_INSTR_ASCII_FORMAT_COLUMN_EXTENDED))))

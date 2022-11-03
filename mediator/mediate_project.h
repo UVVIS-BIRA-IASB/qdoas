@@ -409,6 +409,7 @@ extern "C" {
     char calibrationFile[FILENAME_BUFFER_LENGTH];
     char transmissionFunctionFile[FILENAME_BUFFER_LENGTH];
     char trackSelection[TRACK_SELECTION_LENGTH];
+    int  binning;
   };
 
   typedef struct mediate_project_instrumental

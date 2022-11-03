@@ -18,9 +18,17 @@ add_executable(doas_cl
   qdoasxml.h
 )
 
+message("${HDF5_LBIRARIES}")
+message("${GSL_LBIRARIES}")
+
+message("${netCDF_LBIRARIES}")
+message("testtttttxxxxxxxtt:: ${netCDF_LIBRARIES}")
+message("${netCDF_INCLUDE_DIR}")
+
+
 target_compile_features(doas_cl PUBLIC cxx_std_11)
 target_link_libraries(doas_cl
-  common mediate engine
+  common engine mediate 
   Qt5::Core Qt5::Xml
   ${CODA_LIBRARY}
   ${GSL_LIBRARIES}

@@ -11,17 +11,6 @@
 #include <netcdf.h>
 // #include "nc4internal.h" /* to get name of the special properties file */
 
-extern "C" {
-#include "winthrd.h"
-#include "comdefs.h"
-#include "stdfunc.h"
-#include "engine_context.h"
-#include "mediate.h"
-#include "analyse.h"
-#include "spline.h"
-#include "vector.h"
-}
-
 typedef unsigned int uint;
 
 struct free_nc_string {
@@ -57,6 +46,7 @@ public:
   void defVarFletcher32(int varid, int fletcher32=NC_FLETCHER32);
   void defVarFletcher32(const std::string& name, int fletcher32=NC_FLETCHER32);
   std::string getAttText(const std::string& attrname, int varid=NC_GLOBAL);
+  double getAttDouble(const std::string& attrname, int varid=NC_GLOBAL);
 
   bool hasAttr(const std::string& name, int varid=NC_GLOBAL) const;
 

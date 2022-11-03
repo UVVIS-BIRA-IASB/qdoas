@@ -138,6 +138,7 @@ void initializeMediateProjectInstrumental(mediate_project_instrumental_t *d)
   d->biramobile.lambdaMin=d->biramobile.lambdaMax=(double)0.;
   d->biraairborne.lambdaMin=d->biraairborne.lambdaMax=(double)0.;
   d->oceanoptics.lambdaMin=d->oceanoptics.lambdaMax=(double)0.;
+  d->gems.binning=1;
 
   d->omi.pixelQFMaxGaps=5;
 }
