@@ -31,4 +31,5 @@ void initializeMediateRing(mediate_ring_t *d)
 
   d->normalize=1;
   d->temperature = 250.0;
+  d->n_groundpixel=1;
 }

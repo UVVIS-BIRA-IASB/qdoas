@@ -22,11 +22,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <math.h>
 #include <time.h>
 
-#include "../mediator/mediate_response.h"
-#include "../mediator/mediate_types.h"
-#include "../mediator/mediate_xsconv.h"
+#include "mediate_response.h"
+#include "mediate_types.h"
+#include "mediate_xsconv.h"
 #include "mediate_common.h"
+#include "mediate_xsconv_output_netcdf.h"
 
+#include "engine_xsconv.h"
 #include "xsconv.h"
 #include "filter.h"
 #include "vector.h"
@@ -38,14 +40,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 // STATIC VARIABLES
 // ================
 
-static const char *mediateConvolutionTypesStr[CONVOLUTION_TYPE_MAX]=
+const char *mediateConvolutionTypesStr[CONVOLUTION_TYPE_MAX]=
  {
   "Interpolation only",
   "Standard convolution",
   "Convolution with I0 correction"
  };
 
-static const char *mediateConvolutionFileExt[CONVOLUTION_TYPE_MAX]=
+const char *mediateConvolutionFileExt[CONVOLUTION_TYPE_MAX]=
    {
     "_none",                                                                     // CONVOLUTION_TYPE_NONE
     "_std",                                                                       // CONVOLUTION_TYPE_STANDARD
@@ -58,11 +60,11 @@ const char *mediateUsampAnalysisMethod[PRJCT_ANLYS_METHOD_MAX]={"Optical density
 
 FFT    usampFFT;
 
-// ----------------------------------------------------------
-// mediateConvolutionSave : Save the convoluted cross section
-// ----------------------------------------------------------
+// ---------------------------------------------------------------
+// mediateConvolutionSaveAscii : Save the convoluted cross section
+// ----------------------------------------------------------------
 
-RC mediateConvolutionSave(void *engineContext)
+RC mediateConvolutionSaveAscii(void *engineContext)
  {
   // Declarations
 
@@ -72,7 +74,7 @@ RC mediateConvolutionSave(void *engineContext)
   SZ_LEN fileNameLength;
   char *ptr,*ptr2;
   FILE *fp;
-  INDEX i,slitType;
+  INDEX i,j,slitType;
   MATRIX_OBJECT *pXs;
   int nextraPixels;
   double *filterVector;
@@ -167,7 +169,7 @@ RC mediateConvolutionSave(void *engineContext)
              fprintf(fp,"; Asymmetry factor : %.3f\n",pEngineContext->slitConv.slitParam2);
             if (slitType==SLIT_TYPE_SUPERGAUSS)
              {
-                 fprintf(fp,"; Exponential term : %.3f\n",pEngineContext->slitConv.slitParam2);
+              fprintf(fp,"; Exponential term : %.3f\n",pEngineContext->slitConv.slitParam2);
               fprintf(fp,"; Asymmetry factor : %.3f\n",pEngineContext->slitConv.slitParam3);
              }
 
@@ -214,7 +216,7 @@ RC mediateConvolutionSave(void *engineContext)
                fprintf(fp,"; Asymmetry factor : %.3f\n",pEngineContext->slitDConv.slitParam2);
               if (slitType==SLIT_TYPE_SUPERGAUSS)
                {
-                   fprintf(fp,"; Exponential term : %.3f\n",pEngineContext->slitDConv.slitParam2);
+                fprintf(fp,"; Exponential term : %.3f\n",pEngineContext->slitDConv.slitParam2);
                 fprintf(fp,"; Asymmetry factor : %.3f\n",pEngineContext->slitDConv.slitParam3);
                }
 
@@ -286,29 +288,74 @@ RC mediateConvolutionSave(void *engineContext)
            }
          }
 
+        fprintf(fp,"; Number of ground pixels : %d\n",pEngineContext->n_groundpixel_output);
         fprintf(fp,";\n; Columns description :\n");
         fprintf(fp,"; Column 1 : calibration;\n");
-        fprintf(fp,"; Column 2 : %s;\n",((pLFilter->type!=PRJCT_FILTER_TYPE_NONE) || (pHFilter->type!=PRJCT_FILTER_TYPE_NONE))?
-                   "convoluted and filtered cross section" : "convoluted cross section");
-
-        if ((pLFilter->type!=PRJCT_FILTER_TYPE_NONE) || (pHFilter->type!=PRJCT_FILTER_TYPE_NONE))
-         fprintf(fp,"; Column 3 : convoluted only cross section.\n");
+         
+        if (pEngineContext->n_groundpixel_output==1)
+          fprintf(fp,"; Column 2 : %s;\n",((pLFilter->type!=PRJCT_FILTER_TYPE_NONE) || (pHFilter->type!=PRJCT_FILTER_TYPE_NONE))?
+                     "convoluted and filtered cross section" : "convoluted cross section");
+        else
+           fprintf(fp,"; Column 2-%d : %s;\n",pEngineContext->n_groundpixel_output+1,((pLFilter->type!=PRJCT_FILTER_TYPE_NONE) || (pHFilter->type!=PRJCT_FILTER_TYPE_NONE))?
+                      "convoluted and filtered cross section" : "convoluted cross section");
+ 
+        if ((pLFilter->type!=PRJCT_FILTER_TYPE_NONE) || (pHFilter->type!=PRJCT_FILTER_TYPE_NONE))  // !!! to test later for imagers !!!!
+         {
+          if (pEngineContext->n_groundpixel_output==1)
+           fprintf(fp,"; Column 3 : convoluted only cross section.\n");  
+          else
+           fprintf(fp,"; Column %d-%d : convoluted only cross section.\n",pEngineContext->n_groundpixel_output+2,2*pEngineContext->n_groundpixel_output+1);
+         }
         fprintf(fp,";\n");
        }
 
-      // Cross section
+      // Case 1 : output only only one ground pixel
 
-      if ((pLFilter->type!=PRJCT_FILTER_TYPE_NONE) || (pHFilter->type!=PRJCT_FILTER_TYPE_NONE))
-       for (i=nextraPixels;i<nsize;i++)
-        fprintf(fp,"%.14le %.14le %.14le\n",pXs->matrix[0][i],filterVector[i],pXs->matrix[1][i]);
+      if (pEngineContext->n_groundpixel_output==1)
+       {   
+        if ((pLFilter->type!=PRJCT_FILTER_TYPE_NONE) || (pHFilter->type!=PRJCT_FILTER_TYPE_NONE))   
+          for (i=nextraPixels;i<nsize;i++)                                                          
+           fprintf(fp,"%.14le %.14le %.14le\n",pXs->matrix[0][i],filterVector[i],pXs->matrix[1][i]); 
+        else
+         for (i=nextraPixels;i<nsize;i++)
+          fprintf(fp,"%.14le %.14le\n",pXs->matrix[0][i],pXs->matrix[1][i]);
+       }
+       
+      // Case 2 : duplicate the same cross section (the number of ground pixels)
+      
+      else if (pEngineContext->n_groundpixel_slit==1)
+       {
+        for (i=nextraPixels;i<nsize;i++)   
+         {
+          fprintf(fp,"%.14le ",pXs->matrix[0][i]);
+          if ((pLFilter->type!=PRJCT_FILTER_TYPE_NONE) || (pHFilter->type!=PRJCT_FILTER_TYPE_NONE))   
+           for (j=1;j<=pEngineContext->n_groundpixel_output;j++)
+            fprintf(fp,"%.14le ",filterVector[i]);
+          for (j=1;j<=pEngineContext->n_groundpixel_output;j++)
+           fprintf(fp,"%.14le ",pXs->matrix[1][i]);
+          fprintf(fp,"\n");
+         }
+       }  
+         
+      // case 3 : cross sections is convolved with a slit function for imagers   
+               
       else
-       for (i=nextraPixels;i<nsize;i++)
-        fprintf(fp,"%.14le %.14le\n",pXs->matrix[0][i],pXs->matrix[1][i]);
+       {
+        for (i=nextraPixels;i<nsize;i++)
+         {
+          fprintf(fp,"%.14le ",pXs->matrix[0][i]);
+          if ((pLFilter->type!=PRJCT_FILTER_TYPE_NONE) || (pHFilter->type!=PRJCT_FILTER_TYPE_NONE))   
+           for (j=1;j<=pEngineContext->n_groundpixel_output;j++)
+            fprintf(fp,"%.14le ",filterVector[i]);                              // filterVector should be a matrix for imagers
+          for (j=1;j<=pEngineContext->n_groundpixel_output;j++)
+           fprintf(fp,"%.14le ",pXs->matrix[j][i]);
+         } 
+       }
 
       fclose(fp);
      }
     else
-     rc=ERROR_SetLast("mediateConvolutionSave",ERROR_TYPE_FATAL,ERROR_ID_FILE_OPEN,fileName);
+     rc=ERROR_SetLast("mediateConvolutionSaveAscii",ERROR_TYPE_FATAL,ERROR_ID_FILE_OPEN,fileName);
    }
 
   // Return
@@ -328,7 +375,7 @@ RC mediateConvolutionCalculate(void *engineContext,void *responseHandle)
   MATRIX_OBJECT XSCONV_slitMatrix[NSFP],XSCONV_slitDMatrix[NSFP];
 
   MATRIX_OBJECT XSCONV_xshr,                                                    // high resolution cross section
-               *pXsnew,                                                         // convoluted cross section
+                XSCONV_xsnew,                                                   // convolved cross section
                 XSCONV_kurucz;                                                  // kurucz
 
   PRJCT_FILTER *plFilter,*phFilter;                                             // pointers to the low pass and high pass filtering parts of the engine context
@@ -338,14 +385,13 @@ RC mediateConvolutionCalculate(void *engineContext,void *responseHandle)
   double lambdaMin,lambdaMax,slitParam[NSFP],slitParamD[NSFP],slitWidth,*tmpVector;
 
   int slitType,slitType2,deconvFlag,dispConv;
-  int lowFilterType,highFilterType,nFilter,i;
+  int lowFilterType,highFilterType,nFilter,i,islit;
   RC rc;
 
   // Slit function
 
   pSlitDConv=&pEngineContext->slitDConv;
   pSlitConv=&pEngineContext->slitConv;
-  pXsnew=&pEngineContext->xsNew;
 
   // Initialize buffers
 
@@ -362,8 +408,10 @@ RC mediateConvolutionCalculate(void *engineContext,void *responseHandle)
 
   memset(&XSCONV_xshr,0,sizeof(MATRIX_OBJECT));
   memset(&XSCONV_kurucz,0,sizeof(MATRIX_OBJECT));
-  memset(pXsnew,0,sizeof(MATRIX_OBJECT));
 
+  memset(&XSCONV_xsnew,0,sizeof(MATRIX_OBJECT));
+  memset(&pEngineContext->xsNew,0,sizeof(MATRIX_OBJECT));
+  
   slitType=pSlitConv->slitType;
   slitType2=pSlitDConv->slitType;
   tmpVector=NULL;
@@ -404,31 +452,36 @@ RC mediateConvolutionCalculate(void *engineContext,void *responseHandle)
 
   deconvFlag=((pEngineContext->convolutionType!=CONVOLUTION_TYPE_NONE) &&
               !pSlitDConv->slitWveDptFlag && (pSlitDConv->slitType!=SLIT_TYPE_FILE || (strlen(pSlitDConv->slitFile)!=0)));
-
+  
+  pEngineContext->n_groundpixel_slit=1;
+  
   // Load calibration file and slit function
 
-  if (!(rc=XSCONV_LoadCalibrationFile(pXsnew,pEngineContext->calibrationFile,nFilter)) &&
-     (((lowFilterType==PRJCT_FILTER_TYPE_NONE) && (highFilterType==PRJCT_FILTER_TYPE_NONE)) ||
-     (((pEngineContext->filterVector=(double *)MEMORY_AllocDVector("mediateConvolutionCalculate","filterVector",0,pXsnew->nl-1))!=NULL) &&
-      ((tmpVector=(double *)MEMORY_AllocDVector("mediateConvolutionCalculate","tmpVector",0,pXsnew->nl-1))!=NULL))) &&
-      ((pEngineContext->convolutionType==CONVOLUTION_TYPE_NONE) ||
+  if (((pEngineContext->convolutionType==CONVOLUTION_TYPE_NONE) ||
      (!(rc=XSCONV_LoadSlitFunction(XSCONV_slitMatrix,&pEngineContext->slitConv,&slitParam[0],&slitType)) &&
-
-      (!deconvFlag || !(rc=XSCONV_LoadSlitFunction(XSCONV_slitDMatrix,pSlitDConv,&slitParamD[0],&slitType2))))))
+     (!deconvFlag || !(rc=XSCONV_LoadSlitFunction(XSCONV_slitDMatrix,pSlitDConv,&slitParamD[0],&slitType2))))) &&
+      !(rc=XSCONV_LoadCalibrationFile(&XSCONV_xsnew,pEngineContext->calibrationFile,nFilter)) &&
+     (((lowFilterType==PRJCT_FILTER_TYPE_NONE) && (highFilterType==PRJCT_FILTER_TYPE_NONE)) ||
+     (((pEngineContext->filterVector=(double *)MEMORY_AllocDVector("mediateConvolutionCalculate","filterVector",0,XSCONV_xsnew.nl-1))!=NULL) &&
+      ((tmpVector=(double *)MEMORY_AllocDVector("mediateConvolutionCalculate","tmpVector",0,XSCONV_xsnew.nl-1))!=NULL))) &&
+      !(rc=MATRIX_Allocate(&pEngineContext->xsNew,XSCONV_xsnew.nl,pEngineContext->n_groundpixel_slit+1,0,0,1,"mediateConvolutionCalculate"))
+      )
    {
     slitWidth=(double)3.*slitParam[0];
-
+    
+    pEngineContext->n_groundpixel_output=(pEngineContext->n_groundpixel_slit==1)?pEngineContext->n_groundpixel_general:pEngineContext->n_groundpixel_slit;
+   
     // Window in wavelength
 
     if ((slitType!=SLIT_TYPE_FILE) || (pEngineContext->convolutionType==CONVOLUTION_TYPE_NONE))
      {
-      lambdaMin=pXsnew->matrix[0][0]-slitWidth-1.;                     // add 1 nm
-      lambdaMax=pXsnew->matrix[0][pXsnew->nl-1]+slitWidth+1.;
+      lambdaMin=XSCONV_xsnew.matrix[0][0]-slitWidth-1.;                     // add 1 nm
+      lambdaMax=XSCONV_xsnew.matrix[0][XSCONV_xsnew.nl-1]+slitWidth+1.;
      }
     else
      {
-      lambdaMin=pXsnew->matrix[0][0]+XSCONV_slitMatrix[0].matrix[0][0]-1.;                     // add 1 nm
-      lambdaMax=pXsnew->matrix[0][pXsnew->nl-1]+XSCONV_slitMatrix[0].matrix[0][XSCONV_slitMatrix[0].nl-1]+1.;
+      lambdaMin=XSCONV_xsnew.matrix[0][0]+XSCONV_slitMatrix[0].matrix[0][0]-1.;                     // add 1 nm
+      lambdaMax=XSCONV_xsnew.matrix[0][XSCONV_xsnew.nl-1]+XSCONV_slitMatrix[0].matrix[0][XSCONV_slitMatrix[0].nl-1]+1.;
      }
 
     if (deconvFlag)
@@ -445,107 +498,128 @@ RC mediateConvolutionCalculate(void *engineContext,void *responseHandle)
         !(rc=XSCONV_LoadCrossSectionFile(&XSCONV_xshr,pEngineContext->crossFile,lambdaMin,lambdaMax,(double)pEngineContext->shift,pEngineContext->conversionMode)))
      {
       dispConv=((pEngineContext->convolutionType!=CONVOLUTION_TYPE_NONE) ||
-            (XSCONV_xshr.nl!=pXsnew->nl) ||
-            !VECTOR_Equal(XSCONV_xshr.matrix[0],pXsnew->matrix[0],pXsnew->nl,(double)1.e-7))?1:0;
-
-
-      // -----------
-      // Convolution
-      // -----------
-
-      switch(pEngineContext->convolutionType)
+                (XSCONV_xshr.nl!=XSCONV_xsnew.nl) ||
+                !VECTOR_Equal(XSCONV_xshr.matrix[0],XSCONV_xsnew.matrix[0],XSCONV_xsnew.nl,(double)1.e-7))?1:0;
+            
+      memcpy(pEngineContext->xsNew.matrix[0],XSCONV_xsnew.matrix[0],sizeof(double)*XSCONV_xsnew.nl);
+      
+      for (islit=1;islit<=pEngineContext->n_groundpixel_slit;islit++)
        {
-     // ----------------------------------------------------------------------
-        case CONVOLUTION_TYPE_NONE :
-         rc=XSCONV_TypeNone(pXsnew,&XSCONV_xshr);
-        break;
-     // ----------------------------------------------------------------------
-        case CONVOLUTION_TYPE_STANDARD :
-         rc=XSCONV_TypeStandard(pXsnew,0,pXsnew->nl,&XSCONV_xshr,&XSCONV_xshr,NULL,slitType,XSCONV_slitMatrix,slitParam,pSlitConv->slitWveDptFlag);
-         break;
-     // ----------------------------------------------------------------------
-        case CONVOLUTION_TYPE_I0_CORRECTION :
-          rc=XSCONV_TypeI0Correction(pXsnew,&XSCONV_xshr,&XSCONV_kurucz,pEngineContext->conc,slitType,XSCONV_slitMatrix,slitParam,pSlitConv->slitWveDptFlag);
-        break;
-     // ----------------------------------------------------------------------
-     }
+        for (i=0;i<XSCONV_xsnew.nl;i++)
+         XSCONV_xsnew.matrix[1][i]=(double)0.;
+            
+        // -----------
+        // Convolution
+        // -----------
 
-      // ------------------------------------------
-      // Save resulting cross section and plot data
-      // ------------------------------------------
+        switch(pEngineContext->convolutionType)
+         {
+       // ----------------------------------------------------------------------
+          case CONVOLUTION_TYPE_NONE :
+           rc=XSCONV_TypeNone(&XSCONV_xsnew,&XSCONV_xshr);
+          break;
+       // ----------------------------------------------------------------------
+          case CONVOLUTION_TYPE_STANDARD :
+           rc=XSCONV_TypeStandard(&XSCONV_xsnew,0,XSCONV_xsnew.nl,&XSCONV_xshr,&XSCONV_xshr,NULL,slitType,XSCONV_slitMatrix,slitParam,pSlitConv->slitWveDptFlag);
+           break;
+       // ----------------------------------------------------------------------
+          case CONVOLUTION_TYPE_I0_CORRECTION :
+            rc=XSCONV_TypeI0Correction(&XSCONV_xsnew,&XSCONV_xshr,&XSCONV_kurucz,pEngineContext->conc,slitType,XSCONV_slitMatrix,slitParam,pSlitConv->slitWveDptFlag);
+          break;
+       // ----------------------------------------------------------------------
+         }
+         
+        memcpy(pEngineContext->xsNew.matrix[islit],XSCONV_xsnew.matrix[1],sizeof(double)*XSCONV_xsnew.nl);
 
-      if ((lowFilterType==PRJCT_FILTER_TYPE_NONE) && (highFilterType==PRJCT_FILTER_TYPE_NONE))
-       sprintf(pageTitle,(pEngineContext->convolutionType!=CONVOLUTION_TYPE_NONE)?"Spectrum after convolution":"Spectrum after interpolation");
-      else
-       sprintf(pageTitle,(pEngineContext->convolutionType!=CONVOLUTION_TYPE_NONE)?"Spectrum after convolution and filtering":"Spectrum after interpolation and filtering");
+        // ------------------------------------------
+        // Save resulting cross section and plot data
+        // ------------------------------------------
 
-      if (!rc && dispConv)
-       {
-           plot_data_t spectrumData[2];
+        if ((lowFilterType==PRJCT_FILTER_TYPE_NONE) && (highFilterType==PRJCT_FILTER_TYPE_NONE))
+         sprintf(pageTitle,(pEngineContext->convolutionType!=CONVOLUTION_TYPE_NONE)?"Spectrum after convolution":"Spectrum after interpolation");
+        else
+         sprintf(pageTitle,(pEngineContext->convolutionType!=CONVOLUTION_TYPE_NONE)?"Spectrum after convolution and filtering":"Spectrum after interpolation and filtering");
 
+        if (!rc && dispConv)
+         {
+          plot_data_t spectrumData[2];
+
+          if (pEngineContext->n_groundpixel_slit==1)
            sprintf(windowTitle,(pEngineContext->convolutionType!=CONVOLUTION_TYPE_NONE)?"Spectrum after convolution":"Spectrum after interpolation");
+          else
+           sprintf(windowTitle,(pEngineContext->convolutionType!=CONVOLUTION_TYPE_NONE)?"Spectrum after convolution (%d)":"Spectrum after interpolation (%d)",islit);
 
-        mediateAllocateAndSetPlotData(&spectrumData[0],"High resolution spectrum",XSCONV_xshr.matrix[0],XSCONV_xshr.matrix[1],XSCONV_xshr.nl,Line);
-        mediateAllocateAndSetPlotData(&spectrumData[1],windowTitle,pXsnew->matrix[0]+nFilter,pXsnew->matrix[1]+nFilter,pXsnew->nl-2*nFilter,Line);
-        mediateResponsePlotData(0,spectrumData,2,Spectrum,forceAutoScale,windowTitle,"Wavelength (nm)","",responseHandle);
-        mediateResponseLabelPage(0,pageTitle,"",responseHandle);
-        mediateReleasePlotData(&spectrumData[1]);
-        mediateReleasePlotData(&spectrumData[0]);
-       }
+          mediateAllocateAndSetPlotData(&spectrumData[0],"High resolution spectrum",XSCONV_xshr.matrix[0],XSCONV_xshr.matrix[1],XSCONV_xshr.nl,Line);
+          mediateAllocateAndSetPlotData(&spectrumData[1],windowTitle,XSCONV_xsnew.matrix[0]+nFilter,XSCONV_xsnew.matrix[1]+nFilter,XSCONV_xsnew.nl-2*nFilter,Line);
+          mediateResponsePlotData(0,spectrumData,2,Spectrum,forceAutoScale,windowTitle,"Wavelength (nm)","",responseHandle);
+          mediateResponseLabelPage(0,pageTitle,"",responseHandle);
+          mediateReleasePlotData(&spectrumData[1]);
+          mediateReleasePlotData(&spectrumData[0]);
+         }
 
-      if (pEngineContext->filterVector!=NULL)
-       memcpy(pEngineContext->filterVector,pXsnew->matrix[1],pXsnew->nl*sizeof(double));
+        if (pEngineContext->filterVector!=NULL)
+         memcpy(pEngineContext->filterVector,XSCONV_xsnew.matrix[1],XSCONV_xsnew.nl*sizeof(double));
 
-      // ------------------
-      // Low-Pass filtering
-      // ------------------
+        // ------------------
+        // Low-Pass filtering
+        // ------------------
 
-      if ((lowFilterType!=PRJCT_FILTER_TYPE_NONE) && (pEngineContext->filterVector!=NULL) && !rc &&
-        (((lowFilterType==PRJCT_FILTER_TYPE_ODDEVEN) && !(rc=FILTER_OddEvenCorrection(pXsnew->matrix[0],pXsnew->matrix[1],pEngineContext->filterVector,pXsnew->nl))) ||
-         ((lowFilterType!=PRJCT_FILTER_TYPE_ODDEVEN) && !(rc=FILTER_Vector(plFilter,pEngineContext->filterVector,pEngineContext->filterVector,NULL,pXsnew->nl,PRJCT_FILTER_OUTPUT_LOW)))) && dispConv)
-       {
-           plot_data_t spectrumData[2];
+        if ((lowFilterType!=PRJCT_FILTER_TYPE_NONE) && (pEngineContext->filterVector!=NULL) && !rc &&
+          (((lowFilterType==PRJCT_FILTER_TYPE_ODDEVEN) && !(rc=FILTER_OddEvenCorrection(XSCONV_xsnew.matrix[0],XSCONV_xsnew.matrix[1],pEngineContext->filterVector,XSCONV_xsnew.nl))) ||
+           ((lowFilterType!=PRJCT_FILTER_TYPE_ODDEVEN) && !(rc=FILTER_Vector(plFilter,pEngineContext->filterVector,pEngineContext->filterVector,NULL,XSCONV_xsnew.nl,PRJCT_FILTER_OUTPUT_LOW)))) && dispConv)
+         {
+          plot_data_t spectrumData[2];
 
+          if (pEngineContext->n_groundpixel_slit==1) 
            sprintf(windowTitle,"Spectrum after low-pass filtering");
+          else
+           sprintf(windowTitle,"Spectrum after low-pass filtering (%d)",islit);
 
-        mediateAllocateAndSetPlotData(&spectrumData[0],"Convoluted spectrum before low pass filtering",pXsnew->matrix[0]+nFilter,pXsnew->matrix[1]+nFilter,pXsnew->nl-2*nFilter,Line);
-        mediateAllocateAndSetPlotData(&spectrumData[1],"Convoluted spectrum after low pass filtering",pXsnew->matrix[0]+nFilter,pEngineContext->filterVector+nFilter,pXsnew->nl-2*nFilter,Line);
-        mediateResponsePlotData(0,spectrumData,2,Spectrum,forceAutoScale,windowTitle,"Wavelength (nm)","",responseHandle);
-        mediateResponseLabelPage(0,pageTitle,"",responseHandle);
-        mediateReleasePlotData(&spectrumData[1]);
-        mediateReleasePlotData(&spectrumData[0]);
-       }
+          mediateAllocateAndSetPlotData(&spectrumData[0],"Convoluted spectrum before low pass filtering",XSCONV_xsnew.matrix[0]+nFilter,XSCONV_xsnew.matrix[1]+nFilter,XSCONV_xsnew.nl-2*nFilter,Line);
+          mediateAllocateAndSetPlotData(&spectrumData[1],"Convoluted spectrum after low pass filtering",XSCONV_xsnew.matrix[0]+nFilter,pEngineContext->filterVector+nFilter,XSCONV_xsnew.nl-2*nFilter,Line);
+          mediateResponsePlotData(0,spectrumData,2,Spectrum,forceAutoScale,windowTitle,"Wavelength (nm)","",responseHandle);
+          mediateResponseLabelPage(0,pageTitle,"",responseHandle);
+          mediateReleasePlotData(&spectrumData[1]);
+          mediateReleasePlotData(&spectrumData[0]);
+         }
 
-      // -------------------
-      // High-Pass filtering
-      // -------------------
+        // -------------------
+        // High-Pass filtering
+        // -------------------
 
-      if ((highFilterType!=PRJCT_FILTER_TYPE_NONE) && (highFilterType!=PRJCT_FILTER_TYPE_ODDEVEN) && (pEngineContext->filterVector!=NULL) && !rc &&
-         !(rc=FILTER_Vector(phFilter,pEngineContext->filterVector,pEngineContext->filterVector,tmpVector,pXsnew->nl,phFilter->filterAction)) && dispConv)
-       {
-           plot_data_t spectrumData[2];
+        if ((highFilterType!=PRJCT_FILTER_TYPE_NONE) && (highFilterType!=PRJCT_FILTER_TYPE_ODDEVEN) && (pEngineContext->filterVector!=NULL) && !rc &&
+           !(rc=FILTER_Vector(phFilter,pEngineContext->filterVector,pEngineContext->filterVector,tmpVector,XSCONV_xsnew.nl,phFilter->filterAction)) && dispConv)
+         {
+          plot_data_t spectrumData[2];
 
-        sprintf(windowTitle,"Spectrum after high-pass filtering");
+          if (pEngineContext->n_groundpixel_slit==1)
+           sprintf(windowTitle,"Spectrum after high-pass filtering");
+          else
+           sprintf(windowTitle,"Spectrum after high-pass filtering (%d)",islit);
 
-        mediateAllocateAndSetPlotData(&spectrumData[0],windowTitle,pXsnew->matrix[0]+nFilter,pXsnew->matrix[1]+nFilter,pXsnew->nl-2*nFilter,Line);
-        mediateAllocateAndSetPlotData(&spectrumData[1],windowTitle,pXsnew->matrix[0]+nFilter,tmpVector+nFilter,pXsnew->nl-2*nFilter,Line);
+          mediateAllocateAndSetPlotData(&spectrumData[0],windowTitle,XSCONV_xsnew.matrix[0]+nFilter,XSCONV_xsnew.matrix[1]+nFilter,XSCONV_xsnew.nl-2*nFilter,Line);
+          mediateAllocateAndSetPlotData(&spectrumData[1],windowTitle,XSCONV_xsnew.matrix[0]+nFilter,tmpVector+nFilter,XSCONV_xsnew.nl-2*nFilter,Line);
 
-        mediateResponsePlotData(0,spectrumData,2,Spectrum,forceAutoScale,windowTitle,"Wavelength (nm)","",responseHandle);
-        mediateResponseLabelPage(0,pageTitle,"",responseHandle);
-        mediateReleasePlotData(&spectrumData[0]);
+          mediateResponsePlotData(0,spectrumData,2,Spectrum,forceAutoScale,windowTitle,"Wavelength (nm)","",responseHandle);
+          mediateResponseLabelPage(0,pageTitle,"",responseHandle);
+          mediateReleasePlotData(&spectrumData[0]);
 
+          if (pEngineContext->n_groundpixel_slit==1)
            sprintf(windowTitle,"Spectrum after %s",(phFilter->filterAction==PRJCT_FILTER_OUTPUT_HIGH_SUB)?"subtraction":"division");
+          else
+           sprintf(windowTitle,"Spectrum after %s (%d)",(phFilter->filterAction==PRJCT_FILTER_OUTPUT_HIGH_SUB)?"subtraction":"division",islit);
 
-        mediateAllocateAndSetPlotData(&spectrumData[0],windowTitle,pXsnew->matrix[0]+nFilter,pEngineContext->filterVector+nFilter,pXsnew->nl-2*nFilter,Line);
-        mediateResponsePlotData(1,spectrumData,1,Spectrum,forceAutoScale,windowTitle,"Wavelength (nm)","",responseHandle);
-        mediateResponseLabelPage(1,pageTitle,"",responseHandle);
-        mediateReleasePlotData(&spectrumData[0]);
+          mediateAllocateAndSetPlotData(&spectrumData[0],windowTitle,XSCONV_xsnew.matrix[0]+nFilter,pEngineContext->filterVector+nFilter,XSCONV_xsnew.nl-2*nFilter,Line);
+          mediateResponsePlotData(1,spectrumData,1,Spectrum,forceAutoScale,windowTitle,"Wavelength (nm)","",responseHandle);
+          mediateResponseLabelPage(1,pageTitle,"",responseHandle);
+          mediateReleasePlotData(&spectrumData[0]);
+         }
        }
 
       // Result safe keeping
-
+      
       if (!rc)
-       rc=mediateConvolutionSave(pEngineContext);
+       rc=(pEngineContext->formatType==CONVOLUTION_FORMAT_NETCDF)?netcdf_save_convolution((void *)pEngineContext):mediateConvolutionSaveAscii((void *)pEngineContext);
      }
    }
 
@@ -561,7 +635,8 @@ RC mediateConvolutionCalculate(void *engineContext,void *responseHandle)
 
   MATRIX_Free(&XSCONV_xshr,"mediateConvolutionCalculate");
   MATRIX_Free(&XSCONV_kurucz,"mediateConvolutionCalculate");
-  MATRIX_Free(pXsnew,"mediateConvolutionCalculate");
+  MATRIX_Free(&XSCONV_xsnew,"mediateConvolutionCalculate");
+  MATRIX_Free(&pEngineContext->xsNew,"mediateConvolutionCalculate");
 
   if (plFilter->filterFunction!=NULL)
    {
@@ -596,7 +671,7 @@ RC mediateConvolutionCalculate(void *engineContext,void *responseHandle)
 
 RC mediateRequestConvolution(void *engineContext,mediate_convolution_t *pMediateConvolution,void *responseHandle)
  {
-     // Declarations
+  // Declarations
 
   ENGINE_XSCONV_CONTEXT *pEngineContext = (ENGINE_XSCONV_CONTEXT*)engineContext;
   PRJCT_FILTER *plFilter,*phFilter;                                             // pointers to the low pass and high pass filter parts of the engine context
@@ -611,6 +686,8 @@ RC mediateRequestConvolution(void *engineContext,mediate_convolution_t *pMediate
 
   pEngineContext->convolutionType=pMediateConvolution->general.convolutionType;
   pEngineContext->conversionMode=pMediateConvolution->general.conversionType;
+  pEngineContext->formatType=pMediateConvolution->general.formatType;
+  pEngineContext->n_groundpixel_general=pMediateConvolution->general.n_groundpixel;
   pEngineContext->shift=pMediateConvolution->general.shift;
   pEngineContext->conc=pMediateConvolution->general.conc;
   pEngineContext->noComment=pMediateConvolution->general.noheader;
@@ -638,14 +715,14 @@ RC mediateRequestConvolution(void *engineContext,mediate_convolution_t *pMediate
    rc=ERROR_SetLast("mediateRequestConvolution",ERROR_TYPE_FATAL,ERROR_ID_MEDIATE,"Calibration (General tab page)","Calibration file name is missing");
   else if (pEngineContext->convolutionType!=CONVOLUTION_TYPE_NONE)
    {
-       pSlitConv=&pEngineContext->slitConv;
-       pSlitDConv=&pEngineContext->slitDConv;
-       plFilter=&pEngineContext->lfilter;
-       phFilter=&pEngineContext->hfilter;
+    pSlitConv=&pEngineContext->slitConv;
+    pSlitDConv=&pEngineContext->slitDConv;
+    plFilter=&pEngineContext->lfilter;
+    phFilter=&pEngineContext->hfilter;
 
-       // Convolution slit function
+    // Convolution slit function
 
-       if (((pSlitConv->slitType==SLIT_TYPE_FILE) || pSlitConv->slitWveDptFlag) && !strlen(pSlitConv->slitFile))
+    if (((pSlitConv->slitType==SLIT_TYPE_FILE) || pSlitConv->slitWveDptFlag) && !strlen(pSlitConv->slitFile))
      rc=ERROR_SetLast("mediateRequestConvolution",ERROR_TYPE_FATAL,ERROR_ID_MEDIATE,"Slit Function Type (Slit Function page, convolution part)","Convolution slit function file is missing");
     else if ((pSlitConv->slitType==SLIT_TYPE_INVPOLY) &&
             ((pSlitConv->slitParam2<=(double)0.) ||
@@ -725,7 +802,7 @@ RC mediateRequestConvolution(void *engineContext,mediate_convolution_t *pMediate
 
 RC mediateRequestRing(void *engineContext,mediate_ring_t *pMediateRing,void *responseHandle)
  {
-     // Declarations
+  // Declarations
 
   ENGINE_XSCONV_CONTEXT *pEngineContext = (ENGINE_XSCONV_CONTEXT*)engineContext;// pointer to the engine context
   SLIT *pSlitConv;                                                              // pointer to the convolution part of the engine context
@@ -742,6 +819,9 @@ RC mediateRequestRing(void *engineContext,mediate_ring_t *pMediateRing,void *res
   pEngineContext->normalizeFlag=pMediateRing->normalize;
   pEngineContext->temperature=pMediateRing->temperature;
 
+  pEngineContext->formatType=pMediateRing->formatType;
+  pEngineContext->n_groundpixel_general=pMediateRing->n_groundpixel;
+
   strcpy(pEngineContext->path,pMediateRing->outputFile);                        // output path
   strcpy(pEngineContext->calibrationFile,pMediateRing->calibrationFile);        // calibration file
   strcpy(pEngineContext->kuruczFile,pMediateRing->solarRefFile);                // Kurucz file used when I0 correction is applied
@@ -754,12 +834,11 @@ RC mediateRequestRing(void *engineContext,mediate_ring_t *pMediateRing,void *res
    rc=ERROR_SetLast("mediateRequestRing",ERROR_TYPE_FATAL,ERROR_ID_MEDIATE,"Calibration","Calibration file name is missing");
   else
    {
-       pSlitConv=&pEngineContext->slitConv;
+    pSlitConv=&pEngineContext->slitConv;
 
-       // Convolution slit function
+    // Convolution slit function
 
-       if (((pEngineContext->slitConv.slitType==SLIT_TYPE_FILE) || pSlitConv->slitWveDptFlag) && !strlen(pSlitConv->slitFile))
-
+    if (((pEngineContext->slitConv.slitType==SLIT_TYPE_FILE) || pSlitConv->slitWveDptFlag) && !strlen(pSlitConv->slitFile))
      rc=ERROR_SetLast("mediateRequestRing",ERROR_TYPE_FATAL,ERROR_ID_MEDIATE,"Slit Function Type","Convolution slit function file is missing");
 
     else if ((pSlitConv->slitType==SLIT_TYPE_INVPOLY)  &&
@@ -779,80 +858,126 @@ RC mediateRequestRing(void *engineContext,mediate_ring_t *pMediateRing,void *res
  }
 
 // -----------------------------------------------------------------------------
-// FUNCTION      mediateRingHeader
+// FUNCTION      mediateRingSaveAscii
 // -----------------------------------------------------------------------------
-// PURPOSE       Write options in the file header
+// PURPOSE       Save the ring cross section in an ASCII file
 //
 // INPUT         pEngineContext : pointer to the current engine context
-//               fp    : pointer to the output file
 // -----------------------------------------------------------------------------
 
-void mediateRingHeader(ENGINE_XSCONV_CONTEXT *pEngineContext,FILE *fp)
+int mediateRingSaveAscii(void *engineContext,double *raman,double *solar)
  {
-  // Declaration
+  // Declarations
 
-  int     slitType;                                                 // type of the slit function
-
-  // Header
-
-  fprintf(fp,";\n");
-  fprintf(fp,"; RING CROSS SECTION\n");
-  fprintf(fp,"; Temperature : %g K\n",pEngineContext->temperature);
-  fprintf(fp,"; High resolution Kurucz file : %s\n",pEngineContext->kuruczFile);
-  fprintf(fp,"; Calibration file : %s\n",pEngineContext->calibrationFile);
-  fprintf(fp,"; Slit function type : %s %s\n",XSCONV_slitTypes[(slitType=pEngineContext->slitConv.slitType)],(pEngineContext->slitConv.slitWveDptFlag)?"wavelength dependent":"");
-
-  if (slitType==SLIT_TYPE_FILE)
-   fprintf(fp,"; Slit function file : %s\n",pEngineContext->slitConv.slitFile);
-  else if (pEngineContext->slitConv.slitWveDptFlag)
+  ENGINE_XSCONV_CONTEXT *pEngineContext=(ENGINE_XSCONV_CONTEXT*)engineContext; 
+  FILE *fp;  
+  int   slitType;                                                 // type of the slit function
+  int   i,islit;
+  int   nring;
+  
+  nring=pEngineContext->xsNew.nl;
+  
+  if ((fp=fopen(pEngineContext->path,"w+t"))!=NULL)
    {
-    if (strlen(pEngineContext->slitConv.slitFile))
-     fprintf(fp,"; Slit function file : %s\n",pEngineContext->slitConv.slitFile);
-    if (strlen(pEngineContext->slitConv.slitFile2))
-     fprintf(fp,"; Slit function file 2 : %s\n",pEngineContext->slitConv.slitFile2);
-    if (strlen(pEngineContext->slitConv.slitFile3))
-     fprintf(fp,"; Slit function file 3 : %s\n",pEngineContext->slitConv.slitFile3);          // Super gaussian
-   }
-  else
-   {
-    if ((slitType==SLIT_TYPE_GAUSS) || (slitType==SLIT_TYPE_INVPOLY) || (slitType==SLIT_TYPE_ERF) || (slitType==SLIT_TYPE_AGAUSS) || (slitType==SLIT_TYPE_SUPERGAUSS))
-     fprintf(fp,"; Gaussian FWHM : %.3f\n",pEngineContext->slitConv.slitParam);
-    if (slitType==SLIT_TYPE_ERF)
-     fprintf(fp,"; Boxcar width : %.3f\n",pEngineContext->slitConv.slitParam2);
-    if (slitType==SLIT_TYPE_AGAUSS)
-     fprintf(fp,"; Asymmetry factor : %.3f\n",pEngineContext->slitConv.slitParam2);
-    if (slitType==SLIT_TYPE_SUPERGAUSS)
+    if (!pEngineContext->noComment)
      {
-         fprintf(fp,"; Exponential term : %.3f\n",pEngineContext->slitConv.slitParam2);
-      fprintf(fp,"; Asymmetry factor : %.3f\n",pEngineContext->slitConv.slitParam3);
+      // Header
+
+      fprintf(fp,";\n");
+      fprintf(fp,"; RING CROSS SECTION\n");
+      fprintf(fp,"; Temperature : %g K\n",pEngineContext->temperature);
+      fprintf(fp,"; High resolution Kurucz file : %s\n",pEngineContext->kuruczFile);
+      fprintf(fp,"; Calibration file : %s\n",pEngineContext->calibrationFile);
+      fprintf(fp,"; Slit function type : %s %s\n",XSCONV_slitTypes[(slitType=pEngineContext->slitConv.slitType)],(pEngineContext->slitConv.slitWveDptFlag)?"wavelength dependent":"");
+
+      if (slitType==SLIT_TYPE_FILE)
+       fprintf(fp,"; Slit function file : %s\n",pEngineContext->slitConv.slitFile);
+      else if (pEngineContext->slitConv.slitWveDptFlag)
+       {
+        if (strlen(pEngineContext->slitConv.slitFile))
+         fprintf(fp,"; Slit function file : %s\n",pEngineContext->slitConv.slitFile);
+        if (strlen(pEngineContext->slitConv.slitFile2))
+         fprintf(fp,"; Slit function file 2 : %s\n",pEngineContext->slitConv.slitFile2);
+        if (strlen(pEngineContext->slitConv.slitFile3))
+         fprintf(fp,"; Slit function file 3 : %s\n",pEngineContext->slitConv.slitFile3);          // Super gaussian
+       }
+      else
+       {
+        if ((slitType==SLIT_TYPE_GAUSS) || (slitType==SLIT_TYPE_INVPOLY) || (slitType==SLIT_TYPE_ERF) || (slitType==SLIT_TYPE_AGAUSS) || (slitType==SLIT_TYPE_SUPERGAUSS))
+         fprintf(fp,"; Gaussian FWHM : %.3f\n",pEngineContext->slitConv.slitParam);
+        if (slitType==SLIT_TYPE_ERF)
+         fprintf(fp,"; Boxcar width : %.3f\n",pEngineContext->slitConv.slitParam2);
+        if (slitType==SLIT_TYPE_AGAUSS)
+         fprintf(fp,"; Asymmetry factor : %.3f\n",pEngineContext->slitConv.slitParam2);
+        if (slitType==SLIT_TYPE_SUPERGAUSS)
+         {
+          fprintf(fp,"; Exponential term : %.3f\n",pEngineContext->slitConv.slitParam2);
+          fprintf(fp,"; Asymmetry factor : %.3f\n",pEngineContext->slitConv.slitParam3);
+         }
+
+        if ((slitType== SLIT_TYPE_APOD) || (slitType== SLIT_TYPE_APODNBS))
+         {
+          fprintf(fp,"; Resolution : %.3lf\n",pEngineContext->slitConv.slitParam);
+          fprintf(fp,"; Phase      : %.3lf\n",pEngineContext->slitConv.slitParam2);
+         }
+
+        if (slitType==SLIT_TYPE_VOIGT)
+         {
+          fprintf(fp,"; Gaussian FWHM : %.3f\n",pEngineContext->slitConv.slitParam);
+          fprintf(fp,"; Lorentz/Gauss ratio : %.3f\n",pEngineContext->slitConv.slitParam2);
+         }
+       }
+
+      if (slitType==SLIT_TYPE_INVPOLY)
+       fprintf(fp,"; Polynomial degree : %d\n",(int)pEngineContext->slitConv.slitParam2);
+
+      fprintf(fp,"; column 1 : wavelength\n");
+
+      if (pEngineContext->saveRaman)
+       {
+        fprintf(fp,"; column 2 : ring (raman/solar spectrum)\n");
+        fprintf(fp,"; column 3 : interpolated raman\n");
+        fprintf(fp,"; column 4 : convoluted solar spectrum\n");
+       }
+      else if (pEngineContext->n_groundpixel_output==1)
+       fprintf(fp,"; column 2 : ring (raman/solar spectrum)\n");
+      else
+       fprintf(fp,"; Column 2-%d : ring (raman/solar spectrum)\n",pEngineContext->n_groundpixel_output+1);
+
+      fprintf(fp,";\n");
      }
 
-    if ((slitType== SLIT_TYPE_APOD) || (slitType== SLIT_TYPE_APODNBS))
-     {
-      fprintf(fp,"; Resolution : %.3lf\n",pEngineContext->slitConv.slitParam);
-      fprintf(fp,"; Phase      : %.3lf\n",pEngineContext->slitConv.slitParam2);
-     }
-
-    if (slitType==SLIT_TYPE_VOIGT)
-     {
-      fprintf(fp,"; Gaussian FWHM : %.3f\n",pEngineContext->slitConv.slitParam);
-      fprintf(fp,"; Lorentz/Gauss ratio : %.3f\n",pEngineContext->slitConv.slitParam2);
-     }
-   }
-
-  if (slitType==SLIT_TYPE_INVPOLY)
-   fprintf(fp,"; Polynomial degree : %d\n",(int)pEngineContext->slitConv.slitParam2);
-
-  fprintf(fp,"; column 1 : wavelength\n");
-  fprintf(fp,"; column 2 : ring (raman/solar spectrum)\n");
-
-  if (pEngineContext->saveRaman)
-   {
-    fprintf(fp,"; column 3 : interpolated raman\n");
-    fprintf(fp,"; column 4 : convoluted solar spectrum\n");
-   }
-
-  fprintf(fp,";\n");
+    if (pEngineContext->saveRaman)
+     for (i=0;i<nring;i++)
+      fprintf(fp,"%.14le %.14le %.14le %.14le\n",pEngineContext->xsNew.matrix[0][i],pEngineContext->xsNew.matrix[1][i],raman[i],solar[i]);
+    else if (pEngineContext->n_groundpixel_output==1)
+     for (i=0;i<nring;i++)
+      fprintf(fp,"%.14le %.14le\n",pEngineContext->xsNew.matrix[0][i],pEngineContext->xsNew.matrix[1][i]);
+    else if (pEngineContext->n_groundpixel_slit==1)
+     
+     for (i=0;i<nring;i++)
+      {
+       fprintf(fp,"%.14le ",pEngineContext->xsNew.matrix[0][i]);
+       for (islit=1;islit<=pEngineContext->n_groundpixel_output;islit++)
+        fprintf(fp,"%.14le ",pEngineContext->xsNew.matrix[1][i]);
+       fprintf(fp,"\n");
+      }
+      
+    else
+      
+     for (i=0;i<nring;i++)
+      {
+       fprintf(fp,"%.14le ",pEngineContext->xsNew.matrix[0][i]);
+       for (islit=1;islit<=pEngineContext->n_groundpixel_output;islit++)
+        fprintf(fp,"%.14le ",pEngineContext->xsNew.matrix[islit][i]);
+       fprintf(fp,"\n");
+      }
+   }  
+          
+  if (fp!=NULL)
+   fclose(fp);        
+  
+  return 0;
  }
 
 // -------------------------------------------------------------------
@@ -865,15 +990,9 @@ RC mediateRingCalculate(void *engineContext,void *responseHandle)
 
   MATRIX_OBJECT slitTmp;
   ENGINE_XSCONV_CONTEXT *pEngineContext=(ENGINE_XSCONV_CONTEXT*)engineContext;
-  char   ringFileName[MAX_ITEM_TEXT_LEN],                                       // name of the output ring file
-           pageTitle[MAX_ITEM_TEXT_LEN];
- // double *n2xref,*o2xref,                                                       // rotational Raman spectra
- //         gamman2,sigprimen2,n2xsec,sign2,sumn2xsec,                            // n2 working variables
- //         gammao2,sigprimeo2,o2xsec,sigo2,sumo2xsec,                            // o2 working variables
- //         sigsq,lambda1e7,solar,n2posj,o2posj,                                  // other working variables
-  double  lambda,                                                               // range of wavelengths covered by slit function
-          slitWidth,                                                            // width of the slit function
-         *raman,*raman2,*ramanint,*ringEnd,                                     // output ring cross section
+  char     pageTitle[MAX_ITEM_TEXT_LEN];
+  double  slitWidth,                                                            // width of the slit function
+         *raman,*raman2,*ramanint,                                              // output ring cross section
          *solarLambda,*solarVector,*solarDeriv2,                                // substitution vectors for solar spectrum
          *slitLambda,*slitVector,*slitDeriv2,                                   // substitution vectors for slit function
          *slitLambda2,*slitVector2,*slitDeriv22,                                // substitution vectors for slit function
@@ -882,11 +1001,11 @@ RC mediateRingCalculate(void *engineContext,void *responseHandle)
           slitParam[NSFP];                                                      // gaussian full width at half maximum
 
   MATRIX_OBJECT  xsSolar,xsSolarConv,xsSlit[NSFP],xsRing,*pSlit,*pSlit2;// solar spectrum and slit function
-  int     nsolar,nslit,nslit2,nring,                                            // size of previous vectors
+  int     nsolar,nring,                                            // size of previous vectors
           wveDptFlag,
           slitType;                                                             // type of the slit function
-  INDEX   i,j;                                                                  // indexes for loops and arrays
-  FILE   *fp;                                                                   // output file pointer
+  INDEX   i,islit;                                                            // indexes for loops and arrays
+  plot_data_t spectrumData[1];
   RC      rc;                                                                   // return code
 
   // Debugging
@@ -902,26 +1021,24 @@ RC mediateRingCalculate(void *engineContext,void *responseHandle)
   memset(xsSlit,0,sizeof(MATRIX_OBJECT)*NSFP);
   memset(&xsRing,0,sizeof(MATRIX_OBJECT));
   memset(&slitTmp,0,sizeof(MATRIX_OBJECT));
+  memset(&pEngineContext->xsNew,0,sizeof(MATRIX_OBJECT));
 
   slitParam[0]=pEngineContext->slitConv.slitParam;
   slitParam[1]=pEngineContext->slitConv.slitParam2;
   slitParam[2]=pEngineContext->slitConv.slitParam3;
 
   slitLambda=slitVector=slitDeriv2=NULL;
-  slitLambda2=slitVector2=slitDeriv22=NULL;
-
   slitWidth=(double)RING_SLIT_WIDTH;                                            // NB : force slit width to 6 because of convolutions
   slitType=pEngineContext->slitConv.slitType;
-  raman=raman2=ramanint=ringEnd=NULL;
+  raman=raman2=ramanint=NULL;
   slitLambda2=slitVector2=slitDeriv22=NULL;
   temp=(double)pEngineContext->temperature;                                        // (double)250.;   May 2005/05/31
-  nslit2=0;
-  fp=NULL;
+
   rc=ERROR_ID_NO;
 
   #if defined(__DEBUG_) && __DEBUG_
   {
-      // Declarations
+   // Declarations
 
    time_t today;                                                                // current date and time as a time_t number
    char datetime[20];                                                           // current date and time as a string
@@ -937,6 +1054,8 @@ RC mediateRingCalculate(void *engineContext,void *responseHandle)
   }
   #endif
 
+  pEngineContext->n_groundpixel_slit=1;
+
   if (!(rc=XSCONV_LoadCalibrationFile(&xsRing,pEngineContext->calibrationFile,0)) &&
 
   // Load slit function from file or pre-calculate the slit function
@@ -948,12 +1067,15 @@ RC mediateRingCalculate(void *engineContext,void *responseHandle)
            !(rc=XSCONV_LoadCrossSectionFile(&xsSolar,pEngineContext->kuruczFile,(double)xsRing.matrix[0][0]-slitWidth-1.,
                                      (double)xsRing.matrix[0][xsRing.nl-1]+slitWidth+1.,(double)0.,CONVOLUTION_CONVERSION_NONE)) &&
 
-           !(rc=MATRIX_Allocate(&xsSolarConv,xsSolar.nl,2,0,0,1,"mediateRingCalculate")))
+           !(rc=MATRIX_Allocate(&xsSolarConv,xsSolar.nl,2,0,0,1,"mediateRingCalculate")) &&
+           !(rc=MATRIX_Allocate(&pEngineContext->xsNew,xsRing.nl,pEngineContext->n_groundpixel_slit+1,0,0,1,"mediateRingCalculate")))
    {
+    pEngineContext->n_groundpixel_output=(pEngineContext->n_groundpixel_slit==1)?pEngineContext->n_groundpixel_general:pEngineContext->n_groundpixel_slit;
+    
     // Use substitution variables
 
-    for (i=0;i<xsSolarConv.nl;i++)
-     xsSolarConv.matrix[0][i]=xsSolar.matrix[0][i];
+    memset(xsSolarConv.matrix[0],xsSolar.matrix[0][i],sizeof(double)*xsSolar.nl);
+    memcpy(pEngineContext->xsNew.matrix[0],xsRing.matrix[0],sizeof(double)*xsRing.nl);
 
     pSlit=&xsSlit[0];
     pSlit2=&xsSlit[1];
@@ -970,19 +1092,18 @@ RC mediateRingCalculate(void *engineContext,void *responseHandle)
         slitLambda=pSlit->matrix[0];
         slitVector=pSlit->matrix[1];
         slitDeriv2=pSlit->deriv2[1];
-        nslit=pSlit->nl;
 
         if (wveDptFlag)
          {
-             // Make a backup of the slit function
+          // Make a backup of the slit function
 
           if ((rc=MATRIX_Allocate(&slitTmp,pSlit->nl,2,0,0,1,"XSCONV_TypeStandard"))!=0)
            goto EndRing;
           else
            {
-               memcpy(slitTmp.matrix[0],slitLambda,sizeof(double)*pSlit->nl);
-               memcpy(slitTmp.matrix[1],slitVector,sizeof(double)*pSlit->nl);
-               memcpy(slitTmp.deriv2[1],slitDeriv2,sizeof(double)*pSlit->nl);
+            memcpy(slitTmp.matrix[0],slitLambda,sizeof(double)*pSlit->nl);
+            memcpy(slitTmp.matrix[1],slitVector,sizeof(double)*pSlit->nl);
+            memcpy(slitTmp.deriv2[1],slitDeriv2,sizeof(double)*pSlit->nl);
            }
          }
        }
@@ -993,7 +1114,6 @@ RC mediateRingCalculate(void *engineContext,void *responseHandle)
         slitLambda=slitTmp.matrix[0];
         slitVector=slitTmp.matrix[1];
         slitDeriv2=slitTmp.deriv2[1];
-        nslit=slitTmp.nl;
 
         memcpy(slitTmp.matrix[0],(double *)pSlit->matrix[0]+1,sizeof(double)*(pSlit->nl-1));
        }
@@ -1003,18 +1123,14 @@ RC mediateRingCalculate(void *engineContext,void *responseHandle)
         slitLambda2=pSlit2->matrix[0];
         slitVector2=pSlit2->matrix[1];
         slitDeriv22=pSlit2->deriv2[1];
-        nslit2=pSlit2->nl;
        }
       else
-       {
-           slitLambda2=slitVector2=slitDeriv22=NULL;
-           nslit2=0;
-       }
+       slitLambda2=slitVector2=slitDeriv22=NULL;
      }
     else
      {
-         memcpy(xsSolarConv.matrix[0],xsSolar.matrix[0],sizeof(double)*xsSolar.nl);
-         memcpy(xsSolarConv.matrix[1],xsSolar.matrix[1],sizeof(double)*xsSolar.nl);
+      memcpy(xsSolarConv.matrix[0],xsSolar.matrix[0],sizeof(double)*xsSolar.nl);
+      memcpy(xsSolarConv.matrix[1],xsSolar.matrix[1],sizeof(double)*xsSolar.nl);
      }
 
     ringLambda=xsRing.matrix[0];
@@ -1024,67 +1140,55 @@ RC mediateRingCalculate(void *engineContext,void *responseHandle)
     if (!nsolar ||
        ((raman=MEMORY_AllocDVector("mediateRingCalculate","raman",0,nsolar-1))==NULL) ||
        ((raman2=MEMORY_AllocDVector("mediateRingCalculate","raman2",0,nsolar-1))==NULL) ||
-       ((ramanint=MEMORY_AllocDVector("mediateRingCalculate","ramanint",0,nring-1))==NULL) || ((ringEnd=MEMORY_AllocDVector("mediateRingCalculate","ringEnd",0,nring-1))==NULL))
+       ((ramanint=MEMORY_AllocDVector("mediateRingCalculate","ramanint",0,nring-1))==NULL))
      rc=ERROR_ID_ALLOC;
     else
      {
-      VECTOR_Init(raman,(double)0.,nsolar);
-      VECTOR_Init(raman2,(double)0.,nsolar);
-
-         // Start convolving the solar spectrum
-
-      if (((slitType!=SLIT_TYPE_NONE) && ((rc=XSCONV_TypeStandard(&xsSolarConv,0,xsSolarConv.nl,&xsSolar,&xsSolar,NULL,slitType,xsSlit,slitParam,pEngineContext->slitConv.slitWveDptFlag))!=ERROR_ID_NO)) ||
-          ((rc=SPLINE_Deriv2(solarLambda,solarVector,solarDeriv2,nsolar,"mediateRingCalculate"))!=0) ||
-          ((rc=raman_convolution(solarLambda,solarVector,solarDeriv2,raman,nsolar,temp,pEngineContext->normalizeFlag))!=0))
-       goto EndRing;
-
-      strcpy(ringFileName,pEngineContext->path);
-
-      #if defined(__DEBUG_) && __DEBUG_
-      DEBUG_PrintVar("High resolution vectors",solarLambda,0,nsolar-1,solarVector,0,nsolar-1,raman,0,nsolar-1,NULL);
-      #endif
-
-      // Interpolate the high resolution spectrum
-
-      if (!rc && !(rc=SPLINE_Deriv2(solarLambda,solarVector,solarDeriv2,nsolar,"mediateRingCalculate")) &&
-         !(rc=SPLINE_Vector(solarLambda,solarVector,solarDeriv2,nsolar,ringLambda,ringVector,nring,SPLINE_CUBIC)) &&
-
-      // Interpolate the raman spectrum
-
-         !(rc=SPLINE_Deriv2(solarLambda,raman,raman2,nsolar,"mediateRingCalculate")) &&
-         !(rc=SPLINE_Vector(solarLambda,raman,raman2,nsolar,ringLambda,ramanint,nring,SPLINE_CUBIC)))
+      for (islit=1;islit<=pEngineContext->n_groundpixel_slit;islit++)
        {
-        if ((fp=fopen(ringFileName,"w+t"))!=NULL)
-         {
-             plot_data_t spectrumData[1];
+        VECTOR_Init(raman,(double)0.,nsolar);
+        VECTOR_Init(raman2,(double)0.,nsolar);
 
-          if (!pEngineContext->noComment)
-           mediateRingHeader(pEngineContext,fp);
+        // Start convolving the solar spectrum
 
-          // The final ring is the ratio between the interpolated raman and the interpolated convoluted solar spectrum
+        if (((slitType!=SLIT_TYPE_NONE) && ((rc=XSCONV_TypeStandard(&xsSolarConv,0,xsSolarConv.nl,&xsSolar,&xsSolar,NULL,slitType,xsSlit,slitParam,pEngineContext->slitConv.slitWveDptFlag))!=ERROR_ID_NO)) ||
+            ((rc=SPLINE_Deriv2(solarLambda,solarVector,solarDeriv2,nsolar,"mediateRingCalculate"))!=0) ||
+            ((rc=raman_convolution(solarLambda,solarVector,solarDeriv2,raman,nsolar,temp,pEngineContext->normalizeFlag))!=0) ||
+            
+        // Interpolate the high resolution spectrum
+        
+            ((rc=SPLINE_Deriv2(solarLambda,solarVector,solarDeriv2,nsolar,"mediateRingCalculate"))!=0) ||
+            ((rc=SPLINE_Vector(solarLambda,solarVector,solarDeriv2,nsolar,ringLambda,ringVector,nring,SPLINE_CUBIC))!=0) || 
 
-          for (i=0;i<nring;i++)
-           ringEnd[i]=((ramanint[i]>(double)0.) && (ringVector[i]>(double)0.))?
-                                    (double)ramanint[i] /* ring effect source spectrum */ /ringVector[i] /* solar spectrum */:(double)0.;
+        // Interpolate the raman spectrum
 
-          strcpy(pageTitle,"Ring");
-
-          if (pEngineContext->saveRaman)
-           for (i=0;i<nring;i++)
-            fprintf(fp,"%.14le %.14le %.14le %.14le\n",ringLambda[i],ringEnd[i],ramanint[i],ringVector[i]);
-          else
-           for (i=0;i<nring;i++)
-            fprintf(fp,"%.14le %.14le\n",ringLambda[i],ringEnd[i]);
-
-          mediateAllocateAndSetPlotData(&spectrumData[0],"Calculated ring cross section",ringLambda,ringEnd,nring,Line);
-          mediateResponsePlotData(0,spectrumData,1,Spectrum,forceAutoScale,"Calculated ring cross section","Wavelength (nm)","",responseHandle);
-          mediateResponseLabelPage(0,pageTitle,"",responseHandle);
-          mediateReleasePlotData(&spectrumData[0]);
-
-          if (fp!=NULL)
-           fclose(fp);
-         }
+            ((rc=SPLINE_Deriv2(solarLambda,raman,raman2,nsolar,"mediateRingCalculate"))!=0) ||
+            ((rc=SPLINE_Vector(solarLambda,raman,raman2,nsolar,ringLambda,ramanint,nring,SPLINE_CUBIC))!=0))
+            
+         goto EndRing;
+        
+       #if defined(__DEBUG_) && __DEBUG_
+       DEBUG_PrintVar("High resolution vectors",solarLambda,0,nsolar-1,solarVector,0,nsolar-1,raman,0,nsolar-1,NULL);
+       #endif
+       
+       // The final ring is the ratio between the interpolated raman and the interpolated convoluted solar spectrum
+       
+       for (i=0;i<nring;i++)
+        pEngineContext->xsNew.matrix[islit][i]=((ramanint[i]>(double)0.) && (ringVector[i]>(double)0.))?
+                                  (double)ramanint[i] /* ring effect source spectrum */ /ringVector[i] /* solar spectrum */:(double)0.;       
        }
+       
+      // Result safe keeping
+      
+      if (!rc)
+       rc=(pEngineContext->formatType==CONVOLUTION_FORMAT_NETCDF)?netcdf_save_ring((void *)pEngineContext):mediateRingSaveAscii((void *)pEngineContext,ramanint,ringVector);
+       
+      strcpy(pageTitle,"Ring"); 
+       
+      mediateAllocateAndSetPlotData(&spectrumData[0],"Calculated ring cross section",ringLambda,pEngineContext->xsNew.matrix[1],nring,Line);
+      mediateResponsePlotData(0,spectrumData,1,Spectrum,forceAutoScale,"Calculated ring cross section","Wavelength (nm)","",responseHandle);
+      mediateResponseLabelPage(0,pageTitle,"",responseHandle);
+      mediateReleasePlotData(&spectrumData[0]);
      }
    }
 
@@ -1098,8 +1202,6 @@ RC mediateRingCalculate(void *engineContext,void *responseHandle)
    MEMORY_ReleaseDVector("mediateRingCalculate","raman2",raman2,0);
   if (ramanint!=NULL)
    MEMORY_ReleaseDVector("mediateRingCalculate","ramanint",ramanint,0);
-  if (ringEnd!=NULL)
-   MEMORY_ReleaseDVector("mediateRingCalculate","ringEnd",ringEnd,0);
 
   MATRIX_Free(&xsSolar,"mediateRingCalculate");
   MATRIX_Free(&xsSolarConv,"mediateRingCalculate");
@@ -1113,7 +1215,7 @@ RC mediateRingCalculate(void *engineContext,void *responseHandle)
 
   #if defined(__DEBUG_) && __DEBUG_
   {
-      // Declarations
+   // Declarations
 
    time_t today;                                                                // current date and time as a time_t number
    char datetime[20];                                                           // current date and time as a string
@@ -1157,7 +1259,7 @@ RC mediateRingCalculate(void *engineContext,void *responseHandle)
 
 RC mediateRequestUsamp(void *engineContext,mediate_usamp_t *pMediateUsamp,void *responseHandle)
  {
-     // Declarations
+  // Declarations
 
   ENGINE_XSCONV_CONTEXT *pEngineContext = (ENGINE_XSCONV_CONTEXT*)engineContext;// pointer to the engine context
   SLIT *pSlitConv;                                                              // pointer to the convolution part of the engine context
@@ -1187,11 +1289,12 @@ RC mediateRequestUsamp(void *engineContext,mediate_usamp_t *pMediateUsamp,void *
    rc=ERROR_SetLast("mediateRequestUsamp",ERROR_TYPE_FATAL,ERROR_ID_MEDIATE,"Calibration","Calibration file name is missing");
   else
    {
-       pSlitConv=&pEngineContext->slitConv;
+    pSlitConv=&pEngineContext->slitConv;
 
-       // Convolution slit function
+    // Convolution slit function
 
-       if (((pSlitConv->slitType==SLIT_TYPE_FILE) || pSlitConv->slitWveDptFlag) && !strlen(pSlitConv->slitFile))
+    if (((pSlitConv->slitType==SLIT_TYPE_FILE) || pSlitConv->slitWveDptFlag) && !strlen(pSlitConv->slitFile))
+        
      rc=ERROR_SetLast("mediateRequestUsamp",ERROR_TYPE_FATAL,ERROR_ID_MEDIATE,"Slit Function Type","Convolution slit function file is missing");
 
     else if ((pSlitConv->slitType==SLIT_TYPE_INVPOLY) &&
@@ -1222,7 +1325,7 @@ RC mediateRequestUsamp(void *engineContext,mediate_usamp_t *pMediateUsamp,void *
 
 void UsampWriteHeader(ENGINE_XSCONV_CONTEXT *pEngineContext,FILE *fp,int phase)
  {
-     // Declaration
+  // Declaration
 
   int slitType;
 
@@ -1260,7 +1363,7 @@ void UsampWriteHeader(ENGINE_XSCONV_CONTEXT *pEngineContext,FILE *fp,int phase)
      fprintf(fp,"; Asymmetry factor : %.3f\n",pEngineContext->slitConv.slitParam2);
     if (slitType==SLIT_TYPE_SUPERGAUSS)
      {
-         fprintf(fp,"; Exponential term : %.3f\n",pEngineContext->slitConv.slitParam2);
+      fprintf(fp,"; Exponential term : %.3f\n",pEngineContext->slitConv.slitParam2);
       fprintf(fp,"; Asymmetry factor : %.3f\n",pEngineContext->slitConv.slitParam3);
      }
 
@@ -1292,17 +1395,17 @@ void UsampWriteHeader(ENGINE_XSCONV_CONTEXT *pEngineContext,FILE *fp,int phase)
 
 RC mediateUsampSave(ENGINE_XSCONV_CONTEXT *pEngineContext,char *fileName,int phase,double *lambda,double *usampXS,int nSize,void *responseHandle)
  {
-     // Declarations
+  // Declarations
 
-     FILE *fp;                                                                     // pointer to the output file
-     int i;                                                                        // browse data points of the cross section
-     RC rc;                                                                        // return code
+  FILE *fp;                                                                     // pointer to the output file
+  int i;                                                                        // browse data points of the cross section
+  RC rc;                                                                        // return code
 
-     // Initializations
+  // Initializations
 
-     rc=ERROR_ID_NO;
+  rc=ERROR_ID_NO;
 
-     // Open file
+  // Open file
 
   if ((fp=fopen(fileName,"w+t"))==NULL)
    rc=ERROR_SetLast("mediateUsampSave",ERROR_TYPE_FATAL,ERROR_ID_FILE_OPEN,fileName);
@@ -1393,19 +1496,19 @@ RC mediateUsampCalculate(void *engineContext,void *responseHandle)
 
     if (!rc)
      {
-         // Local declarations
+      // Local declarations
 
-         plot_data_t spectrumData[2];
-         char pageTitle[MAX_ITEM_TEXT_LEN];
+      plot_data_t spectrumData[2];
+      char pageTitle[MAX_ITEM_TEXT_LEN];
 
-         // Save
+      // Save
 
-         if (!(rc=mediateUsampSave(pEngineContext,pEngineContext->path,1,calibrationMatrix.matrix[0],phase1,nSize,responseHandle)))
-          rc=mediateUsampSave(pEngineContext,pEngineContext->path2,2,calibrationMatrix.matrix[0],phase2,nSize,responseHandle);
+      if (!(rc=mediateUsampSave(pEngineContext,pEngineContext->path,1,calibrationMatrix.matrix[0],phase1,nSize,responseHandle)))
+       rc=mediateUsampSave(pEngineContext,pEngineContext->path2,2,calibrationMatrix.matrix[0],phase2,nSize,responseHandle);
 
-         // Plot
+      // Plot
 
-         sprintf(pageTitle,"Undersampling");
+      sprintf(pageTitle,"Undersampling");
 
       mediateAllocateAndSetPlotData(&spectrumData[0],"Phase 1",calibrationMatrix.matrix[0],phase1,nSize,Line);
       mediateAllocateAndSetPlotData(&spectrumData[1],"Phase 2",calibrationMatrix.matrix[0],phase2,nSize,Line);
@@ -1459,10 +1562,10 @@ RC mediateUsampCalculate(void *engineContext,void *responseHandle)
 
 int mediateXsconvCreateContext(void **engineContext, void *responseHandle)
  {
-     ENGINE_XSCONV_CONTEXT *pEngineContext;
+  ENGINE_XSCONV_CONTEXT *pEngineContext;
 
-     *engineContext=(void *)EngineXsconvCreateContext();
-     pEngineContext=(ENGINE_XSCONV_CONTEXT *)*engineContext;
+  *engineContext=(void *)EngineXsconvCreateContext();
+  pEngineContext=(ENGINE_XSCONV_CONTEXT *)*engineContext;
 
   if (pEngineContext==NULL)
    ERROR_DisplayMessage(responseHandle);

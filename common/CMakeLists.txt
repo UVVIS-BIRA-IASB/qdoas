@@ -1,4 +1,4 @@
-include_directories(../engine ../mediator ${QWT_INCLUDE_DIR})
+include_directories(../engine ../mediator ${QWT_INCLUDE_DIR}  ${netCDF_INCLUDE_DIR} ${CODA_INCLUDE_DIR} ${GSL_INCLUDE_DIRS} ${HDF5_INCLUDE_DIRS})
 
 add_library(common STATIC
   CConfigHandler.cpp

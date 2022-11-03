@@ -39,6 +39,8 @@ add_library(engine STATIC
   frm4doas_read.cpp
   frm4doas_read.h
   fvoigt.c
+  gems_read.h
+  gems_read.cpp
   gdp_bin_read.c
   gdp_bin_read.h
   gome1netcdf_read.cpp
@@ -51,6 +53,8 @@ add_library(engine STATIC
   linear_system.h
   matrix.c
   matrix.h
+  matrix_netcdf_read.cpp
+  matrix_netcdf_read.h
   memory.c
   mfc-read.c
   mfc-read.h

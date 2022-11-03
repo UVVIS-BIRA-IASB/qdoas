@@ -144,11 +144,12 @@ FILE_TYPE FILES_types[FILE_TYPE_MAX] =
   { "Instrumental functions", "ins", "" },                                      // FILE_TYPE_INSTR
   { "Filter Files", "flt", ""},                                                 // FILE_TYPE_FILTER
   { "Fits Files","fit",""},                                                     // FILE_TYPE_FIT
-  { "WINDOAS settings","wds", "" },                                             // FILE_TYPE_INI
+  { "QDOAS settings","xml", "" },                                               // FILE_TYPE_QDOAS
   { "Bitmap file","bmp","" },                                                   // FILE_TYPE_BMP
   { "Residuals","res","" },                                                     // FILE_TYPE_RES
   { "Paths","","" },                                                            // FILE_TYPE_PATH
-  { "Configuration","cfg",""}                                                   // FILE_TYPE_CFG
+  { "Configuration","cfg",""},                                                  // FILE_TYPE_CFG
+  { "netCDF","nc",""}                                                           // FILE_TYPE_NETCDF
  };
 
 FILE_TYPE FILES_typeSpectra[FILE_TYPE_SPECTRA_MAX] =
@@ -734,31 +735,52 @@ RC FILES_LoadMatrix(FILE *fp,const char *fileName,double **matrix,int base,int n
 // -----------------------------------------------------------------------------
 // PURPOSE       Build a file name from a given name and extension
 //
-// INPUT/OUTPUT  fileName  the original file name
+// INPUT         fileName  the original file name
 // INPUT         fileType  the type of file to build
 //
-// OUTPUT        pointer to the updated file name
+// OUTPUT        new_fileName : the update file name
+// return        pointer to new_fileName
 // -----------------------------------------------------------------------------
 
-char *FILES_BuildFileName(char *fileName,MASK fileType)
+char *FILES_BuildFileName(char *new_fileName,char *fileName,MASK fileType)
  {
   // Declarations
 
   SZ_LEN fileNameLength;
-  char *ptr;
+  char *ptr,*ptrxs;
 
   // Replace file extension by the correct one
 
-  if (((fileNameLength=strlen(fileName))!=0) && (fileType>FILE_TYPE_ALL))
+  if (fileType>FILE_TYPE_ALL)
    {
-    if ((ptr=strrchr(fileName,'.'))==NULL)
-     ptr=&fileName[fileNameLength];
+    if (!strlen(new_fileName))
+     sprintf(new_fileName,".%c",PATH_SEP);
+    else if ((ptr=strrchr(new_fileName,PATH_SEP))==NULL)
+     {
+      char fileTmp[DOAS_MAX_PATH_LEN+1];
+      sprintf(fileTmp,".%c%s",PATH_SEP,new_fileName);
+      strcpy(new_fileName,fileTmp);
+     }
+    
+    if ((new_fileName[strlen(new_fileName)-1]!=PATH_SEP) && (STD_IsDir(new_fileName)==1))
+     sprintf(&new_fileName[strlen(new_fileName)],"%c",PATH_SEP);
+    
+    ptrxs=strrchr(fileName,PATH_SEP);
 
-    sprintf(ptr,".%s",FILES_types[fileType].fileExt);
+    if (((ptr=strrchr(new_fileName,PATH_SEP))!=NULL) && !strlen(ptr+1))
+     strcpy(ptr+1,ptrxs+1);
+    ptr=strrchr(strrchr(new_fileName,PATH_SEP)+1,'.');
+    if (ptr==NULL)
+     {
+      strcat(new_fileName,".");
+      strcat(new_fileName,FILES_types[fileType].fileExt);
+     }
+    else
+     sprintf(ptr,".%s",FILES_types[fileType].fileExt);
    }
 
   // Return
 
-  return fileName;
+  return new_fileName;
  }
 

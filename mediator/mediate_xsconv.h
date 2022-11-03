@@ -17,10 +17,10 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "doas.h"
 #include "mediate_convolution.h"
 #include "mediate_ring.h"
 #include "mediate_usamp.h"
-#include "../engine/engine_xsconv.h"
 
 #ifndef _MEDIATE_XSCONV_
 #define _MEDIATE_XSCONV_
@@ -28,6 +28,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #if defined(_cplusplus) || defined(__cplusplus)
 extern "C" {
 #endif
+
+extern const char *mediateConvolutionTypesStr[CONVOLUTION_TYPE_MAX];
+extern const char *mediateConvolutionFileExt[CONVOLUTION_TYPE_MAX];
+extern const char *mediateConvolutionFilterTypes[PRJCT_FILTER_TYPE_MAX];
+extern const char *mediateUsampAnalysisMethod[PRJCT_ANLYS_METHOD_MAX];
 
 RC   mediateRequestConvolution(void *engineContext,mediate_convolution_t *pMediateConvolution,void *responseHandle);
 RC   mediateConvolutionCalculate(void *engineContext,void *responseHandle);

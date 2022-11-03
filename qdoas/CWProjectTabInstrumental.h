@@ -31,6 +31,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <QSpinBox>
 #include <QCheckBox>
 #include <QRadioButton>
+#include <QSpinBox>
 #include <QGridLayout>
 
 #include "mediate_project.h"
@@ -529,6 +530,7 @@ class CWInstrGemsEdit : public CWCalibInstrEdit
 
  private:
   QLineEdit *m_trackSelection;
+  QSpinBox *m_binning;
 };
 
 //--------------------------------------------------------------------------

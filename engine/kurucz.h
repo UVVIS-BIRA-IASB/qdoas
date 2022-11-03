@@ -22,6 +22,7 @@ struct _KuruczFeno {
 struct _Kurucz {
   KURUCZ_FENO *KuruczFeno;
   MATRIX_OBJECT hrSolar;                        // high resolution kurucz spectrum for convolution
+  MATRIX_OBJECT hrSolarGridded;                 // solar spectrum retrieved from slit page, to convolve or to interpolate on a high resolution grid
   MATRIX_OBJECT slitFunction;                   // user-defined slit function (file option)
   double *solar,                                // convolved kurucz spectrum
          *lambdaF,

@@ -161,8 +161,9 @@
 #include "apex_read.h"
 #include "gdp_bin_read.h"
 #include "raman.h"
-//#include "gems_read.h"
+#include "gems_read.h"
 #include "output_netcdf.h"
+#include "matrix_netcdf_read.h"
 
 // ===================
 // Global DECLARATIONS
@@ -1192,7 +1193,7 @@ RC TemperatureCorrection(double *xs,double *A,double *B,double *C,double *newXs,
 RC ShiftVector(const double *lambda, double *source, const double *deriv, double *target, const int n_wavel,
                double DSH,double DST,double DST2,                           // first shift and stretch
                double DSH_,double DST_,double DST2_,                        // second shift and stretch
-               const double *Param,int fwhmDir,int kuruczFlag,INDEX indexFenoColumn)
+               const double *Param,int fwhmDir,int kuruczFlag,int slitFlag,INDEX indexFenoColumn)
 {
 #if defined(__DEBUG_) && __DEBUG_
   DEBUG_FunctionBegin((char *)__func__,DEBUG_FCTTYPE_APPL|DEBUG_FCTTYPE_MEM);
@@ -1443,9 +1444,26 @@ RC ShiftVector(const double *lambda, double *source, const double *deriv, double
       if (i<=LimMax)
         rc=ERROR_SetLast((char *)__func__,ERROR_TYPE_WARNING,ERROR_ID_LOG,analyseIndexRecord);
     }
-  } else if (!fwhmFlag) {
-    rc=SPLINE_Vector(lambda,source,deriv,n_wavel,&ANALYSE_shift[LimMin],&target[LimMin],LimN,pAnalysisOptions->interpol);
   }
+  else if (!fwhmFlag && slitFlag && (Feno->analysisType==ANALYSIS_TYPE_FWHM_SLIT) && (KURUCZ_buffers[indexFenoColumn].hrSolarGridded.matrix!=NULL) &&  
+           !(rc=SPLINE_Vector(KURUCZ_buffers[indexFenoColumn].hrSolarGridded.matrix[0],
+                              KURUCZ_buffers[indexFenoColumn].hrSolarGridded.matrix[1],
+                              KURUCZ_buffers[indexFenoColumn].hrSolarGridded.deriv2[1],
+                              KURUCZ_buffers[indexFenoColumn].hrSolarGridded.nl,&ANALYSE_shift[LimMin],&target[LimMin],LimN,pAnalysisOptions->interpol))) 
+   {
+//     if (hFilterRefLog && !(rc=SPLINE_Vector(KURUCZ_buffers[indexFenoColumn].lambdaF,KURUCZ_buffers[indexFenoColumn].solarF,KURUCZ_buffers[indexFenoColumn].solarF2,n_wavel+2*KURUCZ_buffers[indexFenoColumn].solarFGap,ANALYSE_shift+LimMin,source+LimMin,LimN,pAnalysisOptions->interpol))) {
+//       int i;
+//       for (i=LimMin;(i<=LimMax) && (source[i]>(double)0.) && (target[i]>(double)0.);i++)
+//         target[i]=log(target[i]/source[i]);
+//       
+//       if (i<=LimMax)
+//        rc=ERROR_SetLast((char *)__func__,ERROR_TYPE_WARNING,ERROR_ID_LOG,analyseIndexRecord);
+//     }
+      
+   }
+  else if (!fwhmFlag && !slitFlag) 
+   rc=SPLINE_Vector(lambda,source,deriv,n_wavel,&ANALYSE_shift[LimMin],&target[LimMin],LimN,pAnalysisOptions->interpol); 
+    
   // Return
 
 #if defined(__DEBUG_) && __DEBUG_
@@ -2448,6 +2466,7 @@ RC ANALYSE_fit_shift_stretch(int indexFeno, int indexFenoColumn, const double *s
 //  refFlag==2 : Satellites, automatic mode  , file mode selection, radasref && kurucz on irradiance
 RC ANALYSE_AlignReference(ENGINE_CONTEXT *pEngineContext,int refFlag,void *responseHandle,INDEX indexFenoColumn) {
   RC rc = ERROR_ID_NO;
+  
   for (int WrkFeno=0; WrkFeno<NFeno && !rc; WrkFeno++) {
 
     const FENO *pFeno = &TabFeno[indexFenoColumn][WrkFeno];
@@ -2487,7 +2506,7 @@ RC ANALYSE_AlignReference(ENGINE_CONTEXT *pEngineContext,int refFlag,void *respo
       // Display fit
       if (pFeno->displayRefEtalon && pEngineContext->project.spectra.displaySpectraFlag) {
 
-        char refTitle[120];
+        char refTitle[256];
 
         memcpy(ANALYSE_secX,ANALYSE_zeros,sizeof(*ANALYSE_secX)*pFeno->NDET);
 
@@ -2698,7 +2717,7 @@ RC ANALYSE_Function(double *spectrum_orig, double *reference, const double *Sigm
 
     if ( (rc=ShiftVector(LambdaSpec, spectrum_orig, SplineSpec, spectrum_interpolated, n_wavel,
                          shift_rad, stretch_rad, stretch2_rad, //
-                         0., 0., 0., fitParamsF, -1, 0, indexFenoColumn))!=ERROR_ID_NO ||
+                         0., 0., 0., fitParamsF, -1, 0, 0, indexFenoColumn))!=ERROR_ID_NO ||
          (Feno->useUsamp && pUsamp->method==PRJCT_USAMP_AUTOMATIC && (rc=ANALYSE_UsampBuild(2,ITEM_NONE,indexFenoColumn))!=ERROR_ID_NO) )
 
       goto EndFunction;
@@ -2779,7 +2798,6 @@ RC ANALYSE_Function(double *spectrum_orig, double *reference, const double *Sigm
         ((ANALYSE_phFilter->filterFunction!=NULL) &&
          ((!Feno->hidden && ANALYSE_phFilter->hpFilterAnalysis) || ((Feno->hidden==1) && ANALYSE_phFilter->hpFilterCalib)) &&
          ((rc=FILTER_Vector(ANALYSE_phFilter,&spectrum_interpolated[LimMin],&spectrum_interpolated[LimMin],NULL,LimN,PRJCT_FILTER_OUTPUT_HIGH_SUB))!=0))))
-
     goto EndFunction;
 
    // ----------------------------
@@ -2921,7 +2939,7 @@ RC ANALYSE_Function(double *spectrum_orig, double *reference, const double *Sigm
                                  (pTabCross->FitStretch!=ITEM_NONE)?(double)fitParamsF[pTabCross->FitStretch]:(double)pTabCross->InitStretch,
                                  (pTabCross->FitStretch2!=ITEM_NONE)?(double)fitParamsF[pTabCross->FitStretch2]:(double)pTabCross->InitStretch2,
                                  Feno->Shift,Feno->Stretch,Feno->Stretch2,
-                                 NULL,0,0,indexFenoColumn))!=ERROR_ID_NO))
+                                 NULL,0,0,0,indexFenoColumn))!=ERROR_ID_NO))
 
             goto EndFunction;
 
@@ -3019,12 +3037,12 @@ RC ANALYSE_Function(double *spectrum_orig, double *reference, const double *Sigm
       shift_ref = stretch_ref = stretch2_ref = 0;
     }
 
-
-
     if ((rc=ShiftVector(ANALYSE_splineX,reference,SplineRef,reference_shifted,n_wavel,
                         shift_ref,stretch_ref,stretch2_ref,
                         (double)0.,(double)0.,(double)0., fitParamsF,1,
-                        (Feno->analysisType==ANALYSIS_TYPE_FWHM_KURUCZ)?1:0,indexFenoColumn))!=ERROR_ID_NO)
+                        (Feno->analysisType==ANALYSIS_TYPE_FWHM_KURUCZ)?1:0,
+                        (Feno->analysisType==ANALYSIS_TYPE_FWHM_SLIT) && (KURUCZ_buffers[indexFenoColumn].hrSolarGridded.matrix!=NULL)?1:0,
+                        indexFenoColumn))!=ERROR_ID_NO)
 
      goto EndFunction;
 
@@ -3071,8 +3089,11 @@ RC ANALYSE_Function(double *spectrum_orig, double *reference, const double *Sigm
          ((ANALYSE_phFilter->filterFunction!=NULL) &&
           ((!Feno->hidden && ANALYSE_phFilter->hpFilterAnalysis) || ((Feno->hidden==1) && ANALYSE_phFilter->hpFilterCalib)) &&
           ((rc=FILTER_Vector(ANALYSE_phFilter,&reference_shifted[LimMin],&reference_shifted[LimMin],NULL,LimN,PRJCT_FILTER_OUTPUT_HIGH_SUB))!=0))))
-
+    {
+          if (rc==ERROR_ID_LOG)
+     printf("High-pass filtering on reference log error\n");
      goto EndFunction;
+    }
 
     // ----------------------------
     // Transfer to working variable
@@ -3252,7 +3273,7 @@ RC ANALYSE_Function(double *spectrum_orig, double *reference, const double *Sigm
 /*         and are computed by singular value decomposition of cross         */
 /*         sections matrix.                                                  */
 /*                                                                           */
-RC ANALYSE_CurFitMethod(INDEX indexFenoColumn,  // for OMI
+RC ANALYSE_CurFitMethod(INDEX indexFenoColumn,          // for imagers as OMI, TROPOMI, GEMS
                         const double *Spectre,          // raw spectrum
                         const double *SigmaSpec,        // error on raw spectrum
                         const double *Sref,             // reference spectrum
@@ -3416,6 +3437,9 @@ RC ANALYSE_CurFitMethod(INDEX indexFenoColumn,  // for OMI
     if (((rc=SPLINE_Deriv2(LambdaSpec,SpecTrav,SplineSpec,n_wavel,"ANALYSE_CurFitMethod (LambdaSpec) "))!=0) || // !!! ANALYSE_splineX -> LambdaSpec
         ((rc=SPLINE_Deriv2(ANALYSE_splineX,RefTrav,SplineRef,n_wavel,"ANALYSE_CurFitMethod (ANALYSE_splineX) "))!=0))
 
+//    if (((rc=SPLINE_Deriv2(&LambdaSpec[LimMin],&SpecTrav[LimMin],&SplineSpec[LimMin],LimN,"ANALYSE_CurFitMethod (LambdaSpec) "))!=0) || // !!! ANALYSE_splineX -> LambdaSpec
+//        ((rc=SPLINE_Deriv2(&ANALYSE_splineX[LimMin],&RefTrav[LimMin],&SplineRef[LimMin],LimN,"ANALYSE_CurFitMethod (ANALYSE_splineX) "))!=0))     
+
      goto EndCurFitMethod;
 
     // --------------------------------
@@ -3519,6 +3543,7 @@ RC ANALYSE_CurFitMethod(INDEX indexFenoColumn,  // for OMI
         if (Feno->analysisMethod!=OPTICAL_DENSITY_FIT)
          ANALYSE_t[i]=(ANALYSE_tc[i]!=(double)0.)?(double)1.+ANALYSE_absolu[i]/ANALYSE_tc[i]:(double)0.;
       }
+
       if (residuals != NULL)
         memcpy(residuals,ANALYSE_absolu,n_wavel * sizeof(*residuals));
 
@@ -3761,8 +3786,8 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
       } else {
         memcpy(SpectreK,Spectre,sizeof(double)*n_wavel);
 
-//        if (((pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_GEMS) || !(rc=GEMS_LoadCalib(pEngineContext,indexFenoColumn,responseHandle))) &&
-          if (!(rc=KURUCZ_Spectrum(pBuffers->lambda,LambdaK,SpectreK,KURUCZ_buffers[indexFenoColumn].solar,pBuffers->instrFunction,
+        if (((pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_GEMS) || !(rc=GEMS_LoadCalib(pEngineContext,indexFenoColumn,responseHandle))) &&
+            !(rc=KURUCZ_Spectrum(pBuffers->lambda,LambdaK,SpectreK,KURUCZ_buffers[indexFenoColumn].solar,pBuffers->instrFunction,
                                  1,"Calibration applied on spectrum",KURUCZ_buffers[indexFenoColumn].fwhmPolySpec,KURUCZ_buffers[indexFenoColumn].fwhmVector,KURUCZ_buffers[indexFenoColumn].fwhmDeriv2,saveFlag,
                                  KURUCZ_buffers[indexFenoColumn].indexKurucz,responseHandle,indexFenoColumn))) {
 
@@ -3778,8 +3803,8 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
             }
           }
 
-//         if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_GEMS) // && save file
-//          rc=netcdf_save_calib(LambdaK,pBuffers->spectrum,indexFenoColumn,n_wavel);
+         if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_GEMS) // && save file
+          rc=netcdf_save_calib(LambdaK,pBuffers->spectrum,indexFenoColumn,n_wavel);
         }
 
         memcpy(SpectreK,Spectre,sizeof(double)*n_wavel); // !!!
@@ -3912,6 +3937,7 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
               || pInstrumental->readOutFormat == PRJCT_INSTR_FORMAT_OMPS
               || pInstrumental->readOutFormat == PRJCT_INSTR_FORMAT_TROPOMI
               || pInstrumental->readOutFormat == PRJCT_INSTR_FORMAT_GOME1_NETCDF          // ??????????????????????????????
+              || pInstrumental->readOutFormat == PRJCT_INSTR_FORMAT_GEMS 
               || pInstrumental->readOutFormat == PRJCT_INSTR_FORMAT_GOME2 ) {
 
             double *spec_deriv2 = malloc(n_wavel * sizeof(*spec_deriv2));
@@ -3936,8 +3962,8 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
 
           if ((pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_OMI) &&
               pInstrumental->omi.pixelQFRejectionFlag &&
-              (pEngineContext->recordInfo.omi.omiPixelQF!=NULL) && (Feno->omiRejPixelsQF!=NULL)) {
-            unsigned short *pixelQF=(unsigned short *)pEngineContext->recordInfo.omi.omiPixelQF;
+              (pEngineContext->buffers.pixel_QF!=NULL) && (Feno->omiRejPixelsQF!=NULL)) {
+            unsigned short *pixelQF=(unsigned short *)pEngineContext->buffers.pixel_QF;
 
             memset(Feno->omiRejPixelsQF,0,sizeof(int)*Feno->NDET);
             int start = spectrum_start(old_range);
@@ -4089,9 +4115,12 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
            for (int j=SvdPDeb;j<=SvdPFin;j++)
              ANALYSE_absolu[j]= (ANALYSE_t[j]>0.) ? log(ANALYSE_t[j]) : 0.;
 
-          if (strlen(Feno->residualsFile) &&
-              ((rc=AnalyseSaveResiduals(Feno->residualsFile,pEngineContext,n_wavel))!=ERROR_ID_NO))
+          if (Feno->saveResidualsFlag && (Feno->residualSpectrum!=NULL))
+           memcpy(Feno->residualSpectrum,&ANALYSE_absolu[SvdPDeb],sizeof(double)*Feno->fit_properties.DimL);
+          else if (strlen(Feno->residualsFile))
+           rc=AnalyseSaveResiduals(Feno->residualsFile,pEngineContext,n_wavel);
 
+          if (rc!=ERROR_ID_NO)  
            goto EndAnalysis;
 
           if  (Feno->displayResidue && (Feno->analysisMethod!=OPTICAL_DENSITY_FIT))
@@ -4423,6 +4452,8 @@ void ANALYSE_ResetData(void)
        MEMORY_ReleaseDVector(__func__,"Deriv2RadAsRef1",pTabFeno->Deriv2RadAsRef1,0);
       if (pTabFeno->Deriv2RadAsRef2!=NULL)
        MEMORY_ReleaseDVector(__func__,"Deriv2RadAsRef2",pTabFeno->Deriv2RadAsRef2,0);
+      if (pTabFeno->residualSpectrum!=NULL)
+       MEMORY_ReleaseDVector((char *)__func__,"residualSpectrum",pTabFeno->residualSpectrum,0); 
 
       // SVD matrices
 
@@ -4699,9 +4730,6 @@ RC ANALYSE_LoadSlit(const PRJCT_SLIT *pSlit,int kuruczFlag)
     else {
       rc=MATRIX_Load(pSlit->kuruczFile,&ANALYSIS_slitK,0,0,0.,0.,1,0,(char *)__func__);
 
-
-
-
       int n_columns = (pSlitFunction->slitType==SLIT_TYPE_NONE) ? 1+ANALYSE_swathSize : 2;
 
       if (ANALYSIS_slitK.nc != n_columns) {
@@ -4839,8 +4867,19 @@ RC ANALYSE_LoadCross(ENGINE_CONTEXT *pEngineContext, const ANALYSIS_CROSS *cross
         if (!strlen(pWrkSymbol->crossFileName)) {
           return ERROR_SetLast((char *)__func__,ERROR_TYPE_FATAL,ERROR_ID_XS_FILENAME,pWrkSymbol->symbolName);
         }
-        if ( (rc=MATRIX_Load(pCross->crossSectionFile,&pWrkSymbol->xs,0,0,0.,0.,
-                             (pCross->crossType!=ANLYS_CROSS_ACTION_NOTHING) ? 1 : 0, 1, (char *)__func__) ) ) {
+        
+       char *ext;
+       
+       if ((ext=strrchr(pWrkSymbol->crossFileName,'.'))!=NULL) 
+        ext++;
+       else
+        ext="xs";
+       
+       if ((strcmp(ext,"nc") && ((rc=MATRIX_Load(pCross->crossSectionFile,&pWrkSymbol->xs,0,0,0.,0.,
+                                           (pCross->crossType!=ANLYS_CROSS_ACTION_NOTHING) ?1:0,1,(char *)__func__))!=0)) ||
+          (!strcmp(ext,"nc") && ((rc=MATRIX_netcdf_LoadXS(pCross->crossSectionFile,&pWrkSymbol->xs,0,0,0.,0.,
+                                           (pCross->crossType!=ANLYS_CROSS_ACTION_NOTHING) ?1:0,1,pEngineContext->project.instrumental.use_row,(char *)__func__))!=0)))                          
+        {
           return rc;
         }
 
@@ -6007,7 +6046,7 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
                             lambdaRefEtalon,SrefEtalon,pTabFeno->SrefSigma,&n_wavel_ref);
         break;
       case PRJCT_INSTR_FORMAT_GEMS:
-//        rc=GEMS_LoadReference(pTabFeno->ref1,indexFenoColumn,lambdaRefEtalon,SrefEtalon,&n_wavel_ref);
+        rc=GEMS_LoadReference(pTabFeno->ref1,indexFenoColumn,lambdaRefEtalon,SrefEtalon,&n_wavel_ref);
         break;
       case PRJCT_INSTR_FORMAT_APEX:
         rc=apex_get_reference(pTabFeno->ref1,indexFenoColumn,lambdaRefEtalon,SrefEtalon,&n_wavel_ref);
@@ -6049,6 +6088,7 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
         break;
       }
 
+
       if (!rc &&
           !(rc=THRD_SpectrumCorrection(pEngineContext,SrefEtalon,n_wavel)) &&
           !(rc=VECTOR_NormalizeVector(SrefEtalon-1,n_wavel_ref,&pTabFeno->refNormFact,"ANALYSE_LoadRef (SrefEtalon) "))) {
@@ -6086,7 +6126,7 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
               if (!(rc=apex_init(pTabFeno->ref2,pEngineContext,2,indexFenoColumn,&temp_use_row)) &&
                    (temp_use_row==0))
                    pTabFeno->useRefRow = false;
-           } else if (pTabFeno->useRefRow == false)
+           } else // of course : if (pTabFeno->useRefRow == false)
               rc = apex_init(pTabFeno->ref2,pEngineContext,0,0,0);
            if ((pTabFeno->SrefRadAsRef2=(double *)MEMORY_AllocDVector(__func__,"SrefRadAsRef2",0,pTabFeno->n_wavel_ref2))==NULL ||
                (pTabFeno->LambdaRadAsRef2=(double *)MEMORY_AllocDVector(__func__,"LambdaRadAsRef2",0,pTabFeno->n_wavel_ref2))==NULL ||
@@ -6098,6 +6138,30 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
                rc=SPLINE_Vector(pTabFeno->LambdaRadAsRef2,pTabFeno->SrefRadAsRef2,pTabFeno->Deriv2RadAsRef2,pTabFeno->n_wavel_ref2,
                                 pTabFeno->LambdaRef,pTabFeno->Sref,n_wavel_ref,SPLINE_CUBIC);
            }
+           
+           apex_clean();
+           break;
+        case PRJCT_INSTR_FORMAT_GEMS:
+           pTabFeno->useRadAsRef2=1;
+           temp_use_row = 1;
+           if (pTabFeno->useRefRow == true) {
+              if (!(rc=apex_init(pTabFeno->ref2,pEngineContext,2,indexFenoColumn,&temp_use_row)) &&
+                   (temp_use_row==0))
+                   pTabFeno->useRefRow = false;
+           } else // of course : if (pTabFeno->useRefRow == false)
+              rc = apex_init(pTabFeno->ref2,pEngineContext,0,0,0);
+           if ((pTabFeno->SrefRadAsRef2=(double *)MEMORY_AllocDVector(__func__,"SrefRadAsRef2",0,pTabFeno->n_wavel_ref2))==NULL ||
+               (pTabFeno->LambdaRadAsRef2=(double *)MEMORY_AllocDVector(__func__,"LambdaRadAsRef2",0,pTabFeno->n_wavel_ref2))==NULL ||
+               (pTabFeno->Deriv2RadAsRef2=(double *)MEMORY_AllocDVector(__func__,"Deriv2RadAsRef2",0,pTabFeno->n_wavel_ref2))==NULL)
+               rc=ERROR_ID_ALLOC;
+           else if (!(rc=tropomi_get_reference(pTabFeno->ref2,indexFenoColumn,pTabFeno->LambdaRadAsRef2,pTabFeno->SrefRadAsRef2,0,pTabFeno->n_wavel_ref2,1)) &&
+                    !(rc=SPLINE_Deriv2(pTabFeno->LambdaRadAsRef2,pTabFeno->SrefRadAsRef2,pTabFeno->Deriv2RadAsRef2,pTabFeno->n_wavel_ref2,__func__))){
+                memcpy(pTabFeno->LambdaRef,lambdaRefEtalon,sizeof(double)*n_wavel_ref);
+                rc=SPLINE_Vector(pTabFeno->LambdaRadAsRef2,pTabFeno->SrefRadAsRef2,pTabFeno->Deriv2RadAsRef2,pTabFeno->n_wavel_ref2,
+                                 pTabFeno->LambdaRef,pTabFeno->Sref,n_wavel_ref,SPLINE_CUBIC);
+               
+           }
+           
            apex_clean();
            break;
         case PRJCT_INSTR_FORMAT_GOME1_NETCDF:
@@ -6117,9 +6181,6 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
               rc=SPLINE_Deriv2(pTabFeno->LambdaRadAsRef2,pTabFeno->SrefRadAsRef2,pTabFeno->Deriv2RadAsRef2,pTabFeno->n_wavel_ref2,__func__);
            apex_clean();
            break;
-        case PRJCT_INSTR_FORMAT_GEMS:
-//           rc=GEMS_LoadReference(pTabFeno->ref2,indexFenoColumn,lambdaRefEtalon,SrefEtalon,&n_wavel_ref);
-        break;
         case PRJCT_INSTR_FORMAT_APEX:
            rc=apex_get_reference(pTabFeno->ref2,indexFenoColumn,lambdaRef,Sref,&n_wavel_ref);
            break;
@@ -6187,10 +6248,14 @@ void ANALYSE_SetAnalysisType(INDEX indexFenoColumn)
 
   // Fit fwhm in Kurucz procedure
 
-  if ((pTabFeno->hidden) && pKuruczOptions->fwhmFit)
-   pTabFeno->analysisType=ANALYSIS_TYPE_FWHM_KURUCZ;
-
-  else if (!pTabFeno->hidden)
+  if (pTabFeno->hidden) 
+   {
+    if (pKuruczOptions->fwhmFit)
+     pTabFeno->analysisType=ANALYSIS_TYPE_FWHM_KURUCZ;
+    else 
+     pTabFeno->analysisType=ANALYSIS_TYPE_FWHM_SLIT;
+   }
+  else // if (!pTabFeno->hidden)
    {
     // Apply a correction of resolution on reference or spectrum based on the temperature of these spectra
 

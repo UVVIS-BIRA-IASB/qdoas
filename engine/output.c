@@ -114,7 +114,7 @@ const unsigned long long QDOAS_FILL_UINT64 = 18446744073709551614ULL;
     containing their filename extension.  The position in the array
     must correspond to the value of the enum.*/
 const char *output_file_extensions[] = { [ASCII] = ".ASC",
-                                         [HDFEOS5] = ".he5",
+                                     //  [HDFEOS5] = ".he5",
                                          [NETCDF] = ".nc" };
 
 struct output_field output_data_analysis[MAX_FIELDS];
@@ -243,6 +243,7 @@ static void save_analysis_data(struct output_field *output_field, int recordno, 
     case OUTPUT_FLOAT:
       ((func_float) get_data)(output_field, ((float (*)[ncols])data)[recordno], pEngineContext, indexFenoColumn, index_calib);
       break;
+    case OUTPUT_RESIDUAL:      
     case OUTPUT_DOUBLE:
       ((func_double) get_data)(output_field, ((double (*)[ncols])data)[recordno], pEngineContext, indexFenoColumn, index_calib);
       break;
@@ -298,7 +299,7 @@ static void save_calib_data(struct output_field *output_field, int index_calib) 
   }
 }
 
-static int register_analysis_output(const PRJCT_RESULTS *pResults, int indexFeno, int index_calib, const char *windowName);
+static int register_analysis_output(const PRJCT_RESULTS *pResults, int indexFenoColumn,int indexFeno, int index_calib, const char *windowName);
 static int register_cross_results(const PRJCT_RESULTS *pResults, const FENO *pTabFeno, int indexFeno, int index_calib, const char *windowName);
 
 /*! \brief Correct a cross section using wavelength dependent AMF vector
@@ -1013,11 +1014,11 @@ static void OutputRegisterFields(const ENGINE_CONTEXT *pEngineContext, const int
      case PRJCT_RESULTS_INDEX_CROSSTRACK:
        register_field( (struct output_field) { .basic_fieldname = "cross-track index", .memory_type = OUTPUT_INT, .resulttype = fieldtype, .format = "%#3d", .get_data = (func_void)&get_crosstrack_index });
        break;
-     case PRJCT_RESULTS_OMI_GROUNDP_QF:
-       register_field( (struct output_field) { .basic_fieldname = "OMI groundpixel quality flag", .memory_type = OUTPUT_USHORT, .resulttype = fieldtype, .format = "%#6d", .get_data = (func_void)&get_omi_groundpixelqf });
+     case PRJCT_RESULTS_GROUNDP_QF:
+       register_field( (struct output_field) { .basic_fieldname = "groundpixel quality flag", .memory_type = OUTPUT_USHORT, .resulttype = fieldtype, .format = "%#6d", .get_data = (func_void)&get_groundpixelqf });
        break;
-     case PRJCT_RESULTS_OMI_XTRACK_QF:
-       register_field( (struct output_field) { .basic_fieldname = "OMI xtrack quality flag", .memory_type = OUTPUT_USHORT, .resulttype = fieldtype, .format = "%#6d", .get_data = (func_void)&get_omi_xtrackqf });
+     case PRJCT_RESULTS_XTRACK_QF:
+       register_field( (struct output_field) { .basic_fieldname = "xtrack quality flag", .memory_type = OUTPUT_USHORT, .resulttype = fieldtype, .format = "%#6d", .get_data = (func_void)&get_xtrackqf });
        break;
      case PRJCT_RESULTS_OMI_CONFIGURATION_ID:
        register_field( (struct output_field) { .basic_fieldname = "OMI instrument configuration id", .memory_type = OUTPUT_USHORT, .resulttype = fieldtype, .format = "%#6d", .get_data = (func_void)&get_omi_configuration_id });
@@ -1390,11 +1391,11 @@ static void OutputRegisterFieldsToExport(const ENGINE_CONTEXT *pEngineContext, c
      case PRJCT_RESULTS_INDEX_CROSSTRACK:  // !!! EXPORT FUNCTION !!!
        register_field( (struct output_field) { .basic_fieldname = "cross-track index", .memory_type = OUTPUT_INT, .resulttype = fieldtype, .format = "%#3d", .get_data = (func_void)&get_crosstrack_index });
        break;
-     case PRJCT_RESULTS_OMI_GROUNDP_QF:  // !!! EXPORT FUNCTION !!!
-       register_field( (struct output_field) { .basic_fieldname = "OMI groundpixel quality flag", .memory_type = OUTPUT_USHORT, .resulttype = fieldtype, .format = "%#6d", .get_data = (func_void)&get_omi_groundpixelqf });
+     case PRJCT_RESULTS_GROUNDP_QF:  // !!! EXPORT FUNCTION !!!
+       register_field( (struct output_field) { .basic_fieldname = "groundpixel quality flag", .memory_type = OUTPUT_USHORT, .resulttype = fieldtype, .format = "%#6d", .get_data = (func_void)&get_groundpixelqf });
        break;
-     case PRJCT_RESULTS_OMI_XTRACK_QF:  // !!! EXPORT FUNCTION !!!
-       register_field( (struct output_field) { .basic_fieldname = "OMI xtrack quality flag", .memory_type = OUTPUT_USHORT, .resulttype = fieldtype, .format = "%#6d", .get_data = (func_void)&get_omi_xtrackqf });
+     case PRJCT_RESULTS_XTRACK_QF:  // !!! EXPORT FUNCTION !!!
+       register_field( (struct output_field) { .basic_fieldname = "xtrack quality flag", .memory_type = OUTPUT_USHORT, .resulttype = fieldtype, .format = "%#6d", .get_data = (func_void)&get_xtrackqf });
        break;
      case PRJCT_RESULTS_OMI_CONFIGURATION_ID:  // !!! EXPORT FUNCTION !!!
        register_field( (struct output_field) { .basic_fieldname = "OMI instrument configuration id", .memory_type = OUTPUT_USHORT, .resulttype = fieldtype, .format = "%#6d", .get_data = (func_void)&get_omi_configuration_id });
@@ -1603,7 +1604,7 @@ static int OutputRegisterParam(const ENGINE_CONTEXT *pEngineContext)
     const FENO *pTabFeno=&TabFeno[indexFenoColumn][indexFeno];
     if(!outputRunCalib && !pTabFeno->hidden) {
       // run analysis: skip calibration settings
-      int rc = register_analysis_output(pResults, indexFeno, ITEM_NONE, pTabFeno->windowName);
+      int rc = register_analysis_output(pResults, indexFenoColumn,indexFeno, ITEM_NONE, pTabFeno->windowName);
       if (rc != ERROR_ID_NO) return rc;
       rc = register_cross_results(pResults, pTabFeno, indexFeno, ITEM_NONE, pTabFeno->windowName);
       if (rc != ERROR_ID_NO) return rc;
@@ -1614,7 +1615,7 @@ static int OutputRegisterParam(const ENGINE_CONTEXT *pEngineContext)
       for (int indexWin=0; indexWin<KURUCZ_buffers[indexFenoColumn].Nb_Win; indexWin++) {
         char window_name[MAX_ITEM_NAME_LEN+1];
         sprintf(window_name,"RunCalib(%d)",indexWin+1);
-        int rc = register_analysis_output(pResults, indexFeno, indexWin, window_name);
+        int rc = register_analysis_output(pResults, indexFenoColumn,indexFeno, indexWin, window_name);
         if (rc != ERROR_ID_NO) return rc;
         rc = register_cross_results(pResults, pTabFeno, indexFeno, indexWin, window_name);
         if (rc != ERROR_ID_NO) return rc;
@@ -1670,14 +1671,16 @@ static int register_analysis_output_field(int field,struct outputconfig analysis
       output->field.get_tabfeno = &get_tabfeno_analysis;
       output->field.resulttype = output->type;
       int rc = register_analysis_field(&output->field, indexFeno, index_calib, ITEM_NONE, windowName, "");
+      
       if (rc != ERROR_ID_NO) return rc;
      }
 
    return ERROR_ID_NO;
  }
 
-static int register_analysis_output(const PRJCT_RESULTS *pResults, int indexFeno, int index_calib, const char *windowName) {
+static int register_analysis_output(const PRJCT_RESULTS *pResults, int indexFenoColumn,int indexFeno, int index_calib, const char *windowName) {
 
+  FENO *pTabFeno=&TabFeno[indexFenoColumn][indexFeno];  
   struct outputconfig analysis_infos[] = {
 
     { (outputRunCalib) ? -1 : PRJCT_RESULTS_REFZM, // no REFZM in "run calibration" mode
@@ -1692,7 +1695,7 @@ static int register_analysis_output(const PRJCT_RESULTS *pResults, int indexFeno
       { .basic_fieldname = "Ref2/Ref1 Shift", .format = FORMAT_FLOAT, .memory_type = OUTPUT_FLOAT, .get_data = (func_void) &get_ref_shift} },
     { (outputRunCalib) ? -1 : PRJCT_RESULTS_SPIKES, // no spike removal in "run calibration" mode
       { .basic_fieldname = "Spike removal", .format = "%-50s", .memory_type = OUTPUT_STRING, .get_data = (func_void) &get_spikes } },
-    { (outputRunCalib) ? -1 : PRJCT_RESULTS_OMI_PIXELS_QF,  // no pixel quality flags in "run calibration" mode
+    { (outputRunCalib) ? -1 : PRJCT_RESULTS_PIXELS_QF,  // no pixel quality flags in "run calibration" mode
       { .basic_fieldname = "omiRejPixelsQF", .format = "%-50s", .memory_type = OUTPUT_STRING, .get_data = (func_void) &omi_get_rejected_pixels } },
     { PRJCT_RESULTS_CHI,
       { .basic_fieldname = "Chi", .format = FORMAT_DOUBLE, .memory_type = OUTPUT_DOUBLE,
@@ -1706,24 +1709,27 @@ static int register_analysis_output(const PRJCT_RESULTS *pResults, int indexFeno
     { PRJCT_RESULTS_ITER,
       { .basic_fieldname = "iter", .format = FORMAT_INT, .memory_type = OUTPUT_INT,
         .get_data = (outputRunCalib) ? (func_void) &get_n_iter_calib : (func_void) &get_n_iter} },
-    { PRJCT_RESULTS_NUM_BANDS,
+    { (outputRunCalib) ? -1 : PRJCT_RESULTS_NUM_BANDS,
       { .basic_fieldname = "numbands", .format = FORMAT_INT, .memory_type = OUTPUT_INT,
         .get_data = (func_void) &get_num_bands} },
-    { PRJCT_RESULTS_LAMBDA_CENTER,
+    { (outputRunCalib) ? -1 : PRJCT_RESULTS_LAMBDA_CENTER,
       { .basic_fieldname = "center_wavelength", .format = FORMAT_DOUBLE, .memory_type = OUTPUT_DOUBLE,
         .get_data = (func_void) &get_center_wavelength } },
-    { PRJCT_RESULTS_ERROR_FLAG,
+    { (outputRunCalib) ? -1 : PRJCT_RESULTS_ERROR_FLAG,
       { .basic_fieldname = "processing_error", .format = FORMAT_INT, .memory_type = OUTPUT_INT,
-        .get_data = (func_void) &get_processing_error_flag} }
+        .get_data = (func_void) &get_processing_error_flag} },
+    { (outputRunCalib) ? -1 : PRJCT_RESULTS_RESIDUAL_SPECTRUM,
+      { .basic_fieldname = "residual_spectrum", .format = FORMAT_DOUBLE, .memory_type = OUTPUT_RESIDUAL,
+        .get_data = (func_void) &get_residual_spectrum, .data_cols=pTabFeno->fit_properties.DimL} }
 
   };
 
   size_t arr_length = sizeof(analysis_infos)/sizeof(analysis_infos[0]);
-  FENO *pTabFeno=&TabFeno[0][indexFeno];
   int refUnique=((pTabFeno->refMaxdoasSelectionMode==ANLYS_MAXDOAS_REF_SZA) ||
                  (pTabFeno->refSpectrumSelectionScanMode==ANLYS_MAXDOAS_REF_SCAN_BEFORE) ||
                  (pTabFeno->refSpectrumSelectionScanMode==ANLYS_MAXDOAS_REF_SCAN_AFTER))?1:0;
 
+  
   for(int i = 0; i<pResults->fieldsNumber; i++)
    {
     if ((pResults->fieldsFlag[i]!=PRJCT_RESULTS_REFNUMBER) || refUnique)
@@ -2046,6 +2052,9 @@ static RC get_orbit_date(const ENGINE_CONTEXT *pEngineContext, int *orbit_year, 
     break;
   case PRJCT_INSTR_FORMAT_GOME1_NETCDF:
     GOME1NETCDF_get_orbit_date(orbit_year, orbit_month, orbit_day);
+    break;
+  case PRJCT_INSTR_FORMAT_GEMS:
+     GEMS_get_orbit_date(orbit_year,orbit_month,orbit_day);
     break;
   default:
     // we should never get here:
@@ -2513,7 +2522,7 @@ RC OUTPUT_SaveResults(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
 // ====================
 
 /* Return the byte size of a datatype. */
-size_t output_get_size(enum output_datatype datatype) {
+size_t output_get_size(enum output_datatype datatype,int ncols) {
   switch(datatype) {
   case OUTPUT_STRING:
     return sizeof(char*);
@@ -2533,6 +2542,8 @@ size_t output_get_size(enum output_datatype datatype) {
   case OUTPUT_DOUBLE:
     return sizeof(double);
     break;
+  case OUTPUT_RESIDUAL:
+    return sizeof(double)*ncols; 
   case OUTPUT_DATE:
     return sizeof(struct date);
     break;
@@ -2690,7 +2701,7 @@ RC OUTPUT_LocalAlloc(ENGINE_CONTEXT *pEngineContext)
       struct output_field *pfield = &output_data_analysis[i];
       output_field_clear(pfield); // first clear data, then update "data_rows" value, because data_rows is used to determine number of entries we have to free
       pfield->data_rows = output_data_rows;
-      pfield->data = calloc(pfield->data_rows * pfield->data_cols , output_get_size(pfield->memory_type));
+      pfield->data = calloc(pfield->data_rows * pfield->data_cols , output_get_size(pfield->memory_type,pfield->data_cols));
     }
     for (unsigned int i=0; i<calib_num_fields; i++) {
       struct output_field *calib_field = &output_data_calib[i];

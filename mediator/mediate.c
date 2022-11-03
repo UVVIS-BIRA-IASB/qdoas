@@ -1,4 +1,3 @@
-
 /*
   Qdoas is a cross-platform application for spectral analysis with the DOAS
   algorithm.  Copyright (C) 2007  S[&]T and BIRA
@@ -44,6 +43,8 @@
 #include "apex_read.h"
 #include "gems_read.h"
 #include "mfc-read.h"
+
+#include "matrix_netcdf_read.h"
 
 int mediateRequestDisplaySpecInfo(void *engineContext,int page,void *responseHandle)
  {
@@ -183,10 +184,10 @@ int mediateRequestDisplaySpecInfo(void *engineContext,int page,void *responseHan
   if (strlen(pRecord->Nom) && (pSpectra->fieldsFlag[PRJCT_RESULTS_NAME]))
    mediateResponseCellInfo(page,indexLine++,indexColumn,responseHandle,"Record name","%s",pRecord->Nom);
 
-  if (pSpectra->fieldsFlag[PRJCT_RESULTS_OMI_GROUNDP_QF])
-    mediateResponseCellInfo(page,indexLine++,indexColumn,responseHandle,"GroundPixel QF","%d",pRecord->omi.omiGroundPQF);
-  if (pSpectra->fieldsFlag[PRJCT_RESULTS_OMI_XTRACK_QF])
-    mediateResponseCellInfo(page,indexLine++,indexColumn,responseHandle,"XTrack QF","%d",pRecord->omi.omiXtrackQF);
+  if (pSpectra->fieldsFlag[PRJCT_RESULTS_GROUNDP_QF])
+    mediateResponseCellInfo(page,indexLine++,indexColumn,responseHandle,"GroundPixel QF","%d",pRecord->ground_pixel_QF);
+  if (pSpectra->fieldsFlag[PRJCT_RESULTS_XTRACK_QF])
+    mediateResponseCellInfo(page,indexLine++,indexColumn,responseHandle,"XTrack QF","%d",pRecord->xtrack_QF);
 
   if (pSpectra->fieldsFlag[PRJCT_RESULTS_PIXEL])
    mediateResponseCellInfo(page,indexLine++,indexColumn,responseHandle,"Pixel number","%d",pRecord->gome.pixelNumber);
@@ -196,7 +197,7 @@ int mediateRequestDisplaySpecInfo(void *engineContext,int page,void *responseHan
      mediateResponseCellInfo(page,indexLine++,indexColumn,responseHandle,"Orbit number","%d",pRecord->satellite.orbit_number);
 
   if (pSpectra->fieldsFlag[PRJCT_RESULTS_TINT])
-   mediateResponseCellInfo(page,indexLine++,indexColumn,responseHandle,"Exposure time","%.3f sec",pRecord->Tint);
+   mediateResponseCellInfo(page,indexLine++,indexColumn,responseHandle,"Exposure time",(pRecord->Tint>=0.)?"%.3f sec":"N/A",pRecord->Tint);
   if (pSpectra->fieldsFlag[PRJCT_RESULTS_SCANS])
    mediateResponseCellInfo(page,indexLine++,indexColumn,responseHandle,"Scans taken into account","%d",pRecord->NSomme);
   if (pSpectra->fieldsFlag[PRJCT_RESULTS_NREJ])
@@ -513,6 +514,7 @@ void mediateRequestPlotSpectra(ENGINE_CONTEXT *pEngineContext,void *responseHand
      if (pBuffers->irrad!=NULL
          && ( !(pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_OMI || // for OMI and Tropomi, irradiance is stored in separate file, which is only read during analysis
                 pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_TROPOMI ||
+                pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_GEMS ||
                 pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF)
               || THRD_id==THREAD_TYPE_ANALYSIS) ) {
 
@@ -1253,16 +1255,18 @@ void setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const
       break;
       // ----------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_GEMS :
-
-      for (int i=0; i<MAX_SWATHSIZE; ++i) {
+     
+      for (int i=0; i<MAX_SWATHSIZE; ++i) 
+       {
         NDET[i] = GEMS_INIT_LENGTH;
         pEngineInstrumental->use_row[i]=false;
-      }                                                                                    // Could be reduced by Set function
+       }                                                                                    // Could be reduced by Set function
+      OMI_TrackSelection(pMediateInstrumental->gems.trackSelection,pEngineInstrumental->use_row);
 
       strcpy(pEngineInstrumental->calibrationFile,pMediateInstrumental->gems.calibrationFile);     // calibration file
       strcpy(pEngineInstrumental->instrFunction,pMediateInstrumental->gems.transmissionFunctionFile);     // instrumental function file
 
-      OMI_TrackSelection(pMediateInstrumental->gems.trackSelection,pEngineInstrumental->use_row);
+      pEngineInstrumental->gems.binning=pMediateInstrumental->gems.binning;
 
       break;
       // ----------------------------------------------------------------------------
@@ -1652,7 +1656,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
    #if defined(__DEBUG_) && __DEBUG_
    DEBUG_Start(ENGINE_dbgFile,"mediateRequestSetAnalysisWindows",DEBUG_FCTTYPE_MEM,15,DEBUG_DVAR_YES,0);
     #endif
-
+   
    lambdaMin=1000;
    lambdaMax=0;
    pEngineContext=(ENGINE_CONTEXT *)engineContext;
@@ -1689,7 +1693,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
        goto handle_errors;
    }
 
-   switch(pEngineContext->project.instrumental.readOutFormat) {
+   switch(pInstrumental->readOutFormat) {
    case PRJCT_INSTR_FORMAT_OMI:
      ANALYSE_swathSize = 60;
      break;
@@ -1719,7 +1723,15 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
        pInstrumental->use_row[i] = true;
      break;
    case PRJCT_INSTR_FORMAT_GEMS:
-     ANALYSE_swathSize=28;
+     // ANALYSE_swathSize=2048; //pInstrumental->gems.binning;    
+     pEngineContext->radAsRefFlag=0;
+     if (strlen(analysisWindows[0].refOneFile))
+      rc = GEMS_Init(pEngineContext,analysisWindows[0].refOneFile,&n_wavel_temp1);
+     if (strlen(analysisWindows[0].refTwoFile))
+      {
+       pEngineContext->radAsRefFlag=1;
+       rc = GEMS_Init(pEngineContext,analysisWindows[0].refTwoFile,&n_wavel_temp2);
+      }
      break;
      // TO SEE LATER WHAT IS NECESSARY FOR THIS FORMAT rc = gems_init(analysisWindows[0].refOneFile,pEngineContext);              // !!! GEMS : if fixed format, just initialize the ANALYSE_swathSize
      break;
@@ -1757,7 +1769,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
        pTabFeno->n_wavel_ref1=n_wavel_temp1;
        pTabFeno->n_wavel_ref2=n_wavel_temp2;
        const int n_wavel = pTabFeno->NDET;
-
+       
        if ((pTabFeno->hidden<2) && ((THRD_id==THREAD_TYPE_ANALYSIS) || (pTabFeno->hidden==1))) {
          // QDOAS : avoid the load of disabled analysis windows with hidden==2
 
@@ -1774,6 +1786,8 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
 
            pTabFeno->resolFwhm=pAnalysisWindows->resolFwhm;
            pTabFeno->lambda0=pAnalysisWindows->lambda0;
+
+           pTabFeno->saveResidualsFlag=(!pTabFeno->hidden)?pAnalysisWindows->saveResidualsFlag:0;
 
            if (fabs(pTabFeno->lambda0)<EPSILON)
             pTabFeno->lambda0=(double)0.5*(pAnalysisWindows->fitMinWavelength+pAnalysisWindows->fitMaxWavelength);
@@ -1888,7 +1902,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
               (!(rc=ANALYSE_LoadGaps(pEngineContext,pAnalysisWindows->gapList.gap,pAnalysisWindows->gapList.nGap,pTabFeno->LambdaRef,pAnalysisWindows->fitMinWavelength,pAnalysisWindows->fitMaxWavelength,indexFenoColumn)) &&
 
                (!pTabFeno->gomeRefFlag || !(rc=FIT_PROPERTIES_alloc(__func__,&pTabFeno->fit_properties)))
-               ))) {
+               ))) { 
            if (pTabFeno->hidden==1) {
              indexKurucz=NFeno;
            } else {
@@ -1915,7 +1929,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
        } // if ((pTabFeno->hidden<2) && ((THRD_id==THREAD_TYPE_ANALYSIS) || (pTabFeno->hidden==1)))
      }  // for (indexFeno=0;(indexFeno<numberOfWindows+1) && !rc;indexFeno++)
    } // for (indexFenoColumn=0;(indexFenoColumn<ANALYSE_swathSize) && !rc;indexFenoColumn++)
-
+   
    if (rc)
      goto handle_errors;
 
@@ -1929,7 +1943,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
      lambdaMin=pEngineContext->buffers.lambda[0];
      lambdaMax=pEngineContext->buffers.lambda[max_ndet-1];
    }
-
+   
    // load slit function from project properties -> slit page?
    // calibration procedure with FWHM fit -> Kurucz (and xs) are convolved with the fitted slit function
    // no calibration procedure and no xs to convolve -> nothing to do with the slit function in the slit page
@@ -1962,17 +1976,26 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
 
      if (!pEngineContext->project.instrumental.use_row[indexFenoColumn])
        continue;
-
-     if ((xsToConvolute && !useKurucz) || !pKuruczOptions->fwhmFit)
-       for (indexWindow=0;(indexWindow<NFeno) && !rc;indexWindow++) {
-         pTabFeno=&TabFeno[indexFenoColumn][indexWindow];
-
+     
+     
+     
+     for (indexWindow=0;(indexWindow<NFeno) && !rc;indexWindow++)
+      {
+       pTabFeno=&TabFeno[indexFenoColumn][indexWindow];
+      
+       if (pTabFeno->saveResidualsFlag && !pTabFeno->hidden &&
+         ((pTabFeno->residualSpectrum=(double *)MEMORY_AllocDVector(__func__,"residualSpectrum",0,pTabFeno->fit_properties.DimL))==NULL))
+          break;
+         
+       if ((xsToConvolute && !useKurucz) || !pKuruczOptions->fwhmFit)
+        { 
          if ((pSlitOptions->slitFunction.slitType==SLIT_TYPE_NONE) && pTabFeno->xsToConvolute)
            rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_CONVOLUTION);
          else if ((pTabFeno->gomeRefFlag || pEngineContext->refFlag) &&         // test on pTabFeno->xsToConvolute done in ANALYSE_XsConvolution (molecular ring done in this function for both convolution and interpolation)
                  ((rc=ANALYSE_XsConvolution(pTabFeno,pTabFeno->LambdaRef,ANALYSIS_slitMatrix,ANALYSIS_slitParam,pSlitOptions->slitFunction.slitType,indexFenoColumn,pSlitOptions->slitFunction.slitWveDptFlag))!=0))
            break;
-       }
+        } 
+      }
 
      if (!rc) {
        // Allocate Kurucz buffers on Run Calibration or
@@ -2004,7 +2027,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
          TabFeno[indexFenoColumn][indexWindow].rcKurucz=rc;
        rc=ERROR_ID_NO;
      }
-   }
+   }  // for (indexFenoColumn=0;(
 
    // OMI SEE LATER
 
@@ -2016,7 +2039,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
 
  handle_errors:
 
-//   GEMS_CloseReferences();
+   GEMS_CloseReferences();
    MATRIX_Free(&hr_solar_temp, __func__);
 
    if (rc!=ERROR_ID_NO) {
@@ -2028,7 +2051,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
    #if defined(__DEBUG_) && __DEBUG_
    DEBUG_Stop("mediateRequestSetAnalysisWindows");
    #endif
-
+   
    return (rc!=ERROR_ID_NO)?-1:0;    // supposed that an error at the level of the load of projects stops the current session
  }
 
@@ -2183,7 +2206,7 @@ int mediateRequestNextMatchingSpectrum(ENGINE_CONTEXT *pEngineContext,void *resp
        // reset the rc based on the severity of the failure - for non fatal errors keep searching
        rc = ERROR_DisplayMessage(responseHandle);
      } else if ( (pProject->instrumental.readOutFormat==PRJCT_INSTR_FORMAT_OMI) &&
-                 !omi_use_track(pRecord->omi.omiXtrackQF, pProject->instrumental.omi.xtrack_mode) ) {
+                 !omi_use_track(pRecord->xtrack_QF, pProject->instrumental.omi.xtrack_mode) ) {
        // skip this spectrum
      } else {
        longit=pRecord->longitude;
@@ -2466,7 +2489,6 @@ int mediateRequestNextMatchingCalibrateSpectrum(void *engineContext,
    if (rec > 0 && (pEngineContext->indexRecord<=pEngineContext->recordNumber))
     {
      mediateRequestPlotSpectra(pEngineContext,responseHandle);
-
      if ((rc = ANALYSE_Spectrum(pEngineContext,responseHandle))!=ERROR_ID_NO)
       ERROR_DisplayMessage(responseHandle);
     }
@@ -2517,18 +2539,22 @@ int mediateRequestViewCrossSections(void *engineContext, char *awName,double min
 
    ENGINE_CONTEXT *pEngineContext = (ENGINE_CONTEXT *)engineContext;
    char symbolName[MAX_ITEM_NAME_LEN+1],*ptr,                                   // the symbol name
-     windowTitle[MAX_ITEM_TEXT_LEN],                                       // title to display at the top of the page
-     tabTitle[MAX_ITEM_TEXT_LEN];                                          // title to display on the tab of the page
-   MATRIX_OBJECT xs;                                                             // matrix to load the cross section
-   INDEX indexFile;                                                              // browse files
-   int   indexLine,indexColumn;                                                  // browse lines and column in the data page
-   plot_data_t xs2plot;                                                          // cross  section to plot
+        windowTitle[MAX_ITEM_TEXT_LEN],                                         // title to display at the top of the page
+        tabTitle[MAX_ITEM_TEXT_LEN],                                            // title to display on the tab of the page
+       *ext;                                                                    // pointer to the extension of the file
+   MATRIX_OBJECT xs;                                                            // matrix to load the cross section
+   INDEX indexFile;                                                             // browse files
+   int   indexLine,indexColumn;                                                 // browse lines and column in the data page
+   plot_data_t xs2plot;                                                         // cross  section to plot
+   bool use_rows[MAX_SWATHSIZE];                                                // only select the first row
 
    // Initializations
 
-   sprintf(windowTitle,"Cross sections used in %s analysis window of project %s",awName,pEngineContext->project.window_name);   // !!! it would be nice to add also the project name
-   sprintf(tabTitle,"%s.%s (XS)",pEngineContext->project.window_name,awName);
+   sprintf(windowTitle,"Cross sections used in %s analysis window of project %s",awName,pEngineContext->project.project_name);  
+   sprintf(tabTitle,"%s.%s (XS)",pEngineContext->project.project_name,awName);
    indexLine=indexColumn=2;
+   memset(use_rows,false,sizeof(bool)*MAX_SWATHSIZE);
+   use_rows[0]=true;
 
    // Get index of selected analysis window in list
 
@@ -2548,17 +2574,29 @@ int mediateRequestViewCrossSections(void *engineContext, char *awName,double min
       }
      else
       symbolName[0]='\0';
+     
+     if ((ext=strrchr(filenames[indexFile],'.'))!=NULL) 
+      ext++;
+     else
+      ext="xs";
+     
 
      // Load the file
 
-     if (!MATRIX_Load(filenames[indexFile],&xs,0,0,
+     if ((strcmp(ext,"nc") && !MATRIX_Load(filenames[indexFile],&xs,0,0,
                       minWavelength,maxWavelength,
                       0,   // no derivatives
                       1,   // reverse vectors if needed
-                      "mediateRequestViewCrossSections") && (xs.nl>1) && (xs.nc>1))
+                      "mediateRequestViewCrossSections") && (xs.nl>1) && (xs.nc>1)) || 
+         (!strcmp(ext,"nc") && !MATRIX_netcdf_LoadXS(filenames[indexFile],&xs,0,0,
+                      minWavelength,maxWavelength,
+                      0,   // no derivatives
+                      1,   // reverse vectors if needed
+                      use_rows,
+                      "mediateRequestViewCrossSections") && (xs.nl>1) && (xs.nc>1))) 
       {
        // Plot the cross section
-
+       
        mediateAllocateAndSetPlotData(&xs2plot,symbolName,xs.matrix[0],xs.matrix[1],xs.nl,Line);
        mediateResponsePlotData(plotPageCross,&xs2plot,1,Spectrum,0,symbolName,"Wavelength","cm**2 / molec", responseHandle);
        mediateResponseLabelPage(plotPageCross,windowTitle,tabTitle, responseHandle);
@@ -2567,7 +2605,7 @@ int mediateRequestViewCrossSections(void *engineContext, char *awName,double min
       }
      else
       mediateResponseCellInfo(plotPageCross,indexLine,indexColumn,responseHandle,filenames[indexFile],"%s","Not found !!!");
-
+     
      // Release the allocated buffers
 
      MATRIX_Free(&xs,"mediateRequestViewCrossSections");

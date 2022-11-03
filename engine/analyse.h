@@ -36,10 +36,11 @@ struct _AnalyseNonLinearParameters {
 // ---------------------------
 
 enum _analysisType {
-  ANALYSIS_TYPE_FWHM_NONE,                                                      // no fwhm fit
+  ANALYSIS_TYPE_FWHM_NONE,                                                      // not concerned by slit function
   ANALYSIS_TYPE_FWHM_CORRECTION,                                                // fwhm correction between spectrum and reference based on their temperature
   ANALYSIS_TYPE_FWHM_KURUCZ,                                                    // fwhm fit in Kurucz procedure
-  ANALYSIS_TYPE_FWHM_NLFIT                                                      // fit the difference of resolution between spectrum and reference
+  ANALYSIS_TYPE_FWHM_NLFIT,                                                     // fit the difference of resolution between spectrum and reference
+  ANALYSIS_TYPE_FWHM_SLIT                                                       // do not fit fwhm in Kurucz procedure, slit function retrieved from slit page
 };
 
 enum linear_offset_mode {
@@ -210,6 +211,7 @@ struct _feno {
   int             xsToConvolute;                                                // flag set if high resolution cross sections to convolute real time
   int             xsToConvoluteI0;
   int             xsPukite;
+  int             saveResidualsFlag;
 
   double         *LambdaRef,                                                    // absolute reference wavelength scale
                  *LambdaK,                                                      // new wavelength scale after Kurucz
@@ -223,6 +225,7 @@ struct _feno {
                  *SrefEtalon,                                                   // etalon reference spectrum
                  *SrefRadAsRef1,                                                // RadAsRef reference spectrum
                  *SrefRadAsRef2,                                                // RadAsRef reference spectrum
+                 *residualSpectrum,                                             // residuals spectrum
                   Shift,                                                        // shift found when aligning etalon on reference
                   Stretch,                                                      // stretch order 1 found when aligning etalon on reference
                   Stretch2,                                                     // stretch order 2 found when aligning etalon on reference

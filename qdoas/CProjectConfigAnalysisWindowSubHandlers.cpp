@@ -104,6 +104,8 @@ bool CAnalysisWindowSubHandler::start(const QString &element, const QXmlAttribut
     return postErrorMessage("Residual Filename too long");
     }
 
+    d->saveResidualsFlag = (atts.value("saveresiduals") == "true") ? 1 : 0;
+
     d->refMinLongitude = atts.value("minlon").toDouble();
     d->refMaxLongitude = atts.value("maxlon").toDouble();
     d->refMinLatitude = atts.value("minlat").toDouble();

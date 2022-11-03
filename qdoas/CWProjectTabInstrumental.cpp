@@ -2224,6 +2224,14 @@ CWInstrGemsEdit::CWInstrGemsEdit(const struct instrumental_gems *pInstrGems, QWi
   mainLayout->addLayout(gridLayout);
 
   int row = 0;
+  
+//   gridLayout->addWidget(new QLabel("Binning", this), row, 0);
+//   m_binning = new QSpinBox(this);
+//   m_binning->setRange(1, 2048);
+//   m_binning->setFixedWidth(cStandardEditWidth);
+//   gridLayout->addWidget(m_binning, row, 1);
+//   
+//   ++row;
 
   // Track selection
   gridLayout->addWidget(new QLabel("Row selection", this), row, 0);
@@ -2232,10 +2240,10 @@ CWInstrGemsEdit::CWInstrGemsEdit(const struct instrumental_gems *pInstrGems, QWi
   ++row;
 
   helperConstructCalInsFileWidgets(gridLayout, row,
-                   pInstrGems->calibrationFile, sizeof(pInstrGems->calibrationFile),
-                   pInstrGems->transmissionFunctionFile, sizeof(pInstrGems->transmissionFunctionFile));
+  pInstrGems->calibrationFile, sizeof(pInstrGems->calibrationFile),
+  pInstrGems->transmissionFunctionFile, sizeof(pInstrGems->transmissionFunctionFile));
 
-        m_trackSelection->setText(QString(pInstrGems->trackSelection));
+  m_trackSelection->setText(QString(pInstrGems->trackSelection));
 }
 
 void CWInstrGemsEdit::apply(struct instrumental_gems *pInstrGems) const
@@ -2243,6 +2251,8 @@ void CWInstrGemsEdit::apply(struct instrumental_gems *pInstrGems) const
   strcpy(pInstrGems->calibrationFile, m_fileOneEdit->text().toLocal8Bit().data());
   strcpy(pInstrGems->transmissionFunctionFile, m_fileTwoEdit->text().toLocal8Bit().data());
   strcpy(pInstrGems->trackSelection, m_trackSelection->text().toLocal8Bit().data());
+  
+//  pInstrGems->binning = m_binning->value();
 }
 
 //--------------------------------------------------------

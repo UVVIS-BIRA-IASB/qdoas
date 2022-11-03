@@ -82,6 +82,19 @@ bool CRingGeneralSubHandler::start(const QXmlAttributes &atts)
   m_d->noheader = (atts.value("rmhdr") == "true") ? 1 : 0;
   m_d->saveraman = (atts.value("save_raman") == "true") ? 1 : 0;
 
+  // output format
+  str = atts.value("output_format");
+  if (str == "ascii")
+    m_d->formatType = CONVOLUTION_FORMAT_ASCII;
+  else if (str == "netcdf")
+    m_d->formatType = CONVOLUTION_FORMAT_NETCDF;
+  else
+    m_d->formatType = CONVOLUTION_FORMAT_ASCII;
+  
+   // number of ground pixels
+  str = atts.value("pixels");
+  m_d->n_groundpixel=(!str.isEmpty())?str.toInt():1;
+
   str = atts.value("output");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);

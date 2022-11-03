@@ -17,10 +17,22 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef _CVALIDATOR_H_GUARD
+#ifndef _CVALIDATOR_H_GUARD 
 #define _CVALIDATOR_H_GUARD
 
 #include <QValidator>
+
+class CRecordValidator : public QValidator
+{
+ public:
+  CRecordValidator(QObject *obj);
+
+  void setRange(int bottom, int top);
+  virtual QValidator::State validate(QString &input, int &pos) const;
+
+ private:
+  int m_bottom, m_top;
+};
 
 // CSzaValidator : Allow '0.000 to 180.000' with 3 decimal precision
 
