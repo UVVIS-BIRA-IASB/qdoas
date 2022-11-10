@@ -225,7 +225,7 @@ RC GEMS_LoadReference(char *filename,int indexFenoColumn,double *lambda,double *
    return rc;
  }
  
-int GEMS_init(ENGINE_CONTEXT *pEngineContext,char *ref_filename,int* n_wavel_temp) 
+int GEMS_Init(ENGINE_CONTEXT *pEngineContext,char *ref_filename,int* n_wavel_temp) 
  {
   int rc=ERROR_ID_NO;
   try 

@@ -1726,11 +1726,11 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
      // ANALYSE_swathSize=2048; //pInstrumental->gems.binning;    
      pEngineContext->radAsRefFlag=0;
      if (strlen(analysisWindows[0].refOneFile))
-      rc = GEMS_init(pEngineContext,analysisWindows[0].refOneFile,&n_wavel_temp1);
+      rc = GEMS_Init(pEngineContext,analysisWindows[0].refOneFile,&n_wavel_temp1);
      if (strlen(analysisWindows[0].refTwoFile))
       {
        pEngineContext->radAsRefFlag=1;
-       rc = GEMS_init(pEngineContext,analysisWindows[0].refTwoFile,&n_wavel_temp2);
+       rc = GEMS_Init(pEngineContext,analysisWindows[0].refTwoFile,&n_wavel_temp2);
       }
      break;
      // TO SEE LATER WHAT IS NECESSARY FOR THIS FORMAT rc = gems_init(analysisWindows[0].refOneFile,pEngineContext);              // !!! GEMS : if fixed format, just initialize the ANALYSE_swathSize
