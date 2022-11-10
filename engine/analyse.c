@@ -163,6 +163,7 @@
 #include "raman.h"
 #include "gems_read.h"
 #include "output_netcdf.h"
+#include "matrix_netcdf_read.h"
 
 // ===================
 // Global DECLARATIONS
