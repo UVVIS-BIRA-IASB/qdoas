@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.8.0)
 
 project(qdoas)
 
-set(VERSION 3.4.6)
+set(VERSION 3.5.0)
 set(QDOAS_VERSION "3.5.0" CACHE STRING "")
 set(QDOAS_DATE "7 November 2022" CACHE STRING "")
 
