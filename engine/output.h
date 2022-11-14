@@ -2,6 +2,7 @@
 #define OUTPUT_H
 
 #include "engine.h"
+#include "doas.h"
 #include "output_formats.h"
 
 /*! \file output.h \brief Output module interface.*/

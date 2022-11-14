@@ -95,9 +95,10 @@ int NetCDFGroup::dimID(const string& dimName) const {
   int rc = nc_inq_dimid(groupid, dimName.c_str(), &id);
   if(rc == NC_NOERR) {
     return id;
-  } 
-  else
-    return -1;
+  } else {
+    throw std::runtime_error("Cannot find netCDF dimension '"+dimName+"' in group '"+name+"'");
+  }
+  return -1;
 }
 
 
@@ -153,8 +154,8 @@ NetCDFFile& NetCDFFile::operator=(NetCDFFile &&other) {
 }
 
 #define NEW_CACHE_SIZE 32000000
-#define NEW_CACHE_NELEMS 1000000
-#define NEW_CACHE_PREEMPTION 0.75
+#define NEW_CACHE_NELEMS 2000
+#define NEW_CACHE_PREEMPTION .75
 
 static int openNetCDF(const string &filename, int mode) {
   int groupid;
@@ -304,17 +305,4 @@ string NetCDFGroup::getAttText(const string& name, int varid) {
   charbuf[len] = '\0';
   status = nc_get_att_text(groupid, varid, name.c_str(), charbuf.data());
   return string(charbuf.data() );
-}
-
-double NetCDFGroup::getAttDouble(const string& name, int varid) {
-  size_t len;
-  double data;
-  ; // len does not include terminating NULL string
-  int status = nc_inq_att(groupid, varid, name.c_str(), NULL, &len);
-  if (status != NC_NOERR)
-    data=0.;
-  else
-    status = nc_get_att_double(groupid, varid, name.c_str(), &data);
-  
-  return data;
 }

@@ -648,12 +648,12 @@ void CWMoleculesDoasTable::slotInsertRow()
       if (symbol_name.startsWith("Slope") || symbol_name.startsWith("Pukite"))
        {
         if (symbol_name.startsWith("Slope"))
-         filter.append(*it).append(" (Slope*.*);;");
+         filter.append(*it).append(" (Slope*.xs*);;");
         if (symbol_name.startsWith("Pukite"))
-         filter.append(*it).append(" (Pukite*.*);;");
+         filter.append(*it).append(" (Pukite*.xs*);;");
        }
       else
-       filter.append(*it).append(" (").append(*it).append("_*.*);;");
+       filter.append(*it).append(" (").append(*it).append("_*.xs*);;");
     }
     ++it;
   }
@@ -720,7 +720,7 @@ void CWMoleculesDoasTable::slotChangeCrossSectionFileName()
     QString prefix = rowLabel(m_selectedRow);
 
     QString filter = prefix;
-    filter.append(" (").append(prefix).append("_*.*);;All files (*)");
+    filter.append(" (").append(prefix).append("_*.xs*);;All files (*)");
 
     // file dialog to change the cross section
     QString filename = QFileDialog::getOpenFileName(this, "Cross section Filename", m_csFilename.at(m_selectedRow), filter);

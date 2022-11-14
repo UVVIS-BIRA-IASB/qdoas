@@ -37,8 +37,6 @@ extern "C" {
   {
     int convolutionType;
     int conversionType;
-    int formatType; 
-    int n_groundpixel;
     double shift;
     double conc;
     int noheader;

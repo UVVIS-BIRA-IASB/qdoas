@@ -30,8 +30,7 @@ enum output_datatype {
   OUTPUT_DOUBLE, /*!< double */
   OUTPUT_DATE, /*!< \ref date structure */
   OUTPUT_TIME, /*!< \ref time structure */
-  OUTPUT_DATETIME, /*!< \ref datetime structure */
-  OUTPUT_RESIDUAL
+  OUTPUT_DATETIME /*!< \ref datetime structure */
 };
 
 struct field_attribute{
@@ -169,7 +168,7 @@ extern struct output_field output_data_analysis[MAX_FIELDS];
 extern struct output_field output_data_calib[MAX_CALIB_FIELDS];
 
 /*! \brief returns the number of bytes used by an output datatype. */
-size_t output_get_size(enum output_datatype datatype,int n_cols);
+size_t output_get_size(enum output_datatype datatype);
 
 /** @name Open output file.*/
 //!@{

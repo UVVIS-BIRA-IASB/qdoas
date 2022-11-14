@@ -171,7 +171,7 @@ RC FILTER_OddEvenCorrection(double *lambdaData,double *specData,double *output,i
 
 void fourier(double *data,int nn,int is)
  {
-  // Declarations
+     // Declarations
 
   double wtemp,theta,wr,wi,wpr,wpi,tempr,tempi;
   int    j,n,i,m,nmax,istep;
@@ -250,7 +250,7 @@ void fourier(double *data,int nn,int is)
 
 void realft(double *source,double *buffer,int nn,int is)
  {
-  // Declarations
+     // Declarations
 
   double wr,wi,wpr,wpi,wtemp,theta;
   double c1,c2,h1r,h1i,h2r,h2i,wrs,wis;
@@ -338,7 +338,7 @@ void realft(double *source,double *buffer,int nn,int is)
 
 double ModBessel(double X)
  {
-  // Declarations
+     // Declarations
 
   double S, Ds;
   int D;
@@ -387,7 +387,7 @@ double ModBessel(double X)
 
 RC FilterNeqRipple (PRJCT_FILTER *pFilter,double *Beta, double *Delta,double *dB)
  {
-  // Declarations
+     // Declarations
 
   int i, j, k,Nterm;
   double Kf, Eta, Be1, Be2, Gk, Dk, Geta;
@@ -662,8 +662,8 @@ RC FILTER_Build(PRJCT_FILTER *pFilter,double fa1,double fa2,double fa3)
      {
       if (filterType==PRJCT_FILTER_TYPE_BINOMIAL)
        {
-        if (!(rc=FilterPascalTriangle(pFilter->filterFunction,pFilter->filterSize-1)))
-         {
+           if (!(rc=FilterPascalTriangle(pFilter->filterFunction,pFilter->filterSize-1)))
+            {
           memcpy(pFilter->filterFunction+1,pFilter->filterFunction+(pFilter->filterSize>>1)+1,sizeof(double)*((pFilter->filterSize+1)>>1));
           sum=(double)pow(2.,pFilter->filterSize-1);
          }

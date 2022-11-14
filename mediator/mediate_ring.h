@@ -46,8 +46,6 @@ extern "C" {
     char calibrationFile[FILENAME_BUFFER_LENGTH];
     char solarRefFile[FILENAME_BUFFER_LENGTH];
     mediate_slit_function_t slit;
-    int formatType;
-    int n_groundpixel;
   } mediate_ring_t;
 
 

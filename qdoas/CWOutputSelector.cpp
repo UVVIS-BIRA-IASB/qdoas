@@ -145,9 +145,9 @@ CWOutputSelector::CWOutputSelector(const data_select_list_t *d, QWidget *parent)
   m_availableList->addItem(new CWOutputFieldItem(PRJCT_RESULTS_SATURATED,              "Saturated flag"           ));
   m_availableList->addItem(new CWOutputFieldItem(PRJCT_RESULTS_INDEX_ALONGTRACK,       "Along-track index"));
   m_availableList->addItem(new CWOutputFieldItem(PRJCT_RESULTS_INDEX_CROSSTRACK,       "Cross-track index"));
-  m_availableList->addItem(new CWOutputFieldItem(PRJCT_RESULTS_GROUNDP_QF,             "Ground pixel quality flags"));
-  m_availableList->addItem(new CWOutputFieldItem(PRJCT_RESULTS_XTRACK_QF,              "Xtrack quality flags"));
-  m_availableList->addItem(new CWOutputFieldItem(PRJCT_RESULTS_PIXELS_QF,              "Rejected pixels based on quality flags"));
+  m_availableList->addItem(new CWOutputFieldItem(PRJCT_RESULTS_OMI_GROUNDP_QF,         "Ground pixel quality flags"));
+  m_availableList->addItem(new CWOutputFieldItem(PRJCT_RESULTS_OMI_XTRACK_QF,          "Xtrack quality flags"));
+  m_availableList->addItem(new CWOutputFieldItem(PRJCT_RESULTS_OMI_PIXELS_QF,          "Rejected pixels based on quality flags"));
   m_availableList->addItem(new CWOutputFieldItem(PRJCT_RESULTS_OMI_CONFIGURATION_ID,   "Instrument configuration id"));
   m_availableList->addItem(new CWOutputFieldItem(PRJCT_RESULTS_SPIKES,                 "Pixels with spikes in residual"));
   m_availableList->addItem(new CWOutputFieldItem(PRJCT_RESULTS_UAV_SERVO_BYTE_SENT,    "Servo position byte sent"));
@@ -178,7 +178,6 @@ CWOutputSelector::CWOutputSelector(const data_select_list_t *d, QWidget *parent)
 
   m_availableList->addItem(new CWOutputFieldItem(PRJCT_RESULTS_PRECALCULATED_FLUXES,   "Precalculated fluxes"));
   m_availableList->addItem(new CWOutputFieldItem(PRJCT_RESULTS_RC,                     "Return code"));
-  m_availableList->addItem(new CWOutputFieldItem(PRJCT_RESULTS_RESIDUAL_SPECTRUM ,     "Residual spectrum"));
 
   // populate the selected list by key-reference to the available list ...
 
@@ -668,12 +667,12 @@ void getValidFieldFlags(int *validFlags, int instrument,int selectorOrigin)
      {
       validFlags[PRJCT_RESULTS_INDEX_ALONGTRACK]=1;
       validFlags[PRJCT_RESULTS_INDEX_CROSSTRACK]=1;
-      validFlags[PRJCT_RESULTS_GROUNDP_QF]=1;
-      validFlags[PRJCT_RESULTS_XTRACK_QF]=1;
+      validFlags[PRJCT_RESULTS_OMI_GROUNDP_QF]=1;
+      validFlags[PRJCT_RESULTS_OMI_XTRACK_QF]=1;
       validFlags[PRJCT_RESULTS_OMI_CONFIGURATION_ID]=1;
 
       if (selectorOrigin!=TAB_SELECTOR_EXPORT)
-       validFlags[PRJCT_RESULTS_PIXELS_QF]=1;
+       validFlags[PRJCT_RESULTS_OMI_PIXELS_QF]=1;
 
       validFlags[PRJCT_RESULTS_SAT_LAT]=1;
       validFlags[PRJCT_RESULTS_SAT_LON]=1;
@@ -724,18 +723,12 @@ void getValidFieldFlags(int *validFlags, int instrument,int selectorOrigin)
 
    case PRJCT_INSTR_FORMAT_GEMS :
      {
-      validFlags[PRJCT_RESULTS_INDEX_ALONGTRACK]=1;
-      validFlags[PRJCT_RESULTS_INDEX_CROSSTRACK]=1;
-      validFlags[PRJCT_RESULTS_LONGIT]=1;
-      validFlags[PRJCT_RESULTS_LATIT]=1;
-      validFlags[PRJCT_RESULTS_VIEW_ZENITH]=1;
-      validFlags[PRJCT_RESULTS_VIEW_AZIMUTH]=1;
-      validFlags[PRJCT_RESULTS_GROUNDP_QF]=1;
-      validFlags[PRJCT_RESULTS_XTRACK_QF]=1;
-      validFlags[PRJCT_RESULTS_SAT_HEIGHT]=1;
-      validFlags[PRJCT_RESULTS_SAT_LAT]=1;
-      validFlags[PRJCT_RESULTS_SAT_LON]=1;
-      validFlags[PRJCT_RESULTS_RESIDUAL_SPECTRUM]=1;
+       validFlags[PRJCT_RESULTS_INDEX_ALONGTRACK]=1;
+       validFlags[PRJCT_RESULTS_INDEX_CROSSTRACK]=1;
+       validFlags[PRJCT_RESULTS_LONGIT]=1;
+       validFlags[PRJCT_RESULTS_LATIT]=1;
+       validFlags[PRJCT_RESULTS_VIEW_ZENITH]=1;
+       validFlags[PRJCT_RESULTS_VIEW_AZIMUTH]=1;
      }
      break;
 

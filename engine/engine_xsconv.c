@@ -63,16 +63,16 @@
 
 ENGINE_XSCONV_CONTEXT *EngineXsconvCreateContext(void)
  {
-  // Declaration
+     // Declaration
 
-  ENGINE_XSCONV_CONTEXT *pEngineContext;                                        // pointer to the engine context
+     ENGINE_XSCONV_CONTEXT *pEngineContext;                                        // pointer to the engine context
 
-  if ((pEngineContext=(ENGINE_XSCONV_CONTEXT *)malloc(sizeof(ENGINE_XSCONV_CONTEXT)))!=NULL)
-   memset(pEngineContext,0,sizeof(ENGINE_XSCONV_CONTEXT));                      // main engine context
+     if ((pEngineContext=(ENGINE_XSCONV_CONTEXT *)malloc(sizeof(ENGINE_XSCONV_CONTEXT)))!=NULL)
+      memset(pEngineContext,0,sizeof(ENGINE_XSCONV_CONTEXT));                      // main engine context
 
   // Return
 
-  return pEngineContext;
+     return pEngineContext;
  }
 
 // -----------------------------------------------------------------------------
@@ -87,7 +87,7 @@ ENGINE_XSCONV_CONTEXT *EngineXsconvCreateContext(void)
 
 RC EngineXsconvDestroyContext(ENGINE_XSCONV_CONTEXT *pEngineContext)
  {
-  MATRIX_Free(&pEngineContext->xsNew,"EngineXsconvDestroyContext");
+     MATRIX_Free(&pEngineContext->xsNew,"EngineXsconvDestroyContext");
 
   if (pEngineContext->filterVector!=NULL)
    MEMORY_ReleaseDVector("EngineXsconvDestroyContext","filterVector",pEngineContext->filterVector,0);
@@ -95,5 +95,5 @@ RC EngineXsconvDestroyContext(ENGINE_XSCONV_CONTEXT *pEngineContext)
   if (pEngineContext!=NULL)
    free(pEngineContext);
 
-  return 0;
+     return 0;
  }

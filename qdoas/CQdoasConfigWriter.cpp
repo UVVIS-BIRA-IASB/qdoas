@@ -979,7 +979,7 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
   tmpStr = pathMgr->simplifyPath(QString(d->tropomi.instrFunctionFile));
   fprintf(fp, " instr=\"%s\" />\n", tmpStr.toUtf8().constData());
 
-  fprintf(fp, "      <gems trackSelection=\"%s\" binning=\"%d\"",d->gems.trackSelection,d->gems.binning);
+  fprintf(fp, "      <gems trackSelection=\"%s\"",d->gems.trackSelection);
   tmpStr = pathMgr->simplifyPath(QString(d->apex.calibrationFile));
   fprintf(fp, " calib=\"%s\"", tmpStr.toUtf8().constData());
 
@@ -1240,61 +1240,61 @@ void CQdoasConfigWriter::writeAnalysisWindows(FILE *fp, const QString &projectNa
       properties = CWorkSpace::instance()->findAnalysisWindow(projectName, awName);
       if (properties != NULL) {
 
- fprintf(fp, "    <analysis_window name=\"%s\" disable=\"%s\" kurucz=", awName.toUtf8().constData(),
-  (awItem->isEnabled() ? sFalse : sTrue));
+    fprintf(fp, "    <analysis_window name=\"%s\" disable=\"%s\" kurucz=", awName.toUtf8().constData(),
+        (awItem->isEnabled() ? sFalse : sTrue));
 
- switch (properties->kuruczMode) {
- case ANLYS_KURUCZ_REF:
-   fprintf(fp, "\"ref\""); break;
- case ANLYS_KURUCZ_SPEC:
-   fprintf(fp, "\"spec\""); break;
- case ANLYS_KURUCZ_REF_AND_SPEC:
-   fprintf(fp, "\"ref+spec\""); break;
- default:
-   fprintf(fp, "\"none\"");
- }
+    switch (properties->kuruczMode) {
+    case ANLYS_KURUCZ_REF:
+      fprintf(fp, "\"ref\""); break;
+    case ANLYS_KURUCZ_SPEC:
+      fprintf(fp, "\"spec\""); break;
+    case ANLYS_KURUCZ_REF_AND_SPEC:
+      fprintf(fp, "\"ref+spec\""); break;
+    default:
+      fprintf(fp, "\"none\"");
+    }
 
- if (properties->refSpectrumSelection == ANLYS_REF_SELECTION_MODE_AUTOMATIC)
-   fprintf(fp, " refsel=\"auto\"");
- else
-   fprintf(fp, " refsel=\"file\"");
+    if (properties->refSpectrumSelection == ANLYS_REF_SELECTION_MODE_AUTOMATIC)
+      fprintf(fp, " refsel=\"auto\"");
+    else
+      fprintf(fp, " refsel=\"file\"");
 
- fprintf(fp, " min=\"%.3f\" max=\"%.3f\" resol_fwhm=\"%.3f\" lambda0=\"%.3f\" >\n", properties->fitMinWavelength, properties->fitMaxWavelength, properties->resolFwhm,properties->lambda0);
+    fprintf(fp, " min=\"%.3f\" max=\"%.3f\" resol_fwhm=\"%.3f\" lambda0=\"%.3f\" >\n", properties->fitMinWavelength, properties->fitMaxWavelength, properties->resolFwhm,properties->lambda0);
 
- fprintf(fp, "      <display spectrum=\"%s\" poly=\"%s\" fits=\"%s\" residual=\"%s\" predef=\"%s\" ratio=\"%s\" />\n",
-  (properties->requireSpectrum ? sTrue : sFalse),
-  (properties->requirePolynomial ? sTrue : sFalse),
-  (properties->requireFit ? sTrue : sFalse),
-  (properties->requireResidual ? sTrue : sFalse),
-  (properties->requirePredefined ? sTrue : sFalse),
-  (properties->requireRefRatio ? sTrue : sFalse));
+    fprintf(fp, "      <display spectrum=\"%s\" poly=\"%s\" fits=\"%s\" residual=\"%s\" predef=\"%s\" ratio=\"%s\" />\n",
+        (properties->requireSpectrum ? sTrue : sFalse),
+        (properties->requirePolynomial ? sTrue : sFalse),
+        (properties->requireFit ? sTrue : sFalse),
+        (properties->requireResidual ? sTrue : sFalse),
+        (properties->requirePredefined ? sTrue : sFalse),
+        (properties->requireRefRatio ? sTrue : sFalse));
 
- tmpStr = pathMgr->simplifyPath(QString(properties->refOneFile));
- fprintf(fp, "      <files refone=\"%s\"\n", tmpStr.toUtf8().constData());
- tmpStr = pathMgr->simplifyPath(QString(properties->refTwoFile));
- fprintf(fp, "             reftwo=\"%s\"\n", tmpStr.toUtf8().constData());
- tmpStr = pathMgr->simplifyPath(QString(properties->residualFile));
+    tmpStr = pathMgr->simplifyPath(QString(properties->refOneFile));
+    fprintf(fp, "      <files refone=\"%s\"\n", tmpStr.toUtf8().constData());
+    tmpStr = pathMgr->simplifyPath(QString(properties->refTwoFile));
+    fprintf(fp, "             reftwo=\"%s\"\n", tmpStr.toUtf8().constData());
+    tmpStr = pathMgr->simplifyPath(QString(properties->residualFile));
 
- fprintf(fp, "             residual=\"%s\"\nsaveresiduals=\"%s\" szacenter=\"%.3f\" szadelta=\"%.3f\" scanmode=",tmpStr.toUtf8().constData(),(properties->saveResidualsFlag ? sTrue : sFalse),properties->refSzaCenter , properties->refSzaDelta);
+    fprintf(fp, "             residual=\"%s\"\nszacenter=\"%.3f\" szadelta=\"%.3f\" scanmode=",tmpStr.toUtf8().constData(),properties->refSzaCenter , properties->refSzaDelta);
 
- switch(properties->refSpectrumSelectionScanMode)
-  {
-   case ANLYS_MAXDOAS_REF_SCAN_BEFORE :
-    fprintf(fp,"\"before\" ");
-   break;
+    switch(properties->refSpectrumSelectionScanMode)
+     {
+         case ANLYS_MAXDOAS_REF_SCAN_BEFORE :
+          fprintf(fp,"\"before\" ");
+         break;
 
-   case ANLYS_MAXDOAS_REF_SCAN_AVERAGE :
-    fprintf(fp,"\"average\" ");
-   break;
+         case ANLYS_MAXDOAS_REF_SCAN_AVERAGE :
+          fprintf(fp,"\"average\" ");
+         break;
 
-   case ANLYS_MAXDOAS_REF_SCAN_INTERPOLATE :
-    fprintf(fp,"\"interpolate\" ");
-   break;
+         case ANLYS_MAXDOAS_REF_SCAN_INTERPOLATE :
+          fprintf(fp,"\"interpolate\" ");
+         break;
 
-   default :
-    fprintf(fp,"\"after\" ");
-   break;
-  }
+         default :
+          fprintf(fp,"\"after\" ");
+         break;
+     }
 
         fprintf(fp,"minlon=\"%.3f\" maxlon=\"%.3f\" minlat=\"%.3f\" maxlat=\"%.3f\" refns=\"%d\" cloudfmin=\"%.3f\" cloudfmax=\"%.3f\" \n",
                 properties->refMinLongitude, properties->refMaxLongitude,
@@ -1680,9 +1680,9 @@ void CQdoasConfigWriter::writeDataSelectList(FILE *fp, const data_select_list_t 
     case PRJCT_RESULTS_SATURATED : config_string = "saturated"; break;
     case PRJCT_RESULTS_INDEX_ALONGTRACK : config_string = "index_alongtrack"; break;
     case PRJCT_RESULTS_INDEX_CROSSTRACK : config_string = "index_crosstrack"; break;
-    case PRJCT_RESULTS_GROUNDP_QF : config_string = "groundp_qf"; break;
-    case PRJCT_RESULTS_XTRACK_QF : config_string = "xtrack_qf"; break;
-    case PRJCT_RESULTS_PIXELS_QF : config_string = "pixels_qf"; break;
+    case PRJCT_RESULTS_OMI_GROUNDP_QF : config_string = "omi_groundp_qf"; break;
+    case PRJCT_RESULTS_OMI_XTRACK_QF : config_string = "omi_xtrack_qf"; break;
+    case PRJCT_RESULTS_OMI_PIXELS_QF : config_string = "omi_pixels_qf"; break;
     case PRJCT_RESULTS_OMI_CONFIGURATION_ID : config_string = "omi_configuration_id"; break;
     case PRJCT_RESULTS_SPIKES: config_string = "spike_pixels"; break;
     case PRJCT_RESULTS_UAV_SERVO_BYTE_SENT : config_string = "servo_byte_sent"; break;
@@ -1710,7 +1710,6 @@ void CQdoasConfigWriter::writeDataSelectList(FILE *fp, const data_select_list_t 
     case PRJCT_RESULTS_ZENITH_AFTER : config_string = "zenith_after_index"; break;
     case PRJCT_RESULTS_PRECALCULATED_FLUXES : config_string = "precalculated_fluxes"; break;
     case PRJCT_RESULTS_RC : config_string = "rc"; break;
-    case PRJCT_RESULTS_RESIDUAL_SPECTRUM : config_string = "residual_spectrum"; break;
 
     default: puts("ERROR: no configuration string defined for output field. This is a bug, please contact Qdoas developers.");
     }

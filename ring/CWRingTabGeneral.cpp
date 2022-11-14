@@ -32,8 +32,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "constants.h"
 
-static const int cStandardEditWidth         = 70;
-static const int cSuggestedColumnZeroWidth = 115; // try and keep editor layout
 
 CWRingTabGeneral::CWRingTabGeneral(const mediate_ring_t *properties, QWidget *parent) :
   QFrame(parent)
@@ -78,38 +76,15 @@ CWRingTabGeneral::CWRingTabGeneral(const mediate_ring_t *properties, QWidget *pa
 
   m_slitEdit = new CWSlitSelector(&(properties->slit), "Slit Function", true,this);
   mainLayout->addWidget(m_slitEdit);
-  
-  QGroupBox *outputGroup = new QGroupBox("Output format",this);
-  QGridLayout *outputLayout = new QGridLayout(outputGroup);
 
-  QLabel *labelFormat=new QLabel("Output format", this);
-  labelFormat->setFixedWidth(cSuggestedColumnZeroWidth);
-  outputLayout->addWidget(labelFormat, 0, 0);
-  m_formatCombo = new QComboBox(this);
-  m_formatCombo->addItem("ASCII", QVariant(CONVOLUTION_FORMAT_ASCII));
-  m_formatCombo->addItem("netCDF", QVariant(CONVOLUTION_FORMAT_NETCDF));
-  outputLayout->addWidget(m_formatCombo, 0, 1);
-  
-  QLabel *labelPixel=new QLabel("number of columns", this);
-  labelPixel->setFixedWidth(cSuggestedColumnZeroWidth);
-  outputLayout->addWidget(labelPixel, 1, 0);
-  m_pixelEdit = new QLineEdit(this);
-  m_pixelEdit->setFixedWidth(cStandardEditWidth);
-  m_pixelEdit->setValidator(new QIntValidator(1, 8192, m_pixelEdit));
-  outputLayout->addWidget(m_pixelEdit, 1, 1);
-  outputLayout->setColumnStretch(2, 1);
-  
-  mainLayout->addWidget(outputGroup);
-
-  QGridLayout *tempLayout = new QGridLayout;
+  QHBoxLayout *tempLayout = new QHBoxLayout;
   tempLayout->setMargin(0);
-  tempLayout->addWidget(new QLabel("Temperature (K)", this),0,0);
+  tempLayout->addWidget(new QLabel("Temperature (K)", this));
   m_tempEdit = new QLineEdit(this);
-  m_tempEdit->setFixedWidth(cStandardEditWidth);
   m_tempEdit->setValidator(new CDoubleFixedFmtValidator(0, 999, 1, m_tempEdit));
-  tempLayout->addWidget(m_tempEdit,0,1);
-  tempLayout->rowStretch(1);
-  
+  tempLayout->addWidget(m_tempEdit);
+  tempLayout->addStretch(1);
+
   mainLayout->addLayout(tempLayout);
 
   mainLayout->addStretch(1);
@@ -159,17 +134,6 @@ void CWRingTabGeneral::reset(const mediate_ring_t *properties)
 
   // slit function
   m_slitEdit->reset(&(properties->slit));
-  
-  // output format type
-  int index = m_formatCombo->findData(QVariant(properties->formatType));
-  if (index != -1)
-    m_formatCombo->setCurrentIndex(index);
-  
-  // n groundpixel
-  
-  tmpStr.setNum(properties->n_groundpixel);
-  m_pixelEdit->validator()->fixup(tmpStr);
-  m_pixelEdit->setText(tmpStr);
 }
 
 void CWRingTabGeneral::apply(mediate_ring_t *properties) const
@@ -178,9 +142,6 @@ void CWRingTabGeneral::apply(mediate_ring_t *properties) const
   properties->noheader = (m_headerCheck->checkState() == Qt::Checked) ? 1 : 0;
   properties->saveraman = (m_ramanCheck->checkState() == Qt::Checked) ? 1 : 0;
   properties->temperature = m_tempEdit->text().toDouble();
-  properties->n_groundpixel = m_pixelEdit->text().toInt();
-  
-  properties->formatType = m_formatCombo->itemData(m_formatCombo->currentIndex()).toInt();
 
   strcpy(properties->outputFile, m_outputFileEdit->text().toLocal8Bit().constData());
   strcpy(properties->calibrationFile, m_calibFileEdit->text().toLocal8Bit().constData());

@@ -161,25 +161,18 @@ typedef struct _prjctMfcFormat
  }
 PRJCT_MFC;
 
-typedef struct _prjctGemsFormat
- {
-  int binning;
- }
-PRJCT_GEMS;
-
 typedef struct _prjctInstrumental
  {
-  char        observationSite[MAX_ITEM_NAME_LEN+1];                            // index of observation site in list
-  char        readOutFormat;                                                   // spectra read out format
-   int        user;                                                            // user defined
-  char        calibrationFile[MAX_ITEM_TEXT_LEN];                              // calibration file
-  char        instrFunction[MAX_ITEM_TEXT_LEN];                                // instrumental function
-  char        vipFile[MAX_ITEM_TEXT_LEN];                                      // interpixel variability correction
-  char        dnlFile[MAX_ITEM_TEXT_LEN];                                      // detector not linearity correction
-  char        imagePath[MAX_ITEM_TEXT_LEN];                                    // root path for camera pictures
-  bool        use_row[MAX_SWATHSIZE];                                          // to skip rows of imager instruments
-  INDEX       use_row_index[MAX_SWATHSIZE];                                    // to skip rows of imager instruments
-  int         detectorSize;                                                    // size of detector in pixels
+  char       observationSite[MAX_ITEM_NAME_LEN+1];                            // index of observation site in list
+  char       readOutFormat;                                                   // spectra read out format
+   int         user;                                                             // user defined
+  char       calibrationFile[MAX_ITEM_TEXT_LEN];                            // calibration file
+  char       instrFunction[MAX_ITEM_TEXT_LEN];                              // instrumental function
+  char       vipFile[MAX_ITEM_TEXT_LEN];                                    // interpixel variability correction
+  char       dnlFile[MAX_ITEM_TEXT_LEN];                                    // detector not linearity correction
+  char       imagePath[MAX_ITEM_TEXT_LEN];                                  // root path for camera pictures
+  bool        use_row[MAX_SWATHSIZE];                          // to skip rows of imager instruments
+  int         detectorSize;                                                     // size of detector in pixels
   int         azimuthFlag;
   int         averageFlag;
   PRJCT_ASCII ascii;
@@ -189,7 +182,6 @@ typedef struct _prjctInstrumental
   PRJCT_SCIA  scia;
   PRJCT_OMI   omi;
   PRJCT_MFC   mfc;
-  PRJCT_GEMS  gems;
   char       offsetFile[MAX_ITEM_TEXT_LEN];                                 // offset file
   struct instrumental_tropomi tropomi;
   int         offsetFlag;
@@ -332,6 +324,9 @@ GOME2_DATA;
 // Record information specific to OMI
 
 typedef struct _omi {
+  unsigned short *omiPixelQF;                                                     // pixel quality flag
+  unsigned short  omiGroundPQF;                                                 // ground pixel quality flags
+  unsigned short  omiXtrackQF;                                                  // xtrack quality flags
   unsigned short  instrumentConfigurationId;
 }
 OMI_DATA;
@@ -456,7 +451,6 @@ typedef struct _engineBuffers
   INDEX  *zenithBeforeIndexes;
   INDEX  *zenithAfterIndexes;
   unsigned int *recordIndexes;                                                     // indexes of records for direct access (specific to BIRA-IASB spectra file format)
-  unsigned short *pixel_QF;
   MATRIX_OBJECT dnl;                                                            // correction for the non linearity of the detector
  }
 BUFFERS;
@@ -556,11 +550,7 @@ typedef struct _engineRecordInfo
   char  refFileName[DOAS_MAX_PATH_LEN+1];
   int    refRecord;
   RC rc;
-  
-  // quality flag
 
-  unsigned short  ground_pixel_QF;                                            // ground pixel quality flags
-  unsigned short  xtrack_QF;                                                  // xtrack quality flags
  }
 RECORD_INFO;
 

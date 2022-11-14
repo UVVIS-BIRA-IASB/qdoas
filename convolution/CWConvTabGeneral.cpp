@@ -32,7 +32,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "constants.h"
 
-static const int cStandardEditWidth         = 70;
 
 CWConvTabGeneral::CWConvTabGeneral(const mediate_conv_general_t *properties, QWidget *parent) :
   QFrame(parent)
@@ -77,29 +76,10 @@ CWConvTabGeneral::CWConvTabGeneral(const mediate_conv_general_t *properties, QWi
   m_concEdit = new QLineEdit(this);
   m_concEdit->setValidator(new CDoubleExpFmtValidator(0.0, 1.0e30, 3, m_concEdit));
   valueLayout->addWidget(m_concEdit, 1, 1);
-  
+
   valueLayout->setColumnStretch(2, 1);
   topLayout->addWidget(valueGroup);
-  
-  // output group
-  
-  QGroupBox *outputGroup = new QGroupBox(this);
-  QGridLayout *outputLayout = new QGridLayout(outputGroup);
 
-  outputLayout->addWidget(new QLabel("Output format", this), 0, 0);
-  m_formatCombo = new QComboBox(this);
-  m_formatCombo->addItem("ASCII", QVariant(CONVOLUTION_FORMAT_ASCII));
-  m_formatCombo->addItem("netCDF", QVariant(CONVOLUTION_FORMAT_NETCDF));
-  outputLayout->addWidget(m_formatCombo, 0, 1);
-
-  outputLayout->addWidget(new QLabel("number of columns", this), 1, 0);
-  m_pixelEdit = new QLineEdit(this);
-  m_pixelEdit->setFixedWidth(cStandardEditWidth);
-  m_pixelEdit->setValidator(new QIntValidator(1, 8192, m_pixelEdit));
-  outputLayout->addWidget(m_pixelEdit, 1, 1);
-  
-  topLayout->addWidget(outputGroup);
-  
   mainLayout->addLayout(topLayout);
 
   QGridLayout *fileLayout = new QGridLayout;
@@ -146,8 +126,6 @@ CWConvTabGeneral::CWConvTabGeneral(const mediate_conv_general_t *properties, QWi
   mainLayout->addLayout(fileLayout);
 
   mainLayout->addStretch(1);
-  
-  // detector size
 
   m_headerCheck = new QCheckBox("Remove Header", this);
   mainLayout->addWidget(m_headerCheck, 0, Qt::AlignLeft);
@@ -188,11 +166,6 @@ void CWConvTabGeneral::reset(const mediate_conv_general_t *properties)
   index = m_conversionCombo->findData(QVariant(properties->conversionType));
   if (index != -1)
     m_conversionCombo->setCurrentIndex(index);
-  
-  // output format type
-  index = m_formatCombo->findData(QVariant(properties->formatType));
-  if (index != -1)
-    m_formatCombo->setCurrentIndex(index);
 
   // shift
   tmpStr.setNum(properties->shift);
@@ -202,13 +175,7 @@ void CWConvTabGeneral::reset(const mediate_conv_general_t *properties)
   tmpStr.setNum(properties->conc);
   m_concEdit->validator()->fixup(tmpStr);
   m_concEdit->setText(tmpStr);
-  
-  // n groundpixel
-  
-  tmpStr.setNum(properties->n_groundpixel);
-  m_pixelEdit->validator()->fixup(tmpStr);
-  m_pixelEdit->setText(tmpStr);
-  
+
   m_headerCheck->setCheckState(properties->noheader ? Qt::Checked : Qt::Unchecked);
 }
 
@@ -216,11 +183,9 @@ void CWConvTabGeneral::apply(mediate_conv_general_t *properties) const
 {
   properties->convolutionType = m_convolutionCombo->itemData(m_convolutionCombo->currentIndex()).toInt();
   properties->conversionType = m_conversionCombo->itemData(m_conversionCombo->currentIndex()).toInt();
-  properties->formatType = m_formatCombo->itemData(m_formatCombo->currentIndex()).toInt();
 
   properties->shift = m_shiftEdit->text().toDouble();
   properties->conc = m_concEdit->text().toDouble();
-  properties->n_groundpixel = m_pixelEdit->text().toInt();
 
   strcpy(properties->inputFile, m_inputFileEdit->text().toLocal8Bit().constData());
   strcpy(properties->outputFile, m_outputFileEdit->text().toLocal8Bit().constData());

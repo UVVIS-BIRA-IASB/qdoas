@@ -117,12 +117,11 @@ enum _filesTypes
   FILE_TYPE_INSTR,                                // instrumental function (*.ins)
   FILE_TYPE_FILTER,                               // filter files (*.flt)
   FILE_TYPE_FIT,                                  // fits files (*.fit*)
-  FILE_TYPE_QDOAS,                                // QDOAS settings (*.xml)
+  FILE_TYPE_INI,                                  // WINDOAS settings (*.wds)
   FILE_TYPE_BMP,                                  // bitmap files (*.bmp)
   FILE_TYPE_RES,                                  // residuals (*.res)
   FILE_TYPE_PATH,                                 // paths
   FILE_TYPE_CFG,                                  // config
-  FILE_TYPE_NETCDF,                               // netCDF (*.nc) 
   FILE_TYPE_MAX
  };
 
@@ -514,7 +513,7 @@ enum _omiSpectralTypes {
   PRJCT_INSTR_OMI_TYPE_MAX
 };
 
-#define MAX_SWATHSIZE 4096 // maximum number of tracks per swath (for satellites)
+#define MAX_SWATHSIZE 1000 // maximum number of tracks per swath (for satellites)
 
 // ----------------
 // RESULTS TAB PAGE
@@ -617,9 +616,9 @@ enum _prjctResults
   PRJCT_RESULTS_SATURATED,
   PRJCT_RESULTS_INDEX_CROSSTRACK,
   PRJCT_RESULTS_INDEX_ALONGTRACK,
-  PRJCT_RESULTS_GROUNDP_QF,
-  PRJCT_RESULTS_XTRACK_QF,
-  PRJCT_RESULTS_PIXELS_QF,
+  PRJCT_RESULTS_OMI_GROUNDP_QF,
+  PRJCT_RESULTS_OMI_XTRACK_QF,
+  PRJCT_RESULTS_OMI_PIXELS_QF,
   PRJCT_RESULTS_OMI_CONFIGURATION_ID,
   PRJCT_RESULTS_SPIKES,
   PRJCT_RESULTS_UAV_SERVO_BYTE_SENT,
@@ -664,7 +663,6 @@ enum _prjctResults
   PRJCT_RESULTS_ZENITH_BEFORE,
   PRJCT_RESULTS_ZENITH_AFTER,
   PRJCT_RESULTS_RC,
-  PRJCT_RESULTS_RESIDUAL_SPECTRUM,
   PRJCT_RESULTS_MAX            // addition/deletion of new fields impact changes in ascii-qdoas (ascFieldsNames)
  };
 
@@ -725,19 +723,10 @@ enum _convolutionTypes {
 // ----------------
 
 enum _conversionModes {
-  CONVOLUTION_CONVERSION_NONE,                                                  // no conversion
-  CONVOLUTION_CONVERSION_AIR2VAC,                                               // air to vacuum
-  CONVOLUTION_CONVERSION_VAC2AIR,                                               // vacuum to air
+  CONVOLUTION_CONVERSION_NONE,                                               // no conversion
+  CONVOLUTION_CONVERSION_AIR2VAC,                                            // air to vacuum
+  CONVOLUTION_CONVERSION_VAC2AIR,                                            // vacuum to air
   CONVOLUTION_CONVERSION_MAX
-};
-
-// Output format
-// -------------
-
-enum _convolutionFormat {
-  CONVOLUTION_FORMAT_ASCII,                                                     // ASCII
-  CONVOLUTION_FORMAT_NETCDF,                                                    // netCDF
-  CONVOLUTION_FORMAT_MAX
 };
 
 // Pages of the dialog box

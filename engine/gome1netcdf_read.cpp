@@ -1621,7 +1621,6 @@ int GOME1NETCDF_InitRef(const char *reference_filename, int *n_wavel_temp,ENGINE
       }
      }
 
-    reference_file.close();
     *n_wavel_temp = spectral_dim;
   } catch(std::runtime_error& e) {
     return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, e.what());
@@ -1674,7 +1673,7 @@ RC GOME1NETCDF_LoadAnalysis(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
 
      // Load calibration and reference spectra
 
-     if (!pTabFeno->hidden && !pTabFeno->gomeRefFlag) { 
+     if (!pTabFeno->hidden && !pTabFeno->gomeRefFlag) {
        // use irradiance from L1B file
        GOME1NETCDF_Get_Irradiance(pOrbitFile,channel_index,pTabFeno->LambdaRef,pTabFeno->SrefEtalon);
 

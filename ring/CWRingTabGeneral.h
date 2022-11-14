@@ -46,8 +46,7 @@ Q_OBJECT
     void slotBrowseSolarReference(void);
 
  private:
-  QComboBox *m_formatCombo;
-  QLineEdit *m_outputFileEdit, *m_calibFileEdit, *m_refFileEdit, *m_pixelEdit;
+  QLineEdit *m_outputFileEdit, *m_calibFileEdit, *m_refFileEdit;
   CWSlitSelector *m_slitEdit;
   QLineEdit *m_tempEdit;
   QCheckBox *m_normalizeCheck;

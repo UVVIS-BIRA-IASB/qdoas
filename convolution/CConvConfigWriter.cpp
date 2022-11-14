@@ -106,10 +106,7 @@ void CConvConfigWriter::writeGeneral(FILE *fp, const mediate_conv_general_t *d)
   }
 
   fprintf(fp, " shift=\"%.3f\" conc=\"%.3g\" rmhdr=\"%s\"",
-  d->shift, d->conc, (d->noheader ? sTrue : sFalse));
-  
-  fprintf(fp," output_format=\"%s\"",(d->formatType==CONVOLUTION_FORMAT_NETCDF)?"netcdf":"ascii");
-  fprintf(fp, " pixels=\"%d\"",d->n_groundpixel);
+      d->shift, d->conc, (d->noheader ? sTrue : sFalse));
 
   tmpStr = pathMgr->simplifyPath(QString(d->inputFile));
   fprintf(fp, " input=\"%s\"", tmpStr.toLocal8Bit().data());

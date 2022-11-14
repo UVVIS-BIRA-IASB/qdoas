@@ -418,12 +418,12 @@ static inline void get_crosstrack_index(struct output_field *this_field __attrib
   *row = 1 + pEngineContext->recordInfo.i_crosstrack;
 }
 
-static inline void get_groundpixelqf(struct output_field *this_field __attribute__ ((unused)), unsigned short *groundpixelqf, const ENGINE_CONTEXT *pEngineContext, int indexFenoColumn __attribute__ ((unused)), int index_calib __attribute__ ((unused))) {
-  *groundpixelqf = pEngineContext->recordInfo.ground_pixel_QF;
+static inline void get_omi_groundpixelqf(struct output_field *this_field __attribute__ ((unused)), unsigned short *groundpixelqf, const ENGINE_CONTEXT *pEngineContext, int indexFenoColumn __attribute__ ((unused)), int index_calib __attribute__ ((unused))) {
+  *groundpixelqf = pEngineContext->recordInfo.omi.omiGroundPQF;
 }
 
-static inline void get_xtrackqf(struct output_field *this_field __attribute__ ((unused)), unsigned short *xtrackqf, const ENGINE_CONTEXT *pEngineContext, int indexFenoColumn __attribute__ ((unused)), int index_calib __attribute__ ((unused))) {
-  *xtrackqf = pEngineContext->recordInfo.xtrack_QF;
+static inline void get_omi_xtrackqf(struct output_field *this_field __attribute__ ((unused)), unsigned short *xtrackqf, const ENGINE_CONTEXT *pEngineContext, int indexFenoColumn __attribute__ ((unused)), int index_calib __attribute__ ((unused))) {
+  *xtrackqf = pEngineContext->recordInfo.omi.omiXtrackQF;
 }
 
 static inline void get_omi_configuration_id(struct output_field *this_field __attribute__ ((unused)), unsigned short *configuration_id, const ENGINE_CONTEXT *pEngineContext, int indexFenoColumn __attribute__ ((unused)), int index_calib __attribute__ ((unused))) {
@@ -684,18 +684,6 @@ static inline void get_spikes(struct output_field *this_field, char **spike_list
   write_spikes(*spike_list, 50, pTabFeno->spikes, pTabFeno->NDET);
 }
 
-static inline void get_residual_spectrum(struct output_field *this_field, double *residualSpectrum, const ENGINE_CONTEXT *pEngineContext __attribute__ ((unused)), int indexFenoColumn, int index_calib __attribute__ ((unused))) {
-  FENO *pTabFeno = this_field->get_tabfeno(this_field, indexFenoColumn);
-  
-  if (pTabFeno->residualSpectrum!=NULL)
-   memcpy(residualSpectrum,pTabFeno->residualSpectrum,sizeof(double)*this_field->data_cols);
-  else
-   for (int i=0;i<this_field->data_cols;i++)
-     residualSpectrum[i]=QDOAS_FILL_DOUBLE;
-}
-
-
-
 static inline void omi_get_rejected_pixels(struct output_field *this_field, char **pixel_list, const ENGINE_CONTEXT *pEngineContext __attribute__ ((unused)), int indexFenoColumn, int index_calib __attribute__ ((unused))) {
   FENO *pTabFeno = this_field->get_tabfeno(this_field, indexFenoColumn);
   *pixel_list = malloc(50);
@@ -820,8 +808,6 @@ static inline void get_zenith_before_index(struct output_field *this_field __att
 static inline void get_zenith_after_index(struct output_field *this_field __attribute__ ((unused)), int *zenithAfterIndex, const ENGINE_CONTEXT *pEngineContext, int indexFenoColumn __attribute__ ((unused)), int index_calib __attribute__ ((unused))) {
   *zenithAfterIndex = (pEngineContext->recordInfo.maxdoas.zenithAfterIndex!=ITEM_NONE)?pEngineContext->recordInfo.maxdoas.zenithAfterIndex+1:ITEM_NONE;
 }
-
-
 // write_spikes:
 // concatenate all pixels containing spikes into a single string for output.
 

@@ -16,10 +16,9 @@ extern "C" {
   enum output_format {
     UNDEFINED=-1,
     ASCII,
- // HDFEOS5,
+    HDFEOS5,
     NETCDF,
-    LAST_OUTPUT_FORMAT = NETCDF,
-    HDFEOS5                                // OBSOLETE
+    LAST_OUTPUT_FORMAT = NETCDF
   };
 
   enum output_format output_get_format(const char *fileext);

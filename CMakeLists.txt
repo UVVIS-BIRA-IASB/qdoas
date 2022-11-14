@@ -2,9 +2,11 @@ cmake_minimum_required(VERSION 3.8.0)
 
 project(qdoas)
 
-set(VERSION 3.5.0)
-set(QDOAS_VERSION "3.5.0" CACHE STRING "")
-set(QDOAS_DATE "7 November 2022" CACHE STRING "")
+set(VERSION 3.4.6)
+set(QDOAS_VERSION "3.4.6" CACHE STRING "")
+set(QDOAS_DATE "18 May 2022" CACHE STRING "")
+
+
 
 function(list_transform_prepend var prefix)
   set(temp "")
@@ -64,6 +66,7 @@ find_library(HDFEOS2_LIBRARY NAMES hdfeos libhdfeos PATHS ${HDFEOS_LIB})
 find_library(HDFEOS5_LIBRARY NAMES he5_hdfeos libhe5_hdfeos PATHS ${HDFEOS_LIB} )
 find_library(GCTP_LIBRARY NAMES libGctp Gctp PATHS ${HDFEOS_LIB} )
 list(APPEND HDFEOS_LIBRARIES ${HDFEOS2_LIBRARY} ${HDFEOS5_LIBRARY} ${GCTP_LIBRARY})
+
 
 add_definitions(-DQDOAS_VERSION="${QDOAS_VERSION}" -DQDOAS_DATE="${QDOAS_DATE}")
 

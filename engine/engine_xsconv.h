@@ -1,4 +1,7 @@
 
+#include "../engine/doas.h"
+#include "engine_context.h"
+
 #ifndef _ENGINE_XSCONV_
 #define _ENGINE_XSCONV_
 
@@ -6,11 +9,8 @@
 extern "C" {
 #endif
 
-#include "doas.h"
-#include "engine_context.h"
 
-
-typedef struct _engineXsconvContext
+typedef struct _enigneXsconvContext
  {                                                                              // GENERAL OPTIONS
   int    convolutionType;                                                       // type of convolution
   int    conversionMode;                                                        // conversion mode
@@ -31,7 +31,7 @@ typedef struct _engineXsconvContext
                                                                                 // FILTERING
   PRJCT_FILTER lfilter;                                                         // low filtering options
   PRJCT_FILTER hfilter;                                                         // high filtering options
-  double *filterVector;                                                         // SHOULD BE A MATRIX FOR IMAGERS !!!
+  double *filterVector;
   int nFilter;
 
   MATRIX_OBJECT xsNew;                                                          // New cross section
@@ -48,10 +48,6 @@ typedef struct _engineXsconvContext
   double    temperature;                                                        // temperature
   int    normalizeFlag;                                                         // normalization of the raman spectru
   int saveRaman;
-  int formatType;
-  int n_groundpixel_general;
-  int n_groundpixel_slit;
-  int n_groundpixel_output;
  }
 ENGINE_XSCONV_CONTEXT;
 

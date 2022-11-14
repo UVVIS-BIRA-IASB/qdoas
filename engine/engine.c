@@ -95,7 +95,7 @@
 #include "apex_read.h"
 #include "mfc-read.h"
 #include "spectrum_files.h"
-#include "gems_read.h"
+//#include "gems_read.h"
 #include "output_netcdf.h"
 
 #include "coda.h"
@@ -176,8 +176,8 @@ void EngineResetContext(ENGINE_CONTEXT *pEngineContext)
 
    if (pBuffers->dnl.matrix!=NULL)
     MATRIX_Free(&pBuffers->dnl,"EngineResetContext (dnl)");
-   if (pBuffers->pixel_QF!=NULL)
-    MEMORY_ReleaseBuffer("EngineResetContext","pixel_QF",pBuffers->pixel_QF);
+   if (pRecord->omi.omiPixelQF!=NULL)
+    MEMORY_ReleaseBuffer("EngineResetContext","omiPixelQF",pRecord->omi.omiPixelQF);
 
    MFC_ResetFiles(pEngineContext);
    CCD_ResetInstrumental(&pRecord->ccd);
@@ -255,8 +255,8 @@ RC EngineCopyContext(ENGINE_CONTEXT *pEngineContextTarget,ENGINE_CONTEXT *pEngin
         ((pBuffersTarget->specMaxx=(double *)MEMORY_AllocDVector("EngineCopyContext","specMaxx",0,MAX_SPECMAX-1))==NULL)) ||
        ((pBuffersSource->specMax!=NULL) && (pBuffersTarget->specMax==NULL) &&
         ((pBuffersTarget->specMax=(double *)MEMORY_AllocDVector("EngineCopyContext","specMax",0,MAX_SPECMAX-1))==NULL)) ||
-       ((pBuffersSource->pixel_QF!=NULL) && (pBuffersTarget->pixel_QF==NULL) &&
-        ((pBuffersTarget->pixel_QF=(unsigned short *)MEMORY_AllocBuffer("EngineCopyContext","pixel_QF",max_ndet,sizeof(unsigned short),0,MEMORY_TYPE_USHORT))==NULL)) ||
+       ((pEngineContextSource->recordInfo.omi.omiPixelQF!=NULL) && (pEngineContextTarget->recordInfo.omi.omiPixelQF==NULL) &&
+        ((pEngineContextTarget->recordInfo.omi.omiPixelQF=(unsigned short *)MEMORY_AllocBuffer("EngineCopyContext","omiPixelQF",max_ndet,sizeof(unsigned short),0,MEMORY_TYPE_USHORT))==NULL)) ||
        ((pBuffersSource->recordIndexes!=NULL) && (pBuffersTarget->recordIndexes==NULL) &&
         ((pBuffersTarget->recordIndexes=(uint32_t *)MEMORY_AllocBuffer("THRD_CopySpecInfo","recordIndexes",
          (pEngineContextTarget->recordIndexesSize=pEngineContextSource->recordIndexesSize),sizeof(uint32_t),0,MEMORY_TYPE_ULONG))==NULL)) ||
@@ -303,8 +303,8 @@ RC EngineCopyContext(ENGINE_CONTEXT *pEngineContextTarget,ENGINE_CONTEXT *pEngin
       memcpy(pBuffersTarget->specMaxx,pBuffersSource->specMaxx,sizeof(double)*MAX_SPECMAX);
      if ((pBuffersTarget->specMax!=NULL) && (pBuffersSource->specMax!=NULL))
       memcpy(pBuffersTarget->specMax,pBuffersSource->specMax,sizeof(double)*MAX_SPECMAX);
-     if ((pBuffersTarget->pixel_QF!=NULL) && (pBuffersSource->pixel_QF!=NULL))
-      memcpy(pBuffersTarget->pixel_QF,pBuffersSource->pixel_QF,sizeof(unsigned short)*max_ndet);
+     if ((pEngineContextTarget->recordInfo.omi.omiPixelQF!=NULL) && (pEngineContextSource->recordInfo.omi.omiPixelQF!=NULL))
+      memcpy(pEngineContextTarget->recordInfo.omi.omiPixelQF,pEngineContextSource->recordInfo.omi.omiPixelQF,sizeof(unsigned short)*max_ndet);
      if ((pBuffersTarget->recordIndexes!=NULL) && (pBuffersSource->recordIndexes!=NULL))
       memcpy(pBuffersTarget->recordIndexes,pBuffersSource->recordIndexes,sizeof(uint32_t)*pEngineContextSource->recordIndexesSize);
 
@@ -453,9 +453,9 @@ RC EngineSetProject(ENGINE_CONTEXT *pEngineContext)
        (((pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_ASCII) && (pInstrumental->ascii.format==PRJCT_INSTR_ASCII_FORMAT_COLUMN_EXTENDED)) &&
         ((pBuffers->sigmaSpec=MEMORY_AllocDVector(__func__,"sigmaSpec",0,max_ndet-1))==NULL)) ||
 
-       (((pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_OMI) || (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_GEMS)) &&
-        ((pBuffers->pixel_QF=(unsigned short *)MEMORY_AllocBuffer(__func__,"pixel_QF",max_ndet,sizeof(unsigned short),0,MEMORY_TYPE_USHORT))==NULL)) ||
-        
+       ((pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_OMI) &&
+        ((pRecord->omi.omiPixelQF=(unsigned short *)MEMORY_AllocBuffer(__func__,"omiPixelQF",max_ndet,sizeof(unsigned short),0,MEMORY_TYPE_USHORT))==NULL)) ||
+
        ((pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_MKZY) &&
         ((pBuffers->scanRef=MEMORY_AllocDVector(__func__,"scanRef",0,max_ndet-1))==NULL)) ||
 
@@ -651,7 +651,7 @@ RC EngineSetFile(ENGINE_CONTEXT *pEngineContext,const char *fileName,void *respo
        (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG) ||
        (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG_OLD))
 
-    pFile->namesFp=fopen(FILES_BuildFileName(fileTmp,fileName,FILE_TYPE_NAMES),"rb");
+    pFile->namesFp=fopen(FILES_BuildFileName(fileTmp,FILE_TYPE_NAMES),"rb");
 
    // Dark current files : the file name is automatically built from the spectra file name
 
@@ -661,7 +661,7 @@ RC EngineSetFile(ENGINE_CONTEXT *pEngineContext,const char *fileName,void *respo
        (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_CCD_EEV) ||
        (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_PDASI_EASOE))
 
-    pFile->darkFp=fopen(FILES_BuildFileName(fileTmp,fileName,FILE_TYPE_DARK),"rb");
+    pFile->darkFp=fopen(FILES_BuildFileName(fileTmp,FILE_TYPE_DARK),"rb");
 
    // Some satellite measurements have their own functions to open the file
 
@@ -730,8 +730,7 @@ RC EngineSetFile(ENGINE_CONTEXT *pEngineContext,const char *fileName,void *respo
        break;
        // ---------------------------------------------------------------------------
      case PRJCT_INSTR_FORMAT_GEMS :
-       if (!(rc=GEMS_Set(pEngineContext)) && (THRD_id!=THREAD_TYPE_SPECTRA) && (THRD_id!=THREAD_TYPE_EXPORT) && (THRD_id!=THREAD_TYPE_NONE))
-        rc=GEMS_LoadAnalysis(pEngineContext,responseHandle);
+//       rc=GEMS_Set(pEngineContext);
        break;
        // ---------------------------------------------------------------------------
      case PRJCT_INSTR_FORMAT_MFC :
@@ -952,7 +951,7 @@ RC EngineReadFile(ENGINE_CONTEXT *pEngineContext,int indexRecord,int dateFlag,in
       break;
       // ---------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_GEMS :
-      pRecord->rc=GEMS_Read(pEngineContext,indexRecord);
+//      pRecord->rc=GEMS_Read(pEngineContext,indexRecord);
       break;
       // ---------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_MFC :
@@ -1218,12 +1217,12 @@ RC EngineRequestEndBrowseSpectra(ENGINE_CONTEXT *pEngineContext)
        pRef->timeDec=NULL;
       }
 
-     if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_GEMS)
+/*     if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_GEMS)
       {
        gems_clean();
        if (THRD_id==THREAD_TYPE_KURUCZ) // && output file is specified
         netcdf_close_calib();
-      }
+      }*/
     }
 
    // Close the files

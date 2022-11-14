@@ -27,6 +27,4 @@ void initializeMediateConvolution(mediate_convolution_t *d)
   // Initializations
 
   memset(d, 0, sizeof(mediate_convolution_t));
-  
-  d->general.n_groundpixel=1;
 }

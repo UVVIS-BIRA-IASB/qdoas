@@ -416,17 +416,17 @@ bool ERROR_Fatal(void);
 
 enum _memoryTypes
  {
-  MEMORY_TYPE_UNKNOWN,                                                          // unknown
-  MEMORY_TYPE_PTR,                                                              // pointer
-  MEMORY_TYPE_STRING,                                                           // character/string
-  MEMORY_TYPE_SHORT,                                                            // short
-  MEMORY_TYPE_USHORT,                                                           // unsigned short
-  MEMORY_TYPE_INT,                                                              // integer
-  MEMORY_TYPE_LONG,                                                             // long
-  MEMORY_TYPE_FLOAT,                                                            // float
-  MEMORY_TYPE_DOUBLE,                                                           // double
-  MEMORY_TYPE_STRUCT,                                                           // structure
-  MEMORY_TYPE_MAX
+     MEMORY_TYPE_UNKNOWN,                                                          // unknown
+     MEMORY_TYPE_PTR,                                                              // pointer
+     MEMORY_TYPE_STRING,                                                           // character/string
+     MEMORY_TYPE_SHORT,                                                            // short
+     MEMORY_TYPE_USHORT,                                                           // unsigned short
+     MEMORY_TYPE_INT,                                                              // integer
+     MEMORY_TYPE_LONG,                                                             // long
+     MEMORY_TYPE_FLOAT,                                                            // float
+     MEMORY_TYPE_DOUBLE,                                                           // double
+     MEMORY_TYPE_STRUCT,                                                           // structure
+     MEMORY_TYPE_MAX
  };
 
 #define MEMORY_TYPE_INDEX MEMORY_TYPE_INT

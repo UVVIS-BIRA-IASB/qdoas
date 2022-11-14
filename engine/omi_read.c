@@ -1365,8 +1365,8 @@ static void get_omi_record_data(RECORD_INFO *pRecord, const struct omi_orbit_fil
   pRecord->azimuthViewAngle=pData->viewingAzimuthAngle[i_record];
   pRecord->useErrors=1;                                                     // Errors are available for OMI
 
-  pRecord->xtrack_QF = pData->have_xtrack_quality_flags ? pData->xtrackQualityFlags[i_record] : QDOAS_FILL_USHORT;
-  pRecord->ground_pixel_QF = pData->groundPixelQualityFlags[i_record];
+  pRecord->omi.omiXtrackQF = pData->have_xtrack_quality_flags ? pData->xtrackQualityFlags[i_record] : QDOAS_FILL_USHORT;
+  pRecord->omi.omiGroundPQF = pData->groundPixelQualityFlags[i_record];
   pRecord->omi.instrumentConfigurationId = pData->instrumentConfigurationId[i_alongtrack];
 
   pRecord->satellite.altitude = pData->spacecraftAltitude[i_alongtrack];
@@ -1441,7 +1441,7 @@ RC OMI_read_earth(ENGINE_CONTEXT *pEngineContext,int recordNo)
                         i_crosstrack,
                         pOrbitFile->nWavel,
                         lambda,spectrum,sigma,
-                        pEngineContext->buffers.pixel_QF);
+                        pEngineContext->recordInfo.omi.omiPixelQF);
   if (rc)
     return rc;
 
