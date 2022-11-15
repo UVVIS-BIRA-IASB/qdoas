@@ -72,7 +72,7 @@ struct linear_system *LINEAR_alloc(int m, int n, enum linear_fit_mode);
 
 // create a linear fitting environment from a matix a[1..n][1..m]
 // memory must be freed with LINEAR_free
-struct linear_system *LINEAR_from_matrix(const double **a, int m, int n, enum linear_fit_mode mode);
+struct linear_system *LINEAR_from_matrix(const double *const *a, int m, int n, enum linear_fit_mode mode);
 
 // assign a vector to column n of the linear system.
 // col[1..m]:

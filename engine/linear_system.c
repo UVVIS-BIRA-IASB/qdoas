@@ -117,7 +117,7 @@ struct linear_system*LINEAR_alloc(int m, int n, enum linear_fit_mode mode) {
 }
 
 // linear system of m equations in n variables
-struct linear_system *LINEAR_from_matrix(const double **a, int m, int n, enum linear_fit_mode mode) {
+struct linear_system *LINEAR_from_matrix(const double *const *a, int m, int n, enum linear_fit_mode mode) {
   struct linear_system *s = LINEAR_alloc(m, n, mode);
   switch (mode) {
   case DECOMP_SVD:
@@ -389,7 +389,7 @@ int LINEAR_fit_poly(int num_eqs, int poly_order, const double *a, const double *
     }
   }
 
-  linsys = LINEAR_from_matrix(A, num_eqs, num_unknowns, DECOMP_QR);
+  linsys = LINEAR_from_matrix((const double *const *)A, num_eqs, num_unknowns, DECOMP_QR);
   LINEAR_set_weight(linsys, sigma);
   // decomposition and solution
   rc = LINEAR_decompose(linsys, NULL, NULL);

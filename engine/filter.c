@@ -506,7 +506,7 @@ RC FilterSavitskyGolay(PRJCT_FILTER *pFilter,int filterWidth,int filterOrder) {
     for (int i=-lc;i<=lc;i++)
       poly_matrix[j+1][i+lc+1]=(j!=0)?pow((double)i,(double)j):(double)1.;
 
-  filter_system = LINEAR_from_matrix(poly_matrix, filterWidth, filterOrder+1, DECOMP_SVD);
+  filter_system = LINEAR_from_matrix((const double *const *)poly_matrix, filterWidth, filterOrder+1, DECOMP_SVD);
   if (filter_system == NULL) {
     rc = ERROR_ID_ALLOC;
     goto cleanup;
