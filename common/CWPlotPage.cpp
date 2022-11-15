@@ -56,7 +56,7 @@ bool CWPlot::getImageSaveNameAndFormat(QWidget *parent, QString &fileName, QStri
   dialog.setWindowTitle("Export as Image");;
   dialog.setDirectory(pref->directoryName("ExportPlot"));
   dialog.setAcceptMode(QFileDialog::AcceptSave);
-  dialog.setConfirmOverwrite(true);
+  dialog.setOption(QFileDialog::DontConfirmOverwrite, false);
   QStringList filters;
   filters << "PNG (*.png)" << "BMP (*.bmp)" << "JPEG (*.jpg)";
   dialog.setNameFilters(filters);
