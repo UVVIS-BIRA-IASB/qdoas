@@ -735,7 +735,7 @@ RC netcdf_open_calib(const ENGINE_CONTEXT *pEngineContext, const char *filename,
   
   char new_filename[DOAS_MAX_PATH_LEN+1],error_message[DOAS_MAX_PATH_LEN+1];
   strcpy(new_filename,filename);
-  FILES_BuildFileName(new_filename,(char *)filename,FILE_TYPE_NETCDF);
+  FILES_BuildFileName(new_filename,filename,FILE_TYPE_NETCDF);
   
   if ((fp=fopen(new_filename,"rb"))!=NULL)
    {

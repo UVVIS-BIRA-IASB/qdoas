@@ -742,7 +742,7 @@ RC FILES_LoadMatrix(FILE *fp,const char *fileName,double **matrix,int base,int n
 // return        pointer to new_fileName
 // -----------------------------------------------------------------------------
 
-char *FILES_BuildFileName(char *new_fileName,char *fileName,MASK fileType)
+char *FILES_BuildFileName(char *new_fileName,const char *fileName,MASK fileType)
  {
   // Declarations
 
