@@ -298,7 +298,7 @@ RC SetCCD_EEV(ENGINE_CONTEXT *pEngineContext,FILE *specFp,FILE *darkFp)
   // Declarations
 
   CCD_DATA header;                                                              // header of a record
-  int   *recordIndexes;                                                       // indexes of records for direct access
+  unsigned int  *recordIndexes;                                                 // indexes of records for direct access
   int      ccdX,ccdY,dataSize;                                                  // size of the detector
   INDEX    indexTps;                                                            // browse the predefined integration time
   int    offset;                                                              // offset to remove from the spectrum
@@ -910,8 +910,8 @@ RC SetCCD (ENGINE_CONTEXT *pEngineContext,FILE *specFp,int flag)
  {
   // Declarations
 
-  int  recordSize,                                                            // the size of one record in bytes (without SpecMax)
-        *recordIndexes;                                                         // the position of spectra in bytes from the beginning of the file
+  int  recordSize;                                                              // the size of one record in bytes (without SpecMax)
+  unsigned int *recordIndexes;                                                  // the position of spectra in bytes from the beginning of the file
   short *indexes,                                                               // the number of accumulations per spectrum (give by the same way,
                                                                                 // the size of the SpecMax vectors)
          curvenum;                                                              // the number of spectra in the file
