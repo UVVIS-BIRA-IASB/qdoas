@@ -1778,8 +1778,12 @@ static int register_cross_results(const PRJCT_RESULTS *pResults, const FENO *pTa
       // don't add "cross_attribs_file" attribute if crossFileName is not a string (e.g. for polynomial components)
       bool has_file = ( xs_file != NULL && strlen(xs_file) );
 
-      const struct field_attribute cross_attribs_file[] = {{ "Cross section file",
-                                                              xs_file }};
+      struct field_attribute *cross_attribs_file = NULL;
+      if (has_file) {
+        cross_attribs_file = malloc(sizeof(struct field_attribute));
+        cross_attribs_file->label = strdup("Cross section file");
+        cross_attribs_file->value = strdup(xs_file);
+      }
 
       const struct analysis_output symbol_fitparams[] = {
         { pTabCrossResults->indexAmf!=ITEM_NONE && pTabCrossResults->StoreAmf, symbolName,
@@ -1789,7 +1793,7 @@ static int register_cross_results(const PRJCT_RESULTS *pResults, const FENO *pTa
         { pTabCrossResults->indexAmf!=ITEM_NONE && pTabCrossResults->StoreVrtErr, symbolName,
           { .basic_fieldname = "VErr", .format = FORMAT_DOUBLE, .resulttype = PRJCT_RESULTS_VERT_ERR, .memory_type = OUTPUT_DOUBLE, .get_data = (func_void) &get_vrt_err} },
         { pTabCrossResults->StoreSlntCol, symbolName,
-          { .basic_fieldname = "SlCol", .format = FORMAT_DOUBLE, .resulttype = PRJCT_RESULTS_SLANT_COL, .memory_type = OUTPUT_DOUBLE, .get_data = (func_void) &get_slant_column, .attributes = has_file ? (char *)cross_attribs_file : NULL, .num_attributes = has_file ? 1 : 0} },
+          { .basic_fieldname = "SlCol", .format = FORMAT_DOUBLE, .resulttype = PRJCT_RESULTS_SLANT_COL, .memory_type = OUTPUT_DOUBLE, .get_data = (func_void) &get_slant_column, .attributes = cross_attribs_file, .num_attributes = has_file ? 1 : 0} },
         { pTabCrossResults->StoreSlntErr, symbolName,
           { .basic_fieldname = "SlErr", .format = FORMAT_DOUBLE, .resulttype = PRJCT_RESULTS_SLANT_ERR, .memory_type = OUTPUT_DOUBLE, .get_data = (func_void) &get_slant_err} },
         { pTabCrossResults->StoreShift, symbolName,
