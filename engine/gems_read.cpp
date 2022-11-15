@@ -159,7 +159,7 @@ void GEMS_CloseReferences(void)
    }
  }
  
-RC GEMS_LoadReference(char *filename,int indexFenoColumn,double *lambda,double *spectrum,int *nwve)
+RC GEMS_LoadReference(const char *filename,int indexFenoColumn,double *lambda,double *spectrum,int *nwve)
  {
    // Declarations
 
@@ -225,7 +225,7 @@ RC GEMS_LoadReference(char *filename,int indexFenoColumn,double *lambda,double *
    return rc;
  }
  
-int GEMS_Init(ENGINE_CONTEXT *pEngineContext,char *ref_filename,int* n_wavel_temp) 
+int GEMS_Init(ENGINE_CONTEXT *pEngineContext,const char *ref_filename,int* n_wavel_temp)
  {
   int rc=ERROR_ID_NO;
   try 
