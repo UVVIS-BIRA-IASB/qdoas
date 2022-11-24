@@ -162,6 +162,9 @@ static void print_output_field(FILE *fp, const struct output_field *thefield, in
               (millis != -1) ? millis : micros );
     }
     break;
+  case OUTPUT_RESIDUAL:    // in ASCII output format, ignore OUTPUT_RESIDUAL
+  default:                 // residuals are not saved in the output file but in a separate file
+   break;
   }
 }
 
@@ -254,6 +257,10 @@ static void print_output_field_value(FILE *fp, const struct output_field *thefie
      fprintf(fp, thefield->format, thedate->da_year, thedate->da_mon, thedate->da_day, thetime->ti_hour, thetime->ti_min, thetime->ti_sec,(millis != -1) ? millis : micros );
 
     break;
+    
+  case OUTPUT_RESIDUAL:    // in ASCII output format, ignore OUTPUT_RESIDUAL
+  default:                 // residuals are not saved in the output file but in a separate file
+   break;    
   }
 }
 

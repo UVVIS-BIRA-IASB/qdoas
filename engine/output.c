@@ -297,6 +297,8 @@ static void save_calib_data(struct output_field *output_field, int index_calib) 
     case OUTPUT_DATETIME:
       ((func_datetime) get_data)(output_field,  ((struct datetime (*)[ncols])data)[index_calib], NULL, row, index_calib);
       break;
+    case OUTPUT_RESIDUAL:  
+    break;
   }
 }
 
@@ -2210,6 +2212,8 @@ void output_close_file(void) {
     break;
   case NETCDF:
     netcdf_close_file();
+    break;
+  default:
     break;
   }
 }

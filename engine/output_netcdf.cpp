@@ -253,6 +253,9 @@ static void write_calibration_field(const struct output_field& calibfield, NetCD
   case OUTPUT_DATETIME:
     assert(false && "date, time or datetime output for calibration not supported");
     break;
+  case OUTPUT_RESIDUAL:    // we do not consider to save residuals in the calibration file
+  default:                 
+   break;    
   }
 }
 

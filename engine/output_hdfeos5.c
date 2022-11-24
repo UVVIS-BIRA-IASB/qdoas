@@ -612,6 +612,9 @@ static void write_to_buffer(void *datbuf, const struct output_field *thefield, i
         : datetime_in.microseconds; // GOME2 has microseconds
     }
     break;
+  case OUTPUT_RESIDUAL:    // in HDFEOS output format, ignore OUTPUT_RESIDUAL
+  default:                 // residuals are not saved in the output file but in a separate file
+   break;    
   }
 }
 
