@@ -1033,7 +1033,7 @@ RC mediateRingCalculate(void *engineContext,void *responseHandle)
   raman=raman2=ramanint=NULL;
   slitLambda2=slitVector2=slitDeriv22=NULL;
   temp=(double)pEngineContext->temperature;                                        // (double)250.;   May 2005/05/31
-
+  
   rc=ERROR_ID_NO;
 
   #if defined(__DEBUG_) && __DEBUG_
@@ -1074,7 +1074,7 @@ RC mediateRingCalculate(void *engineContext,void *responseHandle)
     
     // Use substitution variables
 
-    memset(xsSolarConv.matrix[0],xsSolar.matrix[0][i],sizeof(double)*xsSolar.nl);
+    memcpy(xsSolarConv.matrix[0],xsSolar.matrix[0],sizeof(double)*xsSolar.nl);
     memcpy(pEngineContext->xsNew.matrix[0],xsRing.matrix[0],sizeof(double)*xsRing.nl);
 
     pSlit=&xsSlit[0];
@@ -1084,7 +1084,7 @@ RC mediateRingCalculate(void *engineContext,void *responseHandle)
     solarVector=xsSolarConv.matrix[1];
     solarDeriv2=xsSolarConv.deriv2[1];
     nsolar=xsSolarConv.nl;
-
+    
     wveDptFlag=pEngineContext->slitConv.slitWveDptFlag;
 
     if (slitType!=SLIT_TYPE_NONE) {
@@ -1148,21 +1148,21 @@ RC mediateRingCalculate(void *engineContext,void *responseHandle)
        {
         VECTOR_Init(raman,(double)0.,nsolar);
         VECTOR_Init(raman2,(double)0.,nsolar);
-
+        
         // Start convolving the solar spectrum
 
         if (((slitType!=SLIT_TYPE_NONE) && ((rc=XSCONV_TypeStandard(&xsSolarConv,0,xsSolarConv.nl,&xsSolar,&xsSolar,NULL,slitType,xsSlit,slitParam,pEngineContext->slitConv.slitWveDptFlag))!=ERROR_ID_NO)) ||
-            ((rc=SPLINE_Deriv2(solarLambda,solarVector,solarDeriv2,nsolar,"mediateRingCalculate"))!=0) ||
+            ((rc=SPLINE_Deriv2(solarLambda,solarVector,solarDeriv2,nsolar,"mediateRingCalculate1"))!=0) ||
             ((rc=raman_convolution(solarLambda,solarVector,solarDeriv2,raman,nsolar,temp,pEngineContext->normalizeFlag))!=0) ||
             
         // Interpolate the high resolution spectrum
         
-            ((rc=SPLINE_Deriv2(solarLambda,solarVector,solarDeriv2,nsolar,"mediateRingCalculate"))!=0) ||
+            ((rc=SPLINE_Deriv2(solarLambda,solarVector,solarDeriv2,nsolar,"mediateRingCalculate2"))!=0) ||
             ((rc=SPLINE_Vector(solarLambda,solarVector,solarDeriv2,nsolar,ringLambda,ringVector,nring,SPLINE_CUBIC))!=0) || 
 
         // Interpolate the raman spectrum
 
-            ((rc=SPLINE_Deriv2(solarLambda,raman,raman2,nsolar,"mediateRingCalculate"))!=0) ||
+            ((rc=SPLINE_Deriv2(solarLambda,raman,raman2,nsolar,"mediateRingCalculate3"))!=0) ||
             ((rc=SPLINE_Vector(solarLambda,raman,raman2,nsolar,ringLambda,ramanint,nring,SPLINE_CUBIC))!=0))
             
          goto EndRing;
