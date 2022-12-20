@@ -230,7 +230,7 @@ struct _prjctAsciiResults {
   int fieldsNumber;                                                             // number of ascii flags set in the next list
   int fieldsFlag[PRJCT_RESULTS_MAX];                                            // fields used in output
   enum output_format file_format;
-  char swath_name[HDFEOS_OBJ_LEN_MAX];
+	char swath_name[SWATH_NAME_LEN_MAX];
 };
 
 // Export spectra

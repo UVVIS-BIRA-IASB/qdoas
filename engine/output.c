@@ -114,9 +114,7 @@ const unsigned long long QDOAS_FILL_UINT64 = 18446744073709551614ULL;
 /*! \brief Array matching enum output_format values with strings
     containing their filename extension.  The position in the array
     must correspond to the value of the enum.*/
-const char *output_file_extensions[] = { [ASCII] = ".ASC",
-                                     //  [HDFEOS5] = ".he5",
-                                         [NETCDF] = ".nc" };
+const char *output_file_extensions[] = { [ASCII] = ".ASC",[NETCDF] = ".nc" };
 
 struct output_field output_data_analysis[MAX_FIELDS];
 unsigned int output_num_fields = 0;
@@ -2191,9 +2189,7 @@ RC open_output_file(const ENGINE_CONTEXT *pEngineContext, const char *outputFile
   case ASCII:
     return ascii_open(pEngineContext, (char *)outputFileName);
     break;
-  case HDFEOS5:
-    return hdfeos5_open(pEngineContext, (char *)outputFileName);
-    break;
+
   case NETCDF:
     return netcdf_open(pEngineContext, (char *)outputFileName,outputNbRecords);
     break;
@@ -2207,9 +2203,7 @@ void output_close_file(void) {
   case ASCII:
     ascii_close_file();
     break;
-  case HDFEOS5:
-    hdfeos5_close_file();
-    break;
+
   case NETCDF:
     netcdf_close_file();
     break;
@@ -2226,10 +2220,7 @@ void output_write_data(const bool selected_records[]) {
     else
      ascii_write_analysis_data(selected_records, outputNbRecords);
     break;
-  case HDFEOS5:
-    hdfeos5_write_analysis_data(selected_records, outputNbRecords, outputRecords);
-    break;
-  case NETCDF:
+   case NETCDF:
     netcdf_write_analysis_data(selected_records, outputNbRecords, outputRecords);
     break;
   default:
@@ -2318,11 +2309,7 @@ RC OUTPUT_CheckPath(ENGINE_CONTEXT *pEngineContext,char *path,int format) {
     } else {
       fclose(test);
       switch (format) {
-      case HDFEOS5:
-        // for HDFEOS-5, we do not append to existing files
-        // -> if the file already exists, its size should be 0
-        rc = hdfeos5_allow_file(filename);
-        break;
+    
       case NETCDF:
         rc = netcdf_allow_file(filename, &pEngineContext->project.asciiResults);
         break;

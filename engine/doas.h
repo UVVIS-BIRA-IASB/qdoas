@@ -1,4 +1,3 @@
-
 //
 //  Product/Project   :  QDOAS
 //  Name of module    :  DOAS.H

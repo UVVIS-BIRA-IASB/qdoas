@@ -146,8 +146,8 @@ CWProjectTabOutput::CWProjectTabOutput(const mediate_project_output_t *propertie
   m_groupNameEdit->setText(properties->swath_name);
 
   m_selectFileFormat->setCurrentIndex(properties->file_format);
-  // swath frame is hidden unless HDF5 output is selected
-  groupFrame->setVisible(properties->file_format == HDFEOS5 || properties->file_format == NETCDF);
+ 
+  groupFrame->setVisible( properties->file_format == NETCDF);
 
   m_analysisCheck->setCheckState(properties->analysisFlag ? Qt::Checked : Qt::Unchecked);
   m_calibrationCheck->setCheckState(properties->calibrationFlag ? Qt::Checked : Qt::Unchecked);
@@ -204,9 +204,8 @@ void CWProjectTabOutput::apply(mediate_project_output_t *properties) const
 void CWProjectTabOutput::slotSelectFileFormatChanged(int index)
 {
   // parent widget of m_groupNameEdit contains the label and the text
-  // field -> set both to visible/invisible if HDF-EOS5 output is
-  // selected/unselected
-  m_groupNameEdit->parentWidget()->setVisible(index == HDFEOS5 || index == NETCDF);
+  // field 
+  m_groupNameEdit->parentWidget()->setVisible( index == NETCDF);
 }
 
 void CWProjectTabOutput::slotBrowsePath()

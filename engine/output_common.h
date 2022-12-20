@@ -186,14 +186,12 @@ size_t output_get_size(enum output_datatype datatype,int n_cols);
 */
 RC open_output_file(const ENGINE_CONTEXT *pEngineContext, const char *filename);
 RC ascii_open(const ENGINE_CONTEXT *pEngineContext, char *filename);
-RC hdfeos5_open(const ENGINE_CONTEXT *pEngineContext, const char *filename);
 //!@}
 
 /** @name Close output file.*/
 //!@{
 /** \brief Close current output file. */
 //void output_close_file(const ENGINE_CONTEXT *pEngineContext);
-void hdfeos5_close_file(void);
 void ascii_close_file(void);
 //!@}
 
@@ -208,8 +206,6 @@ void ascii_close_file(void);
     \param [in] outputRecords meta data on the records
     */
 //void output_write_data(const bool selected_records[],const ENGINE_CONTEXT *pEngineContext);
-RC hdfeos5_write_analysis_data(const bool selected_records[], int num_records, const OUTPUT_INFO *outputRecords);
-RC hdfeos5_allow_file(const char *filename);
 void ascii_write_analysis_data(const bool selected_records[], int num_records);
 void ascii_write_spectra_data(const bool selected_records[], int num_records);
 //!@}

@@ -1226,7 +1226,7 @@ void setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const
       strcpy(pEngineInstrumental->tropomi.reference_orbit_dir, pMediateInstrumental->tropomi.reference_orbit_dir);
 
       strcpy(pEngineInstrumental->calibrationFile,pMediateInstrumental->tropomi.calibrationFile);     // calibration file
-      strcpy(pEngineInstrumental->instrFunction,pMediateInstrumental->tropomi.instrFunctionFile);     // instrumental function file
+     strcpy(pEngineInstrumental->instrFunction,pMediateInstrumental->tropomi.instrFunctionFile);     // instrumental function file
 
       OMI_TrackSelection(pMediateInstrumental->tropomi.trackSelection,pEngineInstrumental->use_row);
 

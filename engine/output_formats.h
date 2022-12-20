@@ -5,7 +5,7 @@
 #ifndef OUTPUT_FORMATS_H
 #define OUTPUT_FORMATS_H
 
-#define HDFEOS_OBJ_LEN_MAX 256 // taken from HE5_HdfEosDef.h
+#define SWATH_NAME_LEN_MAX 256 
 #define OUTPUT_HDF5_DEFAULT_GROUP "QDOAS Results"
 
 #if defined(_cplusplus) || defined(__cplusplus)
@@ -16,10 +16,8 @@ extern "C" {
   enum output_format {
     UNDEFINED=-1,
     ASCII,
- // HDFEOS5,
     NETCDF,
-    LAST_OUTPUT_FORMAT = NETCDF,
-    HDFEOS5                                // OBSOLETE
+    LAST_OUTPUT_FORMAT = NETCDF
   };
 
   enum output_format output_get_format(const char *fileext);

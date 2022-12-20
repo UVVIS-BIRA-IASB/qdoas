@@ -74,7 +74,6 @@ add_library(engine STATIC
   output_ascii.c
   output_common.h
   output_formats.h
-  output_hdfeos5.c
   output_netcdf.cpp
   output_netcdf.h
   output_private.h

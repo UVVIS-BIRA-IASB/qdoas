@@ -1869,7 +1869,7 @@ bool CProjectOutputSubHandler::start(const QXmlAttributes &atts)
   str = atts.value("fileFormat");
   if (!str.isEmpty()) {
     enum output_format format = output_get_format(str.toLocal8Bit().data());
-    if ((format == ASCII)  || (format == HDFEOS5) || (format==NETCDF)) 
+    if ((format == ASCII)  || (format==NETCDF)) 
      m_output->file_format = format;
     else
      m_output->file_format=ASCII;
