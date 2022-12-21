@@ -3,7 +3,7 @@
 QDOAS is a cross-platform application based on the long experience of BIRA-IASB (Royal Belgian Institute for Space Aeronomy) in the development and improvement of algorithms for the retrieval of trace gases from UV-Visible spectral measurements (satellite, ground-based, mobile or aircraft-based instruments) using the DOAS (Differential Optical Absorption Spectroscopy).  This software evolves along with the measurement techniques in DOAS. It has been extensively validated in different intercomparison campaigns. The friendly user interface, flexibility and the robustness of the algorithms largely contribute to QDOAS success in the world.
 
 QDOAS is now part of the [Atmospheric Toolbox](https://atmospherictoolbox.org/).
-The current version is 3.4.6
+The current version is 3.5.0
 
 Ready-for-use packages for windows, linux and MAC systems are available. To get the S/W, please, go to the following page and register to get the instructions how to install executables :
 http://uv-vis.aeronomie.be/software/QDOAS/QDOAS_Register.php
@@ -86,7 +86,6 @@ Building QDOAS from sources requires :
 * [HDF4/MFHDF](https://support.hdfgroup.org/products/hdf4/)
 * [HDF5/HDF5\_CPP/HDF5\_HL/HDF5\_HL\_CPP](https://www.hdfgroup.org/downloads/hdf5/)
 * [HDF-EOS](https://www.hdfeos.org/)
-* [H5-EOS](https://www.hdfeos.org/)
 * [NETCDF](https://www.unidata.ucar.edu/software/netcdf/)
 * [GSL](https://www.gnu.org/software/gsl/)
 

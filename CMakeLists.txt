@@ -4,7 +4,7 @@ project(qdoas)
 
 set(VERSION 3.5.0)
 set(QDOAS_VERSION "3.5.0" CACHE STRING "")
-set(QDOAS_DATE "14 November 2022" CACHE STRING "")
+set(QDOAS_DATE "21 December 2022" CACHE STRING "")
 
 
 

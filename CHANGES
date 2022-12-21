@@ -1,3 +1,33 @@
+3.5.0 2022-12-21
+~~~~~~~~~~~~~~~~
+
+### Satellites measurements
+
+* support GEMS Level-1 format (it's recommended to work on files with dimensions correctly reordered for better performances)
+
+     - an irradiance in GEMS format is always expected as ref1; a second reference spectrum can be used as ref2 in APEX format
+     - the residual spectrum can be included in the output file in netCDF format (replaces "residual" option in analysis windows properties)  this option currently only works for GEMS format
+     - doas_cl: new option -new_irrad <output file> to save the wavelength calibration after a run calibration on an irradiance spectrum.          This option works for GEMS but has never been tested on other formats; example on the command line to test :
+
+                        ./doas_cl -c <application path>/GEMS/S5_O3_BremenTDS_config_v1_20180613.xml
+                                                -k S5_O3
+                                               -new_irrad <application path>/GEMS/ref/s5-spectra_convolved_irradiance_v20180613_nonoise_shift_corrected
+                                               -f <application path>/GEMS/ref/s5-spectra_convolved_irradiance_v20180613_nonoise_shifted
+                                               -o <application path>/Applications/GEMS/ref/s5-spectra_convolved_irradiance_v20180613_nonoise_output
+* minor error fixed in netCDF output, otherwise compilation with newer netcdf/hdf5 libraries was not possible. 
+
+### Ground-based measurements
+
+* ASCII column extended format : a third column can be added with the errors on spectra.
+* MFC format : measurements with elevation angles > 100 are tagged as off-axis measurements (useful for instruments pointing to two opposite directions)
+* When a site is specified to recalculate solar angles, it's now possible to specify the convention for calculated solar azimuth angles
+
+### Miscellaneous
+
+* "spline interpolation requests increasing absissae ..." turns from fatal error to warning (useful for imagers in order not to exclude all rows)
+* Convolution tool outputs cross sections in ASCII or netCDF format.  Cross section files in netCDF format can be used directly in QDOAS analysis windows properties (useful for imagers).  Reference spectra in projects properties should still be in ASCII format even if convolved 
+
+
 3.4.6 2022-05-31
 ~~~~~~~~~~~~~~~~
 
