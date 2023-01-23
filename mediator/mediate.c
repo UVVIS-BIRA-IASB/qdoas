@@ -432,7 +432,7 @@ void mediateRequestPlotSpectra(ENGINE_CONTEXT *pEngineContext,void *responseHand
      if ((tempSpectrum=(double *)MEMORY_AllocDVector("mediateRequestPlotSpectra","tempSpectrum",0,n_wavel-1))!=NULL) {
        memcpy(tempSpectrum,pBuffers->spectrum,sizeof(double)*n_wavel);
 
-        if ((pInstrumental->readOutFormat!=PRJCT_INSTR_FORMAT_MFC_BIRA) &&   
+        if ((pInstrumental->readOutFormat!=PRJCT_INSTR_FORMAT_MFC_BIRA) &&
             (pInstrumental->readOutFormat!=PRJCT_INSTR_FORMAT_MFC) &&
             (pInstrumental->readOutFormat!=PRJCT_INSTR_FORMAT_MFC_STD) &&
             (pEngineContext->buffers.instrFunction!=NULL)) {
@@ -442,7 +442,7 @@ void mediateRequestPlotSpectra(ENGINE_CONTEXT *pEngineContext,void *responseHand
            else
              tempSpectrum[i]/=pBuffers->instrFunction[i];
        }
-       
+
        if ((pInstrumental->readOutFormat!=PRJCT_INSTR_FORMAT_MFC_BIRA) || ((pEngineContext->recordInfo.mfcBira.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_DARK) && (pEngineContext->recordInfo.mfcBira.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_OFFSET)))
          sprintf(tmpTitle,"Spectrum");
        else if (pEngineContext->recordInfo.mfcBira.measurementType==PRJCT_INSTR_MAXDOAS_TYPE_DARK)
@@ -1255,8 +1255,8 @@ void setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const
       break;
       // ----------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_GEMS :
-     
-      for (int i=0; i<MAX_SWATHSIZE; ++i) 
+
+      for (int i=0; i<MAX_SWATHSIZE; ++i)
        {
         NDET[i] = GEMS_INIT_LENGTH;
         pEngineInstrumental->use_row[i]=false;
@@ -1373,6 +1373,7 @@ int mediateRequestSetProject(void *engineContext,
    EngineEndCurrentSession(pEngineContext);
 
    THRD_id=operatingMode;
+   ANALYSE_swathSize=1;
 
    // Transfer projects options from the mediator to the engine
 
@@ -1656,7 +1657,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
    #if defined(__DEBUG_) && __DEBUG_
    DEBUG_Start(ENGINE_dbgFile,"mediateRequestSetAnalysisWindows",DEBUG_FCTTYPE_MEM,15,DEBUG_DVAR_YES,0);
     #endif
-   
+
    lambdaMin=1000;
    lambdaMax=0;
    pEngineContext=(ENGINE_CONTEXT *)engineContext;
@@ -1723,7 +1724,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
        pInstrumental->use_row[i] = true;
      break;
    case PRJCT_INSTR_FORMAT_GEMS:
-     // ANALYSE_swathSize=2048; //pInstrumental->gems.binning;    
+     // ANALYSE_swathSize=2048; //pInstrumental->gems.binning;
      pEngineContext->radAsRefFlag=0;
      if (strlen(analysisWindows[0].refOneFile))
       rc = GEMS_Init(pEngineContext,analysisWindows[0].refOneFile,&n_wavel_temp1);
@@ -1769,7 +1770,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
        pTabFeno->n_wavel_ref1=n_wavel_temp1;
        pTabFeno->n_wavel_ref2=n_wavel_temp2;
        const int n_wavel = pTabFeno->NDET;
-       
+
        if ((pTabFeno->hidden<2) && ((THRD_id==THREAD_TYPE_ANALYSIS) || (pTabFeno->hidden==1))) {
          // QDOAS : avoid the load of disabled analysis windows with hidden==2
 
@@ -1902,7 +1903,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
               (!(rc=ANALYSE_LoadGaps(pEngineContext,pAnalysisWindows->gapList.gap,pAnalysisWindows->gapList.nGap,pTabFeno->LambdaRef,pAnalysisWindows->fitMinWavelength,pAnalysisWindows->fitMaxWavelength,indexFenoColumn)) &&
 
                (!pTabFeno->gomeRefFlag || !(rc=FIT_PROPERTIES_alloc(__func__,&pTabFeno->fit_properties)))
-               ))) { 
+               ))) {
            if (pTabFeno->hidden==1) {
              indexKurucz=NFeno;
            } else {
@@ -1913,7 +1914,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
              if (pTabFeno->gomeRefFlag || pEngineContext->refFlag) {
                memcpy(pTabFeno->Lambda,pTabFeno->LambdaRef,sizeof(double)*n_wavel);
                memcpy(pTabFeno->LambdaK,pTabFeno->LambdaRef,sizeof(double)*n_wavel);
-               
+
                rc=ANALYSE_XsInterpolation(pTabFeno,pTabFeno->LambdaRef,indexFenoColumn);
              }
            }
@@ -1929,7 +1930,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
        } // if ((pTabFeno->hidden<2) && ((THRD_id==THREAD_TYPE_ANALYSIS) || (pTabFeno->hidden==1)))
      }  // for (indexFeno=0;(indexFeno<numberOfWindows+1) && !rc;indexFeno++)
    } // for (indexFenoColumn=0;(indexFenoColumn<ANALYSE_swathSize) && !rc;indexFenoColumn++)
-   
+
    if (rc)
      goto handle_errors;
 
@@ -1943,7 +1944,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
      lambdaMin=pEngineContext->buffers.lambda[0];
      lambdaMax=pEngineContext->buffers.lambda[max_ndet-1];
    }
-   
+
    // load slit function from project properties -> slit page?
    // calibration procedure with FWHM fit -> Kurucz (and xs) are convolved with the fitted slit function
    // no calibration procedure and no xs to convolve -> nothing to do with the slit function in the slit page
@@ -1976,25 +1977,25 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
 
      if (!pEngineContext->project.instrumental.use_row[indexFenoColumn])
        continue;
-     
-     
-     
+
+
+
      for (indexWindow=0;(indexWindow<NFeno) && !rc;indexWindow++)
       {
        pTabFeno=&TabFeno[indexFenoColumn][indexWindow];
-      
+
        if (pTabFeno->saveResidualsFlag && !pTabFeno->hidden &&
          ((pTabFeno->residualSpectrum=(double *)MEMORY_AllocDVector(__func__,"residualSpectrum",0,pTabFeno->fit_properties.DimL))==NULL))
           break;
-         
+
        if ((xsToConvolute && !useKurucz) || !pKuruczOptions->fwhmFit)
-        { 
+        {
          if ((pSlitOptions->slitFunction.slitType==SLIT_TYPE_NONE) && pTabFeno->xsToConvolute)
            rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_CONVOLUTION);
          else if ((pTabFeno->gomeRefFlag || pEngineContext->refFlag) &&         // test on pTabFeno->xsToConvolute done in ANALYSE_XsConvolution (molecular ring done in this function for both convolution and interpolation)
                  ((rc=ANALYSE_XsConvolution(pTabFeno,pTabFeno->LambdaRef,ANALYSIS_slitMatrix,ANALYSIS_slitParam,pSlitOptions->slitFunction.slitType,indexFenoColumn,pSlitOptions->slitFunction.slitWveDptFlag))!=0))
            break;
-        } 
+        }
       }
 
      if (!rc) {
@@ -2005,7 +2006,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
 
        if ((THRD_id==THREAD_TYPE_KURUCZ) || useKurucz) {
          rc=KURUCZ_Alloc(&pEngineContext->project,pEngineContext->buffers.lambda,indexKurucz,lambdaMin,lambdaMax,indexFenoColumn, &hr_solar_temp);
-         
+
          // the reference spectrum is corrected by the instrument function if any
 
          if (!rc && useKurucz) {
@@ -2051,7 +2052,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
    #if defined(__DEBUG_) && __DEBUG_
    DEBUG_Stop("mediateRequestSetAnalysisWindows");
    #endif
-   
+
    return (rc!=ERROR_ID_NO)?-1:0;    // supposed that an error at the level of the load of projects stops the current session
  }
 
@@ -2434,16 +2435,16 @@ int mediateRequestNextMatchingAnalyseSpectrum(void *engineContext,
     {
      mediateRequestPlotSpectra(pEngineContext,responseHandle);
      ANALYSE_InitResults();
-     
+
      if (!pEngineContext->analysisRef.refAuto || pEngineContext->satelliteFlag || ((pEngineContext->recordInfo.rc=EngineNewRef(pEngineContext,responseHandle))==ERROR_ID_NO))
       pEngineContext->recordInfo.rc=ANALYSE_Spectrum(pEngineContext,responseHandle);
-     
+
     if ((pEngineContext->mfcDoasisFlag || (pEngineContext->lastSavedRecord!=pEngineContext->indexRecord)) &&
         (   ((THRD_id==THREAD_TYPE_ANALYSIS) && pEngineContext->project.asciiResults.analysisFlag && (!pEngineContext->project.asciiResults.successFlag || !pEngineContext->recordInfo.rc )) // (!pEngineContext->project.asciiResults.successFlag /* || nrc */))
             || ((THRD_id==THREAD_TYPE_KURUCZ) && pEngineContext->project.asciiResults.calibFlag) ) )
 
       pEngineContext->recordInfo.rc=OUTPUT_SaveResults(pEngineContext,pEngineContext->recordInfo.i_crosstrack);
-    
+
 //    if (!rc)
 //      rc=rcOutput;
 
@@ -2550,7 +2551,7 @@ int mediateRequestViewCrossSections(void *engineContext, char *awName,double min
 
    // Initializations
 
-   sprintf(windowTitle,"Cross sections used in %s analysis window of project %s",awName,pEngineContext->project.project_name);  
+   sprintf(windowTitle,"Cross sections used in %s analysis window of project %s",awName,pEngineContext->project.project_name);
    sprintf(tabTitle,"%s.%s (XS)",pEngineContext->project.project_name,awName);
    indexLine=indexColumn=2;
    memset(use_rows,false,sizeof(bool)*MAX_SWATHSIZE);
@@ -2574,12 +2575,12 @@ int mediateRequestViewCrossSections(void *engineContext, char *awName,double min
       }
      else
       symbolName[0]='\0';
-     
-     if ((ext=strrchr(filenames[indexFile],'.'))!=NULL) 
+
+     if ((ext=strrchr(filenames[indexFile],'.'))!=NULL)
       ext++;
      else
       ext="xs";
-     
+
 
      // Load the file
 
@@ -2587,16 +2588,16 @@ int mediateRequestViewCrossSections(void *engineContext, char *awName,double min
                       minWavelength,maxWavelength,
                       0,   // no derivatives
                       1,   // reverse vectors if needed
-                      "mediateRequestViewCrossSections") && (xs.nl>1) && (xs.nc>1)) || 
+                      "mediateRequestViewCrossSections") && (xs.nl>1) && (xs.nc>1)) ||
          (!strcmp(ext,"nc") && !MATRIX_netcdf_LoadXS(filenames[indexFile],&xs,0,0,
                       minWavelength,maxWavelength,
                       0,   // no derivatives
                       1,   // reverse vectors if needed
                       use_rows,
-                      "mediateRequestViewCrossSections") && (xs.nl>1) && (xs.nc>1))) 
+                      "mediateRequestViewCrossSections") && (xs.nl>1) && (xs.nc>1)))
       {
        // Plot the cross section
-       
+
        mediateAllocateAndSetPlotData(&xs2plot,symbolName,xs.matrix[0],xs.matrix[1],xs.nl,Line);
        mediateResponsePlotData(plotPageCross,&xs2plot,1,Spectrum,0,symbolName,"Wavelength","cm**2 / molec", responseHandle);
        mediateResponseLabelPage(plotPageCross,windowTitle,tabTitle, responseHandle);
@@ -2605,7 +2606,7 @@ int mediateRequestViewCrossSections(void *engineContext, char *awName,double min
       }
      else
       mediateResponseCellInfo(plotPageCross,indexLine,indexColumn,responseHandle,filenames[indexFile],"%s","Not found !!!");
-     
+
      // Release the allocated buffers
 
      MATRIX_Free(&xs,"mediateRequestViewCrossSections");

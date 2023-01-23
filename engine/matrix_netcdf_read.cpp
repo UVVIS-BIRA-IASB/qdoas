@@ -252,7 +252,7 @@ RC MATRIX_netcdf_LoadXS(const char *fileName,MATRIX_OBJECT *pMatrix,
   #if defined(__DEBUG_) && __DEBUG_
   if (!rc)
    {
-   	int basel=0,basec=0;
+    int basel=0,basec=0;
     DEBUG_PrintVar("the matrix",pMatrix->matrix,basel,basel+nl-1,basec,basec+nc-1,NULL);
     if (allocateDeriv2)
      DEBUG_PrintVar("the 2nd derivatives",pMatrix->deriv2,basel,basel+nl-1,basec+1,basec+nc-1,NULL);

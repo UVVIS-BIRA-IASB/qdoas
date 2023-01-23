@@ -11,7 +11,28 @@
 #include <netcdf.h>
 // #include "nc4internal.h" /* to get name of the special properties file */
 
+extern "C" {
+#include "winthrd.h"
+#include "comdefs.h"
+#include "stdfunc.h"
+#include "engine_context.h"
+#include "mediate.h"
+#include "analyse.h"
+#include "spline.h"
+#include "vector.h"
+}
+
 typedef unsigned int uint;
+
+struct netcdf_data_fields
+ {
+  const std::string& varGroupName;
+  const std::string& varName;
+  size_t  varDimsLen[6];                                                        // assume that we do not have variables with a number of dimensions higher than 6
+  int     varDimsN;
+  int     varType;
+  void   *varData;
+ };
 
 struct free_nc_string {
   void operator() (char *string) {
@@ -27,7 +48,10 @@ template<typename T> T default_fillvalue();
 class NetCDFGroup {
 
 public:
-  NetCDFGroup(int id=0, const std::string& groupName ="") :  groupid(id), name(groupName) {};
+  NetCDFGroup(int id=0, const std::string& groupName ="") :  groupid(id), name(groupName) { data_fields_list=NULL; nfields=0; };
+
+  int  read_data_fields(struct netcdf_data_fields *new_fields,int n);
+  void release_data_fields(void);
 
   bool hasVar(const std::string& varName) const;
 //  bool hasGrp(const std::string& grpName) const;
@@ -37,6 +61,7 @@ public:
   std::vector<int> dimIDs(const std::string& varName) const;
   std::vector<int> dimIDs(int varid) const;
   std::string varName(int varid) const;
+
   int defVar(const std::string& name, const std::vector<int>& dimids, nc_type xtype);
   int defVar(const std::string& name, const std::vector<std::string>& dimnames, nc_type xtype);
   void defVarChunking(int varid, int storage, size_t *chunksizes);
@@ -217,6 +242,8 @@ protected:
 
 private:
   std::string name;
+  struct netcdf_data_fields *data_fields_list;
+  int    nfields=0;
 
   inline int ncGetVar(int varid, const size_t start[], const size_t count[], float *out) const {
     return nc_get_vara_float(groupid, varid, start, count, out); };

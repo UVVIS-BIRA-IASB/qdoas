@@ -178,7 +178,7 @@ static void define_variable(NetCDFGroup &group, const struct output_field& thefi
    }
   switch (thefield.memory_type) {
   case OUTPUT_STRING:
-	   group.putAttr("_FillValue", QDOAS_FILL_STRING, varid);
+    group.putAttr("_FillValue", QDOAS_FILL_STRING, varid);
     break;
   case OUTPUT_SHORT:
     group.putAttr("_FillValue", QDOAS_FILL_SHORT, varid);

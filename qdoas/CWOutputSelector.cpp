@@ -713,10 +713,17 @@ void getValidFieldFlags(int *validFlags, int instrument,int selectorOrigin)
      {
        validFlags[PRJCT_RESULTS_INDEX_ALONGTRACK]=1;
        validFlags[PRJCT_RESULTS_INDEX_CROSSTRACK]=1;
+       validFlags[PRJCT_RESULTS_STARTDATE]=1;
+       validFlags[PRJCT_RESULTS_ENDDATE]=1;
+       validFlags[PRJCT_RESULTS_STARTTIME]=1;
+       validFlags[PRJCT_RESULTS_ENDTIME]=1;
        validFlags[PRJCT_RESULTS_LONGIT]=1;
        validFlags[PRJCT_RESULTS_LATIT]=1;
        validFlags[PRJCT_RESULTS_VIEW_ZENITH]=1;
        validFlags[PRJCT_RESULTS_VIEW_AZIMUTH]=1;
+       validFlags[PRJCT_RESULTS_VIEW_ELEVATION]=1;
+       validFlags[PRJCT_RESULTS_SCANS]=1;
+       validFlags[PRJCT_RESULTS_NREJ]=1;
      }
      break;
 

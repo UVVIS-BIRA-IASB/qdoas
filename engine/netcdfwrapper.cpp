@@ -8,7 +8,105 @@
 
 using std::string;
 using std::vector;
-using std::stringstream; 
+using std::stringstream;
+
+int NetCDFGroup::read_data_fields(struct netcdf_data_fields *new_fields,int n)
+ {
+  // Allocation
+
+  struct netcdf_data_fields *pField;
+  int varSize;
+  size_t start[6];
+  size_t dimlen;
+  int nelemts;
+  int groupId;
+  int rc=ERROR_ID_NO;
+
+  if ((new_fields!=NULL) && n)
+   {
+    if (data_fields_list!=NULL)
+     release_data_fields();
+
+    data_fields_list=new_fields;
+    nfields=n;
+
+    for (int i=0;(i<nfields) && !rc;i++)
+     {
+      int varId;
+      int dimIds[6];
+      int groupId;
+
+      pField=&data_fields_list[i];
+      groupId=(pField->varGroupName.size()==0)?groupID():groupID(pField->varGroupName);
+
+      if (!nc_inq_varid(groupId, pField->varName.c_str(), &varId) &&
+          !nc_inq_varndims(groupId, varId, &pField->varDimsN) &&
+          !nc_inq_vardimid(groupId, varId, dimIds))
+       {
+        switch(pField->varType)
+         {
+       // ------------------------------------------------------------------------
+          case NC_DOUBLE:
+            varSize=8;
+          break;
+       // ------------------------------------------------------------------------
+          case NC_SHORT:
+            varSize=2;
+          break;
+       // ------------------------------------------------------------------------
+          default:
+            varSize=4;
+          break;
+       // ------------------------------------------------------------------------
+         }
+
+        nelemts=1;
+
+        for (int idim=0;idim<pField->varDimsN;idim++)
+         {
+          nc_inq_dimlen(groupId,dimIds[idim], &dimlen);
+          start[idim]=0;
+          nelemts*=(int)dimlen;
+          pField->varDimsLen[idim]=dimlen;
+         }
+
+        if ((pField->varData=(void *)malloc(nelemts*varSize))==NULL)
+         rc=ERROR_ID_ALLOC;
+        else if (((pField->varType==NC_DOUBLE) && nc_get_vara_double(groupId,varId,(const size_t *)start,(const size_t *)pField->varDimsLen,(double *)pField->varData)) ||
+                 ((pField->varType==NC_FLOAT) && nc_get_vara_float(groupId,varId,(const size_t *)start,(const size_t *)pField->varDimsLen,(float *)pField->varData)) ||
+                 ((pField->varType==NC_INT) && nc_get_vara_int(groupId,varId,(const size_t *)start,(const size_t *)pField->varDimsLen,(int *)pField->varData)) ||
+                 ((pField->varType==NC_SHORT) && nc_get_vara_short(groupId,varId,(const size_t *)start,(const size_t *)pField->varDimsLen,(short *)pField->varData)))
+         rc=ERROR_ID_NETCDF;
+       }
+     }
+   }
+
+  // Return
+
+  return rc;
+ }
+
+void NetCDFGroup::release_data_fields(void)
+ {
+  struct netcdf_data_fields *pField;
+
+  if (data_fields_list!=NULL)
+   {
+    for (int i=0;i<nfields;i++)
+     {
+      pField=&data_fields_list[i];
+
+      memset(pField->varDimsLen,0,sizeof(size_t)*6);
+      pField->varDimsN=0;
+
+      if (pField->varData!=NULL)
+       free(pField->varData);
+      pField->varData=NULL;
+     }
+   }
+
+  nfields=0;
+ }
 
 int NetCDFGroup::groupID(const string& groupName) const {
   int grpid;
@@ -95,7 +193,7 @@ int NetCDFGroup::dimID(const string& dimName) const {
   int rc = nc_inq_dimid(groupid, dimName.c_str(), &id);
   if(rc == NC_NOERR) {
     return id;
-  } 
+  }
   else
     return -1;
 }
@@ -153,7 +251,7 @@ NetCDFFile& NetCDFFile::operator=(NetCDFFile &&other) {
 }
 
 #define NEW_CACHE_SIZE 32000000
-#define NEW_CACHE_NELEMS 1000000
+#define NEW_CACHE_NELEMS 2000
 #define NEW_CACHE_PREEMPTION 0.75
 
 static int openNetCDF(const string &filename, int mode) {
@@ -203,7 +301,7 @@ NetCDFGroup NetCDFGroup::getGroup(const string& groupname) const {
     return NetCDFGroup(groupID(groupname), groupname);
   else
     throw std::runtime_error("Cannot open netCDF group '" + groupname + "'");
-  
+
   return {};
 }
 
@@ -315,6 +413,6 @@ double NetCDFGroup::getAttDouble(const string& name, int varid) {
     data=0.;
   else
     status = nc_get_att_double(groupid, varid, name.c_str(), &data);
-  
+
   return data;
 }

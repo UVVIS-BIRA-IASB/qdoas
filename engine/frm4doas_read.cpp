@@ -108,7 +108,7 @@ using std::set;
     vector<double> sigma;
   };
 
-//! \struct metadata
+//! \struct frm4doas_data_fields
 //! \brief This structure defined in frm4doas_read.cpp module mainly contains variables present in the metadata group of the netCDF file (format used in the FRM<sub>4</sub>DOAS network).
 //! \details Vectors are automatically allocated when the file is open and released when the file is closed.  It is only locally used by functions of the module frm4doas_read.cpp.
 //! \details Five groups are present in netCDF files :\n
@@ -117,112 +117,69 @@ using std::set;
 //!          \li <strong>instrument_location</strong> (name of the station, latitude, longitude and altitude of the instrument)\n
 //!          \li <strong>keydata</strong> (reference spectrum, measured slit function(s))\n
 //!          \li <strong>measurements</strong> : radiances, instrumental errors if known, scan index and wavelength calibration\n
-//!          \li <strong>metadata</strong> : currently limited to data present in ASCII files proposed for CINDI-2 reprocessing but could be extended to any data relevant for ground-based measurements (for example, temperature of the detector, �)\n
-//! \details <strong>metadata</strong> group contains information useful to QDOAS to describe the records.
+//!          \li <strong>frm4doas_data_fields</strong> : currently limited to data present in ASCII files proposed for CINDI-2 reprocessing but could be extended to any data relevant for ground-based measurements (for example, temperature of the detector, �)\n
+//! \details <strong>frm4doas_data_fields</strong> group contains information useful to QDOAS to describe the records.
 
-  struct metadata
-   {
-    vector<float> sza;                                                          //!< \details Solar zenith angle
-    vector<float> saa;                                                          //!< \details Solar azimuth angle
-    vector<float> vea;                                                          //!< \details Viewing elevation angle
-    vector<float> vaa;                                                          //!< \details Viewing azimuth angle
-    vector<float> mea;                                                          //!< \details Moon elevation angle
-    vector<float> maa;                                                          //!< \details Moon azimuth angle
-    vector<float> tat;                                                          //!< \details Total acquisition time
-    vector<float> tmt;                                                          //!< \details Total measurement time
-    vector<float> lon;                                                          //!< \details Longitude
-    vector<float> lat;                                                          //!< \details Latitude
-    vector<float> alt;                                                          //!< \details Altitude
-    vector<float> tint;                                                         //!< \details Exposure time
-    vector<int>   mt;                                                           //!< \details Measurement type
-    vector<int>   nacc;                                                         //!< \details Number of co-added spectra
-    vector<short> dt;                                                           //!< \details Datetime (date and time at half of the measurement (UT YYYY,MM,DD,hh,mm,ss,ms)
-    vector<short> dts;                                                          //!< \details Datetime_start (date and time at the beginning of the measurement (UT YYYY,MM,DD,hh,mm,ss,ms)
-    vector<short> dte;                                                          //!< \details Datetime_end (date and time at the end of the measurement (UT YYYY,MM,DD,hh,mm,ss,ms)
-    vector<short> sci;                                                          //!< \details Scan index
-    vector<short> zbi;                                                          //!< \details Zenith before index
-    vector<short> zai;                                                          //!< \details Zenith after index
+enum _frm4doas_data_fields
+ {
+  FRM4DOAS_FIELD_LAT,                                                           //!< \details Latitude
+  FRM4DOAS_FIELD_LON,                                                           //!< \details Longitude
+  FRM4DOAS_FIELD_ALT,                                                           //!< \details Altitude
 
-    float stationLon;
-   };
+  FRM4DOAS_FIELD_VAA,                                                           //!< \details Viewing azimuth angle
+  FRM4DOAS_FIELD_VEA,                                                           //!< \details Viewing elevation angle
+  FRM4DOAS_FIELD_SZA,                                                           //!< \details Solar zenith angle
+  FRM4DOAS_FIELD_SAA,                                                           //!< \details Solar azimuth angle
+  FRM4DOAS_FIELD_MEA,                                                           //!< \details Moon elevation angle
+  FRM4DOAS_FIELD_MAA,                                                           //!< \details Moon azimuth angle
+
+  FRM4DOAS_FIELD_TINT,                                                          //!< \details Exposure time
+  FRM4DOAS_FIELD_TAT,                                                           //!< \details Total acquisition time
+  FRM4DOAS_FIELD_TMT,                                                           //!< \details Total measurement time
+  FRM4DOAS_FIELD_NACC,                                                          //!< \details Number of co-added spectra
+  FRM4DOAS_FIELD_MT,                                                            //!< \details Measurement type
+  FRM4DOAS_FIELD_DT,                                                            //!< \details Datetime (date and time at half of the measurement (UT YYYY,MM,DD,hh,mm,ss,ms)
+  FRM4DOAS_FIELD_DTS,                                                           //!< \details Datetime_start (date and time at the beginning of the measurement (UT YYYY,MM,DD,hh,mm,ss,ms)
+  FRM4DOAS_FIELD_DTE,                                                           //!< \details Datetime_end (date and time at the end of the measurement (UT YYYY,MM,DD,hh,mm,ss,ms)
+  FRM4DOAS_FIELD_SCI,                                                           //!< \details Scan index
+  FRM4DOAS_FIELD_ZBI,                                                           //!< \details Zenith before index
+  FRM4DOAS_FIELD_ZAI,                                                           //!< \details Zenith after index
+  FRM4DOAS_FIELD_MAX
+ };
+
+static struct netcdf_data_fields frm4doas_data_fields[FRM4DOAS_FIELD_MAX]=
+ {
+   { "/INSTRUMENT_LOCATION", "latitude", { 0, 0, 0, 0, 0, 0 }, 0, NC_FLOAT, NULL },                             // FRM4DOAS_FIELD_LAT
+   { "/INSTRUMENT_LOCATION", "longitude", { 0, 0, 0, 0, 0, 0 }, 0, NC_FLOAT, NULL },                            // FRM4DOAS_FIELD_LON
+   { "/INSTRUMENT_LOCATION", "altitude", { 0, 0, 0, 0, 0, 0 }, 0, NC_FLOAT, NULL },                             // FRM4DOAS_FIELD_ALT
+                                                                                                                //
+   { "/RADIANCE/GEODATA", "viewing_azimuth_angle", { 0, 0, 0, 0, 0, 0 }, 0, NC_FLOAT, NULL },                   // FRM4DOAS_FIELD_VAA
+   { "/RADIANCE/GEODATA", "viewing_elevation_angle", { 0, 0, 0, 0, 0, 0 }, 0, NC_FLOAT, NULL },                 // FRM4DOAS_FIELD_VEA
+   { "/RADIANCE/GEODATA", "solar_zenith_angle", { 0, 0, 0, 0, 0, 0 }, 0, NC_FLOAT, NULL },                      // FRM4DOAS_FIELD_SZA
+   { "/RADIANCE/GEODATA", "solar_azimuth_angle", { 0, 0, 0, 0, 0, 0 }, 0, NC_FLOAT, NULL },                     // FRM4DOAS_FIELD_SAA
+   { "/RADIANCE/GEODATA", "moon_elevation_angle", { 0, 0, 0, 0, 0, 0 }, 0, NC_FLOAT, NULL },                    // FRM4DOAS_FIELD_MEA
+   { "/RADIANCE/GEODATA", "moon_azimuth_angle", { 0, 0, 0, 0, 0, 0 }, 0, NC_FLOAT, NULL },                      // FRM4DOAS_FIELD_MAA
+                                                                                                                //
+   { "/RADIANCE/OBSERVATIONS", "exposure_time", { 0, 0, 0, 0, 0, 0 }, 0, NC_FLOAT, NULL },                      // FRM4DOAS_FIELD_TINT
+   { "/RADIANCE/OBSERVATIONS", "total_acquisition_time", { 0, 0, 0, 0, 0, 0 }, 0, NC_FLOAT, NULL },             // FRM4DOAS_FIELD_TAT
+   { "/RADIANCE/OBSERVATIONS", "total_measurement_time", { 0, 0, 0, 0, 0, 0 }, 0, NC_FLOAT, NULL },             // FRM4DOAS_FIELD_TMT
+   { "/RADIANCE/OBSERVATIONS", "number_of_coadded_spectra", { 0, 0, 0, 0, 0, 0 }, 0, NC_INT, NULL },            // FRM4DOAS_FIELD_NACC
+   { "/RADIANCE/OBSERVATIONS", "measurement_type", { 0, 0, 0, 0, 0, 0 }, 0, NC_INT, NULL },                     // FRM4DOAS_FIELD_MT
+   { "/RADIANCE/OBSERVATIONS", "datetime", { 0, 0, 0, 0, 0, 0 }, 0, NC_SHORT, NULL },                           // FRM4DOAS_FIELD_DT
+   { "/RADIANCE/OBSERVATIONS", "datetime_start", { 0, 0, 0, 0, 0, 0 }, 0, NC_SHORT, NULL },                     // FRM4DOAS_FIELD_DTS
+   { "/RADIANCE/OBSERVATIONS", "datetime_end", { 0, 0, 0, 0, 0, 0 }, 0, NC_SHORT, NULL },                       // FRM4DOAS_FIELD_DTE
+   { "/RADIANCE/OBSERVATIONS", "scan_index", { 0, 0, 0, 0, 0, 0 }, 0, NC_SHORT, NULL },                         // FRM4DOAS_FIELD_SCI
+   { "/RADIANCE/OBSERVATIONS", "index_zenith_before", { 0, 0, 0, 0, 0, 0 }, 0, NC_SHORT, NULL },                // FRM4DOAS_FIELD_ZBI
+   { "/RADIANCE/OBSERVATIONS", "index_zenith_after", { 0, 0, 0, 0, 0, 0 }, 0, NC_SHORT, NULL }                  // FRM4DOAS_FIELD_ZAI
+ };
 
 // ================
 // STATIC VARIABLES
 // ================
 
-static NetCDFFile current_file;                                                 //!< \details Pointer to the current netCDF file
-static string root_name;                                                        //!< \details The name of the root (should be the basename of the file)
-static metadata current_metadata;                                               //!< \details Keep the metadata as far as the netCDF file is open
-
-static size_t det_size;                                                         //!< \details The current detector size
-
-// -----------------------------------------------------------------------------
-// FUNCTION FRM4DOAS_Read_Metadata
-// -----------------------------------------------------------------------------
-//!
-//! \fn      static metadata FRM4DOAS_Read_Metadata(size_t number_of_records)
-//! \details Load variables from the metadata group + scan index from the measurements group\n
-//! \param   [in]  number_of_records the number of records
-//! \return  result : a \a metadata structure with all the metadata variables and scan index
-//!
-// -----------------------------------------------------------------------------
-
-static metadata FRM4DOAS_Read_Metadata(size_t number_of_records)
- {
-  // Declarations
-
-  metadata result;                                                              // metadata
-  const size_t start[] = {0};                                                   // there is no reason not to start from 0
-  const size_t count[] = {number_of_records};                                             // for these variables, only one dimension
-  const size_t count1[]={1};                                                    // for these variables, only one element
-  const size_t datetime_start[] = {0,0};                                        // there is no reason not to start from 0
-  const size_t datetime_count[] = {number_of_records,7};                                  // for datetime variables, two dimensions
-  vector<float> lon,lat,alt;                                                    // instrument geolocation + altitude
-
-  // Get the instrument location and altitude
-
-  NetCDFGroup location_group = current_file.getGroup(root_name+"/INSTRUMENT_LOCATION");
-
-  location_group.getVar("latitude",start,count1,1,(float)-1.,lat);
-  location_group.getVar("longitude",start,count1,1,(float)-1.,lon);
-  location_group.getVar("altitude",start,count1,1,(float)-1.,alt);
-
-  result.stationLon=lon[0];
-
-  // Get metadata variables
-
-  NetCDFGroup metadata_group;
-
-  metadata_group = current_file.getGroup(root_name+"/RADIANCE/GEODATA");
-
-  metadata_group.getVar("viewing_azimuth_angle",start,count,1,(float)-1.,result.vaa);
-  metadata_group.getVar("viewing_elevation_angle",start,count,1,(float)-1.,result.vea);
-  metadata_group.getVar("solar_zenith_angle",start,count,1,(float)-1.,result.sza);
-  metadata_group.getVar("solar_azimuth_angle",start,count,1,(float)-1.,result.saa);
-  metadata_group.getVar("moon_elevation_angle",start,count,1,(float)-1.,result.mea);
-  metadata_group.getVar("moon_azimuth_angle",start,count,1,(float)-1.,result.maa);
-
-  metadata_group = current_file.getGroup(root_name+"/RADIANCE/OBSERVATIONS");
-
-  metadata_group.getVar("latitude",start,count,1,(float)lat[0],result.lat);
-  metadata_group.getVar("longitude",start,count,1,(float)lon[0],result.lon);
-  metadata_group.getVar("altitude",start,count,1,(float)alt[0],result.alt);
-  metadata_group.getVar("exposure_time",start,count,1,(float)-1.,result.tint);
-  metadata_group.getVar("total_acquisition_time",start,count,1,(float)-1.,result.tat);
-  metadata_group.getVar("total_measurement_time",start,count,1,(float)-1.,result.tmt);
-  metadata_group.getVar("number_of_coadded_spectra",start,count,1,(int)-1,result.nacc);
-  metadata_group.getVar("measurement_type",start,count,1,(int)0,result.mt);
-  metadata_group.getVar("datetime",datetime_start,datetime_count,2,(short)-1,result.dt);
-  metadata_group.getVar("datetime_start",datetime_start,datetime_count,2,(short)-1,result.dts);
-  metadata_group.getVar("datetime_end",datetime_start,datetime_count,2,(short)-1,result.dte);
-  metadata_group.getVar("scan_index",start,count,1,(short)-1,result.sci);
-  metadata_group.getVar("index_zenith_before",start,count,1,(short)-1,result.zbi);  // Check the presence of the vector !!!
-  metadata_group.getVar("index_zenith_after",start,count,1,(short)-1,result.zai);
-
-  // Return
-
-  return result;
- }
+static NetCDFFile current_file;                                                  //!< \details Pointer to the current netCDF file
+static string root_name;                                                         //!< \details The name of the root (should be the basename of the file)
+static size_t det_size;                                                          //!< \details The current detector size
 
 // -----------------------------------------------------------------------------
 // FUNCTION FRM4DOAS_Set
@@ -230,7 +187,7 @@ static metadata FRM4DOAS_Read_Metadata(size_t number_of_records)
 //!
 //! \fn      RC FRM4DOAS_Set(ENGINE_CONTEXT *pEngineContext)
 //! \details Open the netCDF file, get the number of records and load metadata variables.\n
-//! \param   [in]  pEngineContext  pointer to the engine context; some fields are affected by this function.\n
+//! \param   [in]  pEngineContext  pointer to the engine context;  some fields are affected by this function.\n
 //! \return  ERROR_ID_NETCDF on run time error (opening of the file didn't succeed, missing variable...)\n
 //!          ERROR_ID_NO on success
 //!
@@ -247,35 +204,35 @@ RC FRM4DOAS_Set(ENGINE_CONTEXT *pEngineContext)
 
   try
    {
-    current_file = NetCDFFile(pEngineContext->fileInfo.fileName,NC_NOWRITE);    // open file
-    root_name = current_file.getName();                                         // get the root name (should be the file name)
+    current_file = NetCDFFile(pEngineContext->fileInfo.fileName,NC_NOWRITE);     // open file
+    root_name = current_file.getName();
 
-    NetCDFGroup root_group = current_file.getGroup(root_name);                  // go to the root
+    NetCDFGroup root_group = current_file.getGroup(root_name);                   // go to the root
 
     pEngineContext->n_alongtrack=
-    pEngineContext->recordNumber=root_group.dimLen("number_of_records");                  // get the record number
+    pEngineContext->recordNumber=root_group.dimLen("number_of_records");                   // get the record number
 
-    pEngineContext->n_crosstrack=1;                                             // spectra should be one dimension only
-    det_size=root_group.dimLen("detector_size");                                     // get the number of pixels of the detector
+    pEngineContext->n_crosstrack=1;                                              // spectra should be one dimension only
+    det_size=root_group.dimLen("detector_size");                                      // get the number of pixels of the detector
 
-    for (int i=0;i<(int)det_size;i++)
+    for (int i=0; i<(int)det_size; i++)
      pEngineContext->buffers.irrad[i]=(double)0.;
 
     // Read metadata
 
-    current_metadata = FRM4DOAS_Read_Metadata(pEngineContext->recordNumber);
+    current_file.read_data_fields(frm4doas_data_fields,FRM4DOAS_FIELD_MAX);
 
-    auto dt = reinterpret_cast<const short(*)[7]>(current_metadata.dt.data());
+    short *dt=(short *)frm4doas_data_fields[FRM4DOAS_FIELD_DTS].varData;
 
-    pEngineContext->fileInfo.startDate.da_day=(char)dt[0][2];
-    pEngineContext->fileInfo.startDate.da_mon=(char)dt[0][1];
-    pEngineContext->fileInfo.startDate.da_year=dt[0][0];
+    pEngineContext->fileInfo.startDate.da_day=(char)dt[2];
+    pEngineContext->fileInfo.startDate.da_mon=(char)dt[1];
+    pEngineContext->fileInfo.startDate.da_year=dt[0];
 
-    THRD_localShift=current_metadata.stationLon/15.;
+    THRD_localShift=((float *)frm4doas_data_fields[FRM4DOAS_FIELD_LON].varData)[0]/15.;
    }
   catch (std::runtime_error& e)
    {
-    rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, e.what());  // in case of error, capture the message
+    rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, e.what());   // in case of error, capture the message
    }
 
   // Return
@@ -289,9 +246,9 @@ RC FRM4DOAS_Set(ENGINE_CONTEXT *pEngineContext)
 //!
 //! /fn      RC FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int localDay)
 //! /details Read a specified record from a file in the netCDF format implemented for the FRM<sub>4</sub>DOAS project\n
-//! /param   [in]  pEngineContext  pointer to the engine context; some fields are affected by this function.\n
+//! /param   [in]  pEngineContext  pointer to the engine context;  some fields are affected by this function.\n
 //! /param   [in]  recordNo        the index of the record to read\n
-//! /param   [in]  dateFlag        1 to search for a reference spectrum; 0 otherwise\n
+//! /param   [in]  dateFlag        1 to search for a reference spectrum;  0 otherwise\n
 //! /param   [in]  localDay        if /a dateFlag is 1, the calendar day for the reference spectrum to search for\n
 //! /return  ERROR_ID_FILE_END if the requested record number is not found\n
 //!          ERROR_ID_FILE_RECORD if the requested record doesn't satisfy current criteria (for example for the selection of the reference)\n
@@ -303,16 +260,17 @@ RC FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
  {
   // Declarations
 
-  NetCDFGroup measurements_group;                                               // measurement group in the netCDF file
-  RECORD_INFO *pRecordInfo;                                                     // pointer to the record structure in the engine context
-  double tmLocal;                                                               // calculation of the local time (in number of seconds)
-  vector<float> wve;                                                            // wavelength calibration
-  vector<float> spe;                                                            // spectrum
-  vector<float> err;                                                            // instrumental errors
-  vector<short> qf;                                                             // quality flag
+  NetCDFGroup measurements_group;                                                // measurement group in the netCDF file
+  RECORD_INFO *pRecordInfo;                                                      // pointer to the record structure in the engine context
+  double tmLocal;                                                                // calculation of the local time (in number of seconds)
+  vector<float> wve;                                                             // wavelength calibration
+  vector<float> spe;                                                             // spectrum
+  vector<float> err;                                                             // instrumental errors
+  vector<short> qf;                                                              // quality flag
   int measurementType;
-  int i;                                                                        // index for loops and arrays
-  RC rc;                                                                        // return code
+  const size_t i_alongtrack=(recordNo-1); // /col_dim;
+  const size_t i_crosstrack=(recordNo-1); // %col_dim;                                                                    // index for loops and arrays
+  RC rc;                                                                         // return code
 
   // Initializations
 
@@ -328,7 +286,7 @@ RC FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
     // Goto the requested record
 
     const size_t start[] = {(size_t)(recordNo-1), 0};
-    const size_t count[] = {(size_t)1, det_size};                               // only one record to load
+    const size_t count[] = {(size_t)1, det_size};                                // only one record to load
 
     // Spectra
 
@@ -341,9 +299,9 @@ RC FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
       measurements_group.getVar("radiance_error",start,count,2,(float)1.,err);
       measurements_group.getVar("radiance_quality_flag",start,count,2,(short)1,qf);
 
-      for (i=0;i<det_size;i++)
+      for (int i=0; i<det_size; i++)
        {
-        pEngineContext->buffers.lambda_irrad[i]=(double)wve[i];    // Check and complete
+        pEngineContext->buffers.lambda_irrad[i]=(double)wve[i];     // Check and complete
         pEngineContext->buffers.lambda[i]=wve[i];
 
         pEngineContext->buffers.spectrum[i]=spe[i];
@@ -353,73 +311,75 @@ RC FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
 
     // Date and time fields (UT YYYY,MM,DD,hh,mm,ss,ms)
 
-    auto dt = reinterpret_cast<const short(*)[7]>(current_metadata.dt.data());
+    short *dt=(short *)frm4doas_data_fields[FRM4DOAS_FIELD_DT].varData;
+    short *dts=(short *)frm4doas_data_fields[FRM4DOAS_FIELD_DTS].varData;
+    short *dte=(short *)frm4doas_data_fields[FRM4DOAS_FIELD_DTE].varData;
 
-    pRecordInfo->present_datetime.thedate.da_day=(char)dt[recordNo-1][2];
-    pRecordInfo->present_datetime.thedate.da_mon=(char)dt[recordNo-1][1];
-    pRecordInfo->present_datetime.thedate.da_year=dt[recordNo-1][0];
-    pRecordInfo->present_datetime.thetime.ti_hour=(char)dt[recordNo-1][3];
-    pRecordInfo->present_datetime.thetime.ti_min=(char)dt[recordNo-1][4];
-    pRecordInfo->present_datetime.thetime.ti_sec=(char)dt[recordNo-1][5];
-    pRecordInfo->present_datetime.millis=dt[recordNo-1][6];
+    pRecordInfo->present_datetime.thedate.da_day=(char)dt[i_alongtrack*7+2];
+    pRecordInfo->present_datetime.thedate.da_mon=(char)dt[i_alongtrack*7+1];
+    pRecordInfo->present_datetime.thedate.da_year=dt[i_alongtrack*7+0];
+    pRecordInfo->present_datetime.thetime.ti_hour=(char)dt[i_alongtrack*7+3];
+    pRecordInfo->present_datetime.thetime.ti_min=(char)dt[i_alongtrack*7+4];
+    pRecordInfo->present_datetime.thetime.ti_sec=(char)dt[i_alongtrack*7+5];
+    pRecordInfo->present_datetime.millis=dt[i_alongtrack*7+6];
 
-    auto dts = reinterpret_cast<const short(*)[7]>(current_metadata.dts.data());
+    pRecordInfo->startDateTime.thedate.da_day=(char)dts[i_alongtrack*7+2];
+    pRecordInfo->startDateTime.thedate.da_mon=(char)dts[i_alongtrack*7+1];
+    pRecordInfo->startDateTime.thedate.da_year=dts[i_alongtrack*7+0];
+    pRecordInfo->startDateTime.thetime.ti_hour=(char)dts[i_alongtrack*7+3];
+    pRecordInfo->startDateTime.thetime.ti_min=(char)dts[i_alongtrack*7+4];
+    pRecordInfo->startDateTime.thetime.ti_sec=(char)dts[i_alongtrack*7+5];
+    pRecordInfo->startDateTime.millis=dts[i_alongtrack*7+6];
 
-    pRecordInfo->startDateTime.thedate.da_day=(char)dts[recordNo-1][2];
-    pRecordInfo->startDateTime.thedate.da_mon=(char)dts[recordNo-1][1];
-    pRecordInfo->startDateTime.thedate.da_year=dts[recordNo-1][0];
-    pRecordInfo->startDateTime.thetime.ti_hour=(char)dts[recordNo-1][3];
-    pRecordInfo->startDateTime.thetime.ti_min=(char)dts[recordNo-1][4];
-    pRecordInfo->startDateTime.thetime.ti_sec=(char)dts[recordNo-1][5];
-    pRecordInfo->startDateTime.millis=dts[recordNo-1][6];
-
-    auto dte = reinterpret_cast<const short(*)[7]>(current_metadata.dte.data());
-
-    pRecordInfo->endDateTime.thedate.da_day=(char)dte[recordNo-1][2];
-    pRecordInfo->endDateTime.thedate.da_mon=(char)dte[recordNo-1][1];
-    pRecordInfo->endDateTime.thedate.da_year=dte[recordNo-1][0];
-    pRecordInfo->endDateTime.thetime.ti_hour=(char)dte[recordNo-1][3];
-    pRecordInfo->endDateTime.thetime.ti_min=(char)dte[recordNo-1][4];
-    pRecordInfo->endDateTime.thetime.ti_sec=(char)dte[recordNo-1][5];
-    pRecordInfo->endDateTime.millis=dte[recordNo-1][6];
+    pRecordInfo->endDateTime.thedate.da_day=(char)dte[i_alongtrack*7+2];
+    pRecordInfo->endDateTime.thedate.da_mon=(char)dte[i_alongtrack*7+1];
+    pRecordInfo->endDateTime.thedate.da_year=dte[i_alongtrack*7+0];
+    pRecordInfo->endDateTime.thetime.ti_hour=(char)dte[i_alongtrack*7+3];
+    pRecordInfo->endDateTime.thetime.ti_min=(char)dte[i_alongtrack*7+4];
+    pRecordInfo->endDateTime.thetime.ti_sec=(char)dte[i_alongtrack*7+5];
+    pRecordInfo->endDateTime.millis=dte[i_alongtrack*7+6];
 
     // Other metadata
 
-    pRecordInfo->NSomme=current_metadata.nacc[recordNo-1];
-    pRecordInfo->Tint=current_metadata.tint[recordNo-1];
-    pRecordInfo->Zm=current_metadata.sza[recordNo-1];
-    pRecordInfo->Azimuth=current_metadata.saa[recordNo-1];
-    pRecordInfo->longitude=current_metadata.lon[recordNo-1];
-    pRecordInfo->latitude=current_metadata.lat[recordNo-1];
-    pRecordInfo->altitude=current_metadata.alt[recordNo-1];
-    pRecordInfo->elevationViewAngle=current_metadata.vea[recordNo-1];
-    pRecordInfo->azimuthViewAngle=current_metadata.vaa[recordNo-1];
-    pRecordInfo->maxdoas.measurementType=current_metadata.mt[recordNo-1];
-    pRecordInfo->TotalExpTime=current_metadata.tmt[recordNo-1];
-    pRecordInfo->TotalAcqTime=current_metadata.tat[recordNo-1];
-    pRecordInfo->maxdoas.measurementType=current_metadata.mt[recordNo-1];
+    size_t ilat=(frm4doas_data_fields[FRM4DOAS_FIELD_LAT].varData!=NULL)?frm4doas_data_fields[FRM4DOAS_FIELD_LAT].varDimsLen[0]:0;
 
-    pRecordInfo->maxdoas.scanIndex=current_metadata.sci[recordNo-1];
-    pRecordInfo->maxdoas.zenithBeforeIndex=current_metadata.zbi[recordNo-1];
-    pRecordInfo->maxdoas.zenithAfterIndex=current_metadata.zai[recordNo-1];
+    pRecordInfo->longitude=(frm4doas_data_fields[FRM4DOAS_FIELD_LON].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_LON].varData)[(ilat==pEngineContext->n_alongtrack)?i_alongtrack:0]:0.;
+    pRecordInfo->latitude=(frm4doas_data_fields[FRM4DOAS_FIELD_LAT].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_LAT].varData)[(ilat==pEngineContext->n_alongtrack)?i_alongtrack:0]:0.;
+    pRecordInfo->altitude=(frm4doas_data_fields[FRM4DOAS_FIELD_ALT].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_ALT].varData)[(ilat==pEngineContext->n_alongtrack)?i_alongtrack:0]:0.;
+
+    pRecordInfo->azimuthViewAngle=(frm4doas_data_fields[FRM4DOAS_FIELD_VAA].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_VAA].varData)[i_alongtrack] : 0.;
+    pRecordInfo->elevationViewAngle=(frm4doas_data_fields[FRM4DOAS_FIELD_VEA].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_VEA].varData)[i_alongtrack] : 0.;
+    pRecordInfo->Zm=(frm4doas_data_fields[FRM4DOAS_FIELD_SZA].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_SZA].varData)[i_alongtrack] : 0.;
+    pRecordInfo->Azimuth=(frm4doas_data_fields[FRM4DOAS_FIELD_SAA].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_SAA].varData)[i_alongtrack] : 0.;
+
+    pRecordInfo->Tint=(frm4doas_data_fields[FRM4DOAS_FIELD_TINT].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_TINT].varData)[i_alongtrack] : 0.;
+    pRecordInfo->TotalAcqTime=(frm4doas_data_fields[FRM4DOAS_FIELD_TAT].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_TAT].varData)[i_alongtrack] : 0.;
+    pRecordInfo->TotalExpTime=(frm4doas_data_fields[FRM4DOAS_FIELD_TMT].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_TMT].varData)[i_alongtrack] : 0.;
+
+    pRecordInfo->NSomme=(frm4doas_data_fields[FRM4DOAS_FIELD_NACC].varData!=NULL)?(int)((int *)frm4doas_data_fields[FRM4DOAS_FIELD_NACC].varData)[i_alongtrack] : 0;
+    pRecordInfo->maxdoas.measurementType=(frm4doas_data_fields[FRM4DOAS_FIELD_MT].varData!=NULL)?(int)((int *)frm4doas_data_fields[FRM4DOAS_FIELD_MT].varData)[i_alongtrack] : 0;
+
+    pRecordInfo->maxdoas.scanIndex=(frm4doas_data_fields[FRM4DOAS_FIELD_SCI].varData!=NULL)?(short)((short *)frm4doas_data_fields[FRM4DOAS_FIELD_SCI].varData)[i_alongtrack] : ITEM_NONE;
+    pRecordInfo->maxdoas.zenithBeforeIndex=(frm4doas_data_fields[FRM4DOAS_FIELD_ZBI].varData!=NULL)?(short)((short *)frm4doas_data_fields[FRM4DOAS_FIELD_ZBI].varData)[i_alongtrack] : ITEM_NONE;
+    pRecordInfo->maxdoas.zenithAfterIndex=(frm4doas_data_fields[FRM4DOAS_FIELD_ZAI].varData!=NULL)?(short)((short *)frm4doas_data_fields[FRM4DOAS_FIELD_ZAI].varData)[i_alongtrack] : ITEM_NONE;
 
     if (pRecordInfo->NSomme<0)   // -1 means that the information is not available
      pRecordInfo->NSomme=1;
-    
+
     pRecordInfo->Tm=(double)ZEN_NbSec(&pRecordInfo->present_datetime.thedate,&pRecordInfo->present_datetime.thetime,0);
-    
+
     tmLocal=pRecordInfo->Tm+THRD_localShift*3600.;
     pRecordInfo->localCalDay=ZEN_FNCaljda(&tmLocal);
 
     // Recalculate solar zenith angle if necessary
-    
+
     if (std::isnan(pRecordInfo->Zm) && !std::isnan(pRecordInfo->longitude) && !std::isnan(pRecordInfo->latitude))
      {
       double longitude;
       longitude=-pRecordInfo->longitude;
       pRecordInfo->Zm=ZEN_FNTdiz(ZEN_FNCrtjul(&pRecordInfo->Tm),&longitude,&pRecordInfo->latitude,&pRecordInfo->Azimuth);
 
-      pRecordInfo->Azimuth+=180.; // because the used convention is 0..360, 0° Northward and ZEN_FNTdiz is -180..180
+      pRecordInfo->Azimuth+=180.;  // because the used convention is 0..360, 0° Northward and ZEN_FNTdiz is -180..180
      }
 
     // Selection of the reference spectrum
@@ -465,8 +425,7 @@ RC FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
 
 void FRM4DOAS_Cleanup(void)
  {
+  current_file.release_data_fields();
   current_file.close();
-
-  current_metadata = metadata();
  }
 
