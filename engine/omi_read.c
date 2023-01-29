@@ -40,16 +40,19 @@
 //
 //  This module uses HDF-EOS (Hierarchical Data Format - Earth Observing System)
 //  libraries based on HDF-4
+//  UPDATE: 31/1/2023:  hdf-eos removed and replaced by coda reading routines
 //
 //  ----------------------------------------------------------------------------
 
 #include <dirent.h>
 #include <stdio.h>
+#include <math.h>
 
 #include <hdf.h>
-#include <HdfEosDef.h>
+/* #include <HdfEosDef.h> */
 #include <mfhdf.h>
-
+#include <assert.h>
+#include <coda.h>
 #include "omi_read.h"
 
 #include "engine_context.h"
@@ -108,13 +111,19 @@ struct omi_data {
   float          *solarAzimuthAngle;
   float          *viewingZenithAngle;
   float          *viewingAzimuthAngle;
+	int16        *temp_RadianceMantissa;
+	int16        *temp_RadiancePrecisionMantissa;
+	int8        *temp_RadianceExponent;
   short          *terrainHeight;
   unsigned short *groundPixelQualityFlags;
+	unsigned short *pixelQualityFlags;
+	float *spec_wavelengthcoeff;
   uint8_t        *xtrackQualityFlags;
   short *wavelengthReferenceColumn;
   unsigned short *measurementQualityFlags;
   unsigned char *instrumentConfigurationId;
   bool have_xtrack_quality_flags;
+	
 };
 
 struct omi_spectrum {
@@ -148,8 +157,12 @@ struct omi_orbit_file { // description of an orbit
   long       nMeasurements,
     nXtrack,                    // number of detector tracks (normally 60)
     nWavel;
+   coda_cursor  cursor;
+	coda_product *product;
+
   int year, month, day;         // orbit date
   int number;                   // orbit number
+	char *swathpath;          ///Earth_UV_1_Swath or /Earth_UV_2_Swath or /Earth_VIS_Swath
 };
 
 /* Before calculating the automatic reference spectrum, we build a
@@ -169,7 +182,7 @@ struct omi_ref_spectrum {
 
 /* List of spectra to be used in the automatic reference calculation
  * for a single pair (analysiswindow, detector row).
- */
+  */
 struct omi_ref_list {
   struct omi_ref_spectrum *reference;
   struct omi_ref_list *next;
@@ -198,7 +211,7 @@ static void omi_free_swath_data(struct omi_swath_earth *pSwath);
 static void omi_calculate_wavelengths(float32 wavelength_coeff[], int16 refcol, int32 n_wavel, double* lambda);
 static void omi_make_double(int16 mantissa[], int8 exponent[], int32 n_wavel, double* result);
 static void omi_interpolate_errors(int16 mantissa[], int32 n_wavel, double wavelengths[], double y[] );
-static RC omi_load_spectrum(int spec_type, int32 sw_id, int32 measurement, int32 track, int32 n_wavel, double *lambda, double *spectrum, double *sigma, unsigned short *pixelQualityFlags);
+static RC omi_load_spectrum(int spec_type, int32 sw_id, int32 measurement, int32 track, int32 n_wavel, double *lambda, double *spectrum, double *sigma, unsigned short *pixelQualityFlags,int16 * spec_mantissa,int16 * spec_precisionmantissa, int8 * spec_exponent,uint16 * pixquality, float * spec_wavelengthcoeff, long dim [], int16 * refcol);
 static void average_spectrum(double *average, double *errors, const struct omi_ref_list *spectra, const double *wavelength_grid);
 static RC read_orbit_metadata(struct omi_orbit_file *orbit);
 
@@ -345,14 +358,18 @@ static void omi_free_swath_data(struct omi_swath_earth *pSwath)
       {"time",data->time},
       {"groundPixelQualityFlags",data->groundPixelQualityFlags},
       {"xtrackQualityFlags",data->xtrackQualityFlags},
-    };
+	  {"temp_RadianceMantissa"  ,      data->temp_RadianceMantissa},
+	  {"temp_RadiancePrecisionMantissa" ,       data->temp_RadiancePrecisionMantissa},
+	  {"temp_RadianceExponent",       data->temp_RadianceExponent},
+	  {"pixelQualityFlags",	data->pixelQualityFlags},
+	  {"spec_wavelengthcoeff",	data->spec_wavelengthcoeff}
 
+	};
     for(unsigned int i=0; i<sizeof(omi_swath_buffers)/sizeof(omi_swath_buffers[0]); i++) {
       void *ptr = omi_swath_buffers[i].bufferptr;
       if (ptr != NULL)
         MEMORY_ReleaseBuffer(__func__, omi_swath_buffers[i].buffername, ptr);
     }
-
     free(pSwath);
   }
 
@@ -361,20 +378,9 @@ static void omi_free_swath_data(struct omi_swath_earth *pSwath)
 #endif
 }
 
-static void omi_close_orbit_file(struct omi_orbit_file *pOrbitFile)
-{
-  if(pOrbitFile->sw_id != 0) {
-    SWdetach(pOrbitFile->sw_id);
-    pOrbitFile->sw_id = 0;
-  }
-  if(pOrbitFile->swf_id != 0) {
-    SWclose(pOrbitFile->swf_id);
-    pOrbitFile->swf_id = 0;
-  }
-}
 
 static void omi_destroy_orbit_file(struct omi_orbit_file *pOrbitFile) {
-  omi_close_orbit_file(pOrbitFile);
+  /* omi_close_orbit_file(pOrbitFile); */
 
   free(pOrbitFile->omiFileName);
   pOrbitFile->omiFileName = NULL;
@@ -489,11 +495,9 @@ static RC OMI_AllocateSwath(struct omi_swath_earth **swath, const int n_alongtra
       ((pData->viewingAzimuthAngle=(float *)MEMORY_AllocBuffer(__func__,"viewingAzimuthAngle",nRecords,sizeof(float),0,MEMORY_TYPE_FLOAT))==NULL) ||
       ((pData->terrainHeight=(short *)MEMORY_AllocBuffer(__func__,"terrainHeight",nRecords,sizeof(short),0,MEMORY_TYPE_SHORT))==NULL) ||
       ((pData->groundPixelQualityFlags=(unsigned short *)MEMORY_AllocBuffer(__func__,"groundPixelQualityFlags",nRecords,sizeof(unsigned short),0,MEMORY_TYPE_USHORT))==NULL) ||
-      ((pData->xtrackQualityFlags=(uint8_t *)MEMORY_AllocBuffer(__func__,"xtrackQualityFlags",nRecords,sizeof(unsigned short),0,MEMORY_TYPE_STRING))==NULL))
-
+      ((pData->xtrackQualityFlags=(uint8_t *)MEMORY_AllocBuffer(__func__,"xtrackQualityFlags",nRecords,sizeof(unsigned short),0,MEMORY_TYPE_STRING))==NULL) || ((pData->temp_RadianceMantissa=(int16 *)MEMORY_AllocBuffer(__func__,"temp_RadianceMantissa",nRecords*n_wavel,sizeof(int16),0,MEMORY_TYPE_SHORT))==NULL) || ((pData->temp_RadiancePrecisionMantissa=(int16 *)MEMORY_AllocBuffer(__func__,"temp_RadiancePrecisionMantissa",nRecords*n_wavel,sizeof(int16),0,MEMORY_TYPE_SHORT))==NULL) || ((pData->temp_RadianceExponent=(int8 *)MEMORY_AllocBuffer(__func__,"temp_RadianceExponent",nRecords*n_wavel,sizeof(int8),0,MEMORY_TYPE_STRING))==NULL) ||   ((pData->pixelQualityFlags=(unsigned short *)MEMORY_AllocBuffer(__func__,"pixelQualityFlags",nRecords*n_wavel,sizeof(unsigned short),0,MEMORY_TYPE_USHORT))==NULL) || ((pData->spec_wavelengthcoeff=(float *)MEMORY_AllocBuffer(__func__,"spec_wavelengthcoeff",nRecords*OMI_NUM_COEFFICIENTS,sizeof(float),0,MEMORY_TYPE_FLOAT))==NULL) ) 
     rc=ERROR_ID_ALLOC;
 
-  // Return
 
   return rc;
 }
@@ -682,13 +686,13 @@ static RC find_matching_spectra(const ENGINE_CONTEXT *pEngineContext, struct omi
               newref->spectrum = malloc(orbit_file->nWavel * sizeof(*newref->spectrum));
               newref->errors = malloc(orbit_file->nWavel * sizeof(*newref->errors));
               newref->wavelengths = malloc(orbit_file->nWavel * sizeof(*newref->wavelengths));
-
-              rc = omi_load_spectrum(OMI_SPEC_RAD, orbit_file->sw_id, measurement, row, orbit_file->nWavel, newref->wavelengths, newref->spectrum, newref->errors, NULL);
-
+			  long dd[3]={orbit_file->nMeasurements,orbit_file->nXtrack,orbit_file->nWavel};
+			  unsigned short *groundPixelQualityFlags;
+			  uint8_t        *xtrackQualityFlags;
+              rc = omi_load_spectrum(OMI_SPEC_RAD, orbit_file->sw_id, measurement, row, orbit_file->nWavel, newref->wavelengths, newref->spectrum, newref->errors, NULL,&orbit_file->omiSwath->dataFields.temp_RadianceMantissa[0],&orbit_file->omiSwath->dataFields.temp_RadiancePrecisionMantissa[0],&orbit_file->omiSwath->dataFields.temp_RadianceExponent[0],&orbit_file->omiSwath->dataFields.pixelQualityFlags[0],&orbit_file->omiSwath->dataFields.spec_wavelengthcoeff[0],dd,&orbit_file->omiSwath->dataFields.wavelengthReferenceColumn[0]);			  
               if(rc)
                 goto end_find_matching_spectra;
             }
-
             struct omi_ref_list *list_item = malloc(sizeof(struct omi_ref_list));
             list_item->reference = newref;
             list_item->next = (*row_references)[analysis_window][row];
@@ -752,7 +756,6 @@ static RC setup_automatic_reference(ENGINE_CONTEXT *pEngineContext, void *respon
       (*row_references)[analysis_window][row] = NULL;
     }
   }
-
   // list containing the actual data of the selected spectra
   struct omi_ref_spectrum *ref_candidates = NULL;
   // strings describing the selected spectra for each row/analysis window
@@ -780,7 +783,7 @@ static RC setup_automatic_reference(ENGINE_CONTEXT *pEngineContext, void *respon
     // relevant data has been copied to ref_candidates, so we can free the swath data, and close the orbit file
     omi_free_swath_data(orbit_file->omiSwath);
     orbit_file->omiSwath = NULL;
-    omi_close_orbit_file(reference_orbit_files[i]);
+    /* omi_close_orbit_file(reference_orbit_files[i]); */
   }
 
   // take the average of the matching spectra for each detector row & analysis window:
@@ -793,9 +796,7 @@ static RC setup_automatic_reference(ENGINE_CONTEXT *pEngineContext, void *respon
         if(pTabFeno->hidden || (pTabFeno->refSpectrumSelectionMode!=ANLYS_REF_SELECTION_MODE_AUTOMATIC) ) {
           continue;
         }
-
         struct omi_ref_list *reflist = (*row_references)[analysis_window][row];
-
         if(reflist != NULL) {
           average_spectrum(pTabFeno->Sref, pTabFeno->SrefSigma, reflist, pTabFeno->LambdaRef);
           VECTOR_NormalizeVector(pTabFeno->Sref-1,n_wavel,&pTabFeno->refNormFact, __func__);
@@ -809,12 +810,10 @@ static RC setup_automatic_reference(ENGINE_CONTEXT *pEngineContext, void *respon
       }
     }
   }
-
  end_setup_automatic_reference:
   // free row_references & ref_candidates
   free_row_references(row_references);
   free_ref_candidates(ref_candidates);
-
   return rc;
 }
 
@@ -910,177 +909,272 @@ static RC OmiGetSwathData(struct omi_orbit_file *pOrbitFile, const ENGINE_CONTEX
       {"ViewingAzimuthAngle", pData->viewingAzimuthAngle},
       {"TerrainHeight", pData->terrainHeight},
       {"GroundPixelQualityFlags", pData->groundPixelQualityFlags}
-    };
+	};
 
-  int32 start[] = {0,0};
-  int32 edge[] =  {pOrbitFile->nMeasurements,pOrbitFile->nXtrack };
-  intn swrc;
-  for (unsigned int i=0; i<sizeof(swathdata)/sizeof(swathdata[0]); i++) {
-    swrc = SWreadfield(pOrbitFile->sw_id, (char *) swathdata[i].buffername, start, NULL, edge, swathdata[i].bufferptr);
-    if (swrc == FAIL) {
-      rc = ERROR_SetLast("OmiGetSwathData",ERROR_TYPE_FATAL,ERROR_ID_HDFEOS,swathdata[i].buffername,pOrbitFile->omiFileName,"Cannot read ", swathdata[i].buffername);
-      break;
-    }
+ 
 
-    // Older OMI files do not have "XTrackQualityFlags", so reading them is optional (if the project isn't configured to use XTrackQualityFlags)
-    pData->have_xtrack_quality_flags = false;
-    int32 rank;
-    int32 dims[2];
-    int32 numbertype;
-    char dimlist[520];
-    swrc = SWfieldinfo(pOrbitFile->sw_id, (char *) "XTrackQualityFlags", &rank, dims, &numbertype, dimlist);
-    if (swrc != FAIL) {
-      swrc = SWreadfield(pOrbitFile->sw_id, (char *)"XTrackQualityFlags", start, NULL, edge, pData->xtrackQualityFlags);
-      if (swrc != FAIL) {
-        pData->have_xtrack_quality_flags = true;
-      } else {
-        rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_HDFEOS, "XTrackQualityFlags", pOrbitFile->omiFileName,
-                           "Cannot read XTrackQualityFlags", "");
-      }
-    } else if (pEngineContext->project.instrumental.omi.xtrack_mode != XTRACKQF_IGNORE) {
-    rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_HDFEOS, "XTrackQualityFlags", pOrbitFile->omiFileName,
-                       "File does not contain XTrackQualityFlags", "");
-    }
-  }
+   char ee[300];
+   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Data_Fields/RadianceMantissa");
+   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
+   assert(coda_cursor_read_int16_array(&pOrbitFile->cursor,&pData->temp_RadianceMantissa[0],coda_array_ordering_c)==0);
+    sprintf(ee,"%s%s",pOrbitFile->swathpath,"Data_Fields/RadianceExponent");
+   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
+   assert(coda_cursor_read_int8_array(&pOrbitFile->cursor,&pData->temp_RadianceExponent[0],coda_array_ordering_c)==0);
 
+   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Data_Fields/RadiancePrecisionMantissa");
+   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
+   assert(coda_cursor_read_int16_array(&pOrbitFile->cursor,&pData->temp_RadiancePrecisionMantissa[0],coda_array_ordering_c)==0);
+
+   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/ViewingAzimuthAngle");
+   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
+   assert(coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->viewingAzimuthAngle[0],coda_array_ordering_c)==0);
+  
+   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/TerrainHeight");
+   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
+   assert(coda_cursor_read_int16_array(&pOrbitFile->cursor,&pData->terrainHeight[0],coda_array_ordering_c)==0);
+   
+   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/ViewingZenithAngle");
+   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
+   assert(coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->viewingZenithAngle[0],coda_array_ordering_c)==0);
+   
+   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/SolarAzimuthAngle");
+   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
+   assert(coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->solarAzimuthAngle[0],coda_array_ordering_c)==0);
+   
+   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/SolarZenithAngle");
+   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
+   assert(coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->solarZenithAngle[0],coda_array_ordering_c)==0);
+
+   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/Longitude");
+   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
+   assert(coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->longitude[0],coda_array_ordering_c)==0);
+
+   
+   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/Latitude");
+   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
+   assert(coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->latitude[0],coda_array_ordering_c)==0);
+   
+   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/Time/Time");
+   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
+   assert(coda_cursor_read_double_array(&pOrbitFile->cursor,&pData->time[0],coda_array_ordering_c)==0);
+
+   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/GroundPixelQualityFlags");
+   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
+   assert(coda_cursor_read_uint16_array(&pOrbitFile->cursor,&pData->groundPixelQualityFlags[0],coda_array_ordering_c)==0);
+
+   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/XTrackQualityFlags");
+   if(coda_cursor_goto(&pOrbitFile->cursor,ee)==0){
+	   pData->have_xtrack_quality_flags = true;
+	   assert(coda_cursor_read_uint8_array(&pOrbitFile->cursor,&pData->xtrackQualityFlags[0],coda_array_ordering_c)==0);
+   }
+   else  pData->have_xtrack_quality_flags = false;
+
+   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Data_Fields/MeasurementQualityFlags/MeasurementQualityFlags");
+   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
+   assert(coda_cursor_read_uint16_array(&pOrbitFile->cursor,&pData->measurementQualityFlags[0],coda_array_ordering_c)==0);
+
+   
+   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Data_Fields/WavelengthReferenceColumn/WavelengthReferenceColumn");
+   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
+   assert(coda_cursor_read_int16_array(&pOrbitFile->cursor,&pData->wavelengthReferenceColumn[0],coda_array_ordering_c)==0);
+
+   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Data_Fields/InstrumentConfigurationId/InstrumentConfigurationId");
+   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
+   assert(coda_cursor_read_uint8_array(&pOrbitFile->cursor,&pData->instrumentConfigurationId[0],coda_array_ordering_c)==0);
+
+   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Data_Fields/PixelQualityFlags");
+   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
+   assert(coda_cursor_read_uint16_array(&pOrbitFile->cursor,&pData->pixelQualityFlags[0],coda_array_ordering_c)==0);
+   
+   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Data_Fields/WavelengthCoefficient");
+   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
+   assert(coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->spec_wavelengthcoeff[0],coda_array_ordering_c)==0);
+
+   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/SpacecraftAltitude/SpacecraftAltitude");
+   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
+   assert(coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->spacecraftAltitude[0],coda_array_ordering_c)==0);
+
+   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/SpacecraftLongitude/SpacecraftLongitude");
+   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
+   assert(coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->spacecraftLongitude[0],coda_array_ordering_c)==0);
+
+   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/SpacecraftLatitude/SpacecraftLatitude");
+   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
+   assert(coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->spacecraftLatitude[0],coda_array_ordering_c)==0);
+   
+   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/SecondsInDay/SecondsInDay");
+   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
+   assert(coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->secondsInDay[0],coda_array_ordering_c)==0);
+   
   // normalize longitudes: should be in the range 0-360
   for (int i=0; i< (pOrbitFile->nMeasurements * pOrbitFile->nXtrack); i++) {
     if(pData->longitude[i] < 0.)
       pData->longitude[i] += 360.;
   }
 
-  // Return
 
   return rc;
 }
 
-  static RC OmiOpen(struct omi_orbit_file *pOrbitFile,const char *swathName, const ENGINE_CONTEXT *pEngineContext)
-{
-  RC rc = ERROR_ID_NO;
 
-  // Open the file
-  int32 swf_id = SWopen(pOrbitFile->omiFileName, DFACC_READ);
-  if (swf_id == FAIL) {
-    rc = ERROR_SetLast(__func__,ERROR_TYPE_FATAL,ERROR_ID_HDFEOS,__func__,pOrbitFile->omiFileName,"SWopen");
-    goto end_OmiOpen;
+static RC OmiOpen(struct omi_orbit_file *pOrbitFile,const char *swathName, const ENGINE_CONTEXT *pEngineContext)
+  {
+	  
+	  RC rc = ERROR_ID_NO;
+	  if (	pEngineContext->project.instrumental.omi.spectralType== PRJCT_INSTR_OMI_TYPE_UV1){
+		  pOrbitFile->swathpath="/Earth_UV_1_Swath/";
+	  }
+	  else if (pEngineContext->project.instrumental.omi.spectralType== PRJCT_INSTR_OMI_TYPE_UV2){
+		  pOrbitFile->swathpath="/Earth_UV_2_Swath/";
+	  }
+	  else if (pEngineContext->project.instrumental.omi.spectralType== PRJCT_INSTR_OMI_TYPE_VIS){
+		  pOrbitFile->swathpath="/Earth_VIS_Swath/";
+	  }
+	  else{
+		  assert(0);
+	  }
+	  coda_init();
+	  coda_set_option_perform_boundary_checks(0);
+	  assert(coda_open(pOrbitFile->omiFileName,&pOrbitFile->product)==0);
+	  coda_cursor_set_product(&pOrbitFile->cursor, pOrbitFile->product);
+	  	 
+	  long int dims[3];
+	  char str_sw[200];
+	  sprintf(str_sw, "%s%s", pOrbitFile->swathpath,"Data_Fields/RadianceMantissa");
+	  int ppz=coda_cursor_goto(&pOrbitFile->cursor,str_sw);
+	  assert(ppz==0);
+	  int nd=0;
+	  assert(coda_cursor_get_array_dim(&pOrbitFile->cursor,&nd,dims)==0);
+	  pOrbitFile->nMeasurements=(long)dims[0];
+	  pOrbitFile->nXtrack=(long)dims[1];
+	  pOrbitFile->nWavel=(long)dims[2];
+	  pOrbitFile->specNumber=pOrbitFile->nMeasurements*pOrbitFile->nXtrack;
+	  if (!pOrbitFile->specNumber) {
+		  return ERROR_SetLast(__func__,ERROR_TYPE_FATAL,ERROR_ID_FILE_EMPTY,pOrbitFile->omiFileName);
+	  }
+	  rc=OMI_AllocateSwath(&pOrbitFile->omiSwath,pOrbitFile->nMeasurements,pOrbitFile->nXtrack,pOrbitFile->nWavel);
+	  if (!rc) {
+		  // Retrieve information on records from Data fields and Geolocation fields
+		  rc=OmiGetSwathData(pOrbitFile, pEngineContext);
+	  }
+	  if (!rc) {
+		  // Read orbit number and date from HDF-EOS metadata
+		  rc=read_orbit_metadata(pOrbitFile);
+	  }
+  
+  
+coda_close(pOrbitFile->product);
+coda_done();					
+
+
+
+	  return rc;
   }
-  pOrbitFile->swf_id = swf_id;
-
-  // Get a list of all swaths in the file:
-  int32 strbufsize = 0;
-  int nswath = SWinqswath(pOrbitFile->omiFileName, NULL, &strbufsize);
-  if(nswath == FAIL) {
-    rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_HDFEOS, "SWinqswath", pOrbitFile->omiFileName);
-    goto end_OmiOpen;
-  } else {
-    char swathlist[strbufsize+1];
-    SWinqswath(pOrbitFile->omiFileName, swathlist, &strbufsize);
-
-    // Look for requested swath in the list, and extract the complete
-    // name e.g. look for "Earth UV-1 Swath" and extract "Earth UV-1
-    // Swath (60x159x4)"
-    //
-    // (the complete name is needed to open the swath with SWattach)
-    char *swath_full_name = strstr(swathlist,swathName);
-    if (swath_full_name == NULL) {
-    rc = ERROR_SetLast(__func__,ERROR_TYPE_FATAL,ERROR_ID_HDFEOS,__func__,pOrbitFile->omiFileName,"find swath");
-    goto end_OmiOpen;
-    }
-    char *end_name = strpbrk(swath_full_name,",");
-
-    if (end_name != NULL)
-      *(end_name) = '\0';
-
-    int32 sw_id = SWattach(swf_id, swath_full_name); // attach the swath
-    if (sw_id == FAIL) {
-      rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL,ERROR_ID_HDFEOS,__func__,pOrbitFile->omiFileName,"SWattach");
-      goto end_OmiOpen;
-    }
-    pOrbitFile->sw_id = sw_id;
-
-    int32 dims[3];
-    int32 rank;
-    int32 numbertype;
-    char dimlist[520]; // 520 is a safe maximum length, see HDF-EOS ref for SWfieldinfo()
-    intn swrc = SWfieldinfo(sw_id, (char *) "RadianceMantissa",&rank,dims,&numbertype , dimlist);
-    if(swrc == FAIL) {
-      rc=ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_FILE_EMPTY,pOrbitFile->omiFileName);
-      goto end_OmiOpen;
-    }
-
-    pOrbitFile->nMeasurements=(long)dims[0];
-    pOrbitFile->nXtrack=(long)dims[1];
-    pOrbitFile->nWavel=(long)dims[2];
-
-    pOrbitFile->specNumber=pOrbitFile->nMeasurements*pOrbitFile->nXtrack;
-    if (!pOrbitFile->specNumber) {
-      return ERROR_SetLast(__func__,ERROR_TYPE_FATAL,ERROR_ID_FILE_EMPTY,pOrbitFile->omiFileName);
-    }
-
-    // Allocate data
-    rc=OMI_AllocateSwath(&pOrbitFile->omiSwath,pOrbitFile->nMeasurements,pOrbitFile->nXtrack,pOrbitFile->nWavel);
-
-    if (!rc) {
-      // Retrieve information on records from Data fields and Geolocation fields
-      rc=OmiGetSwathData(pOrbitFile, pEngineContext);
-    }
-
-    if (!rc) {
-      // Read orbit number and date from HDF-EOS metadata
-      rc=read_orbit_metadata(pOrbitFile);
-    }
-  }
-
- end_OmiOpen:
-  return rc;
-}
 
 static RC OMI_LoadReference(int spectralType, const char *refFile, struct omi_ref **return_ref)
 {
+	char * irr, * irrprec, * irrexp, * pixelq , * wave, * refstr;
+	if (	spectralType== PRJCT_INSTR_OMI_TYPE_UV1){
+		irr="/Sun_Volume_UV_1_Swath/Data_Fields/IrradianceMantissa";
+		irrprec="/Sun_Volume_UV_1_Swath/Data_Fields/IrradiancePrecisionMantissa";
+		irrexp="/Sun_Volume_UV_1_Swath/Data_Fields/IrradianceExponent";
+		pixelq="/Sun_Volume_UV_1_Swath/Data_Fields/PixelQualityFlags";
+		wave="/Sun_Volume_UV_1_Swath/Data_Fields/WavelengthCoefficient";
+		refstr="/Sun_Volume_UV_1_Swath/Data_Fields/WavelengthReferenceColumn/WavelengthReferenceColumn";
+	}
+	else if (spectralType== PRJCT_INSTR_OMI_TYPE_UV2){
+		irr="/Sun_Volume_UV_2_Swath/Data_Fields/IrradianceMantissa";
+		irrprec="/Sun_Volume_UV_2_Swath/Data_Fields/IrradiancePrecisionMantissa";
+		irrexp="/Sun_Volume_UV_2_Swath/Data_Fields/IrradianceExponent";
+		pixelq="/Sun_Volume_UV_2_Swath/Data_Fields/PixelQualityFlags";
+		wave="/Sun_Volume_UV_2_Swath/Data_Fields/WavelengthCoefficient";
+		refstr="/Sun_Volume_UV_2_Swath/Data_Fields/WavelengthReferenceColumn/WavelengthReferenceColumn";
+	}
+	else if (spectralType== PRJCT_INSTR_OMI_TYPE_VIS){
+		irr="/Sun_Volume_VIS_Swath/Data_Fields/IrradianceMantissa";
+		irrprec="/Sun_Volume_VIS_Swath/Data_Fields/IrradiancePrecisionMantissa";
+		irrexp="/Sun_Volume_VIS_Swath/Data_Fields/IrradianceExponent";
+		pixelq="/Sun_Volume_VIS_Swath/Data_Fields/PixelQualityFlags";
+		wave="/Sun_Volume_VIS_Swath/Data_Fields/WavelengthCoefficient";
+		refstr="/Sun_Volume_VIS_Swath/Data_Fields/WavelengthReferenceColumn/WavelengthReferenceColumn";
+	}
+	else{
+		assert(0);
+	}
+	coda_product *product=NULL;
+	coda_cursor cursor;
+	coda_init();
+	coda_set_option_perform_boundary_checks(0);
+	assert(coda_open(refFile,&product)==0);
+	coda_cursor_set_product(&cursor, product);
+	assert(coda_cursor_goto(&cursor,irr)==0);
+	long  dims[3];	int nd;
+	assert(coda_cursor_get_array_dim(&cursor,&nd,dims)==0);
+	int16 *temp_Mantissa= (int16 *)malloc(dims[0]*dims[1]*dims[2]*sizeof(*temp_Mantissa));
+	int16 *temp_PrecisionMantissa= (int16 *)malloc(dims[0]*dims[1]*dims[2]*sizeof(*temp_PrecisionMantissa));
+	int8 *temp_Exponent= (int8 *)malloc(dims[0]*dims[1]*dims[2]*sizeof(*temp_Exponent));
+	unsigned short *temp_pixelq= (unsigned short *)malloc(dims[0]*dims[1]*dims[2]*sizeof(*temp_pixelq));
+	float *temp_wave= (float *)malloc(dims[0]*dims[1]*OMI_NUM_COEFFICIENTS*sizeof(*temp_wave));
+	int16 *refcol= (int16 *)malloc(dims[0]*sizeof(*refcol));
+	assert(coda_cursor_read_int16_array(&cursor,temp_Mantissa,coda_array_ordering_c)==0);
+	
+	int pp=coda_cursor_goto(&cursor,irrprec);
+	assert(pp==0);
+
+	pp=coda_cursor_read_int16_array(&cursor,temp_PrecisionMantissa,coda_array_ordering_c);
+	assert(pp==0);
+	pp=coda_cursor_goto(&cursor,irrexp);
+	assert(pp==0);
+
+	pp=coda_cursor_read_int8_array(&cursor,temp_Exponent,coda_array_ordering_c);
+	assert(pp==0);
+	
+	pp=coda_cursor_read_int16_array(&cursor,temp_PrecisionMantissa,coda_array_ordering_c);
+	pp=coda_cursor_goto(&cursor,pixelq);
+	assert(pp==0);
+
+	pp=coda_cursor_read_uint16_array(&cursor,temp_pixelq,coda_array_ordering_c);
+	assert(pp==0);
+
+	pp=coda_cursor_goto(&cursor,wave);
+	pp=coda_cursor_read_float_array(&cursor,temp_wave,coda_array_ordering_c);
+	assert(pp==0);
+	
+	assert(pp==0);
+	pp=coda_cursor_goto(&cursor,refstr);
+	pp=coda_cursor_read_int16_array(&cursor,refcol,coda_array_ordering_c);
+	assert(pp==0);
+	
   struct omi_ref *pRef=&OMI_ref[omiRefFilesN];
   RC rc=ERROR_ID_NO;
+  const int32 n_xtrack = dims[1];
 
-  int32 swf_id = 0;
-  int32 sw_id = 0;
-
-  swf_id = SWopen((char *)refFile, DFACC_READ); // library header doesn't contain const modifier
-  if (swf_id == FAIL) {
-    rc=ERROR_SetLast(__func__,ERROR_TYPE_FATAL,ERROR_ID_HDFEOS,refFile,"can't open file ","");
-    goto end_loadreference;
-  }
-  sw_id = SWattach(swf_id, (char *) OMI_SunSwaths[spectralType]); // library header doesn't contain const modifier
-  if (sw_id  == FAIL) {
-    rc=ERROR_SetLast(__func__,ERROR_TYPE_FATAL,ERROR_ID_HDFEOS,OMI_SunSwaths[spectralType],"swath not found in file ", refFile);
-    goto end_loadreference;
-  }
-
-  const int32 n_xtrack = SWdiminfo(sw_id, (char *) NXTRACK);
-  if (n_xtrack == FAIL) {
-    rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_HDFEOS, NXTRACK, "can't access dimension in file ", refFile);
-    goto end_loadreference;
-  }
-  const int32 n_wavel = SWdiminfo(sw_id, (char *) NWAVEL);
-  if (n_wavel == FAIL) {
-    rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_HDFEOS, NWAVEL, "can't access dimension in file ", refFile);
-    goto end_loadreference;
-  }
+  const int32 n_wavel = dims[2];
 
   OMI_AllocateReference(omiRefFilesN,n_xtrack,n_wavel);
 
   strcpy(pRef->omiRefFileName,refFile);
   pRef->nXtrack=n_xtrack;
   pRef->nWavel=n_wavel;
-
+ 
   for (int indexSpectrum=0; indexSpectrum < pRef->nXtrack; indexSpectrum++) {
-    rc = omi_load_spectrum(OMI_SPEC_IRRAD, sw_id, 0, indexSpectrum, n_wavel,
+	  
+    rc = omi_load_spectrum(OMI_SPEC_IRRAD, 0, 0, indexSpectrum, n_wavel,
                            pRef->omiRefLambda[indexSpectrum],
                            pRef->omiRefSpectrum[indexSpectrum],
                            pRef->omiRefSigma[indexSpectrum],
-                           NULL);
-    if (rc)
-      goto end_loadreference;
+                           pRef->spectrum.pixelQualityFlags,temp_Mantissa,temp_PrecisionMantissa,temp_Exponent,temp_pixelq,temp_wave, dims,refcol);
   }
-
+    
+  free(temp_PrecisionMantissa);
+  free(temp_Exponent);
+  free(temp_Mantissa);
+  free(temp_pixelq);
+  free(temp_wave);
+  free(refcol);
+  coda_close(product);
+  coda_done();					
+  
   if (!rc) {
     ++omiRefFilesN;
     for(int i=0; i<n_xtrack; ++i) {
@@ -1090,23 +1184,17 @@ static RC OMI_LoadReference(int spectralType, const char *refFile, struct omi_re
     *return_ref = pRef;
   }
 
- end_loadreference:
-
-  if(sw_id !=0)
-    SWdetach(sw_id);
-  if(swf_id !=0)
-    SWclose(swf_id);
-
   return rc;
 }
+
 
 /*! read wavelengths, spectrum, and errors into the buffers lambda,
  * spectrum and sigma.  If any of these pointers is NULL, the
  * corresponding data is not read.
  */
-static RC omi_load_spectrum(int spec_type, int32 sw_id, int32 measurement, int32 track, int32 n_wavel, double *lambda, double *spectrum, double *sigma, unsigned short *pixelQualityFlags) {
+static RC omi_load_spectrum(int spec_type, int32 sw_id, int32 measurement, int32 track, int32 n_wavel, double *lambda, double *spectrum, double *sigma, unsigned short *pixelQualityFlags,int16 * spec_mantissa,int16 * spec_precisionmantissa, int8 * spec_exponent,uint16 * pixelq, float *wavecoeff, long dim [],int16 * refcoll) {
   RC rc = ERROR_ID_NO;
-
+  
   int16 *mantissa = malloc(n_wavel*sizeof(*mantissa));
   int16 *precisionmantissa = malloc(n_wavel*sizeof(*precisionmantissa));
   int8 *exponent = malloc(n_wavel*sizeof(*exponent));
@@ -1125,56 +1213,57 @@ static RC omi_load_spectrum(int spec_type, int32 sw_id, int32 measurement, int32
   int32 start[] = {measurement, track, 0};
   int32 edge[] = {1,1,0}; // read 1 measurement, 1 detector row
   intn swrc = 0;
+  int ii_rad=measurement*dim[1]*dim[2]+ track*dim[2];
+  int ii_wave=measurement*dim[1]*OMI_NUM_COEFFICIENTS+ track*OMI_NUM_COEFFICIENTS;
 
   // read wavelengths:
   if(lambda != NULL) {
-    // read reference column
-    int16 refcol;
-    swrc = SWreadfield(sw_id, (char *) REFERENCE_COLUMN, start, NULL, (int32[]) {1}, &refcol);
-    // read 5 wavelength coefficients
-    edge[2] = OMI_NUM_COEFFICIENTS;
+	  int16 refcol;
+	  refcol=refcoll[measurement];
     float32 wavelength_coeff[OMI_NUM_COEFFICIENTS];
-    swrc |= SWreadfield(sw_id,(char *) WAVELENGTH_COEFFICIENT, start, NULL, edge, wavelength_coeff);
-
-    if (swrc == FAIL) {
-      rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_HDFEOS, "SWreadfield");
-      goto end_load_spectrum;
-    }
+    	for (int j=0; j<OMI_NUM_COEFFICIENTS; j++) {
+		wavelength_coeff[j]=wavecoeff[ii_wave+j];
+	}
+	    
     // store wavelength in lambda
     omi_calculate_wavelengths(wavelength_coeff, refcol, n_wavel, lambda);
+	
   }
 
   // (ir-)radiance mantissae, exponents & pixel quality have dimension (nMeasurement x nXtrack x nWavel)
-  edge[2] = n_wavel;
-
   if(spectrum != NULL || sigma != NULL) {
-    swrc |= SWreadfield(sw_id, (char *) s_exponent, start, NULL, edge, exponent);
-
     if(spectrum != NULL) {
-      swrc |= SWreadfield(sw_id, (char *) s_mantissa, start, NULL, edge, mantissa);
-      if(!swrc) {
+		  for (int j=0; j<n_wavel; j++) {
+			  
+			  mantissa[j]=spec_mantissa[ii_rad+j];
+			  exponent[j]=spec_exponent[ii_rad+j];
+			  assert(mantissa[j]==spec_mantissa[ii_rad+j]);
+		  }
         omi_make_double(mantissa, exponent, n_wavel, spectrum);
         omi_interpolate_errors(mantissa,n_wavel,lambda,spectrum);
       }
     }
-
     if(sigma != NULL) {
-      swrc |= SWreadfield(sw_id, (char *) s_precision_mantissa, start, NULL, edge, precisionmantissa);
-      if(!swrc) {
-        omi_make_double(precisionmantissa, exponent, n_wavel, sigma);
+		  for (int j=0; j<n_wavel; j++) {
+				  precisionmantissa[j]=spec_precisionmantissa[ii_rad+j];
+			  assert(precisionmantissa[j]==spec_precisionmantissa[ii_rad+j]);
+		  }
+		  omi_make_double(precisionmantissa, exponent, n_wavel, sigma);
         omi_interpolate_errors(precisionmantissa,n_wavel,lambda,sigma);
       }
-    }
+    
+
+
+  if(pixelQualityFlags != NULL){
+  for (int j=0; j<n_wavel; j++) {
+	  //here can the filtering on pixelqualityflag be implemented. 
+// pixelQualityFlags[j]=pixelq[ii_rad+j];
   }
-
-  
-  if(swrc) // error reading either mantissa/precision_mantissa/exponent/qualityflags:
-    rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_HDFEOS, "SWreadfield");
-
- end_load_spectrum:
-  free(mantissa);
+}
+   free(mantissa);
   free(precisionmantissa);
   free(exponent);
+  
 
   return rc;
 }
@@ -1189,6 +1278,7 @@ static void omi_calculate_wavelengths(float32 wavelength_coeff[], int16 refcol, 
     lambda[i] = 0.;
     int j;
     for (j=OMI_NUM_COEFFICIENTS-1; j>=0 ; j--) {
+		/* printf("%f",wavelength_coeff[j]); */
       lambda[i] = lambda[i]*x + (double)wavelength_coeff[j];
     }
   }
@@ -1308,21 +1398,26 @@ RC OMI_Set(ENGINE_CONTEXT *pEngineContext)
   DEBUG_FunctionBegin(__func__,DEBUG_FCTTYPE_FILE);
 #endif
 
+
   // Initializations
   pEngineContext->recordNumber=0;
   omiSwathOld=ITEM_NONE;
   RC rc=ERROR_ID_NO;
-
+  /* assert(0); */
   // Release old buffers and close file (if open)
   omi_free_swath_data(current_orbit_file.omiSwath);
-  omi_close_orbit_file(&current_orbit_file);
+  /* omi_close_orbit_file(&current_orbit_file); */
+ 
 
   current_orbit_file.omiFileName = malloc(strlen(pEngineContext->fileInfo.fileName)+1);
   strcpy(current_orbit_file.omiFileName,pEngineContext->fileInfo.fileName);
   current_orbit_file.specNumber=0;
+ 
 
   rc=OmiOpen(&current_orbit_file,OMI_EarthSwaths[pEngineContext->project.instrumental.omi.spectralType],pEngineContext);
   // Open the file
+  
+
   if (!rc) {
     pEngineContext->recordNumber=current_orbit_file.specNumber;
     pEngineContext->n_alongtrack=current_orbit_file.nMeasurements;
@@ -1335,7 +1430,7 @@ RC OMI_Set(ENGINE_CONTEXT *pEngineContext)
     }
   } else {
     omi_free_swath_data(current_orbit_file.omiSwath);
-    omi_close_orbit_file(&current_orbit_file);
+    /* omi_close_orbit_file(&current_orbit_file); */
   }
 
 #if defined(__DEBUG_) && __DEBUG_
@@ -1408,8 +1503,9 @@ static void get_omi_record_data(RECORD_INFO *pRecord, const struct omi_orbit_fil
 //               ERROR_ID_NO              otherwise.
 // -----------------------------------------------------------------------------
 
-RC OMI_read_earth(ENGINE_CONTEXT *pEngineContext,int recordNo)
-{
+RC  OMI_read_earth(ENGINE_CONTEXT *pEngineContext,int recordNo)
+  {
+	  // assert(0);
   // Initializations
   const struct omi_orbit_file *pOrbitFile = &current_orbit_file; // pointer to the current orbit
 
@@ -1433,15 +1529,16 @@ RC OMI_read_earth(ENGINE_CONTEXT *pEngineContext,int recordNo)
   if (!pEngineContext->project.instrumental.use_row[i_crosstrack]) {
     return ERROR_ID_FILE_RECORD;
   }
+  long dd[3]={    pOrbitFile->nMeasurements, pOrbitFile->nXtrack,	  pOrbitFile->nWavel};
+
   rc= omi_load_spectrum(OMI_SPEC_RAD,
                         pOrbitFile->sw_id,
                         i_alongtrack,
                         i_crosstrack,
                         pOrbitFile->nWavel,
                         lambda,spectrum,sigma,
-                        NULL);
-  if (rc)
-    return rc;
+                        pEngineContext->buffers.pixel_QF,&pOrbitFile->omiSwath->dataFields.temp_RadianceMantissa[0],&pOrbitFile->omiSwath->dataFields.temp_RadiancePrecisionMantissa[0],&pOrbitFile->omiSwath->dataFields.temp_RadianceExponent[0],&pOrbitFile->omiSwath->dataFields.pixelQualityFlags[0],&pOrbitFile->omiSwath->dataFields.spec_wavelengthcoeff[0],dd,&pOrbitFile->omiSwath->dataFields.wavelengthReferenceColumn[0]);
+  assert(rc==0);
 
   // check L1 wavelength calibration
   // might be good to check that lambda covers the current analysis window, as well
@@ -1562,10 +1659,10 @@ void OMI_ReleaseBuffers(void) {
     reference_orbit_files[i] = NULL;
   }
 
-  omi_close_orbit_file(&current_orbit_file);
+  /* omi_close_orbit_file(&current_orbit_file); */
 
   num_reference_orbit_files = 0;
-
+  
   omiRefFilesN=0; // the total number of files to browse in one shot
   omiTotalRecordNumber=0;
   omiSwathOld=ITEM_NONE;

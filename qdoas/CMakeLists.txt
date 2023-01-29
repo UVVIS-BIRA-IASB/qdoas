@@ -112,7 +112,6 @@ target_link_libraries(qdoas
   ${CODA_LIBRARY}
   ${GSL_LIBRARIES}
   ${HDF5_LIBRARIES}
-  ${HDFEOS_LIBRARIES}
   ${netCDF_LIBRARIES}
 )
 set_target_properties(qdoas PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/resources/qdoas.plist)

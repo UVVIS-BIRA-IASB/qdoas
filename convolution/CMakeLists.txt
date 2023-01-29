@@ -32,8 +32,7 @@ target_link_libraries(convolution
   ${CODA_LIBRARY}
   ${GSL_LIBRARIES}
   ${HDF5_LIBRARIES}
-  ${HDFEOS_LIBRARIES}
-  ${netCDF_LIBRARIES}
+   ${netCDF_LIBRARIES}
 )
 
 if(APPLE)
