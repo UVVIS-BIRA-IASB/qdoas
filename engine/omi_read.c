@@ -1076,7 +1076,7 @@ static RC OMI_LoadReference(int spectralType, const char *refFile, struct omi_re
                            pRef->omiRefLambda[indexSpectrum],
                            pRef->omiRefSpectrum[indexSpectrum],
                            pRef->omiRefSigma[indexSpectrum],
-                           pRef->spectrum.pixelQualityFlags);
+                           NULL);
     if (rc)
       goto end_loadreference;
   }
@@ -1167,9 +1167,7 @@ static RC omi_load_spectrum(int spec_type, int32 sw_id, int32 measurement, int32
     }
   }
 
-  if(pixelQualityFlags != NULL)
-    swrc |= SWreadfield(sw_id, (char *) PIXEL_QUALITY_FLAGS, start, NULL, edge, pixelQualityFlags);
-
+  
   if(swrc) // error reading either mantissa/precision_mantissa/exponent/qualityflags:
     rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_HDFEOS, "SWreadfield");
 
@@ -1441,7 +1439,7 @@ RC OMI_read_earth(ENGINE_CONTEXT *pEngineContext,int recordNo)
                         i_crosstrack,
                         pOrbitFile->nWavel,
                         lambda,spectrum,sigma,
-                        pEngineContext->buffers.pixel_QF);
+                        NULL);
   if (rc)
     return rc;
 
