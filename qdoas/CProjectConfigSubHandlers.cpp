@@ -689,6 +689,7 @@ bool CProjectInstrumentalSubHandler::start(const QXmlAttributes &atts)
   str = atts.value("format");
   if (str == "ascii")
     m_instrumental->format = PRJCT_INSTR_FORMAT_ASCII;
+#ifdef PRJCT_INSTR_FORMAT_OLD  
   else if (str == "logger")
     m_instrumental->format = PRJCT_INSTR_FORMAT_LOGGER;
   else if (str == "acton")
@@ -701,6 +702,7 @@ bool CProjectInstrumentalSubHandler::start(const QXmlAttributes &atts)
     m_instrumental->format = PRJCT_INSTR_FORMAT_CCD_OHP_96;
   else if (str == "ccdha_94")
     m_instrumental->format = PRJCT_INSTR_FORMAT_CCD_HA_94;
+#endif  
   else if (str == "saozvis")
     m_instrumental->format = PRJCT_INSTR_FORMAT_SAOZ_VIS;
   else if (str == "saozefm")
@@ -719,10 +721,12 @@ bool CProjectInstrumentalSubHandler::start(const QXmlAttributes &atts)
     m_instrumental->format = PRJCT_INSTR_FORMAT_MFC_STD;
   else if (str == "mfcbira")
     m_instrumental->format = PRJCT_INSTR_FORMAT_MFC_BIRA;
+#ifdef PRJCT_INSTR_FORMAT_OLD  
   else if (str == "rasas")
     m_instrumental->format = PRJCT_INSTR_FORMAT_RASAS;
   else if (str == "pdasieasoe")
     m_instrumental->format = PRJCT_INSTR_FORMAT_PDASI_EASOE;
+#endif  
   else if (str == "ccdeev")
     m_instrumental->format = PRJCT_INSTR_FORMAT_CCD_EEV;
   else if (str == "gdpbin")
@@ -816,6 +820,7 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     }
 
   }
+#ifdef PRJCT_INSTR_FORMAT_OLD  
   else if (element == "logger") { // LOGGER
     return helperLoadLogger(atts, &(m_instrumental->logger));
 
@@ -868,6 +873,7 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     return helperLoadCcd(atts, &(m_instrumental->ccdha94));
 
   }
+#endif  
   else if (element == "saozvis") { // SAOZ VIS
     return helperLoadSaoz(atts, &(m_instrumental->saozvis));
 
@@ -1017,7 +1023,7 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     }
   }
 
-
+#ifdef PRJCT_INSTR_FORMAT_OLD
   else if (element == "rasas") { // RASAS
     m_instrumental->rasas.straylight = (atts.value("straylight") == "true") ? 1 : 0;
     m_instrumental->rasas.lambdaMin = atts.value("lambda_min").toDouble();
@@ -1032,6 +1038,7 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     return helperLoadMinimum(atts, &(m_instrumental->pdasieasoe));
 
   }
+#endif  
   else if (element == "ccdeev") { // CCD EEV
     QString str;
 

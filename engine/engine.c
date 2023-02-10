@@ -424,21 +424,27 @@ RC EngineSetProject(ENGINE_CONTEXT *pEngineContext)
        ((pBuffers->spectrum=MEMORY_AllocDVector(__func__,"spectrum",0,max_ndet-1))==NULL) ||
 
        (((pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_CCD_EEV) ||
+         #ifdef PRJCT_INSTR_FORMAT_OLD 
          (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_CCD_OHP_96) ||
          (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_CCD_HA_94) ||
          (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG) ||
          (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG_OLD) ||
          (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_PDASI_EASOE) ||
+         #endif
          (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_MKZY)) &&
 
         ((pBuffers->recordIndexes=(uint32_t *)MEMORY_AllocBuffer(__func__,"recordIndexes",2001,sizeof(uint32_t),0,MEMORY_TYPE_ULONG))==NULL)) ||
 
-       (((pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_CCD_EEV) ||
+       (((pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_CCD_EEV) 
+         #ifdef PRJCT_INSTR_FORMAT_OLD
+         ||
          (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_CCD_OHP_96) ||
          (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_CCD_HA_94) ||
          (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG) ||
          (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG_OLD) ||
-         (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_PDASI_EASOE)) &&
+         (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_PDASI_EASOE)
+         #endif
+         ) &&
 
         (((pBuffers->specMaxx=(double *)MEMORY_AllocDVector(__func__,"specMaxx",0,MAX_SPECMAX-1))==NULL) ||
         ((pBuffers->specMax=(double *)MEMORY_AllocDVector(__func__,"specMax",0,MAX_SPECMAX-1))==NULL))) ||
@@ -459,10 +465,13 @@ RC EngineSetProject(ENGINE_CONTEXT *pEngineContext)
        ((pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_MKZY) &&
         ((pBuffers->scanRef=MEMORY_AllocDVector(__func__,"scanRef",0,max_ndet-1))==NULL)) ||
 
-       (((pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_ACTON) ||
+       ((
+        #ifdef PRJCT_INSTR_FORMAT_OLD
+         (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_ACTON) ||
          (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG) ||
          (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG_OLD) ||
          (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_PDASI_EASOE) ||
+        #endif 
          (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_MKZY) ||
          (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_CCD_EEV)) &&
         ((pBuffers->darkCurrent=MEMORY_AllocDVector(__func__,"darkCurrent",0,max_ndet-1))==NULL)) ||
@@ -646,20 +655,27 @@ RC EngineSetFile(ENGINE_CONTEXT *pEngineContext,const char *fileName,void *respo
    //        For the moment, I suppose that the file exists and if not, the selection of the
    //        measurement is ignored.  To improve ???
 
-   if ((pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_SAOZ_VIS) ||
+   if ((pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_SAOZ_VIS) 
+       #ifdef PRJCT_INSTR_FORMAT_OLD
+        ||
        (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_PDASI_EASOE) ||
        (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG) ||
-       (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG_OLD))
+       (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG_OLD)
+       #endif
+      )
 
     pFile->namesFp=fopen(FILES_BuildFileName(fileTmp,fileName,FILE_TYPE_NAMES),"rb");
 
    // Dark current files : the file name is automatically built from the spectra file name
 
-   if ((pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG) ||
+   if (
+       #ifdef PRJCT_INSTR_FORMAT_OLD
+       (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG) ||
        (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG_OLD) ||
        (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_ACTON) ||
-       (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_CCD_EEV) ||
-       (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_PDASI_EASOE))
+       (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_PDASI_EASOE) ||
+       #endif
+       (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_CCD_EEV))
 
     pFile->darkFp=fopen(FILES_BuildFileName(fileTmp,fileName,FILE_TYPE_DARK),"rb");
 
@@ -688,6 +704,7 @@ RC EngineSetFile(ENGINE_CONTEXT *pEngineContext,const char *fileName,void *respo
         rc=ASCII_QDOAS_Set(pEngineContext,pFile->specFp);
        break;
        // ---------------------------------------------------------------------------
+     #ifdef PRJCT_INSTR_FORMAT_OLD  
      case PRJCT_INSTR_FORMAT_ACTON :
        rc=SetActon_Logger(pEngineContext,pFile->specFp);
        break;
@@ -695,11 +712,13 @@ RC EngineSetFile(ENGINE_CONTEXT *pEngineContext,const char *fileName,void *respo
      case PRJCT_INSTR_FORMAT_PDASI_EASOE :
        rc=SetEASOE(pEngineContext,pFile->specFp,pFile->namesFp);
        break;
+     #endif  
        // ---------------------------------------------------------------------------
      case PRJCT_INSTR_FORMAT_OCEAN_OPTICS :
        rc=SetOceanOptics(pEngineContext,pFile->specFp);
        break;
        // ---------------------------------------------------------------------------
+     #ifdef PRJCT_INSTR_FORMAT_OLD  
      case PRJCT_INSTR_FORMAT_PDAEGG :
        rc=SetPDA_EGG(pEngineContext,pFile->specFp,1);
        break;
@@ -711,6 +730,7 @@ RC EngineSetFile(ENGINE_CONTEXT *pEngineContext,const char *fileName,void *respo
      case PRJCT_INSTR_FORMAT_LOGGER :
        rc=SetPDA_EGG_Logger(pEngineContext,pFile->specFp);
        break;
+     #endif  
        // ---------------------------------------------------------------------------
      case PRJCT_INSTR_FORMAT_SAOZ_VIS :
        rc=SetSAOZ(pEngineContext,pFile->specFp);
@@ -744,9 +764,11 @@ RC EngineSetFile(ENGINE_CONTEXT *pEngineContext,const char *fileName,void *respo
         rc=MFCBIRA_Set(pEngineContext,pFile->specFp);
        break;
        // ---------------------------------------------------------------------------
+     #ifdef PRJCT_INSTR_FORMAT_OLD  
      case PRJCT_INSTR_FORMAT_RASAS :
        rc=SetRAS(pEngineContext,pFile->specFp);
        break;
+     #endif  
        // ---------------------------------------------------------------------------
      case PRJCT_INSTR_FORMAT_UOFT :
        rc=SetUofT(pEngineContext,pFile->specFp);
@@ -779,6 +801,7 @@ RC EngineSetFile(ENGINE_CONTEXT *pEngineContext,const char *fileName,void *respo
        rc=SetCCD_EEV(pEngineContext,pFile->specFp,pFile->darkFp);
        break;
        // ---------------------------------------------------------------------------
+     #ifdef PRJCT_INSTR_FORMAT_OLD  
      case PRJCT_INSTR_FORMAT_CCD_OHP_96 :
        rc=SetCCD(pEngineContext,pFile->specFp,0);
        break;
@@ -786,6 +809,7 @@ RC EngineSetFile(ENGINE_CONTEXT *pEngineContext,const char *fileName,void *respo
      case PRJCT_INSTR_FORMAT_CCD_HA_94 :
        rc=SetCCD(pEngineContext,pFile->specFp,1);
        break;
+     #endif  
        // ---------------------------------------------------------------------------
      case PRJCT_INSTR_FORMAT_GDP_BIN :
        if (!(rc=GDP_BIN_Set(pEngineContext) ) &&  (THRD_id!=THREAD_TYPE_SPECTRA) && (THRD_id!=THREAD_TYPE_EXPORT) && (THRD_id!=THREAD_TYPE_NONE))
@@ -910,6 +934,7 @@ RC EngineReadFile(ENGINE_CONTEXT *pEngineContext,int indexRecord,int dateFlag,in
        pRecord->rc=ASCII_QDOAS_Read(pEngineContext,indexRecord,dateFlag,localCalDay,pFile->specFp);
       break;
       // ---------------------------------------------------------------------------
+    #ifdef PRJCT_INSTR_FORMAT_OLD  
     case PRJCT_INSTR_FORMAT_ACTON :
       pRecord->rc=ReliActon_Logger(pEngineContext,indexRecord,dateFlag,localCalDay,pFile->specFp,pFile->namesFp,pFile->darkFp);
       break;
@@ -917,11 +942,13 @@ RC EngineReadFile(ENGINE_CONTEXT *pEngineContext,int indexRecord,int dateFlag,in
     case PRJCT_INSTR_FORMAT_PDASI_EASOE :
       pRecord->rc=ReliEASOE(pEngineContext,indexRecord,dateFlag,localCalDay,pFile->specFp,pFile->namesFp,pFile->darkFp);
       break;
+    #endif  
       // ---------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_OCEAN_OPTICS :
       pRecord->rc=ReliOceanOptics(pEngineContext,indexRecord,dateFlag,localCalDay,pFile->specFp);
       break;
       // ---------------------------------------------------------------------------
+    #ifdef PRJCT_INSTR_FORMAT_OLD  
     case PRJCT_INSTR_FORMAT_PDAEGG :
       pRecord->rc=ReliPDA_EGG(pEngineContext,indexRecord,dateFlag,localCalDay,pFile->specFp,pFile->namesFp,pFile->darkFp,1);
       break;
@@ -933,6 +960,7 @@ RC EngineReadFile(ENGINE_CONTEXT *pEngineContext,int indexRecord,int dateFlag,in
     case PRJCT_INSTR_FORMAT_LOGGER :
       pRecord->rc=ReliPDA_EGG_Logger(pEngineContext,indexRecord,dateFlag,localCalDay,pFile->specFp);
       break;
+    #endif  
       // ---------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_SAOZ_VIS :
       pRecord->rc=ReliSAOZ(pEngineContext,indexRecord,dateFlag,localCalDay,pFile->specFp,pFile->namesFp);
@@ -967,9 +995,11 @@ RC EngineReadFile(ENGINE_CONTEXT *pEngineContext,int indexRecord,int dateFlag,in
       pRecord->rc=MFCBIRA_Reli(pEngineContext,indexRecord,dateFlag,localCalDay,pFile->specFp);
       break;
       // ---------------------------------------------------------------------------
+    #ifdef PRJCT_INSTR_FORMAT_OLD  
     case PRJCT_INSTR_FORMAT_RASAS :
       pRecord->rc=ReliRAS(pEngineContext,indexRecord,dateFlag,localCalDay,pFile->specFp);
       break;
+    #endif
       // ---------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_UOFT :
       pRecord->rc=ReliUofT(pEngineContext,indexRecord,dateFlag,localCalDay,pFile->specFp);
@@ -995,6 +1025,7 @@ RC EngineReadFile(ENGINE_CONTEXT *pEngineContext,int indexRecord,int dateFlag,in
       pRecord->rc=ReliCCD_EEV(pEngineContext,indexRecord,dateFlag,localCalDay,pFile->specFp,pFile->darkFp);
       break;
       // ---------------------------------------------------------------------------
+    #ifdef PRJCT_INSTR_FORMAT_OLD  
     case PRJCT_INSTR_FORMAT_CCD_HA_94 :
       pRecord->rc=ReliCCD(pEngineContext,indexRecord,dateFlag,localCalDay,pFile->specFp,pFile->namesFp,pFile->darkFp);
       break;
@@ -1002,6 +1033,7 @@ RC EngineReadFile(ENGINE_CONTEXT *pEngineContext,int indexRecord,int dateFlag,in
     case PRJCT_INSTR_FORMAT_CCD_OHP_96 :
       pRecord->rc=ReliCCDTrack(pEngineContext,indexRecord,dateFlag,localCalDay,pFile->specFp,pFile->namesFp,pFile->darkFp);
       break;
+    #endif  
       // ---------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_GDP_BIN :
       pRecord->rc=GDP_BIN_Read(pEngineContext,indexRecord,pFile->specFp);
@@ -1593,6 +1625,7 @@ RC EngineBuildRefList(ENGINE_CONTEXT *pEngineContext)
 
   rc=ERROR_ID_NO;
 
+  #ifdef PRJCT_INSTR_FORMAT_OLD
   if ((pInstr->readOutFormat==PRJCT_INSTR_FORMAT_LOGGER) ||
       (pInstr->readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG) ||
       (pInstr->readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG_OLD))
@@ -1600,6 +1633,7 @@ RC EngineBuildRefList(ENGINE_CONTEXT *pEngineContext)
        ENGINE_contextRef.project.instrumental.user=
        ENGINE_contextRef2.project.instrumental.user=PRJCT_INSTR_IASB_TYPE_ZENITHAL;
    }
+  #endif 
 
   if (ENGINE_contextRef.recordNumber>0)
    {

@@ -1,4 +1,4 @@
- /*
+/*
 Qdoas is a cross-platform application for spectral analysis with the DOAS
 algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
@@ -397,6 +397,7 @@ void getValidFieldFlags(int *validFlags, int instrument,int selectorOrigin)
      }
     break;
  // ----------------------------------------------------------------------------
+#ifdef PRJCT_INSTR_FORMAT_OLD    
     case PRJCT_INSTR_FORMAT_ACTON:
      {
       validFlags[PRJCT_RESULTS_NAME]=1;
@@ -436,6 +437,7 @@ void getValidFieldFlags(int *validFlags, int instrument,int selectorOrigin)
       validFlags[PRJCT_RESULTS_TDET]=1;
      }
     break;
+#endif    
  // ----------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_SAOZ_VIS :                                          // SAOZ PCD/NMOS UV-Visible
      {
@@ -494,7 +496,9 @@ void getValidFieldFlags(int *validFlags, int instrument,int selectorOrigin)
     break;
  // ----------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_SAOZ_EFM :
+#ifdef PRJCT_INSTR_FORMAT_OLD     
     case PRJCT_INSTR_FORMAT_RASAS :
+#endif     
      {
       validFlags[PRJCT_RESULTS_SCANS]=1;
       validFlags[PRJCT_RESULTS_NREJ]=1;
@@ -528,6 +532,7 @@ void getValidFieldFlags(int *validFlags, int instrument,int selectorOrigin)
      }
     break;
  // ----------------------------------------------------------------------------
+#ifdef PRJCT_INSTR_FORMAT_OLD    
     case PRJCT_INSTR_FORMAT_PDASI_EASOE :
      {
       validFlags[PRJCT_RESULTS_NAME]=1;
@@ -535,6 +540,7 @@ void getValidFieldFlags(int *validFlags, int instrument,int selectorOrigin)
       validFlags[PRJCT_RESULTS_NREJ]=1;
      }
     break;
+#endif    
  // ----------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_UOFT :
      {

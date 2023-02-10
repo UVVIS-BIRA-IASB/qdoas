@@ -359,6 +359,7 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
   case PRJCT_INSTR_FORMAT_ASCII:
     fprintf(fp, "\"ascii\"");
     break;
+#ifdef PRJCT_INSTR_FORMAT_OLD    
   case PRJCT_INSTR_FORMAT_LOGGER:
     fprintf(fp, "\"logger\"");
     break;
@@ -377,6 +378,7 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
   case PRJCT_INSTR_FORMAT_CCD_HA_94:
     fprintf(fp, "\"ccdha94\"");
     break;
+#endif    
   case PRJCT_INSTR_FORMAT_SAOZ_VIS:
     fprintf(fp, "\"saozvis\"");
     break;
@@ -392,12 +394,14 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
   case PRJCT_INSTR_FORMAT_MFC_BIRA:
     fprintf(fp, "\"mfcbira\"");
     break;
+#ifdef PRJCT_INSTR_FORMAT_OLD    
   case PRJCT_INSTR_FORMAT_RASAS:
     fprintf(fp, "\"rasas\"");
     break;
   case PRJCT_INSTR_FORMAT_PDASI_EASOE:
     fprintf(fp, "\"pdasieasoe\"");
     break;
+#endif    
   case PRJCT_INSTR_FORMAT_CCD_EEV:
     fprintf(fp, "\"ccdeev\"");
     break;
@@ -480,6 +484,8 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
 
   tmpStr = pathMgr->simplifyPath(QString(d->ascii.transmissionFunctionFile));
   fprintf(fp, " transmission=\"%s\" />\n", tmpStr.toUtf8().constData());
+  
+#ifdef PRJCT_INSTR_FORMAT_OLD  
 
   // logger
   fprintf(fp, "      <logger type=");
@@ -617,7 +623,8 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
 
   tmpStr = pathMgr->simplifyPath(QString(d->ccdha94.detectorNonLinearityFile));
   fprintf(fp, " dnl=\"%s\" />\n", tmpStr.toUtf8().constData());
-
+#endif
+  
   // saozvis
 
   fprintf(fp, "      <saozvis type=\"%s\"",(d->saozvis.spectralType==PRJCT_INSTR_SAOZ_TYPE_ZENITHAL)?"zenithal":"pointed");
@@ -680,7 +687,7 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
 
   tmpStr = pathMgr->simplifyPath(QString(d->mfcstd.offsetFile));
   fprintf(fp, " offset=\"%s\" />\n", tmpStr.toUtf8().constData());
-
+#ifdef PRJCT_INSTR_FORMAT_OLD
   // rasas
 
   fprintf(fp, "      <rasas straylight=\"%s\" lambda_min=\"%g\" lambda_max=\"%g\"",(d->rasas.straylight ? sTrue : sFalse),d->rasas.lambdaMin,d->rasas.lambdaMax);
@@ -698,7 +705,7 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
 
   tmpStr = pathMgr->simplifyPath(QString(d->pdasieasoe.transmissionFunctionFile));
   fprintf(fp, " instr=\"%s\" />\n", tmpStr.toUtf8().constData());
-
+#endif
   // ccdeev
   fprintf(fp, "      <ccdeev size=\"%d\" straylight=\"%s\" lambda_min=\"%g\" lambda_max=\"%g\"", d->ccdeev.detectorSize,(d->ccdeev.straylight ? sTrue : sFalse),d->ccdeev.lambdaMin,d->ccdeev.lambdaMax);
 

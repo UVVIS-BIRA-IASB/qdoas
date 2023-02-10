@@ -37,11 +37,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "mediate_project.h"
 
 class CWInstrAsciiEdit;
+#ifdef PRJCT_INSTR_FORMAT_OLD
 class CWInstrLoggerEdit;
 class CWInstrActonEdit;
+#endif
 class CWInstrSaozEdit;
 class CWInstrMinimumEdit;
+#ifdef PRJCT_INSTR_FORMAT_OLD
 class CWInstrCcdEdit;
+#endif
 class CWInstrCcdEevEdit;
 class CWInstrGdpEdit;
 class CWInstrGome1Edit;
@@ -80,20 +84,24 @@ Q_OBJECT
   QStackedWidget *m_formatStack;
   // widgets for the configuration of each instrument file format
   CWInstrAsciiEdit *m_asciiEdit;
+  #ifdef PRJCT_INSTR_FORMAT_OLD
   CWInstrLoggerEdit *m_loggerEdit;
   CWInstrActonEdit *m_actonEdit;
   CWInstrLoggerEdit *m_pdaEggEdit;
   CWInstrLoggerEdit *m_pdaEggOldEdit;
   CWInstrCcdEdit *m_ccdOhp96Edit;
   CWInstrCcdEdit *m_ccdHa94Edit;
+  #endif
   CWInstrSaozEdit *m_saozVisEdit;
   CWInstrSaozEdit *m_saozUvEdit;
   CWInstrMfcEdit *m_mfcEdit;
   CWInstrMfcStdEdit *m_mfcStdEdit;
   CWInstrMfcbiraEdit *m_mfcbiraEdit;
   CWInstrMinimumEdit *m_saozEfmEdit;
+  #ifdef PRJCT_INSTR_FORMAT_OLD
   CWInstrMinimumEdit *m_rasasEdit;
   CWInstrMinimumEdit *m_pdasiEasoeEdit;
+  #endif
   CWInstrCcdEevEdit *m_ccdEevEdit;
   CWInstrGome1Edit *m_gdpNetcdfEdit;
   CWInstrGdpEdit *m_gdpBinEdit;
@@ -218,7 +226,7 @@ private:
 };
 
 //--------------------------------------------------------------------------
-
+#ifdef PRJCT_INSTR_FORMAT_OLD
 class CWInstrLoggerEdit : public CWCalibInstrEdit
 {
  public:
@@ -243,7 +251,7 @@ class CWInstrActonEdit : public CWCalibInstrEdit
  private:
   QComboBox *m_niluTypeCombo;
 };
-
+#endif
 //--------------------------------------------------------------------------
 
 class CWInstrSaozEdit : public CWCalibInstrEdit
@@ -318,7 +326,7 @@ class CWInstrMinimumEdit : public CWCalibInstrEdit
 };
 
 //--------------------------------------------------------------------------
-
+#ifdef PRJCT_INSTR_FORMAT_OLD
 class CWInstrCcdEdit : public CWAllFilesEdit
 {
  public:
@@ -326,7 +334,7 @@ class CWInstrCcdEdit : public CWAllFilesEdit
 
   void apply(struct instrumental_ccd *d) const;
 };
-
+#endif
 //--------------------------------------------------------------------------
 
 class CWInstrCcdEevEdit : public CWAllFilesEdit

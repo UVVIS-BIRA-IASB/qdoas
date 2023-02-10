@@ -107,6 +107,8 @@ CWProjectTabInstrumental::CWProjectTabInstrumental(const mediate_project_instrum
   m_asciiEdit = new CWInstrAsciiEdit(&(instr->ascii));
   index = m_formatStack->addWidget(m_asciiEdit);
   m_instrumentToStackIndexMap.insert(std::map<int,int>::value_type(PRJCT_INSTR_FORMAT_ASCII, index));
+  
+  #ifdef PRJCT_INSTR_FORMAT_OLD
 
   // logger
   m_loggerEdit = new CWInstrLoggerEdit(&(instr->logger));
@@ -137,6 +139,8 @@ CWProjectTabInstrumental::CWProjectTabInstrumental(const mediate_project_instrum
   m_ccdHa94Edit = new CWInstrCcdEdit(&(instr->ccdha94));
   index = m_formatStack->addWidget(m_ccdHa94Edit);
   m_instrumentToStackIndexMap.insert(std::map<int,int>::value_type(PRJCT_INSTR_FORMAT_CCD_HA_94, index));
+  
+  #endif
 
   // saozvis
   m_saozVisEdit = new CWInstrSaozEdit(&(instr->saozvis));
@@ -162,7 +166,8 @@ CWProjectTabInstrumental::CWProjectTabInstrumental(const mediate_project_instrum
   m_mfcbiraEdit = new CWInstrMfcbiraEdit(&(instr->mfcbira));
   index = m_formatStack->addWidget(m_mfcbiraEdit);
   m_instrumentToStackIndexMap.insert(std::map<int,int>::value_type(PRJCT_INSTR_FORMAT_MFC_BIRA, index));
-
+  
+  #ifdef PRJCT_INSTR_FORMAT_OLD
   // rasas
   m_rasasEdit = new CWInstrMinimumEdit(&(instr->rasas));
   index = m_formatStack->addWidget(m_rasasEdit);
@@ -172,6 +177,7 @@ CWProjectTabInstrumental::CWProjectTabInstrumental(const mediate_project_instrum
   m_pdasiEasoeEdit = new CWInstrMinimumEdit(&(instr->pdasieasoe));
   index = m_formatStack->addWidget(m_pdasiEasoeEdit);
   m_instrumentToStackIndexMap.insert(std::map<int,int>::value_type(PRJCT_INSTR_FORMAT_PDASI_EASOE, index));
+  #endif
 
   // ccdeev
   m_ccdEevEdit = new CWInstrCcdEevEdit(&(instr->ccdeev));
@@ -323,19 +329,23 @@ void CWProjectTabInstrumental::apply(mediate_project_instrumental_t *instr) cons
   if (m_saaNRadioButton->isChecked()) instr->saaConvention = PRJCT_INSTR_SAA_NORTH;
 
   m_asciiEdit->apply(&(instr->ascii));
+  #ifdef PRJCT_INSTR_FORMAT_OLD
   m_loggerEdit->apply(&(instr->logger));
   m_actonEdit->apply(&(instr->acton));
   m_pdaEggEdit->apply(&(instr->pdaegg));
   m_pdaEggOldEdit->apply(&(instr->pdaeggold));
   m_ccdOhp96Edit->apply(&(instr->ccdohp96));
   m_ccdHa94Edit->apply(&(instr->ccdha94));
+  #endif
   m_saozVisEdit->apply(&(instr->saozvis));
   m_saozEfmEdit->apply(&(instr->saozefm));
   m_mfcEdit->apply(&(instr->mfc));
   m_mfcStdEdit->apply(&(instr->mfcstd));
   m_mfcbiraEdit->apply(&(instr->mfcbira));
+  #ifdef PRJCT_INSTR_FORMAT_OLD
   m_rasasEdit->apply(&(instr->rasas));
   m_pdasiEasoeEdit->apply(&(instr->pdasieasoe));
+  #endif
   m_ccdEevEdit->apply(&(instr->ccdeev));
   m_gdpNetcdfEdit->apply(&(instr->gdpnetcdf));
   m_gdpBinEdit->apply(&(instr->gdpbin));
@@ -771,6 +781,7 @@ void CWInstrAsciiEdit::slotAsciiExtendedFormatChanged(bool state)
 }
 
 //--------------------------------------------------------
+#ifdef PRJCT_INSTR_FORMAT_OLD
 
 CWInstrLoggerEdit::CWInstrLoggerEdit(const struct instrumental_logger *d, QWidget *parent) :
   CWCalibInstrEdit(parent)
@@ -874,7 +885,7 @@ void CWInstrActonEdit::apply(struct instrumental_acton *d) const
   strcpy(d->calibrationFile, m_fileOneEdit->text().toLocal8Bit().data());
   strcpy(d->transmissionFunctionFile, m_fileTwoEdit->text().toLocal8Bit().data());
 }
-
+#endif
 //--------------------------------------------------------
 
 CWInstrSaozEdit::CWInstrSaozEdit(const struct instrumental_saoz *d, QWidget *parent) :
@@ -1416,7 +1427,7 @@ void CWInstrMinimumEdit::apply(struct instrumental_minimum *d) const
 }
 
 //--------------------------------------------------------
-
+#ifdef PRJCT_INSTR_FORMAT_OLD
 CWInstrCcdEdit::CWInstrCcdEdit(const struct instrumental_ccd *d, QWidget *parent) :
   CWAllFilesEdit(parent)
 {
@@ -1446,7 +1457,7 @@ void CWInstrCcdEdit::apply(struct instrumental_ccd *d) const
   strcpy(d->interPixelVariabilityFile, m_fileThreeEdit->text().toLocal8Bit().data());
   strcpy(d->detectorNonLinearityFile, m_fileFourEdit->text().toLocal8Bit().data());
 }
-
+#endif
 //--------------------------------------------------------
 
 CWInstrCcdEevEdit::CWInstrCcdEevEdit(const struct instrumental_ccdeev *d, QWidget *parent) :

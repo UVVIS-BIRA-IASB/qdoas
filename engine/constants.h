@@ -371,19 +371,23 @@ enum _prjctUsampMethod {
 
 enum _prjctInstrFormat {
   PRJCT_INSTR_FORMAT_ASCII,                                                     //  1 ASCII
+#ifdef PRJCT_INSTR_FORMAT_OLD
   PRJCT_INSTR_FORMAT_LOGGER,                                                    //  2 Logger (PDA,CCD or HAMAMATSU)
   PRJCT_INSTR_FORMAT_ACTON,                                                     //  3 Acton (NILU)
   PRJCT_INSTR_FORMAT_PDAEGG,                                                    //  4 PDA EG&G (sept. 94 until now)
   PRJCT_INSTR_FORMAT_PDAEGG_OLD,                                                //  5 PDA EG&G (spring 94)
   PRJCT_INSTR_FORMAT_CCD_OHP_96,                                                //  6 CCD (OHP 96)
   PRJCT_INSTR_FORMAT_CCD_HA_94,                                                 //  7 CCD (HARESTUA 94)
+#endif  
   PRJCT_INSTR_FORMAT_SAOZ_VIS,                                                  //  8 SAOZ visible
   PRJCT_INSTR_FORMAT_SAOZ_EFM,                                                  //  9 SAOZ EFM (1024)
   PRJCT_INSTR_FORMAT_MFC,                                                       // 10 MFC Heidelberg
   PRJCT_INSTR_FORMAT_MFC_STD,                                                   // 11 MFC Heidelberg
   PRJCT_INSTR_FORMAT_MFC_BIRA,                                                  // 12 MFC BIRA-IASB
+#ifdef PRJCT_INSTR_FORMAT_OLD  
   PRJCT_INSTR_FORMAT_RASAS,                                                     // 13 RASAS (INTA)
   PRJCT_INSTR_FORMAT_PDASI_EASOE,                                               // 14 EASOE
+#endif  
   PRJCT_INSTR_FORMAT_CCD_EEV,                                                   // 15 CCD EEV
   PRJCT_INSTR_FORMAT_GDP_BIN,                                                   // 16 GOME GDP BINARY format
   PRJCT_INSTR_FORMAT_SCIA_PDS,                                                  // 17 SCIAMACHY Calibrated Level 1 data in PDS format

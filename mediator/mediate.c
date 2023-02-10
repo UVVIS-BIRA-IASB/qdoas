@@ -487,10 +487,13 @@ void mediateRequestPlotSpectra(ENGINE_CONTEXT *pEngineContext,void *responseHand
        }
       }
 
-     if (((pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG) ||
+     if ((
+         #ifdef PRJCT_INSTR_FORMAT_OLD
+          (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG) ||
           (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG_OLD) ||
           (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_ACTON) ||
           (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_PDASI_EASOE) ||
+         #endif 
           (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_CCD_EEV)) &&
          (pEngineContext->fileInfo.darkFp!=NULL) && (pBuffers->darkCurrent!=NULL)) {
        sprintf(tmpString,"Dark current (%d/%d)",pEngineContext->indexRecord,pEngineContext->recordNumber);
@@ -525,8 +528,11 @@ void mediateRequestPlotSpectra(ENGINE_CONTEXT *pEngineContext,void *responseHand
        mediateResponseLabelPage(plotPageIrrad, fileName, "Irradiance", responseHandle);
      }
 
-     if (((pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG) ||
+     if ((
+         #ifdef PRJCT_INSTR_FORMAT_OLD
+          (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG) ||
           (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG_OLD) ||
+         #endif 
           (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_CCD_EEV)) &&
          (pBuffers->specMax!=NULL) &&
          (pRecord->NSomme>1))
@@ -844,6 +850,7 @@ void setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const
    switch (pEngineInstrumental->readOutFormat)
     {
      // ----------------------------------------------------------------------------
+    #ifdef PRJCT_INSTR_FORMAT_OLD
     case PRJCT_INSTR_FORMAT_ACTON :                                                                 // Acton (NILU)
 
       NDET[0]=1024;                                                                     // size of the detector
@@ -865,6 +872,7 @@ void setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const
       strcpy(pEngineInstrumental->instrFunction,pMediateInstrumental->logger.transmissionFunctionFile);     // instrumental function file
 
       break;
+    #endif  
       // ----------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_ASCII :                                                                 // Format ASCII
 
@@ -887,6 +895,7 @@ void setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const
 
       break;
       // ----------------------------------------------------------------------------
+    #ifdef PRJCT_INSTR_FORMAT_OLD  
     case PRJCT_INSTR_FORMAT_PDAEGG_OLD :                                                            // PDA EG&G (spring 94)
 
       NDET[0]=1024;                                                                                     // size of the detector
@@ -923,6 +932,7 @@ void setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const
       strcpy(pEngineInstrumental->instrFunction,pMediateInstrumental->pdasieasoe.transmissionFunctionFile); // instrumental function file
 
       break;
+    #endif  
       // ----------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_OCEAN_OPTICS :                                                                 // Format OCEAN OPTICS
 
@@ -1000,6 +1010,7 @@ void setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const
       OMI_TrackSelection(pMediateInstrumental->apex.trackSelection,pEngineInstrumental->use_row);
 
       break;
+    #ifdef PRJCT_INSTR_FORMAT_OLD  
     case PRJCT_INSTR_FORMAT_RASAS :                                                                 // Format RASAS (INTA)
 
       NDET[0]=1024;                                                                                     // size of the detector
@@ -1012,6 +1023,7 @@ void setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const
       strcpy(pEngineInstrumental->instrFunction,pMediateInstrumental->rasas.transmissionFunctionFile);      // instrumental function file
 
       break;
+    #endif  
       // ----------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_NOAA :                                                                  // NOAA
 
@@ -1944,6 +1956,9 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
      lambdaMin=pEngineContext->buffers.lambda[0];
      lambdaMax=pEngineContext->buffers.lambda[max_ndet-1];
    }
+   
+   if (!useKurucz)
+     pEngineContext->project.kurucz.fwhmFit=0;
 
    // load slit function from project properties -> slit page?
    // calibration procedure with FWHM fit -> Kurucz (and xs) are convolved with the fitted slit function
@@ -1957,7 +1972,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
    }
    if (rc)
      goto handle_errors;
-
+   
    if ((THRD_id==THREAD_TYPE_KURUCZ) || useKurucz) {
      // pre-load multi-row Kurucz reference spectrum one time, reuse it for each indexFenoColumn in KURUCZ_Alloc
      char kurucz_file[MAX_ITEM_TEXT_LEN];

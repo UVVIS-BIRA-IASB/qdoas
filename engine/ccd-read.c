@@ -849,7 +849,7 @@ RC ReliCCD_EEV(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int loca
   
   return rc;
  }
-
+#ifdef PRJCT_INSTR_FORMAT_OLD
 // ==========================
 // 1024x512 DETECTORS (94-96)
 // ==========================
@@ -1328,7 +1328,7 @@ RC ReliCCDTrack(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int loc
 
   return rc;
  }
-
+#endif
 // -----------------------------------------------------------------------------
 // FUNCTION      CCD_LoadInstrumental
 // -----------------------------------------------------------------------------

@@ -5,7 +5,6 @@ if(MSVC)
 endif()
 
 add_library(engine STATIC
-  actn-read.c
   analyse.c
   analyse.h
   apex_read.cpp
@@ -23,7 +22,6 @@ add_library(engine STATIC
   debug.c
   dir_iter.h
   doas.h
-  easoeread.c
   engine.c
   engine.h
   engine_context.h
@@ -77,8 +75,6 @@ add_library(engine STATIC
   output_netcdf.cpp
   output_netcdf.h
   output_private.h
-  pda-read.c
-  ras-read.c
   ref_list.c
   ref_list.h
   resource.c
