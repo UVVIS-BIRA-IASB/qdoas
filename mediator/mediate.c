@@ -1957,7 +1957,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
      lambdaMax=pEngineContext->buffers.lambda[max_ndet-1];
    }
    
-   if (!useKurucz)
+   if (!useKurucz && (THRD_id!=THREAD_TYPE_KURUCZ))
      pEngineContext->project.kurucz.fwhmFit=0;
 
    // load slit function from project properties -> slit page?
