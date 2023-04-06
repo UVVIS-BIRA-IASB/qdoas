@@ -30,7 +30,7 @@ int NetCDFGroup::read_data_fields(struct netcdf_data_fields *new_fields,int n)
     data_fields_list=new_fields;
     nfields=n;
 
-    for (int i=0;(i<nfields) && !rc;i++)
+    for (int i=0;(i<nfields);i++)
      {
       int varId;
       int dimIds[6];
@@ -191,6 +191,7 @@ string NetCDFGroup::varName(int varid) const {
 int NetCDFGroup::dimID(const string& dimName) const {
   int id;
   int rc = nc_inq_dimid(groupid, dimName.c_str(), &id);
+
   if(rc == NC_NOERR) {
     return id;
   }
@@ -200,7 +201,8 @@ int NetCDFGroup::dimID(const string& dimName) const {
 
 
 size_t NetCDFGroup::dimLen(const string& dimName) const {
-  return dimLen(dimID(dimName));
+  int id=dimID(dimName);
+  return (id!=-1)?dimLen(id):-1;
 }
 
 size_t NetCDFGroup::dimLen(int dimid) const {

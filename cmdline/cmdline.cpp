@@ -1,10 +1,13 @@
 
+
+// qdoas\release\doas_cl -c C:/My_GroundBased_Activities/GB_Campaigns/Seosan/Data/slant_columns/MAXDOAS_Airyx_v01.xml -a MAXDOAS_Airyx -f  C:/My_GroundBased_Activities/GB_Campaigns/Seosan/Data/spectra/MFC-BIRA/2021/GMAP2021_20211012.bin -o C:/My_Applications/Temp/automatic
+// qdoas\release\doas_cl -c C:/My_GroundBased_Activities/GB_Campaigns/Seosan/Data/slant_columns/MAXDOAS_Airyx_v01.xml -a MAXDOAS_Airyx -o C:/My_Applications/Temp/automatic -trigger C:/My_Applications/Temp/trigger
+
 #include <cstdio>
 #include <cstring>
-
+#include <ctime>
 #include <iostream>
 #include <string>
-
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
 #include <QFile>
@@ -15,6 +18,34 @@
 #include <QLocale>
 #include <clocale>
 #include <QTextCodec>
+
+#ifdef _WIN32
+#include <Windows.h>
+#include <conio.h>
+#include "dirent.h"
+#else
+#include <unistd.h>
+#include <sys/ioctl.h>
+#include <termios.h>
+
+bool kbhit()
+{
+    termios term;
+    tcgetattr(0, &term);
+
+    termios term2 = term;
+    term2.c_lflag &= ~ICANON;
+    tcsetattr(0, TCSANOW, &term2);
+
+    int byteswaiting;
+    ioctl(0, FIONREAD, &byteswaiting);
+
+    tcsetattr(0, TCSANOW, &term);
+
+    return byteswaiting > 0;
+}
+#endif
+#include "dir_iter.h"
 
 #include "CWorkSpace.h"
 #include "CQdoasConfigHandler.h"
@@ -36,6 +67,14 @@
 #include "convxml.h"
 
 
+extern "C" {
+#include "stdfunc.h"
+#include "zenithal.h"
+}
+
+#define TRIGGER_DEFAULT_PAUSE  15   // 5 sec
+
+
 //-------------------------------------------------------------------
 // types
 //-------------------------------------------------------------------
@@ -48,7 +87,7 @@ enum RunMode {
 };
 
 enum BatchTool {
-  Unknown,
+  UnknownConfig,
   Qdoas,
   Convolution,
   Ring,
@@ -59,11 +98,174 @@ typedef struct commands
 {
   QString configFile;
   QString projectName;
+  QString triggerDir;
   QList<QString> filenames;
   QList<QString> xmlCommands;
   QString outputDir;
   QString calibDir;
 } commands_t;
+
+// -----------------------------------------------------------------------------
+// Triggers
+// -----------------------------------------------------------------------------
+
+typedef struct timestamp
+ {
+  struct date theDate;
+  struct time theTime;
+ } timestamp_t;
+
+double GetCurrentTimestamp(timestamp_t *pTimestamp)
+ {
+  return ZEN_NbSec(&pTimestamp->theDate,&pTimestamp->theTime,1);
+ }
+
+void SaveTimestamp(char *timestampFile,double Tm)
+ {
+  // Declarations
+
+  char timestampString[256];
+  FILE *fp;
+
+  memset(timestampString,0,256);
+
+  if ((fp=fopen(timestampFile,"w+t"))==NULL)
+    std::cout << "Can not create " << timestampFile << std::endl;
+  else
+   {
+    fprintf(fp,"%s",ZEN_Tm2Str(&Tm,timestampString));
+    fclose(fp);
+   }
+ }
+
+double GetTimestamp(char *timestampString,timestamp_t *pTimestamp)
+ {
+  int year,month,day,hour,minute,sec;
+  double Tm;
+
+  sscanf(timestampString,"%4d%02d%02d_%02d%02d%02d",&year,&month,&day,&hour,&minute,&sec);
+
+  pTimestamp->theDate.da_year=(int)year;
+  pTimestamp->theDate.da_mon=(char)month;
+  pTimestamp->theDate.da_day=(char)day;
+
+  pTimestamp->theTime.ti_hour=(char)hour;
+  pTimestamp->theTime.ti_min=(char)minute;
+  pTimestamp->theTime.ti_sec=(char)sec;
+
+  Tm=ZEN_NbSec(&pTimestamp->theDate,&pTimestamp->theTime,0);
+
+  // Return
+
+  return Tm;
+ }
+
+double GetLastTimestamp(char *timestampFile,timestamp_t *pTimestamp)
+ {
+  FILE *fp=NULL;
+  double Tm=0.;
+  char timestampString[20];
+
+  // Create timestamp file if it doesn't exist
+
+  if ((fp=fopen(timestampFile,"rt"))==NULL)
+   {
+    if ((fp=fopen(timestampFile,"w+t"))==NULL)
+     std::cout << "Trigger path " << " do not exist !" << std::endl;
+    else
+     Tm=GetCurrentTimestamp(pTimestamp);
+   }
+  else
+   {
+    fseek(fp,0L,SEEK_SET);
+    fscanf(fp,"%s",timestampString);
+    Tm=GetTimestamp(timestampString,pTimestamp);
+   }
+
+  fclose(fp);
+
+  // Return
+
+  return Tm;
+ }
+
+// # analyse a pack of files
+// # documentation
+//      wiki
+//      S/M
+// # python
+
+
+double GetFiles(const QString &triggerPath,QList<QString> &filenames,double lastTimestamp)
+ {
+   DIR *hDir=opendir(triggerPath.toLocal8Bit().data());
+   struct dirent *fileInfo = NULL;
+   char newFileName[DOAS_MAX_PATH_LEN+1],fileToProcess[DOAS_MAX_PATH_LEN+1],*ptr;
+   char renameCmd[MAX_ITEM_TEXT_LEN];
+   double nowTm,fileTm,newTm;
+   timestamp_t nowTimestamp,fileTimestamp;
+   FILE *fp,*gp;
+
+   nowTm=GetCurrentTimestamp(&nowTimestamp)-5;                           // take 5 seconds security
+   newTm=lastTimestamp;
+
+   while (hDir!=NULL && ((fileInfo=readdir(hDir))!=NULL) )
+    {
+     sprintf(newFileName,"%s/%s",triggerPath.toLocal8Bit().data(),fileInfo->d_name);
+
+     if (!STD_IsDir(newFileName) &&                                             // not a folder
+         !strncmp(fileInfo->d_name,"trigger_qdoas_",14) &&                      // file name starts with trigger_qdoas_
+        ((ptr=strrchr(newFileName,'.'))!=NULL) && !strncmp(ptr,".list",5) &&    // file extension is .list
+         (ptr-fileInfo->d_name!=29) &&                                          // trigger_qdoas_ should be followed by the timestamp as yyyymmdd_HHMMSS
+        ((fileTm=GetTimestamp(fileInfo->d_name+14,&fileTimestamp))>lastTimestamp) &&
+         (fileTm<nowTm))
+       {
+        if ((fp=fopen(newFileName,"rt"))!=NULL)
+         {
+          while (fgets(fileToProcess,DOAS_MAX_PATH_LEN,fp)!= NULL)
+           {
+            for (ptr=fileToProcess+(strlen(fileToProcess)-1);*ptr=='\n' || *ptr=='\r';ptr--)
+             *ptr='\0';
+
+            if ((gp=fopen(fileToProcess,"rb"))!=NULL)
+             {
+              filenames.push_back(fileToProcess);
+              fclose(gp);
+             }
+           }
+          fclose(fp);
+         }
+
+        if (fileTm>newTm)
+         newTm=fileTm;
+
+         // ---> process files
+
+         #ifdef _WIN32
+         sprintf(renameCmd,"move %s %s",newFileName,newFileName);
+         for (ptr=strchr(renameCmd,'/');ptr!=NULL;ptr=strchr(ptr,'/'))
+          {
+           *ptr='\\';
+           *ptr++;
+          }
+         #else
+         sprintf(renameCmd,"mv %s %s",newFileName,newFileName);
+         #endif
+         ptr=strrchr(renameCmd,'.');                                            // we know that the extension is .list
+         sprintf(ptr,".ok");
+         std::cout << renameCmd << std::endl;
+         system(renameCmd);
+       }
+
+    }
+
+   if (hDir != NULL)
+    closedir(hDir);
+
+  // Return
+
+  return newTm;
+ }
 
 //-------------------------------------------------------------------
 // declarations
@@ -73,12 +275,13 @@ enum RunMode parseCommandLine(int argc, char **argv, commands_t *cmd);
 enum BatchTool requiredBatchTool(const QString &filename);
 void showUsage();
 void showHelp();
-int batchProcess(commands_t *cmd);
+int  batchProcess(commands_t *cmd);
 
 int batchProcessQdoas(commands_t *cmd);
 int readConfigQdoas(commands_t *cmd, QList<const CProjectConfigItem*> &projectItems);
 int analyseProjectQdoas(const CProjectConfigItem *projItem, const QString &outputDir, const QString &calibDir, const QList<QString> &filenames);
 int analyseProjectQdoas(const CProjectConfigItem *projItem, const QString &outputDir,const QString &calibDir);
+int analyseProjectQdoasTrigger(const CProjectConfigItem *projItem, const QString &outputDir,const QString &calibDir,const QString &triggerDir);
 int analyseProjectQdoasPrepare(void **engineContext, const CProjectConfigItem *projItem, const QString &outputDir,const QString &calibDir,
                    CBatchEngineController *controller);
 int analyseProjectQdoasFile(void *engineContext, CBatchEngineController *controller, const QString &filename);
@@ -95,6 +298,7 @@ int batchProcessUsamp(commands_t *cmd);
 int calibSwitch=0;
 int calibSaveSwitch=0;
 int xmlSwitch=0;
+int triggerSwitch=0;
 int verboseMode=0;
 
 //-------------------------------------------------------------------
@@ -155,102 +359,126 @@ enum RunMode parseCommandLine(int argc, char **argv, commands_t *cmd)
 
     // options ...
     if (argv[i][0] == '-') {
+      // -----------------------------------------------------------------------
+      // configuration file ...
+      if (!strcmp(argv[i], "-c")) {
 
-      if (!strcmp(argv[i], "-c")) { // configuration file ...
-    if (++i < argc && argv[i][0] != '-') {
+        if (++i < argc && argv[i][0] != '-') {
+          fileSwitch=0;
+          if (cmd->configFile.isEmpty()) {
+            cmd->configFile = argv[i];
+            runMode = Batch;
+          }
+         else
+           std::cout << "Duplicate '-c' option." << std::endl;
+        }
+        else {
+          runMode = Error;
+          std::cout << "Option '-c' requires an argument (configuration file)." << std::endl;
+        }
+       }
+      // -----------------------------------------------------------------------
+      // project name file (analysis mode) ...
+      else if (!strcmp(argv[i], "-a")) {
+       if (++i < argc && argv[i][0] != '-') {
          fileSwitch=0;
-      if (cmd->configFile.isEmpty()) {
-        cmd->configFile = argv[i];
-        runMode = Batch;
+         cmd->projectName = argv[i];
+       }
+       else {
+        runMode = Error;
+        std::cout << "Option '-a' requires an argument (project name)." << std::endl;
+       }
       }
-      else
-        std::cout << "Duplicate '-c' option." << std::endl;
-    }
-    else {
-      runMode = Error;
-      std::cout << "Option '-c' requires an argument (configuration file)." << std::endl;
-    }
-
-      }
-      else if (!strcmp(argv[i], "-a")) { // project name file ...
-    if (++i < argc && argv[i][0] != '-') {
-         fileSwitch=0;
-      cmd->projectName = argv[i];
-    }
-    else {
-      runMode = Error;
-      std::cout << "Option '-a' requires an argument (project name)." << std::endl;
-    }
-
-      }
-      else if (!strcmp(argv[i], "-k")) { // project name file ...
-    if (++i < argc && argv[i][0] != '-') {
+      // -----------------------------------------------------------------------
+      // project name file ...
+      else if (!strcmp(argv[i], "-k")) {
+       if (++i < argc && argv[i][0] != '-') {
          fileSwitch=0;
          calibSwitch=1;
-      cmd->projectName = argv[i];
-    }
-    else {
-      runMode = Error;
-      std::cout << "Option '-k' requires an argument (project name)." << std::endl;
-    }
-
+         cmd->projectName = argv[i];
+       }
+       else {
+         runMode = Error;
+         std::cout << "Option '-k' requires an argument (project name)." << std::endl;
+       }
       }
-      else if (!strcmp(argv[i], "-saveref")) { // save irradiances
+      // -----------------------------------------------------------------------
+      // trigger path ...
+      else if (!strcmp(argv[i], "-t") || !strcmp(argv[i], "-trigger")) {
+       if (++i < argc && argv[i][0] != '-') {
+         fileSwitch=0;
+         triggerSwitch=1;
+         cmd->triggerDir = argv[i];
+       }
+       else {
+         runMode = Error;
+         std::cout << "Option '-t' requires an argument (trigger path)." << std::endl;
+       }
+      }
+      // -----------------------------------------------------------------------
+      // save irradiances
+      else if (!strcmp(argv[i], "-saveref")) {
             calibSaveSwitch=calibSwitch;
             if (!calibSwitch)
               std::cout << "Warning : Option '-saveref' has effect only with '-k' option." << std::endl;
       }
-
-      else if (!strcmp(argv[i], "-f")) { // filename ...
-    if (++i < argc && argv[i][0] != '-')
-         {
-    fileSwitch=1;
-       cmd->filenames.push_back(argv[i]);
+      // -----------------------------------------------------------------------
+      // filename to analyze ...
+      else if (!strcmp(argv[i], "-f")) {
+       if (++i < argc && argv[i][0] != '-') {
+         fileSwitch=1;
+         cmd->filenames.push_back(argv[i]);
+       }
+       else {
+         runMode = Error;
+         std::cout << "Option '-f' requires an argument (filename)." << std::endl;
+       }
       }
-    else {
-      runMode = Error;
-      std::cout << "Option '-f' requires an argument (filename)." << std::endl;
-    }
-
-      }
-      else if (!strcmp(argv[i], "-new_irrad")) { // filename ...
-        if (++i < argc && argv[i][0] != '-')
-                 {
-    calibSaveSwitch=1;
+      // -----------------------------------------------------------------------
+      // save new irradiance ...
+      else if (!strcmp(argv[i], "-new_irrad")) {
+        if (++i < argc && argv[i][0] != '-') {
+          calibSaveSwitch=1;
           cmd->calibDir=argv[i];
-          }
+        }
         else {
           runMode = Error;
           std::cout << "Option '-new_irrad' requires an argument (filename)." << std::endl;
         }
-
       }
- else if (!strcmp(argv[i],"-xml"))
-     if (++i < argc && argv[i][0] != '-')
-          {
-     xmlSwitch=1;
-        cmd->xmlCommands.push_back(argv[i]);
-       }
-     else {
-       runMode = Error;
-       std::cout << "Option '-xml' requires at least an argument (xmlPath=xmlValue)." << std::endl;
-     }
-    else if (!strcmp(argv[i],"-v"))
-     verboseMode=1;
- else if (!strcmp(argv[i], "-o")) { // output directory ...
-    if (++i < argc && argv[i][0] != '-') {
-         fileSwitch=0;
-      cmd->outputDir = argv[i];
-    }
-    else {
-      runMode = Error;
-      std::cout << "Option '-o' requires an argument (directory)." << std::endl;
-    }
-
+      // -----------------------------------------------------------------------
+      // change an option in the xml file ...
+      else if (!strcmp(argv[i],"-xml")) {
+        if (++i < argc && argv[i][0] != '-') {
+          xmlSwitch=1;
+          cmd->xmlCommands.push_back(argv[i]);
+        }
+        else {
+          runMode = Error;
+          std::cout << "Option '-xml' requires at least an argument (xmlPath=xmlValue)." << std::endl;
+        }
       }
-      else if (!strcmp(argv[i], "-h")) { // help ...
+      // -----------------------------------------------------------------------
+      // verbose mode ...
+      else if (!strcmp(argv[i],"-v"))
+       verboseMode=1;
+      // -----------------------------------------------------------------------
+      // output directory ...
+      else if (!strcmp(argv[i], "-o")) {
+        if (++i < argc && argv[i][0] != '-') {
           fileSwitch=0;
-    runMode = Help;
+          cmd->outputDir = argv[i];
+        }
+        else {
+          runMode = Error;
+          std::cout << "Option '-o' requires an argument (directory)." << std::endl;
+        }
+      }
+      // -----------------------------------------------------------------------
+      // help ...
+      else if (!strcmp(argv[i], "-h")) { // help ...
+        fileSwitch=0;
+        runMode = Help;
       }
     }
     else if (fileSwitch)
@@ -260,12 +488,16 @@ enum RunMode parseCommandLine(int argc, char **argv, commands_t *cmd)
       runMode = Error;
       std::cout << "Invalid argument '" << argv[i] << "'" << std::endl;
     }
-
     ++i;
   }
 
   if ((runMode==None) && calibSaveSwitch && !calibSwitch)
    std::cout << "Warning : -new_irrad switch to use only with -k option; ignored " << std::endl;
+  else if (!cmd->filenames.isEmpty() && triggerSwitch)
+   {
+    std::cout << "Warning : -trigger switch ignored if switch -f is used" << std::endl;
+    triggerSwitch=0;
+   }
 
   // consistency checks ??
 
@@ -304,7 +536,7 @@ int batchProcess(commands_t *cmd)
 
 enum BatchTool requiredBatchTool(const QString &filename)
 {
-  enum BatchTool type = Unknown;
+  enum BatchTool type = UnknownConfig;
 
   FILE *fp = fopen(filename.toLocal8Bit().constData(), "r");
   if (fp != NULL) {
@@ -351,6 +583,7 @@ void showUsage()
   std::cout << "    -v                  : verbose on (default is off)" << std::endl << std::endl;
   std::cout << "    -xml <path=value>   : advanced option to replace the values of some options " << std::endl;
   std::cout << "                          in the configuration file by new ones." << std::endl;
+  std::cout << "    -t, -trigger <path=value> : advanced option to trigger the files to process" << std::endl;
   std::cout << "------------------------------------------------------------------------------" << std::endl;
   std::cout << "doas_cl is a tool of QDoas, a product jointly developed by BIRA-IASB and S[&]T" << std::endl;
   std::cout << "version: " << cQdoasVersionString << std::endl ;
@@ -378,7 +611,15 @@ int batchProcessQdoas(commands_t *cmd)
 
   while (!projectItems.isEmpty() && retCode == 0) {
 
-    if (!cmd->filenames.isEmpty()) {
+    if (triggerSwitch)
+     {
+      const CProjectConfigItem *p = projectItems.takeFirst();
+      retCode = analyseProjectQdoasTrigger(p, cmd->outputDir,cmd->calibDir,cmd->triggerDir);
+
+
+      delete p;
+     }
+    else if (!cmd->filenames.isEmpty()) {
       // if files were specified on the command-line, then ignore the files in the project.
       if (projectItems.size() == 1) {
 
@@ -497,6 +738,84 @@ int readConfigQdoas(commands_t *cmd, QList<const CProjectConfigItem*> &projectIt
   delete handler;
   delete source;
   delete file;
+
+  return retCode;
+}
+
+int analyseProjectQdoasTrigger(const CProjectConfigItem *projItem, const QString &outputDir, const QString &calibDir,const QString &triggerDir)
+{
+  void *engineContext;
+  char timestampFile[DOAS_MAX_PATH_LEN+1];
+  int retCode;
+  int nsec=0;
+  timestamp_t last_timestamp;
+  double lastTm,newTm;
+  QList<QString> filenames;
+
+  CBatchEngineController *controller = new CBatchEngineController;
+  sprintf(timestampFile,"%s/trigger_qdoas.tmstmp",triggerDir.toLocal8Bit().data());
+
+  if ((lastTm=GetLastTimestamp(timestampFile,&last_timestamp))>0.5)
+   retCode=analyseProjectQdoasPrepare(&engineContext, projItem, outputDir, calibDir, controller);
+
+  filenames.clear();
+
+  if (!retCode)
+   {
+    // wait for new files
+
+    while (!kbhit())
+     {
+
+       if (nsec==0)
+        {
+         newTm=GetFiles(triggerDir,filenames,lastTm);
+
+         if (newTm-lastTm>0.5)
+          {
+           lastTm=newTm;
+
+           // loop trigger files ...
+
+           QList<QString>::const_iterator it = filenames.begin();
+           while (it != filenames.end())
+            {
+             QFileInfo info(*it);
+
+             if (info.isFile())
+              retCode = analyseProjectQdoasFile(engineContext, controller, *it);
+
+             ++it;
+            }
+
+           std::cout << "Found files" << std::endl;
+           filenames.clear();
+          }
+         else
+          std::cout << "Wait for trigger list" << std::endl;
+        }
+
+       #ifdef _WIN32
+       Sleep(1000L);
+       #else
+       usleep(1000000);
+       #endif
+       nsec=(nsec+1)%TRIGGER_DEFAULT_PAUSE;
+       // retCode = analyseProjectQdoasTreeNode(engineContext, controller, projItem->rootNode());
+     }
+   }
+
+  SaveTimestamp(timestampFile,lastTm);
+
+  // destroy engine
+  CEngineResponseMessage *msgResp = new CEngineResponseMessage;
+
+  if (mediateRequestDestroyEngineContext(engineContext, msgResp) != 0) {
+    msgResp->process(controller);
+    retCode = 1;
+  }
+
+  delete msgResp;
 
   return retCode;
 }
@@ -678,14 +997,13 @@ int analyseProjectQdoasFile(void *engineContext, CBatchEngineController *control
     : mediateRequestBeginCalibrateSpectra(engineContext, filename.toLocal8Bit().constData(), beginFileResp);
 
   beginFileResp->setNumberOfRecords(result);
-
   beginFileResp->process(controller);
+
   delete beginFileResp;
 
   if (result == -1)
     return 1;
-
-  if (verboseMode)
+ // if (verboseMode)
    std::cout << "Processing file " << filename.toStdString() << std::endl;
 
   oldResult=-1;
@@ -714,7 +1032,12 @@ int analyseProjectQdoasFile(void *engineContext, CBatchEngineController *control
      }
 
     delete resp;
+
   }
+
+  CEngineResponseMessage *resp = new CEngineResponseMessage;
+  mediateRequestStop(engineContext,resp);
+  delete resp;
 
   TRACE("   end file " << retCode);
 
@@ -885,8 +1208,8 @@ int batchProcessConvolution(commands_t *cmd)
   delete handler;
   delete source;
   delete file;
-  
-  
+
+
 
   return retCode;
 }

@@ -117,7 +117,7 @@ using std::set;
 //!          \li <strong>instrument_location</strong> (name of the station, latitude, longitude and altitude of the instrument)\n
 //!          \li <strong>keydata</strong> (reference spectrum, measured slit function(s))\n
 //!          \li <strong>measurements</strong> : radiances, instrumental errors if known, scan index and wavelength calibration\n
-//!          \li <strong>frm4doas_data_fields</strong> : currently limited to data present in ASCII files proposed for CINDI-2 reprocessing but could be extended to any data relevant for ground-based measurements (for example, temperature of the detector, �)\n
+//!          \li <strong>frm4doas_data_fields</strong> : currently limited to data present in ASCII files proposed for CINDI-2 reprocessing but could be extended to any data relevant for ground-based measurements (for example, temperature of the detector, )\n
 //! \details <strong>frm4doas_data_fields</strong> group contains information useful to QDOAS to describe the records.
 
 enum _frm4doas_data_fields
@@ -179,7 +179,7 @@ static struct netcdf_data_fields frm4doas_data_fields[FRM4DOAS_FIELD_MAX]=
 
 static NetCDFFile current_file;                                                  //!< \details Pointer to the current netCDF file
 static string root_name;                                                         //!< \details The name of the root (should be the basename of the file)
-static size_t det_size;                                                          //!< \details The current detector size
+static int det_size;                                                             //!< \details The current detector size
 
 // -----------------------------------------------------------------------------
 // FUNCTION FRM4DOAS_Set
@@ -209,13 +209,19 @@ RC FRM4DOAS_Set(ENGINE_CONTEXT *pEngineContext)
 
     NetCDFGroup root_group = current_file.getGroup(root_name);                   // go to the root
 
-    pEngineContext->n_alongtrack=
-    pEngineContext->recordNumber=root_group.dimLen("number_of_records");                   // get the record number
+    pEngineContext->n_alongtrack=root_group.dimLen("number_of_records");
+    pEngineContext->n_crosstrack=1;                                             // spectra should be one dimension only
 
-    pEngineContext->n_crosstrack=1;                                              // spectra should be one dimension only
-    det_size=root_group.dimLen("detector_size");                                      // get the number of pixels of the detector
+    if ((det_size=root_group.dimLen("detector_size"))==-1)                      // get the number of pixels of the detector
+     {
+      det_size=root_group.dimLen("spectral_dim");
+      if ((pEngineContext->n_crosstrack=root_group.dimLen("spatial_dim"))==-1)
+       pEngineContext->n_crosstrack=1;
+     }
 
-    for (int i=0; i<(int)det_size; i++)
+    ANALYSE_swathSize = pEngineContext->n_crosstrack;
+
+    for (int i=0; i<det_size; i++)
      pEngineContext->buffers.irrad[i]=(double)0.;
 
     // Read metadata
@@ -228,7 +234,10 @@ RC FRM4DOAS_Set(ENGINE_CONTEXT *pEngineContext)
     pEngineContext->fileInfo.startDate.da_mon=(char)dt[1];
     pEngineContext->fileInfo.startDate.da_year=dt[0];
 
-    THRD_localShift=((float *)frm4doas_data_fields[FRM4DOAS_FIELD_LON].varData)[0]/15.;
+    THRD_localShift=(frm4doas_data_fields[FRM4DOAS_FIELD_LON].varData!=NULL)?((float *)frm4doas_data_fields[FRM4DOAS_FIELD_LON].varData)[0]/15.:0.;
+
+    pEngineContext->recordNumber=pEngineContext->n_alongtrack*pEngineContext->n_crosstrack;                   // get the record number
+
    }
   catch (std::runtime_error& e)
    {
@@ -268,9 +277,9 @@ RC FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
   vector<float> err;                                                             // instrumental errors
   vector<short> qf;                                                              // quality flag
   int measurementType;
-  const size_t i_alongtrack=(recordNo-1); // /col_dim;
-  const size_t i_crosstrack=(recordNo-1); // %col_dim;                                                                    // index for loops and arrays
-  RC rc;                                                                         // return code
+  const size_t i_alongtrack=(recordNo-1)/pEngineContext->n_crosstrack;
+  const size_t i_crosstrack=(recordNo-1)%pEngineContext->n_crosstrack;           // index for loops and arrays
+  RC rc;
 
   // Initializations
 
@@ -285,25 +294,44 @@ RC FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
    {
     // Goto the requested record
 
-    const size_t start[] = {(size_t)(recordNo-1), 0};
-    const size_t count[] = {(size_t)1, det_size};                                // only one record to load
+    const size_t start[] ={(size_t)i_alongtrack,(pEngineContext->n_crosstrack==1)?0:(size_t)i_crosstrack,0};
+    const size_t count[] ={1,(pEngineContext->n_crosstrack==1)?(size_t)det_size:1,(size_t)det_size};       // only one record to load
+
+    int ndims=(pEngineContext->n_crosstrack==1)?2:3;
 
     // Spectra
 
     if (!dateFlag)
      {
+      int rcwve;
       measurements_group=current_file.getGroup(root_name+"/RADIANCE/OBSERVATIONS");
 
-      measurements_group.getVar("wavelength",start,count,2,(float)0.,wve);
-      measurements_group.getVar("radiance",start,count,2,(float)0.,spe);
-      measurements_group.getVar("radiance_error",start,count,2,(float)1.,err);
-      measurements_group.getVar("radiance_quality_flag",start,count,2,(short)1,qf);
+      if (pEngineContext->n_crosstrack==1)
+       {
+        measurements_group.getVar("radiance",start,count,ndims,(float)0.,spe);
+
+        // measurements_group.getVar("wavelength",start,count,2,(float)0.,wve);
+       }
+      else
+       {
+        measurements_group.getVar("radiance_full_image",start,count,ndims,(float)0.,spe);
+
+        //  measurements_group.getVar("radiance_error",start,count,ndims,(float)1.,err);
+        measurements_group.getVar("radiance_quality_flag",start,count,ndims,(short)1,qf);
+       }
+
+      measurements_group.getVar("radiance_error",start,count,ndims,(float)1.,err);
+      if (!(rcwve=measurements_group.getVar("wavelength",start,count,ndims,(float)0.,wve)))
+       {
+        for (int i=0; i<det_size; i++)
+         {
+          pEngineContext->buffers.lambda_irrad[i]=(double)wve[i];     // Check and complete
+          pEngineContext->buffers.lambda[i]=wve[i];
+         }
+       }
 
       for (int i=0; i<det_size; i++)
        {
-        pEngineContext->buffers.lambda_irrad[i]=(double)wve[i];     // Check and complete
-        pEngineContext->buffers.lambda[i]=wve[i];
-
         pEngineContext->buffers.spectrum[i]=spe[i];
         pEngineContext->buffers.sigmaSpec[i]=err[i];
        }
@@ -315,29 +343,31 @@ RC FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
     short *dts=(short *)frm4doas_data_fields[FRM4DOAS_FIELD_DTS].varData;
     short *dte=(short *)frm4doas_data_fields[FRM4DOAS_FIELD_DTE].varData;
 
-    pRecordInfo->present_datetime.thedate.da_day=(char)dt[i_alongtrack*7+2];
-    pRecordInfo->present_datetime.thedate.da_mon=(char)dt[i_alongtrack*7+1];
-    pRecordInfo->present_datetime.thedate.da_year=dt[i_alongtrack*7+0];
-    pRecordInfo->present_datetime.thetime.ti_hour=(char)dt[i_alongtrack*7+3];
-    pRecordInfo->present_datetime.thetime.ti_min=(char)dt[i_alongtrack*7+4];
-    pRecordInfo->present_datetime.thetime.ti_sec=(char)dt[i_alongtrack*7+5];
-    pRecordInfo->present_datetime.millis=dt[i_alongtrack*7+6];
+    int idata=i_alongtrack*pEngineContext->n_crosstrack+i_crosstrack;
 
-    pRecordInfo->startDateTime.thedate.da_day=(char)dts[i_alongtrack*7+2];
-    pRecordInfo->startDateTime.thedate.da_mon=(char)dts[i_alongtrack*7+1];
-    pRecordInfo->startDateTime.thedate.da_year=dts[i_alongtrack*7+0];
-    pRecordInfo->startDateTime.thetime.ti_hour=(char)dts[i_alongtrack*7+3];
-    pRecordInfo->startDateTime.thetime.ti_min=(char)dts[i_alongtrack*7+4];
-    pRecordInfo->startDateTime.thetime.ti_sec=(char)dts[i_alongtrack*7+5];
-    pRecordInfo->startDateTime.millis=dts[i_alongtrack*7+6];
+    pRecordInfo->present_datetime.thedate.da_day=(char)dt[idata*7+2];
+    pRecordInfo->present_datetime.thedate.da_mon=(char)dt[idata*7+1];
+    pRecordInfo->present_datetime.thedate.da_year=dt[idata*7+0];
+    pRecordInfo->present_datetime.thetime.ti_hour=(char)dt[idata*7+3];
+    pRecordInfo->present_datetime.thetime.ti_min=(char)dt[idata*7+4];
+    pRecordInfo->present_datetime.thetime.ti_sec=(char)dt[idata*7+5];
+    pRecordInfo->present_datetime.millis=dt[idata*7+6];
 
-    pRecordInfo->endDateTime.thedate.da_day=(char)dte[i_alongtrack*7+2];
-    pRecordInfo->endDateTime.thedate.da_mon=(char)dte[i_alongtrack*7+1];
-    pRecordInfo->endDateTime.thedate.da_year=dte[i_alongtrack*7+0];
-    pRecordInfo->endDateTime.thetime.ti_hour=(char)dte[i_alongtrack*7+3];
-    pRecordInfo->endDateTime.thetime.ti_min=(char)dte[i_alongtrack*7+4];
-    pRecordInfo->endDateTime.thetime.ti_sec=(char)dte[i_alongtrack*7+5];
-    pRecordInfo->endDateTime.millis=dte[i_alongtrack*7+6];
+    pRecordInfo->startDateTime.thedate.da_day=(char)dts[idata*7+2];
+    pRecordInfo->startDateTime.thedate.da_mon=(char)dts[idata*7+1];
+    pRecordInfo->startDateTime.thedate.da_year=dts[idata*7+0];
+    pRecordInfo->startDateTime.thetime.ti_hour=(char)dts[idata*7+3];
+    pRecordInfo->startDateTime.thetime.ti_min=(char)dts[idata*7+4];
+    pRecordInfo->startDateTime.thetime.ti_sec=(char)dts[idata*7+5];
+    pRecordInfo->startDateTime.millis=dts[idata*7+6];
+
+    pRecordInfo->endDateTime.thedate.da_day=(char)dte[idata*7+2];
+    pRecordInfo->endDateTime.thedate.da_mon=(char)dte[idata*7+1];
+    pRecordInfo->endDateTime.thedate.da_year=dte[idata*7+0];
+    pRecordInfo->endDateTime.thetime.ti_hour=(char)dte[idata*7+3];
+    pRecordInfo->endDateTime.thetime.ti_min=(char)dte[idata*7+4];
+    pRecordInfo->endDateTime.thetime.ti_sec=(char)dte[idata*7+5];
+    pRecordInfo->endDateTime.millis=dte[idata*7+6];
 
     // Other metadata
 
@@ -347,21 +377,21 @@ RC FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
     pRecordInfo->latitude=(frm4doas_data_fields[FRM4DOAS_FIELD_LAT].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_LAT].varData)[(ilat==pEngineContext->n_alongtrack)?i_alongtrack:0]:0.;
     pRecordInfo->altitude=(frm4doas_data_fields[FRM4DOAS_FIELD_ALT].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_ALT].varData)[(ilat==pEngineContext->n_alongtrack)?i_alongtrack:0]:0.;
 
-    pRecordInfo->azimuthViewAngle=(frm4doas_data_fields[FRM4DOAS_FIELD_VAA].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_VAA].varData)[i_alongtrack] : 0.;
-    pRecordInfo->elevationViewAngle=(frm4doas_data_fields[FRM4DOAS_FIELD_VEA].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_VEA].varData)[i_alongtrack] : 0.;
-    pRecordInfo->Zm=(frm4doas_data_fields[FRM4DOAS_FIELD_SZA].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_SZA].varData)[i_alongtrack] : 0.;
-    pRecordInfo->Azimuth=(frm4doas_data_fields[FRM4DOAS_FIELD_SAA].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_SAA].varData)[i_alongtrack] : 0.;
+    pRecordInfo->azimuthViewAngle=(frm4doas_data_fields[FRM4DOAS_FIELD_VAA].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_VAA].varData)[idata] : 0.;
+    pRecordInfo->elevationViewAngle=(frm4doas_data_fields[FRM4DOAS_FIELD_VEA].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_VEA].varData)[idata] : 0.;
+    pRecordInfo->Zm=(frm4doas_data_fields[FRM4DOAS_FIELD_SZA].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_SZA].varData)[idata] : 0.;
+    pRecordInfo->Azimuth=(frm4doas_data_fields[FRM4DOAS_FIELD_SAA].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_SAA].varData)[idata] : 0.;
 
-    pRecordInfo->Tint=(frm4doas_data_fields[FRM4DOAS_FIELD_TINT].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_TINT].varData)[i_alongtrack] : 0.;
-    pRecordInfo->TotalAcqTime=(frm4doas_data_fields[FRM4DOAS_FIELD_TAT].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_TAT].varData)[i_alongtrack] : 0.;
-    pRecordInfo->TotalExpTime=(frm4doas_data_fields[FRM4DOAS_FIELD_TMT].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_TMT].varData)[i_alongtrack] : 0.;
+    pRecordInfo->Tint=(frm4doas_data_fields[FRM4DOAS_FIELD_TINT].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_TINT].varData)[idata] : 0.;
+    pRecordInfo->TotalAcqTime=(frm4doas_data_fields[FRM4DOAS_FIELD_TAT].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_TAT].varData)[idata] : 0.;
+    pRecordInfo->TotalExpTime=(frm4doas_data_fields[FRM4DOAS_FIELD_TMT].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_TMT].varData)[idata] : 0.;
 
-    pRecordInfo->NSomme=(frm4doas_data_fields[FRM4DOAS_FIELD_NACC].varData!=NULL)?(int)((int *)frm4doas_data_fields[FRM4DOAS_FIELD_NACC].varData)[i_alongtrack] : 0;
-    pRecordInfo->maxdoas.measurementType=(frm4doas_data_fields[FRM4DOAS_FIELD_MT].varData!=NULL)?(int)((int *)frm4doas_data_fields[FRM4DOAS_FIELD_MT].varData)[i_alongtrack] : 0;
+    pRecordInfo->NSomme=(frm4doas_data_fields[FRM4DOAS_FIELD_NACC].varData!=NULL)?(int)((int *)frm4doas_data_fields[FRM4DOAS_FIELD_NACC].varData)[idata] : 0;
+    pRecordInfo->maxdoas.measurementType=(frm4doas_data_fields[FRM4DOAS_FIELD_MT].varData!=NULL)?(int)((int *)frm4doas_data_fields[FRM4DOAS_FIELD_MT].varData)[idata] : 0;
 
-    pRecordInfo->maxdoas.scanIndex=(frm4doas_data_fields[FRM4DOAS_FIELD_SCI].varData!=NULL)?(short)((short *)frm4doas_data_fields[FRM4DOAS_FIELD_SCI].varData)[i_alongtrack] : ITEM_NONE;
-    pRecordInfo->maxdoas.zenithBeforeIndex=(frm4doas_data_fields[FRM4DOAS_FIELD_ZBI].varData!=NULL)?(short)((short *)frm4doas_data_fields[FRM4DOAS_FIELD_ZBI].varData)[i_alongtrack] : ITEM_NONE;
-    pRecordInfo->maxdoas.zenithAfterIndex=(frm4doas_data_fields[FRM4DOAS_FIELD_ZAI].varData!=NULL)?(short)((short *)frm4doas_data_fields[FRM4DOAS_FIELD_ZAI].varData)[i_alongtrack] : ITEM_NONE;
+    pRecordInfo->maxdoas.scanIndex=(frm4doas_data_fields[FRM4DOAS_FIELD_SCI].varData!=NULL)?(short)((short *)frm4doas_data_fields[FRM4DOAS_FIELD_SCI].varData)[idata] : ITEM_NONE;
+    pRecordInfo->maxdoas.zenithBeforeIndex=(frm4doas_data_fields[FRM4DOAS_FIELD_ZBI].varData!=NULL)?(short)((short *)frm4doas_data_fields[FRM4DOAS_FIELD_ZBI].varData)[idata] : ITEM_NONE;
+    pRecordInfo->maxdoas.zenithAfterIndex=(frm4doas_data_fields[FRM4DOAS_FIELD_ZAI].varData!=NULL)?(short)((short *)frm4doas_data_fields[FRM4DOAS_FIELD_ZAI].varData)[idata] : ITEM_NONE;
 
     if (pRecordInfo->NSomme<0)   // -1 means that the information is not available
      pRecordInfo->NSomme=1;

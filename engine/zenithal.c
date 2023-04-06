@@ -303,6 +303,55 @@ char *ZEN_FNCaljti(double *Tm,char *str)
  }
 
 // -----------------------------------------------------------------------------
+// FUNCTION      ZEN_Tm2Str
+// -----------------------------------------------------------------------------
+// PURPOSE       From a number of seconds, returns a string with the date and
+//               time just separated by an underscore
+//
+// INPUT         pTm    pointer to the number of seconds since 01/01/1970
+//
+// OUTPUT        str   the string to set with the time calculated from Tm
+//
+// RETURN        the pointer to the outptut string str
+// -----------------------------------------------------------------------------
+
+char *ZEN_Tm2Str(double *pTm,char *str)
+ {
+  // Declarations
+
+  int year,cday,mon,day;
+  double Jc, NbreSec, NHeures, NMinut;
+  double Tm1980;
+
+  year=(int)ZEN_FNCaljye(pTm);
+  cday=ZEN_FNCaljda(pTm);
+  mon=ZEN_FNCaljmon(year,cday);
+  day=ZEN_FNCaljday(year,cday);
+
+  // Calculate the time in hours and minutes from the number of seconds since 01/01/1970
+
+  Tm1980  = (double) ( *pTm-HTB80 );
+
+  Jc      = (unsigned int) ( Tm1980 / 86400. );
+  NbreSec = (double) Tm1980 - Jc * 86400.;
+
+  NHeures = floor( NbreSec / 3600. );
+  NbreSec = (double) NbreSec - NHeures * 3600.;
+  NMinut  = floor(NbreSec/60.);
+
+  NbreSec = (double) NbreSec - NMinut*60;
+
+  if (NbreSec>=60.)
+   NbreSec=59.;
+
+  sprintf(str,"%d%02d%02d_%02d%02d%02d",year,mon,day,(int)NHeures,(int)NMinut,(int)NbreSec);
+
+  // Return
+
+  return ((char *)str);
+ }
+
+// -----------------------------------------------------------------------------
 // FUNCTION      ZEN_FNCaldti
 // -----------------------------------------------------------------------------
 // PURPOSE       calculate the decimal time from the number of seconds since
@@ -335,6 +384,7 @@ double ZEN_FNCaldti(const double *Tm)
 
   return ((double)TiDeci);
  }
+
 
 // -----------------------------------------------------------------------------
 // FUNCTION      ZEN_FNCrtjul

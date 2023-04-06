@@ -111,27 +111,27 @@ public:
   }
 
   template<typename T>
-  inline void getVar(int varid, const size_t start[], const size_t count[], T *out) const {
-    if (ncGetVar(varid, start, count, out) != NC_NOERR) {
-       // return error !!!
-
-      // throw std::runtime_error("Cannot read NetCDF variable '"+name+"/"+varName(varid)+"'");
-    } }
+  inline int getVar(int varid, const size_t start[], const size_t count[], T *out) const {
+    return ncGetVar(varid, start, count, out);
+    }
   template<typename T>
-  inline void getVar(const std::string& name, const size_t start[], const size_t count[], T *out) const {
-    getVar(varID(name), start, count, out);
+  inline int getVar(const std::string& name, const size_t start[], const size_t count[], T *out) const {
+    return getVar(varID(name), start, count, out);
     }
 
   // This function allocate the vector, initialize it to the default value and if the requested variable exists, retrieves the values
 
   template<typename T>
-  inline void getVar(const std::string& name, const size_t start[], const size_t count[], int num_dims, T fill_value,std::vector<T>& out) const
+  inline int getVar(const std::string& name, const size_t start[], const size_t count[], int num_dims, T fill_value,std::vector<T>& out) const
    {
     // Declarations
 
     int idim,                                                                     // browse dimensions
         max_dim,                                                                  // number of dimensions (should be the size of start and count vectors
-        i;                                                                        // browse elements of vector var
+        i,
+        rc;                                                                        // browse elements of vector var
+
+    rc=-1;
 
     // Get the number of elements  to allocate
 
@@ -148,7 +148,9 @@ public:
      out[i]=fill_value;
 
     if (hasVar(name))
-     getVar(name,start,count,out.data());
+     rc=getVar(name,start,count,out.data());
+
+    return rc;
    }
 
 
