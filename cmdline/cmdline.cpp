@@ -1,8 +1,222 @@
-
-
-// qdoas\release\doas_cl -c C:/My_GroundBased_Activities/GB_Campaigns/Seosan/Data/slant_columns/MAXDOAS_Airyx_v01.xml -a MAXDOAS_Airyx -f  C:/My_GroundBased_Activities/GB_Campaigns/Seosan/Data/spectra/MFC-BIRA/2021/GMAP2021_20211012.bin -o C:/My_Applications/Temp/automatic
-// qdoas\release\doas_cl -c C:/My_GroundBased_Activities/GB_Campaigns/Seosan/Data/slant_columns/MAXDOAS_Airyx_v01.xml -a MAXDOAS_Airyx -o C:/My_Applications/Temp/automatic -trigger C:/My_Applications/Temp/trigger
-
+//  ----------------------------------------------------------------------------
+//
+//  Product/Project   :  QDOAS
+//  Module purpose    :  doas_cl command line entry point
+//  Name of module    :  cmdline.cpp
+//  Program Language  :  C/C++
+//  Creation date     :  2007
+//
+//        Copyright  (C) Belgian Institute for Space Aeronomy (BIRA-IASB)
+//                       Avenue Circulaire, 3
+//                       1180     UCCLE
+//                       BELGIUM
+//
+//  QDOAS is a cross-platform application developed in QT for DOAS retrieval
+//  (Differential Optical Absorption Spectroscopy).
+//
+//  The QT version of the program has been developed jointly by the Belgian
+//  Institute for Space Aeronomy (BIRA-IASB) and the Science and Technology
+//  company (S[&]T) - Copyright (C) 2007
+//
+//      BIRA-IASB                                   S[&]T
+//      Belgian Institute for Space Aeronomy        Science [&] Technology
+//      Avenue Circulaire, 3                        Postbus 608
+//      1180     UCCLE                              2600 AP Delft
+//      BELGIUM                                     THE NETHERLANDS
+//
+//      caroline.fayt@aeronomie.be                  info@stcorp.nl
+//      jonasv@aeronomie.be
+//      jeroenv@aeronomie.be
+//      thomas.danckaert@aeronomie.be
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 2
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software Foundation,
+//  Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+//  ----------------------------------------------------------------------------
+//
+//  MODULE DESCRIPTION
+//
+//  ----------------------------------------------------------------------------
+//
+//  HISTORY :
+//
+//
+//  September 2012 :
+//
+//        Some options of the configuration file in XML format can be changed
+//        in the call of the doas_cl command line tool
+//
+//           doas_cl .... -xml "<xml path>=<xml value>"
+//
+//        where <xml path> is a path defining the field to modify according to the
+//        xml file structure.  Several -xml switches can be used.
+//
+//        Example for QDOAS :
+//
+//            .../doas_cl -c <QDOAS config file> -a <project name> -o <output file> -f <file to process>  -xml /project/analysis_window/files/refone=<reference file>
+//
+//                   where /project/analysis_window/files/refone is the "xml path" for the reference file
+//
+//             /bira-iasb/projects/DOAS/Programmes/QDOAS/doas_cl -c /bira-iasb/projects/FRM4DOAS/applications/validation_fv002/config/modules_specific/qdoas/stations/VIELSALM/1691_1/STRATO_VIELSALM_1691_1_UVVIS_fv002.xml -o /bira-iasb/projects/FRM4DOAS/applications/validation_fv002/results/qdoas/stations/VIELSALM/1691_1/STRATO_UVVIS/fv002/2023/ESA-FRM4DOAS-L1.QAQC.STRATO.QDOAS-BIRA.IASB-VIELSALM-1691-1-20230410T042536Z-20230410T154557Z-fv002.nc -f /bira-iasb/data/GROUNDBASED/FRM4DOAS/L1_v03.11/L1_validated/stations/VIELSALM/1691_1/fv001/2023/ESA-FRM4DOAS-L1.QAQC-BIRA.IASB-VIELSALM-1691-1-20230410T042536Z-20230410T154557Z-fv001.nc -a STRATO_VIELSALM_1691_1_UVVIS -xml /project/analysis_window/files/refone=/bira-iasb/projects/FRM4DOAS/applications/validation_fv002/data/ref_files/stations/VIELSALM/1691_1/2023/ESA-FRM4DOAS-L1.QAQC-BIRA.IASB-VIELSALM-1691-1-20230410T042536Z-20230410T154557Z-fv001-331-ZS.ref
+//
+//              With this command, the reference file will be replaced in all analysis windows
+//
+//             /project/analysis_window/files/refone : /bira-iasb/projects/FRM4DOAS/applications/validation_fv002/data/ref_files/stations/VIELSALM/VIELSALM_1691_1_UVVIS_ref_20210729.ref replaced by /bira-iasb/projects/FRM4DOAS/applications/validation_fv002/data/ref_files/stations/VIELSALM/1691_1/2023/ESA-FRM4DOAS-L1.QAQC-BIRA.IASB-VIELSALM-1691-1-20230410T042536Z-20230410T154557Z-fv001-331-ZS.ref (w_o3_320_340)
+//             /project/analysis_window/files/refone : /bira-iasb/projects/FRM4DOAS/applications/validation_fv002/data/ref_files/stations/VIELSALM/VIELSALM_1691_1_UVVIS_ref_20210729.ref replaced by /bira-iasb/projects/FRM4DOAS/applications/validation_fv002/data/ref_files/stations/VIELSALM/1691_1/2023/ESA-FRM4DOAS-L1.QAQC-BIRA.IASB-VIELSALM-1691-1-20230410T042536Z-20230410T154557Z-fv001-331-ZS.ref (w_o4_338_370)
+//             /project/analysis_window/files/refone : /bira-iasb/projects/FRM4DOAS/applications/validation_fv002/data/ref_files/stations/VIELSALM/VIELSALM_1691_1_UVVIS_ref_20210729.ref replaced by /bira-iasb/projects/FRM4DOAS/applications/validation_fv002/data/ref_files/stations/VIELSALM/1691_1/2023/ESA-FRM4DOAS-L1.QAQC-BIRA.IASB-VIELSALM-1691-1-20230410T042536Z-20230410T154557Z-fv001-331-ZS.ref (w_no2_411_445)
+//             /project/analysis_window/files/refone : /bira-iasb/projects/FRM4DOAS/applications/validation_fv002/data/ref_files/stations/VIELSALM/VIELSALM_1691_1_UVVIS_ref_20210729.ref replaced by /bira-iasb/projects/FRM4DOAS/applications/validation_fv002/data/ref_files/stations/VIELSALM/1691_1/2023/ESA-FRM4DOAS-L1.QAQC-BIRA.IASB-VIELSALM-1691-1-20230410T042536Z-20230410T154557Z-fv001-331-ZS.ref (w_no2_425_490)
+//             /project/analysis_window/files/refone : /bira-iasb/projects/FRM4DOAS/applications/validation_fv002/data/ref_files/stations/VIELSALM/VIELSALM_1691_1_UVVIS_ref_20210729.ref replaced by /bira-iasb/projects/FRM4DOAS/applications/validation_fv002/data/ref_files/stations/VIELSALM/1691_1/2023/ESA-FRM4DOAS-L1.QAQC-BIRA.IASB-VIELSALM-1691-1-20230410T042536Z-20230410T154557Z-fv001-331-ZS.ref (w_o3_450_540)
+//
+//        IMPORTANT NOTE : currently, the program supports the change of the following fields from a QDOAS config file
+//
+//                  /project/selection/sza/min
+//                  /project/selection/sza/max
+//                  /project/selection/sza/delta
+//                  /project/selection/record/min
+//                  /project/selection/record/max
+//                  /project/selection/cloud/min
+//                  /project/selection/cloud/max
+//                  /project/selection/geolocation/circle/radius
+//                  /project/selection/geolocation/circle/long
+//                  /project/selection/geolocation/circle/lat
+//                  /project/selection/geolocation/rectangle/west
+//                  /project/selection/geolocation/rectangle/east
+//                  /project/selection/geolocation/rectangle/south
+//                  /project/selection/geolocation/rectangle/north
+//                  /project/selection/geolocation/sites/radius
+//                  /project/analysis/converge
+//                  /project/analysis/max_iterations
+//                  /project/instrumental/omi/trackSelection
+//                  /project/instrumental/omi/xTrackMode
+//                  /project/instrumental/tropomi/trackSelection
+//                  /project/instrumental/apex/trackSelection
+//                  /project/calibration/line/slfFile
+//                  /project/analysis_window/min
+//                  /project/analysis_window/max
+//                  /project/analysis_window/resol_fwhm
+//                  /project/analysis_window/lambda0
+//                  /project/analysis_window/refsel
+//                  /project/analysis_window/files/refone
+//                  /project/analysis_window/files/reftwo
+//                  /project/analysis_window/files/residual
+//                  /project/analysis_window/files/szacenter
+//                  /project/analysis_window/files/szadelta/minlon
+//                  /project/analysis_window/files/maxlon
+//                  /project/analysis_window/files/minlat
+//                  /project/analysis_window/files/maxlat
+//                  /project/analysis_window/files/refns
+//                  /project/analysis_window/files/cloudfmin
+//                  /project/analysis_window/files/cloudfmax
+//                  /project/analysis_window/files/maxdoasrefmode
+//                  /project/analysis_window/files/scanmode
+//
+//              Change of any other field should be implemented
+//
+//        Example for the convolution tool :
+//
+//            .../doas_cl -c <convolution config file> -xml /con_slit/slit_func/file/file=<slit function file>
+//
+//                   where /con_slit/slit_func/file/file should modify the name of the slit function file
+//
+//        IMPORTANT NOTE : currently, the program supports the change of the following fields from a convolution config file
+//
+//                  /general/calib
+//                  /con_slit/slit_func/file/file
+//                  /con_slit/slit_func/file/file2
+//                  /con_slit/slit_func/file/wveDptFlag
+//
+//  February 2019 : add -new_irrad, an option specific for GEMS
+//
+//        This switch should be used with -k (Run calibration mode).
+//        When this option is activated, the program
+//
+//             1. reads irradiance files (GEMS format as irradiance files),
+//             2. performs a "Run calib" on the irradiance spectra
+//             3. saves the irradiance with the corrected grid
+//
+//        Example of call :
+//
+//             ./doas_cl -c <application path>/GEMS/S5_O3_BremenTDS_config_v1_20180613.xml
+//                       -k S5_O3
+//                       -new_irrad <application path>/GEMS/ref/s5-spectra_convolved_irradiance_v20180613_nonoise_shift_corrected
+//                       -f <application path>/GEMS/ref/s5-spectra_convolved_irradiance_v20180613_nonoise_shifted
+//                       -o <application path>/Applications/GEMS/ref/s5-spectra_convolved_irradiance_v20180613_nonoise_output
+//
+//        where :
+//
+//             -k uses Run Calib instead of Run analysis (the name of the project has to be specified)
+//             -new_irrad is a new switch to save the irradiances with the corrected grid
+//             -f should apply for this application on a irradiance file instead of a radiance
+//
+//             -o the name of the output file (as before : shift for individual calibration sub-windows)
+//
+//        Not that for output files, it's not necessary to add nc extension (it will be automatically added by QDOAS)
+//        The s5-spectra_convolved_irradiance_v20180613_nonoise_shift_corrected.nc should contain the same irradiance as the input file but with corrected grid.
+//
+//
+//  April 2023 : add triggering mode (-t switch or -trigger)
+//
+//        Triggering mode is useful when doas_cl is coupled to the acquisition
+//        program to obtain concentrations in near real time.
+//
+//        doas_cl makes the calibration (see important note below) and then,
+//        enters a waiting loop for trigger lists with files to process.
+//
+//        -f switch should be replaced by -t switch (or -trigger switch)
+//        followed by the path with trigger lists.
+//
+//        Example : qdoas\release\doas_cl -c <config file>
+//                                        -a <project name>
+//                                        -o <output file> (better to use automatic as file name)
+//                                        -t <trigger path>
+//
+//        1. the acquisition program should save spectra in individual files
+//           the name of the files should include an index number or a timestamp
+//
+//        2. each file is appended to a trigger list with file name as follows
+//
+//                      trigger_qdoas_<YYYYMMDD_hhmmss>.list
+//
+//           the frequency of the timestamp YYYYMMDD_hhmmss (every x seconds, every x minutes)
+//           is determined by the acquisition program.
+//
+//        3. every 15 seconds (value currently hard coded), doas_cl checks if there
+//           are new trigger lists in the trigger path.
+//
+//        4. doas_cl processes files contained in each new trigger list found
+//        5. doas_cl changes the .list file extension of the trigger list into .ok
+//        6. doas_cl creates/updates a trigger_qdoas.tmstmp in the trigger path with
+//           the timestamp of the last processed list.
+//
+//        7. the user is responsible to clean *.ok from the trigger path
+//           a reprocessing is always possible after renaming *.ok into *.list and
+//           changing the timestamp in trigger_qdoas.tmstmp
+//
+//        IMPORTANT NOTE :
+//
+//           this method is very interesting as the calibration is performed
+//           at the start of doas_cl.  It's important that the "Ref selection mode"
+//           is "File" in the properties of all analysis windows of the project
+//
+//        Example of use (should be written in one line) :
+//
+//           qdoas\release\doas_cl -c C:/My_GroundBased_Activities/GB_Campaigns/Seosan/Data/slant_columns/MAXDOAS_Airyx_v01.xml
+//                                 -a MAXDOAS_Airyx
+//                                 -o C:/My_Applications/Temp/automatic
+//                                 -t C:/My_Applications/Temp/trigger
+//
+//  ----------------------------------------------------------------------------
+//
 #include <cstdio>
 #include <cstring>
 #include <ctime>
@@ -27,6 +241,8 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <termios.h>
+
+// kbhit function doesn't exist in Linux libraries (implementation found on the web)
 
 bool kbhit()
 {
@@ -72,7 +288,7 @@ extern "C" {
 #include "zenithal.h"
 }
 
-#define TRIGGER_DEFAULT_PAUSE  15   // 5 sec
+#define TRIGGER_DEFAULT_PAUSE  15   // checks the trigger path every 15 sec
 
 
 //-------------------------------------------------------------------
@@ -115,10 +331,14 @@ typedef struct timestamp
   struct time theTime;
  } timestamp_t;
 
+// GetCurrentTimestamp : returns a number of seconds as timestamp for now
+
 double GetCurrentTimestamp(timestamp_t *pTimestamp)
  {
   return ZEN_NbSec(&pTimestamp->theDate,&pTimestamp->theTime,1);
  }
+
+// SaveTimestamp : save in the timestampFile file, a timestamp provided in seconds (Tm) as a YYYYMMDD_hhmmss string
 
 void SaveTimestamp(char *timestampFile,double Tm)
  {
@@ -127,21 +347,31 @@ void SaveTimestamp(char *timestampFile,double Tm)
   char timestampString[256];
   FILE *fp;
 
+  // Initialize the string
+
   memset(timestampString,0,256);
 
   if ((fp=fopen(timestampFile,"w+t"))==NULL)
     std::cout << "Can not create " << timestampFile << std::endl;
   else
    {
+    // ZEN_Tm2Str : returns the timestamp as a string YYYYMMDD_hhmmss
+
     fprintf(fp,"%s",ZEN_Tm2Str(&Tm,timestampString));
     fclose(fp);
    }
  }
 
+// GetTimestamp : converts the timestamp string YYYMMDD_hhmmss into a number of seconds
+
 double GetTimestamp(char *timestampString,timestamp_t *pTimestamp)
  {
+  // Declarations
+
   int year,month,day,hour,minute,sec;
   double Tm;
+
+  // Separate the date and time fields from the string YYYMMDD_hhmmss
 
   sscanf(timestampString,"%4d%02d%02d_%02d%02d%02d",&year,&month,&day,&hour,&minute,&sec);
 
@@ -153,6 +383,8 @@ double GetTimestamp(char *timestampString,timestamp_t *pTimestamp)
   pTimestamp->theTime.ti_min=(char)minute;
   pTimestamp->theTime.ti_sec=(char)sec;
 
+  // Calculate the timestamp as a number of seconds
+
   Tm=ZEN_NbSec(&pTimestamp->theDate,&pTimestamp->theTime,0);
 
   // Return
@@ -160,8 +392,13 @@ double GetTimestamp(char *timestampString,timestamp_t *pTimestamp)
   return Tm;
  }
 
+// GetLastTimestamp : converts the timestamp string YYYMMDD_hhmmss read from a timestampFile (supposed
+//                    to contain the last trigger timestamp) into a number of seconds
+
 double GetLastTimestamp(char *timestampFile,timestamp_t *pTimestamp)
  {
+  // Declarations
+
   FILE *fp=NULL;
   double Tm=0.;
   char timestampString[20];
@@ -175,6 +412,8 @@ double GetLastTimestamp(char *timestampFile,timestamp_t *pTimestamp)
     else
      Tm=GetCurrentTimestamp(pTimestamp);
    }
+
+  // Read the timestamp from file
   else
    {
     fseek(fp,0L,SEEK_SET);
@@ -189,78 +428,88 @@ double GetLastTimestamp(char *timestampFile,timestamp_t *pTimestamp)
   return Tm;
  }
 
-// # analyse a pack of files
-// # documentation
-//      wiki
-//      S/M
-// # python
-
+// GetFiles : returns the list of files to process
+//            these files come from trigger lists in the trigger path with timestamp higher than the provided lastTimestamp
 
 double GetFiles(const QString &triggerPath,QList<QString> &filenames,double lastTimestamp)
  {
-   DIR *hDir=opendir(triggerPath.toLocal8Bit().data());
-   struct dirent *fileInfo = NULL;
-   char newFileName[DOAS_MAX_PATH_LEN+1],fileToProcess[DOAS_MAX_PATH_LEN+1],*ptr;
-   char renameCmd[MAX_ITEM_TEXT_LEN];
-   double nowTm,fileTm,newTm;
-   timestamp_t nowTimestamp,fileTimestamp;
-   FILE *fp,*gp;
+  // Declarations
 
-   nowTm=GetCurrentTimestamp(&nowTimestamp)-5;                           // take 5 seconds security
-   newTm=lastTimestamp;
+  DIR *hDir=opendir(triggerPath.toLocal8Bit().data());
+  struct dirent *fileInfo = NULL;
+  char newFileName[DOAS_MAX_PATH_LEN+1],fileToProcess[DOAS_MAX_PATH_LEN+1],*ptr;
+  char renameCmd[MAX_ITEM_TEXT_LEN];
+  double nowTm,fileTm,newTm;
+  timestamp_t nowTimestamp,fileTimestamp;
+  FILE *fp,*gp;
 
-   while (hDir!=NULL && ((fileInfo=readdir(hDir))!=NULL) )
-    {
-     sprintf(newFileName,"%s/%s",triggerPath.toLocal8Bit().data(),fileInfo->d_name);
+  // Initializations
 
-     if (!STD_IsDir(newFileName) &&                                             // not a folder
-         !strncmp(fileInfo->d_name,"trigger_qdoas_",14) &&                      // file name starts with trigger_qdoas_
-        ((ptr=strrchr(newFileName,'.'))!=NULL) && !strncmp(ptr,".list",5) &&    // file extension is .list
-         (ptr-fileInfo->d_name!=29) &&                                          // trigger_qdoas_ should be followed by the timestamp as yyyymmdd_HHMMSS
-        ((fileTm=GetTimestamp(fileInfo->d_name+14,&fileTimestamp))>lastTimestamp) &&
-         (fileTm<nowTm))
-       {
-        if ((fp=fopen(newFileName,"rt"))!=NULL)
-         {
-          while (fgets(fileToProcess,DOAS_MAX_PATH_LEN,fp)!= NULL)
-           {
-            for (ptr=fileToProcess+(strlen(fileToProcess)-1);*ptr=='\n' || *ptr=='\r';ptr--)
-             *ptr='\0';
+  nowTm=GetCurrentTimestamp(&nowTimestamp)-5;                                   // take 5 seconds security
+  newTm=lastTimestamp;
 
-            if ((gp=fopen(fileToProcess,"rb"))!=NULL)
-             {
-              filenames.push_back(fileToProcess);
-              fclose(gp);
-             }
-           }
-          fclose(fp);
-         }
+  // Browse files in the trigger path
 
-        if (fileTm>newTm)
-         newTm=fileTm;
+  while (hDir!=NULL && ((fileInfo=readdir(hDir))!=NULL) )
+   {
+    sprintf(newFileName,"%s/%s",triggerPath.toLocal8Bit().data(),fileInfo->d_name);
 
-         // ---> process files
+    if (!STD_IsDir(newFileName) &&                                              // not a folder
+        !strncmp(fileInfo->d_name,"trigger_qdoas_",14) &&                       // file name starts with trigger_qdoas_
+       ((ptr=strrchr(newFileName,'.'))!=NULL) && !strncmp(ptr,".list",5) &&     // file extension is .list
+        (ptr-fileInfo->d_name!=29) &&                                           // trigger_qdoas_ should be followed by the timestamp as yyyymmdd_HHMMSS
+       ((fileTm=GetTimestamp(fileInfo->d_name+14,&fileTimestamp))>lastTimestamp) &&
+        (fileTm<nowTm))
+      {
+       // Open the trigger list
 
-         #ifdef _WIN32
-         sprintf(renameCmd,"move %s %s",newFileName,newFileName);
-         for (ptr=strchr(renameCmd,'/');ptr!=NULL;ptr=strchr(ptr,'/'))
+       if ((fp=fopen(newFileName,"rt"))!=NULL)
+        {
+         // Browse files in the trigger list
+
+         while (fgets(fileToProcess,DOAS_MAX_PATH_LEN,fp)!= NULL)
           {
-           *ptr='\\';
-           *ptr++;
+           for (ptr=fileToProcess+(strlen(fileToProcess)-1);*ptr=='\n' || *ptr=='\r';ptr--)
+            *ptr='\0';
+
+           // If the file exists (it should) and add it to the list of files to process
+
+           if ((gp=fopen(fileToProcess,"rb"))!=NULL)
+            {
+             filenames.push_back(fileToProcess);
+             fclose(gp);
+            }
           }
-         #else
-         sprintf(renameCmd,"mv %s %s",newFileName,newFileName);
-         #endif
-         ptr=strrchr(renameCmd,'.');                                            // we know that the extension is .list
-         sprintf(ptr,".ok");
-         std::cout << renameCmd << std::endl;
-         system(renameCmd);
-       }
+         fclose(fp);
+        }
 
-    }
+       // Update the last timestamp
 
-   if (hDir != NULL)
-    closedir(hDir);
+       if (fileTm>newTm)
+        newTm=fileTm;
+
+        // change the trigger list file extension from .list to .ok
+
+        #ifdef _WIN32
+        sprintf(renameCmd,"move %s %s",newFileName,newFileName);
+        for (ptr=strchr(renameCmd,'/');ptr!=NULL;ptr=strchr(ptr,'/'))
+         {
+          *ptr='\\';
+          *ptr++;
+         }
+        #else
+        sprintf(renameCmd,"mv %s %s",newFileName,newFileName);
+        #endif
+        ptr=strrchr(renameCmd,'.');                                            // we know that the extension is .list
+        sprintf(ptr,".ok");
+        std::cout << renameCmd << std::endl;
+        system(renameCmd);
+      }
+
+   }
+
+  if (hDir != NULL)
+   closedir(hDir);
 
   // Return
 
@@ -495,7 +744,7 @@ enum RunMode parseCommandLine(int argc, char **argv, commands_t *cmd)
    std::cout << "Warning : -new_irrad switch to use only with -k option; ignored " << std::endl;
   else if (!cmd->filenames.isEmpty() && triggerSwitch)
    {
-    std::cout << "Warning : -trigger switch ignored if switch -f is used" << std::endl;
+    std::cout << "Warning : -t/-trigger switch ignored if switch -f is used" << std::endl;
     triggerSwitch=0;
    }
 
