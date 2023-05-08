@@ -658,12 +658,12 @@ RC EngineSetFile(ENGINE_CONTEXT *pEngineContext,const char *fileName,void *respo
    //        For the moment, I suppose that the file exists and if not, the selection of the
    //        measurement is ignored.  To improve ???
 
-   if ((pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_SAOZ_VIS)
+   if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_SAOZ_VIS
        #ifdef PRJCT_INSTR_FORMAT_OLD
         ||
-       (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_PDASI_EASOE) ||
-       (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG) ||
-       (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG_OLD)
+       pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_PDASI_EASOE ||
+       pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG ||
+       pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG_OLD
        #endif
       )
 
@@ -673,12 +673,12 @@ RC EngineSetFile(ENGINE_CONTEXT *pEngineContext,const char *fileName,void *respo
 
    if (
        #ifdef PRJCT_INSTR_FORMAT_OLD
-       (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG) ||
-       (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG_OLD) ||
-       (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_ACTON) ||
-       (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_PDASI_EASOE) ||
+       pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG ||
+       pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG_OLD ||
+       pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_ACTON ||
+       pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_PDASI_EASOE ||
        #endif
-       (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_CCD_EEV))
+       pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_CCD_EEV)
 
     pFile->darkFp=fopen(FILES_BuildFileName(fileTmp,fileName,FILE_TYPE_DARK),"rb");
 

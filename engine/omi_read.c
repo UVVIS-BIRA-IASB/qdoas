@@ -113,7 +113,7 @@ struct omi_data {
   float          *viewingAzimuthAngle;
 	int16        *temp_RadianceMantissa;
 	int16        *temp_RadiancePrecisionMantissa;
-	int8        *temp_RadianceExponent;
+	int8_t        *temp_RadianceExponent;
   short          *terrainHeight;
   unsigned short *groundPixelQualityFlags;
 	unsigned short *pixelQualityFlags;
@@ -209,9 +209,9 @@ int omiSwathOld=ITEM_NONE;
 static RC OmiOpen(struct omi_orbit_file *pOrbitFile,const char *swathName, const ENGINE_CONTEXT *pEngineContext);
 static void omi_free_swath_data(struct omi_swath_earth *pSwath);
 static void omi_calculate_wavelengths(float32 wavelength_coeff[], int16 refcol, int32 n_wavel, double* lambda);
-static void omi_make_double(int16 mantissa[], int8 exponent[], int32 n_wavel, double* result);
+static void omi_make_double(int16 mantissa[], int8_t exponent[], int32 n_wavel, double* result);
 static void omi_interpolate_errors(int16 mantissa[], int32 n_wavel, double wavelengths[], double y[] );
-static RC omi_load_spectrum(int spec_type, int32 sw_id, int32 measurement, int32 track, int32 n_wavel, double *lambda, double *spectrum, double *sigma, unsigned short *pixelQualityFlags,int16 * spec_mantissa,int16 * spec_precisionmantissa, int8 * spec_exponent,uint16 * pixquality, float * spec_wavelengthcoeff, long dim [], int16 * refcol);
+static RC omi_load_spectrum(int spec_type, int32 sw_id, int32 measurement, int32 track, int32 n_wavel, double *lambda, double *spectrum, double *sigma, unsigned short *pixelQualityFlags,int16 * spec_mantissa,int16 * spec_precisionmantissa, int8_t * spec_exponent,uint16 * pixquality, float * spec_wavelengthcoeff, long dim [], int16 * refcol);
 static void average_spectrum(double *average, double *errors, const struct omi_ref_list *spectra, const double *wavelength_grid);
 static RC read_orbit_metadata(struct omi_orbit_file *orbit);
 
@@ -495,7 +495,7 @@ static RC OMI_AllocateSwath(struct omi_swath_earth **swath, const int n_alongtra
       ((pData->viewingAzimuthAngle=(float *)MEMORY_AllocBuffer(__func__,"viewingAzimuthAngle",nRecords,sizeof(float),0,MEMORY_TYPE_FLOAT))==NULL) ||
       ((pData->terrainHeight=(short *)MEMORY_AllocBuffer(__func__,"terrainHeight",nRecords,sizeof(short),0,MEMORY_TYPE_SHORT))==NULL) ||
       ((pData->groundPixelQualityFlags=(unsigned short *)MEMORY_AllocBuffer(__func__,"groundPixelQualityFlags",nRecords,sizeof(unsigned short),0,MEMORY_TYPE_USHORT))==NULL) ||
-      ((pData->xtrackQualityFlags=(uint8_t *)MEMORY_AllocBuffer(__func__,"xtrackQualityFlags",nRecords,sizeof(unsigned short),0,MEMORY_TYPE_STRING))==NULL) || ((pData->temp_RadianceMantissa=(int16 *)MEMORY_AllocBuffer(__func__,"temp_RadianceMantissa",nRecords*n_wavel,sizeof(int16),0,MEMORY_TYPE_SHORT))==NULL) || ((pData->temp_RadiancePrecisionMantissa=(int16 *)MEMORY_AllocBuffer(__func__,"temp_RadiancePrecisionMantissa",nRecords*n_wavel,sizeof(int16),0,MEMORY_TYPE_SHORT))==NULL) || ((pData->temp_RadianceExponent=(int8 *)MEMORY_AllocBuffer(__func__,"temp_RadianceExponent",nRecords*n_wavel,sizeof(int8),0,MEMORY_TYPE_STRING))==NULL) ||   ((pData->pixelQualityFlags=(unsigned short *)MEMORY_AllocBuffer(__func__,"pixelQualityFlags",nRecords*n_wavel,sizeof(unsigned short),0,MEMORY_TYPE_USHORT))==NULL) || ((pData->spec_wavelengthcoeff=(float *)MEMORY_AllocBuffer(__func__,"spec_wavelengthcoeff",nRecords*OMI_NUM_COEFFICIENTS,sizeof(float),0,MEMORY_TYPE_FLOAT))==NULL) ) 
+      ((pData->xtrackQualityFlags=(uint8_t *)MEMORY_AllocBuffer(__func__,"xtrackQualityFlags",nRecords,sizeof(unsigned short),0,MEMORY_TYPE_STRING))==NULL) || ((pData->temp_RadianceMantissa=(int16 *)MEMORY_AllocBuffer(__func__,"temp_RadianceMantissa",nRecords*n_wavel,sizeof(int16),0,MEMORY_TYPE_SHORT))==NULL) || ((pData->temp_RadiancePrecisionMantissa=(int16 *)MEMORY_AllocBuffer(__func__,"temp_RadiancePrecisionMantissa",nRecords*n_wavel,sizeof(int16),0,MEMORY_TYPE_SHORT))==NULL) || ((pData->temp_RadianceExponent=(int8_t *)MEMORY_AllocBuffer(__func__,"temp_RadianceExponent",nRecords*n_wavel,sizeof(int8),0,MEMORY_TYPE_STRING))==NULL) ||   ((pData->pixelQualityFlags=(unsigned short *)MEMORY_AllocBuffer(__func__,"pixelQualityFlags",nRecords*n_wavel,sizeof(unsigned short),0,MEMORY_TYPE_USHORT))==NULL) || ((pData->spec_wavelengthcoeff=(float *)MEMORY_AllocBuffer(__func__,"spec_wavelengthcoeff",nRecords*OMI_NUM_COEFFICIENTS,sizeof(float),0,MEMORY_TYPE_FLOAT))==NULL) ) 
     rc=ERROR_ID_ALLOC;
 
 
@@ -1112,7 +1112,7 @@ static RC OMI_LoadReference(int spectralType, const char *refFile, struct omi_re
 	assert(coda_cursor_get_array_dim(&cursor,&nd,dims)==0);
 	int16 *temp_Mantissa= (int16 *)malloc(dims[0]*dims[1]*dims[2]*sizeof(*temp_Mantissa));
 	int16 *temp_PrecisionMantissa= (int16 *)malloc(dims[0]*dims[1]*dims[2]*sizeof(*temp_PrecisionMantissa));
-	int8 *temp_Exponent= (int8 *)malloc(dims[0]*dims[1]*dims[2]*sizeof(*temp_Exponent));
+	int8_t *temp_Exponent= (int8_t *)malloc(dims[0]*dims[1]*dims[2]*sizeof(*temp_Exponent));
 	unsigned short *temp_pixelq= (unsigned short *)malloc(dims[0]*dims[1]*dims[2]*sizeof(*temp_pixelq));
 	float *temp_wave= (float *)malloc(dims[0]*dims[1]*OMI_NUM_COEFFICIENTS*sizeof(*temp_wave));
 	int16 *refcol= (int16 *)malloc(dims[0]*sizeof(*refcol));
@@ -1192,12 +1192,12 @@ static RC OMI_LoadReference(int spectralType, const char *refFile, struct omi_re
  * spectrum and sigma.  If any of these pointers is NULL, the
  * corresponding data is not read.
  */
-static RC omi_load_spectrum(int spec_type, int32 sw_id, int32 measurement, int32 track, int32 n_wavel, double *lambda, double *spectrum, double *sigma, unsigned short *pixelQualityFlags,int16 * spec_mantissa,int16 * spec_precisionmantissa, int8 * spec_exponent,uint16 * pixelq, float *wavecoeff, long dim [],int16 * refcoll) {
+static RC omi_load_spectrum(int spec_type, int32 sw_id, int32 measurement, int32 track, int32 n_wavel, double *lambda, double *spectrum, double *sigma, unsigned short *pixelQualityFlags,int16 * spec_mantissa,int16 * spec_precisionmantissa, int8_t * spec_exponent,uint16 * pixelq, float *wavecoeff, long dim [],int16 * refcoll) {
   RC rc = ERROR_ID_NO;
   
   int16 *mantissa = malloc(n_wavel*sizeof(*mantissa));
   int16 *precisionmantissa = malloc(n_wavel*sizeof(*precisionmantissa));
-  int8 *exponent = malloc(n_wavel*sizeof(*exponent));
+  int8_t *exponent = malloc(n_wavel*sizeof(*exponent));
 
   // names of the fields in omi hdf files.
   const char *s_mantissa = IRRADIANCE_MANTISSA;
@@ -1304,7 +1304,7 @@ static const double pows[] = {
   10000000000000000.0,
   100000000000000000.0};
 
-static void omi_make_double(int16 mantissa[], int8 exponent[], int32 n_wavel, double* result) {
+static void omi_make_double(int16 mantissa[], int8_t exponent[], int32 n_wavel, double* result) {
   int i;
   for (i=0; i<n_wavel; i++) {
     if (exponent[i] < 0 || exponent[i] >= sizeof(pows)/sizeof(pows[0]) ) {

@@ -94,7 +94,7 @@
 // Description of the header of a record
 // -------------------------------------
 
-#pragma pack(push,1)
+
 
 typedef struct _ccdData
  {
@@ -888,7 +888,7 @@ typedef struct _ccd_1024
  }
 CCD_1024;
 
-#pragma pack(pop)
+
 
 // -----------------------------------------------------------------------------
 // FUNCTION      SetCCD
