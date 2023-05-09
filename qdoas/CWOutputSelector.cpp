@@ -333,6 +333,7 @@ void getValidFieldFlags(int *validFlags, int instrument,int selectorOrigin)
   validFlags[PRJCT_RESULTS_COVAR]=(selectorOrigin!=TAB_SELECTOR_EXPORT)?1:0;
   validFlags[PRJCT_RESULTS_CORR]=(selectorOrigin!=TAB_SELECTOR_EXPORT)?1:0;
   validFlags[PRJCT_RESULTS_RC]=((selectorOrigin==TAB_SELECTOR_OUTPUT) && (instrument==PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF))?1:0;
+  validFlags[PRJCT_RESULTS_RESIDUAL_SPECTRUM]=(selectorOrigin==TAB_SELECTOR_OUTPUT)?1:0;
 
   // Output fields related to overall analysis (or run calibration) results (per analysis window)
 
@@ -748,7 +749,6 @@ void getValidFieldFlags(int *validFlags, int instrument,int selectorOrigin)
       validFlags[PRJCT_RESULTS_SAT_HEIGHT]=1;
       validFlags[PRJCT_RESULTS_SAT_LAT]=1;
       validFlags[PRJCT_RESULTS_SAT_LON]=1;
-      validFlags[PRJCT_RESULTS_RESIDUAL_SPECTRUM]=1;
      }
      break;
 

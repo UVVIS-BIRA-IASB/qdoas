@@ -94,7 +94,7 @@
 // Description of the header of a record
 // -------------------------------------
 
-
+#pragma pack(push,1)
 
 typedef struct _ccdData
  {
@@ -145,6 +145,8 @@ typedef struct _ccdData
   int         measureType;                                                      // if completed with new data in the future, authorizes compatibility with previous versions
  }
 CCD_DATA;
+
+#pragma pack(pop)
 
 typedef struct cameraPicture
  {
@@ -858,6 +860,8 @@ RC ReliCCD_EEV(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int loca
 // Description of records header
 // -----------------------------
 
+#pragma pack(push,1)
+
 typedef struct _ccd_1024
  {
   short        Scans;                                                           //  equivalent to the value for I in the custom scan programs
@@ -888,7 +892,7 @@ typedef struct _ccd_1024
  }
 CCD_1024;
 
-
+#pragma pack(pop)
 
 // -----------------------------------------------------------------------------
 // FUNCTION      SetCCD

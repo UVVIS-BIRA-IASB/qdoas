@@ -350,7 +350,8 @@ CWAnalysisWindowPropertyEditor::CWAnalysisWindowPropertyEditor(const QString &pr
   QHBoxLayout *residualFrameLayout = new QHBoxLayout(residualFrame);
   residualFrameLayout->setMargin(0);
 
-  if (p->instrumental.format==PRJCT_INSTR_FORMAT_GEMS)
+  if  (p->output.file_format==NETCDF)
+  // (p->instrumental.format==PRJCT_INSTR_FORMAT_GEMS)
    {
     m_saveResidualCheck = new QCheckBox("Save residuals", residualFrame);
     displayLayout->addWidget(m_saveResidualCheck, 0, 0);   
@@ -527,7 +528,8 @@ bool CWAnalysisWindowPropertyEditor::actionOk(void)
     strcpy(d->refOneFile, m_refOneEdit->text().toLocal8Bit().data());
     strcpy(d->refTwoFile, m_refTwoEdit->text().toLocal8Bit().data());
     
-    if (p->instrumental.format==PRJCT_INSTR_FORMAT_GEMS)
+    if  (p->output.file_format==NETCDF)
+     // (p->instrumental.format==PRJCT_INSTR_FORMAT_GEMS)
      d->saveResidualsFlag = (m_saveResidualCheck->checkState() == Qt::Checked) ? 1 : 0;
     else
      strcpy(d->residualFile, m_residualEdit->text().toLocal8Bit().data());

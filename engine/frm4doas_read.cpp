@@ -219,7 +219,9 @@ RC FRM4DOAS_Set(ENGINE_CONTEXT *pEngineContext)
        pEngineContext->n_crosstrack=1;
      }
 
-    ANALYSE_swathSize = pEngineContext->n_crosstrack;
+    ANALYSE_swathSize = pEngineContext->n_crosstrack;                           // to further move to FRM4DOAS_init
+    for (int i=0;i<ANALYSE_swathSize;i++)
+     NDET[i]=det_size;
 
     for (int i=0; i<det_size; i++)
      pEngineContext->buffers.irrad[i]=(double)0.;
@@ -303,25 +305,25 @@ RC FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
 
     if (!dateFlag)
      {
-      int rcwve;
+      int rcvar;
       measurements_group=current_file.getGroup(root_name+"/RADIANCE/OBSERVATIONS");
 
       if (pEngineContext->n_crosstrack==1)
-       {
-        measurements_group.getVar("radiance",start,count,ndims,(float)0.,spe);
-
-        // measurements_group.getVar("wavelength",start,count,2,(float)0.,wve);
-       }
+       measurements_group.getVar("radiance",start,count,ndims,(float)0.,spe);
       else
-       {
         measurements_group.getVar("radiance_full_image",start,count,ndims,(float)0.,spe);
 
-        //  measurements_group.getVar("radiance_error",start,count,ndims,(float)1.,err);
-        measurements_group.getVar("radiance_quality_flag",start,count,ndims,(short)1,qf);
+      if (pEngineContext->buffers.sigmaSpec!=NULL)
+       {
+        if (!measurements_group.getVar("radiance_error",start,count,ndims,(float)1.,err))
+          for (int i=0; i<det_size; i++)
+           pEngineContext->buffers.sigmaSpec[i]=err[i];
+        else
+          for (int i=0; i<det_size; i++)
+           pEngineContext->buffers.sigmaSpec[i]=1.;
        }
 
-      measurements_group.getVar("radiance_error",start,count,ndims,(float)1.,err);
-      if (!(rcwve=measurements_group.getVar("wavelength",start,count,ndims,(float)0.,wve)))
+      if (!measurements_group.getVar("wavelength",start,count,ndims,(float)0.,wve))
        {
         for (int i=0; i<det_size; i++)
          {
@@ -331,10 +333,7 @@ RC FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
        }
 
       for (int i=0; i<det_size; i++)
-       {
         pEngineContext->buffers.spectrum[i]=spe[i];
-        pEngineContext->buffers.sigmaSpec[i]=err[i];
-       }
      }
 
     // Date and time fields (UT YYYY,MM,DD,hh,mm,ss,ms)
@@ -400,6 +399,9 @@ RC FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
 
     tmLocal=pRecordInfo->Tm+THRD_localShift*3600.;
     pRecordInfo->localCalDay=ZEN_FNCaljda(&tmLocal);
+
+    pRecordInfo->i_alongtrack=i_alongtrack;
+    pRecordInfo->i_crosstrack=i_crosstrack;
 
     // Recalculate solar zenith angle if necessary
 
