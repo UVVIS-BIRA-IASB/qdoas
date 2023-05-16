@@ -351,23 +351,44 @@ void write_automatic_reference_info(const ENGINE_CONTEXT *pEngineContext, NetCDF
   }
 }
 
+
+void print_metadata_sensor(const ENGINE_CONTEXT *pEngineContext,NetCDFGroup &maingroup){
+	string sensor="Sensor";
+	if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_OMI) maingroup.putAttr(sensor,"OMI");
+	if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_OMPS) maingroup.putAttr(sensor,"OMPS");
+	if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_TROPOMI) maingroup.putAttr(sensor,"TROPOMI");
+	if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_SCIA_PDS) maingroup.putAttr(sensor,"SCIAMACHY");
+	if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_GOME2) maingroup.putAttr(sensor,"GOME-2");
+	if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_GOME1_NETCDF) maingroup.putAttr(sensor,"GOME-1");
+}
+
 // create a subgroup for each analysis window, and for the calibration
 // data belonging to that window
 void create_subgroups(const ENGINE_CONTEXT *pEngineContext,NetCDFGroup &group) {
 
-  int row;
-
+	int row;
+	int k=0;
+	print_metadata_sensor(pEngineContext, group); 
+	for(row=0; row< ANALYSE_swathSize; row++ )
+		if (pEngineContext->project.instrumental.use_row[row]){
+			break;
+		}
+	
   for (unsigned int i=0; i<calib_num_fields; ++i) {
     if (group.groupID(output_data_calib[i].windowname) < 0) {
       // group not yet created
+		k++;
       auto subgroup = group.defGroup(output_data_calib[i].windowname);
       subgroup.defGroup(calib_subgroup_name);
+	  int z=TabFeno[row][k].fit_properties.Z;
+	  double  wvl_fitwin_min=TabFeno[row][k].fit_properties.LFenetre[0][0];
+	  double  wvl_fitwin_max=TabFeno[row][k].fit_properties.LFenetre[z-1][1];
+	  char str1[200];
+	  sprintf(str1,"%.3lf : %.3lf",wvl_fitwin_min, wvl_fitwin_max);
+	  subgroup.putAttr("fitting window range",str1);
+	  
     }
   }
-
-      for(row=0; row< ANALYSE_swathSize; row++ )
-       if (pEngineContext->project.instrumental.use_row[row])
-        break;
 
       for(int analysiswindow=0; analysiswindow < NFeno; ++analysiswindow)
        {
@@ -376,6 +397,13 @@ void create_subgroups(const ENGINE_CONTEXT *pEngineContext,NetCDFGroup &group) {
         if (!pTabFeno->hidden && (group.groupID(pTabFeno->windowName)<0))
          {
           auto subgroup=group.defGroup(pTabFeno->windowName);
+		  int z=TabFeno[row][analysiswindow].fit_properties.Z;
+		  double  wvl_fitwin_min=pTabFeno->fit_properties.LFenetre[0][0];
+		  double  wvl_fitwin_max=pTabFeno->fit_properties.LFenetre[z-1][1];
+		  char str1[200];
+		  sprintf(str1,"%.3lf : %.3lf",wvl_fitwin_min, wvl_fitwin_max);
+		  subgroup.putAttr("fitting window range",str1);
+	  
           CROSS_REFERENCE *pTabCross;
 
           // needs the wavelength at the center of the fitting window for profiling algorithm
