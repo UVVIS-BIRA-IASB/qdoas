@@ -354,11 +354,25 @@ void write_automatic_reference_info(const ENGINE_CONTEXT *pEngineContext, NetCDF
 
 void print_metadata_sensor(const ENGINE_CONTEXT *pEngineContext,NetCDFGroup &maingroup){
 	string sensor="Sensor";
-	if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_OMI) maingroup.putAttr(sensor,"OMI");
+	vector<string> omi_bands {"UV_1","UV_2","VIS"};
+	vector<string> tropomi_bands {"UV_1 / BAND1","UV_2 / BAND2","UVIS_3 / BAND3","UVIS_4 / BAND4","NIR5 / BAND5","NIR6 / BAND6","SWIR7 / BAND7","SWIR8 / BAND8 "};
+	vector<string> gome2_bands {"Band_1a","Band_1b","Band_2a","Band_2b","Band_3", "Band_4"};
+
+	if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_OMI){
+		maingroup.putAttr(sensor,"OMI");
+		maingroup.putAttr("L1 spectral_band",omi_bands[pEngineContext->project.instrumental.omi.spectralType]);
+		} 
 	if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_OMPS) maingroup.putAttr(sensor,"OMPS");
-	if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_TROPOMI) maingroup.putAttr(sensor,"TROPOMI");
+	if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_TROPOMI) {
+		maingroup.putAttr(sensor,"TROPOMI");
+		string band=tropomi_bands[pEngineContext->project.instrumental.tropomi.spectralBand];
+		maingroup.putAttr("L1 spectral_band",band);
+	}
 	if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_SCIA_PDS) maingroup.putAttr(sensor,"SCIAMACHY");
-	if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_GOME2) maingroup.putAttr(sensor,"GOME-2");
+	if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_GOME2){
+		maingroup.putAttr(sensor,"GOME-2");
+		maingroup.putAttr("L1 spectral_band",gome2_bands[pEngineContext->project.instrumental.user]);
+	}
 	if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_GOME1_NETCDF) maingroup.putAttr(sensor,"GOME-1");
 }
 
