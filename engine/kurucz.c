@@ -1627,7 +1627,7 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
         if (pKurucz->displayShift) {
           mediateAllocateAndSetPlotData(&spectrumData[0],"Polynomial fitting individual FWHM points",&Lambda[0],&fwhmVector[indexParam][0],n_wavel,Line);
           mediateAllocateAndSetPlotData(&spectrumData[1],"FWHM calculated in the individual small windows",VLambda+1,fwhm[indexParam],Nb_Win,Point);
-          mediateResponsePlotData(plotPageCalib,spectrumData,2,Spectrum,forceAutoScale,string,"Wavelength (nm)","SFP (nm)", responseHandle);
+          mediateResponsePlotData(plotPageCalib,spectrumData,2,Spectrum,forceAutoScale,string,"Wavelength (nm)",(pKuruczOptions->fwhmType==SLIT_TYPE_FILE)?"":"SFP (nm)", responseHandle);
           mediateReleasePlotData(&spectrumData[1]);
           mediateReleasePlotData(&spectrumData[0]);
         }
