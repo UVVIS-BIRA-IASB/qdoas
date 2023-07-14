@@ -89,6 +89,8 @@
 #include <cassert>
 #include <cmath>
 
+#include "boost/multi_array.hpp"
+
 #include "gome1netcdf_read.h"
 #include "netcdfwrapper.h"
 
@@ -117,6 +119,16 @@ extern "C" {
 using std::string;
 using std::vector;
 using std::set;
+
+template<typename T>
+using array2d = boost::multi_array<T, 2>;
+template<typename T>
+using const_array2d = boost::const_multi_array_ref<T, 2>;
+template<typename T>
+using array3d = boost::multi_array<T, 3>;
+
+template<size_t NumDims>
+using extent_t = std::array<size_t, NumDims>;
 
 #define MAX_GOME_FILES 50                                                       //!< \details Maximum number of files per orbit (in principle, 14/15 should be enough)
 #define GOME1NETCDF_NBAND                6                                      //!< \details The number of spectral bands (1A, 1B, 2A, 2B, 3, 4)
@@ -165,41 +177,114 @@ namespace
   //! \struct geodata
   //! \brief %Geolocation coordinates and angles present in the GEODATA group of the GOME1 netCDF file.
 
-  struct geodata
-   {
-    vector<float> sza;                                                          //!< \details Solar zenith angle
-    vector<float> sza_sat;                                                      //!< \details Solar zenith angle at satellite
-    vector<float> saa;                                                          //!< \details Solar azimuth angle
-    vector<float> saa_sat;                                                      //!< \details Solar azimuth angle_sat at satellite
-    vector<float> vza;                                                          //!< \details Viewing zenith angle
-    vector<float> vza_sat;                                                      //!< \details Viewing zenith angle at satellite
-    vector<float> vaa;                                                          //!< \details Viewing azimuth angle
-    vector<float> vaa_sat;                                                      //!< \details Viewing azimuth angle at satellite
-    vector<float> lon;                                                          //!< \details pixel center longitude
-    vector<float> lat;                                                          //!< \details pixel center latitude
-    vector<float> alt_sat;                                                      //!< \details Satellite altitude
-    vector<float> lat_bounds;                                                   //!< \details The corner coordinate latitudes of each observation
-    vector<float> lon_bounds;                                                   //!< \details The corner coordinate longitudes of each observation
-    vector<float> earth_rad;                                                    //!< \details The earth radius
-   };
+  struct geodata {
+  public:
+      geodata(size_t scan_size=0, size_t pixel_size=0) :
+          geodata(extent_t<2> {scan_size, pixel_size},
+              extent_t<3> {scan_size, pixel_size, 3},
+              extent_t<3> {scan_size, pixel_size, 4}) { };
+	  array3d<float> sza;                                                          //!< \details Solar zenith angle
+	  array3d<float> sza_sat;                                                      //!< \details Solar zenith angle at satellite
+	  array3d<float> saa;                                                          //!< \details Solar azimuth angle
+	  array3d<float> saa_sat;                                                      //!< \details Solar azimuth angle_sat at satellite
+	  array3d<float> vza;                                                          //!< \details Viewing zenith angle
+	  array3d<float> vza_sat;                                                      //!< \details Viewing zenith angle at satellite
+	  array3d<float> vaa;                                                          //!< \details Viewing azimuth angle
+	  array3d<float> vaa_sat;                                                      //!< \details Viewing azimuth angle at satellite
+	  array2d<float> lon;                                                          //!< \details pixel center longitude
+	  array2d<float> lat;                                                          //!< \details pixel center latitude
+	  array2d<float> alt_sat;                                                      //!< \details Satellite altitude
+	  array3d<float> lat_bounds;                                                   //!< \details The corner coordinate latitudes of each observation
+	  array3d<float> lon_bounds;                                                   //!< \details The corner coordinate longitudes of each observation
+	  array2d<float> earth_rad;                                                    //!< \details The earth radius
+    void resize(size_t scan_size, size_t pixel_size) {
+      extent_t<2> extent {scan_size, pixel_size};
+      extent_t<3> extent_angles {scan_size, pixel_size, 3};
+      extent_t<3> extent_bounds {scan_size, pixel_size, 4};
+
+      sza.resize(extent_angles);
+      sza_sat.resize(extent_angles);
+      saa.resize(extent_angles);
+      saa_sat.resize(extent_angles);
+      vza.resize(extent_angles);
+      vza_sat.resize(extent_angles);
+      vaa.resize(extent_angles);
+      vaa_sat.resize(extent_angles);
+      lon.resize(extent);
+      lat.resize(extent);
+      alt_sat.resize(extent);
+      lat_bounds.resize(extent_bounds);
+      lon_bounds.resize(extent_bounds);
+      earth_rad.resize(extent);
+    };
+
+  private:
+      geodata(extent_t<2> extent, extent_t<3> extent_angles, extent_t<3> extent_bounds) :
+          sza(extent_angles),
+          sza_sat(extent_angles),
+          saa(extent_angles),
+          saa_sat(extent_angles),
+          vza(extent_angles),
+          vza_sat(extent_angles),
+          vaa(extent_angles),
+          vaa_sat(extent_angles),
+          lon(extent),
+          lat(extent),
+          alt_sat(extent),
+          lat_bounds(extent_bounds),
+          lon_bounds(extent_bounds),
+          earth_rad(extent) { };
+  };
 
   //! \struct clouddata
   //! \brief Information on clouds contained in the CLOUDDATA group of the GOME1 netCDF file.
 
-  struct clouddata
-   {
-    vector<float> cloud_alb;                                                    //!< \details Cloud albedo
-    vector<float> cloud_alb_prec;                                               //!< \details Cloud albedo precision
-    vector<float> cloud_frac;                                                   //!< \details Cloud fraction
-    vector<float> cloud_frac_prec;                                              //!< \details Cloud fraction precision
-    vector<float> cloud_hgt;                                                    //!< \details Cloud height
-    vector<float> cloud_hgt_prec;                                               //!< \details Cloud height precision
-    vector<float> cloud_pres;                                                   //!< \details Cloud pressure
-    vector<float> cloud_pres_prec;                                              //!< \details Cloud pressure precision
-    vector<float> surf_hgt;                                                     //!< \details Surface height (kms)
+  struct clouddata {
 
-    vector<unsigned char> snow_ice_flag;                                        //!< \details Snow/ice flag (0 : normal)
-    vector<unsigned char> sun_glint;                                            //!< \details Possible Sun-glint derived by a geometrical calculation using viewing angles (0 = no, 1 = yes)
+  public:
+      clouddata(size_t scan_size=0, size_t pixel_size=0) :
+          clouddata(extent_t<2> {scan_size, pixel_size}) {};
+	  array2d<float> cloud_alb;                                                    //!< \details Cloud albedo
+	  array2d<float> cloud_alb_prec;                                               //!< \details Cloud albedo precision
+	  array2d<float> cloud_frac;                                                   //!< \details Cloud fraction
+	  array2d<float> cloud_frac_prec;                                              //!< \details Cloud fraction precision
+	  array2d<float> cloud_hgt;                                                    //!< \details Cloud height
+	  array2d<float> cloud_hgt_prec;                                               //!< \details Cloud height precision
+	  array2d<float> cloud_pres;                                                   //!< \details Cloud pressure
+	  array2d<float> cloud_pres_prec;                                              //!< \details Cloud pressure precision
+	  array2d<float> surf_hgt;                                                     //!< \details Surface height (kms)
+
+	  array2d<unsigned char> snow_ice_flag;                                        //!< \details Snow/ice flag (0 : normal)
+	  array2d<unsigned char> sun_glint;                                            //!< \details Possible Sun-glint derived by a geometrical calculation using viewing angles (0 = no, 1 = yes)
+
+    void resize(size_t scan_size, size_t pixel_size) {
+      extent_t<2> extent {scan_size, pixel_size};
+      cloud_alb.resize(extent);
+      cloud_alb_prec.resize(extent);
+      cloud_frac.resize(extent);
+      cloud_frac_prec.resize(extent);
+      cloud_hgt.resize(extent);
+      cloud_hgt_prec.resize(extent);
+      cloud_pres.resize(extent);
+      cloud_pres_prec.resize(extent);
+      surf_hgt.resize(extent);
+      snow_ice_flag.resize(extent);
+      sun_glint.resize(extent);
+    };
+
+  private:
+	  clouddata(extent_t<2> extent) :
+	    cloud_alb(extent),
+	    cloud_alb_prec(extent),
+	    cloud_frac(extent),
+	    cloud_frac_prec(extent),
+	    cloud_hgt(extent),
+	    cloud_hgt_prec(extent),
+	    cloud_pres(extent),
+	    cloud_pres_prec(extent),
+	    surf_hgt(extent),
+	    snow_ice_flag(extent),
+	    sun_glint(extent) {};
    };
 
   //! \struct GOME1NETCDF_REF
@@ -352,36 +437,36 @@ static geodata GOME1NETCDF_Read_Geodata(NetCDFGroup geodata_group,size_t scan_si
  {
   // Declarations
 
-  geodata result;                                                               // geodata
+  geodata result(scan_size, pixel_size);                                        // geodata
   const size_t start[] = {0,0,0,0};                                             // there is no reason not to start from 0, the presence of the fourth dimension depends on variables
   size_t count[] = {1,scan_size,pixel_size,1};                                  // the presence of the fourth dimension depends on variables
 
   // Get geodata variables
 
-  geodata_group.getVar("earth_radius",start,count,3,(float)-1.,result.earth_rad);
-  geodata_group.getVar("latitude",start,count,3,(float)-1.,result.lat);
-  geodata_group.getVar("longitude",start,count,3,(float)-1.,result.lon);
-  geodata_group.getVar("satellite_altitude",start,count,3,(float)-1.,result.alt_sat);
+  geodata_group.getVar("earth_radius", start, count, result.earth_rad.data());
+  geodata_group.getVar("latitude", start, count, result.lat.data());
+  geodata_group.getVar("longitude", start, count, result.lon.data());
+  geodata_group.getVar("satellite_altitude", start, count, result.alt_sat.data());
 
   // Corner coordinates
 
   count[3]=4;
 
-  geodata_group.getVar("latitude_bounds",start,count,4,(float)-1.,result.lat_bounds);
-  geodata_group.getVar("longitude_bounds",start,count,4,(float)-1.,result.lon_bounds);
+  geodata_group.getVar("latitude_bounds", start, count, result.lat_bounds.data());
+  geodata_group.getVar("longitude_bounds", start, count, result.lon_bounds.data());
 
   // Angles
 
   count[3]=3;
 
-  geodata_group.getVar("solar_zenith_angle",start,count,4,(float)-1.,result.sza);
-  geodata_group.getVar("solar_zenith_angle_sat",start,count,4,(float)-1.,result.sza_sat);
-  geodata_group.getVar("solar_azimuth_angle",start,count,4,(float)-1.,result.saa);
-  geodata_group.getVar("solar_azimuth_angle_sat",start,count,4,(float)-1.,result.saa_sat);
-  geodata_group.getVar("viewing_zenith_angle",start,count,4,(float)-1.,result.vza);
-  geodata_group.getVar("viewing_zenith_angle_sat",start,count,4,(float)-1.,result.vza_sat);
-  geodata_group.getVar("viewing_azimuth_angle",start,count,4,(float)-1.,result.vaa);
-  geodata_group.getVar("viewing_azimuth_angle_sat",start,count,4,(float)-1.,result.vaa_sat);
+  geodata_group.getVar("solar_zenith_angle", start, count, result.sza.data());
+  geodata_group.getVar("solar_zenith_angle_sat", start, count, result.sza_sat.data());
+  geodata_group.getVar("solar_azimuth_angle", start, count, result.saa.data());
+  geodata_group.getVar("solar_azimuth_angle_sat", start, count, result.saa_sat.data());
+  geodata_group.getVar("viewing_zenith_angle", start, count, result.vza.data());
+  geodata_group.getVar("viewing_zenith_angle_sat", start, count, result.vza_sat.data());
+  geodata_group.getVar("viewing_azimuth_angle", start, count, result.vaa.data());
+  geodata_group.getVar("viewing_azimuth_angle_sat", start, count, result.vaa_sat.data());
 
   // Return
 
@@ -405,23 +490,23 @@ static clouddata GOME1NETCDF_Read_Clouddata(NetCDFGroup clouddata_group,size_t s
  {
   // Declarations
 
-  clouddata result;                                                             // clouddata
+  clouddata result(scan_size, pixel_size);                                                             // clouddata
   const size_t start[] = {0,0,0};                                               // there is no reason not to start from 0, the presence of the fourth dimension depends on variables
   const size_t count[] = {1,scan_size,pixel_size};                              // the presence of the fourth dimension depends on variables
 
   // Get geodata variables
 
-  clouddata_group.getVar("cloud_albedo",start,count,3,(float)-1.,result.cloud_alb);
-  clouddata_group.getVar("cloud_albedo_precision",start,count,3,(float)-1.,result.cloud_alb_prec);
-  clouddata_group.getVar("cloud_fraction",start,count,3,(float)-1.,result.cloud_frac);
-  clouddata_group.getVar("cloud_fraction_precision",start,count,3,(float)-1.,result.cloud_frac_prec);
-  clouddata_group.getVar("cloud_height",start,count,3,(float)-1.,result.cloud_hgt);
-  clouddata_group.getVar("cloud_height_precision",start,count,3,(float)-1.,result.cloud_hgt_prec);
-  clouddata_group.getVar("cloud_pressure",start,count,3,(float)-1.,result.cloud_pres);
-  clouddata_group.getVar("cloud_pressure_precision",start,count,3,(float)-1.,result.cloud_pres_prec);
-  clouddata_group.getVar("snow_ice_flag",start,count,3,(unsigned char)0,result.snow_ice_flag);
-  clouddata_group.getVar("sun_glint",start,count,3,(unsigned char)0,result.sun_glint);
-  clouddata_group.getVar("surface_height",start,count,3,(float)-1.,result.surf_hgt);
+  clouddata_group.getVar("cloud_albedo", start, count, result.cloud_alb.data());
+  clouddata_group.getVar("cloud_albedo_precision", start, count, result.cloud_alb_prec.data());
+  clouddata_group.getVar("cloud_fraction", start, count, result.cloud_frac.data());
+  clouddata_group.getVar("cloud_fraction_precision", start, count, result.cloud_frac_prec.data());
+  clouddata_group.getVar("cloud_height", start, count, result.cloud_hgt.data());
+  clouddata_group.getVar("cloud_height_precision", start, count, result.cloud_hgt_prec.data());
+  clouddata_group.getVar("cloud_pressure", start, count, result.cloud_pres.data());
+  clouddata_group.getVar("cloud_pressure_precision", start, count, result.cloud_pres_prec.data());
+  clouddata_group.getVar("snow_ice_flag", start, count, result.snow_ice_flag.data());
+  clouddata_group.getVar("sun_glint", start, count, result.sun_glint.data());
+  clouddata_group.getVar("surface_height", start, count, result.surf_hgt.data());
 
   // Return
 
@@ -478,11 +563,12 @@ static calib GOME1NETCDF_Read_Calib(NetCDFGroup calib_group)
 
 void GOME1NETCDF_Get_Wavelength(GOME1NETCDF_ORBIT_FILE *pOrbitFile,int channel_index,int temp_index,double *wavelength)
  {
-  auto wve = reinterpret_cast<const float(*)[pOrbitFile->calibration.channel_number][pOrbitFile->calibration.channel_size]>(pOrbitFile->calibration.wavelength.data());
+  boost::const_multi_array_ref<float, 3> wve(pOrbitFile->calibration.wavelength.data(),
+      boost::extents[pOrbitFile->calibration.temp_number][pOrbitFile->calibration.channel_number][pOrbitFile->calibration.channel_size]);
 
   if ((temp_index>=0) && (temp_index<pOrbitFile->calibration.temp_number) && (channel_index>=0) && (channel_index<pOrbitFile->calibration.channel_size))
-   for (int i=0;i<(int)pOrbitFile->calibration.channel_size;i++)
-    wavelength[i]=wve[temp_index][channel_index][i];
+      for (int i=0;i<(int)pOrbitFile->calibration.channel_size;i++)
+          wavelength[i]=wve[temp_index][channel_index][i];
  }
 
 // -----------------------------------------------------------------------------
@@ -554,30 +640,22 @@ static void get_ref_info(GOME1NETCDF_ORBIT_FILE *pOrbitFile)
   // Global declarations
 
   GOME1NETCDF_REF *refList,*pRef;
-  geodata geo;
   int pixelSize;
 
   // Declare substition variables for ground pixels
 
-  geo=pOrbitFile->ground_geodata;                                               // do not work ???
-  pixelSize=3;
-
-  auto sza_gr = reinterpret_cast<const float(*)[pixelSize][3]>(pOrbitFile->ground_geodata.sza.data());
-  auto lat_gr =  reinterpret_cast<const float(*)[pixelSize]>(pOrbitFile->ground_geodata.lat.data());
-  auto lon_gr =  reinterpret_cast<const float(*)[pixelSize]>(pOrbitFile->ground_geodata.lon.data());
-  auto cloud_gr =  reinterpret_cast<const float(*)[pixelSize]>(pOrbitFile->ground_clouddata.cloud_frac.data());
-
+  const auto& sza_gr = pOrbitFile->ground_geodata.sza;
+  const auto& lat_gr = pOrbitFile->ground_geodata.lat;
+  const auto& lon_gr = pOrbitFile->ground_geodata.lon;
+  const auto& cloud_gr = pOrbitFile->ground_clouddata.cloud_frac;
 
   // Declare substition variables for backscan pixels
 
-  geo=pOrbitFile->backscan_geodata;
-  pixelSize=1;
+  const auto& sza_bs = pOrbitFile->backscan_geodata.sza;
+  const auto& lat_bs = pOrbitFile->backscan_geodata.lat;
+  const auto& lon_bs = pOrbitFile->backscan_geodata.lon;
 
-  auto sza_bs = reinterpret_cast<const float(*)[pixelSize][3]>(pOrbitFile->backscan_geodata.sza.data());
-  auto lat_bs =  reinterpret_cast<const float(*)[pixelSize]>(pOrbitFile->backscan_geodata.lat.data());
-  auto lon_bs =  reinterpret_cast<const float(*)[pixelSize]>(pOrbitFile->backscan_geodata.lon.data());
-
-  auto cloud_bs =  reinterpret_cast<const float(*)[pixelSize]>(pOrbitFile->backscan_clouddata.cloud_frac.data());
+  const auto& cloud_bs = pOrbitFile->backscan_clouddata.cloud_frac;
 
   for (int i=0;i<pOrbitFile->specNumber;i++)
    {
@@ -637,9 +715,9 @@ RC GOME1NETCDF_Set(ENGINE_CONTEXT *pEngineContext)
   int selected_band;
   vector<int> scanline;
   vector<int> scanline_bs;
-  vector <double> deltatime;
-  vector <double> deltatime_bs;
-  vector <short> startpixel;
+  vector<double> deltatime;
+  vector<double> deltatime_bs;
+  vector<short> startpixel;
   int *iscan,*iscan_bs,maxscan;
   int i,j,k,n;
 
@@ -801,7 +879,9 @@ RC GOME1NETCDF_Set(ENGINE_CONTEXT *pEngineContext)
 
             // Read the metadata
 
+	    pOrbitFile->ground_geodata.resize(pOrbitFile->scan_size, pOrbitFile->pixel_size);
             pOrbitFile->ground_geodata=GOME1NETCDF_Read_Geodata(geodata_group,pOrbitFile->scan_size,pOrbitFile->pixel_size);
+	    pOrbitFile->ground_clouddata.resize(pOrbitFile->scan_size, pOrbitFile->pixel_size);
             pOrbitFile->ground_clouddata=GOME1NETCDF_Read_Clouddata(clouddata_group,pOrbitFile->scan_size,pOrbitFile->pixel_size);
 
             // Get the scanline indexes
@@ -840,7 +920,9 @@ RC GOME1NETCDF_Set(ENGINE_CONTEXT *pEngineContext)
 
             // Read the metadata
 
+	    pOrbitFile->backscan_geodata.resize(pOrbitFile->scan_size_bs, pOrbitFile->pixel_size_bs);
             pOrbitFile->backscan_geodata=GOME1NETCDF_Read_Geodata(geodata_group,pOrbitFile->scan_size_bs,pOrbitFile->pixel_size_bs);
+	    pOrbitFile->backscan_clouddata.resize(pOrbitFile->scan_size_bs, pOrbitFile->pixel_size_bs);
             pOrbitFile->backscan_clouddata=GOME1NETCDF_Read_Clouddata(clouddata_group,pOrbitFile->scan_size_bs,pOrbitFile->pixel_size_bs);
 
             // Get the scanline indexes
@@ -879,8 +961,9 @@ RC GOME1NETCDF_Set(ENGINE_CONTEXT *pEngineContext)
           pOrbitFile->alongtrack_indexes.resize(pOrbitFile->specNumber);
           pOrbitFile->delta_time.resize(pOrbitFile->specNumber);
 
-          auto delta_time_scan=reinterpret_cast<const double(*)[pOrbitFile->pixel_size]>(deltatime.data());
-          auto delta_time_scan_bs = reinterpret_cast<const double(*)[pOrbitFile->pixel_size_bs]>(deltatime_bs.data());
+          auto extent = boost::extents[pOrbitFile->scan_size][pOrbitFile->pixel_size];
+          const_array2d<double> delta_time_scan(deltatime.data(), extent);
+          const_array2d<double> delta_time_scan_bs(deltatime_bs.data(), extent);
 
           pOrbitFile->n_alongtrack=0;
 
@@ -1027,8 +1110,6 @@ RC GOME1NETCDF_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,INDEX fileIndex)
   PRJCT_INSTRUMENTAL *pInstrumental;
   NetCDFGroup obs_group;                                                        // measurement group in the netCDF file
   RECORD_INFO *pRecordInfo;                                                     // pointer to the record structure in the engine context
-  geodata geo;                                                                  // geolocation and angles
-  clouddata cloud;                                                              // information on clouds
   int selected_band;                                                            // index of the selected band (0..6)
   vector<float> wve;                                                            // wavelength calibration
   vector<float> spe;                                                            // spectrum
@@ -1078,26 +1159,16 @@ RC GOME1NETCDF_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,INDEX fileIndex)
 
   // TODO int     nRef;                                                                 // size of irradiance vectors
 
-    geo=(pixelType==3)?pOrbitFile->backscan_geodata:pOrbitFile->ground_geodata;
-    cloud=(pixelType==3)?pOrbitFile->backscan_clouddata:pOrbitFile->ground_clouddata;
+    const auto& geo = (pixelType == 3) ? pOrbitFile->backscan_geodata : pOrbitFile->ground_geodata;
+    const auto& cloud = (pixelType == 3) ? pOrbitFile->backscan_clouddata : pOrbitFile->ground_clouddata;
 
     // Solar zenith angles
 
-    auto sza = reinterpret_cast<const float(*)[pixelSize][3]>(geo.sza.data());
-    auto saa = reinterpret_cast<const float(*)[pixelSize][3]>(geo.saa.data());
-    auto vza = reinterpret_cast<const float(*)[pixelSize][3]>(geo.vza.data());
-    auto vaa = reinterpret_cast<const float(*)[pixelSize][3]>(geo.vaa.data());
-    auto sza_sat = reinterpret_cast<const float(*)[pixelSize][3]>(geo.sza_sat.data());
-    auto saa_sat = reinterpret_cast<const float(*)[pixelSize][3]>(geo.saa_sat.data());
-    auto vza_sat = reinterpret_cast<const float(*)[pixelSize][3]>(geo.vza_sat.data());
-    auto vaa_sat = reinterpret_cast<const float(*)[pixelSize][3]>(geo.vaa_sat.data());
-
-    for (i=0;i<3;i++)
-     {
-      pRecordInfo->gome.sza[i]=sza[scanIndex][pixelIndex][i];
-      pRecordInfo->gome.azim[i]=saa[scanIndex][pixelIndex][i];
-      pRecordInfo->gome.vza[i]=vza[scanIndex][pixelIndex][i];
-      pRecordInfo->gome.vaa[i]=vaa[scanIndex][pixelIndex][i];
+    for (i=0;i<3;i++) {
+      pRecordInfo->gome.sza[i]=geo.sza[scanIndex][pixelIndex][i];
+      pRecordInfo->gome.azim[i]=geo.saa[scanIndex][pixelIndex][i];
+      pRecordInfo->gome.vza[i]=geo.vza[scanIndex][pixelIndex][i];
+      pRecordInfo->gome.vaa[i]=geo.vaa[scanIndex][pixelIndex][i];
      }
 
     pRecordInfo->Zm=pRecordInfo->gome.sza[1];
@@ -1105,49 +1176,34 @@ RC GOME1NETCDF_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,INDEX fileIndex)
     pRecordInfo->zenithViewAngle=pRecordInfo->gome.vza[1];
     pRecordInfo->azimuthViewAngle=pRecordInfo->gome.vaa[1];
 
-    pRecordInfo->satellite.sza=sza_sat[scanIndex][pixelIndex][1];
-    pRecordInfo->satellite.saa=saa_sat[scanIndex][pixelIndex][1];
-    pRecordInfo->satellite.vza=vza_sat[scanIndex][pixelIndex][1];
-    pRecordInfo->satellite.vaa=vaa_sat[scanIndex][pixelIndex][1];
+    pRecordInfo->satellite.sza=geo.sza_sat[scanIndex][pixelIndex][1];
+    pRecordInfo->satellite.saa=geo.saa_sat[scanIndex][pixelIndex][1];
+    pRecordInfo->satellite.vza=geo.vza_sat[scanIndex][pixelIndex][1];
+    pRecordInfo->satellite.vaa=geo.vaa_sat[scanIndex][pixelIndex][1];
 
     // Geolocations
 
-    auto latitude = reinterpret_cast<const float(*)[pixelSize]>(geo.lat.data());
-    auto longitude = reinterpret_cast<const float(*)[pixelSize]>(geo.lon.data());
+    pRecordInfo->latitude=geo.lat[scanIndex][pixelIndex];
+    pRecordInfo->longitude=geo.lon[scanIndex][pixelIndex];
 
-    pRecordInfo->latitude=latitude[scanIndex][pixelIndex];
-    pRecordInfo->longitude=longitude[scanIndex][pixelIndex];
-
-    auto latitude_bounds = reinterpret_cast<const float(*)[pixelSize][4]>(geo.lat_bounds.data());
-    auto longitude_bounds = reinterpret_cast<const float(*)[pixelSize][4]>(geo.lon_bounds.data());
-
-    for (i=0;i<4;i++)
-     {
-      pRecordInfo->satellite.cornerlats[i]=latitude_bounds[scanIndex][pixelIndex][i];
-      pRecordInfo->satellite.cornerlons[i]=longitude_bounds[scanIndex][pixelIndex][i];
+    for (i=0;i<4;i++) {
+		pRecordInfo->satellite.cornerlats[i] = geo.lat_bounds[scanIndex][pixelIndex][i];
+		pRecordInfo->satellite.cornerlons[i] = geo.lon_bounds[scanIndex][pixelIndex][i];
      }
 
     // Satellite height and earth radius
 
-    auto sat_height = reinterpret_cast<const float(*)[pixelSize]>(geo.alt_sat.data());
-    auto earth_radius = reinterpret_cast<const float(*)[pixelSize]>(geo.earth_rad.data());
-
-    pRecordInfo->satellite.altitude = sat_height[scanIndex][pixelIndex];
-    pRecordInfo->satellite.earth_radius = earth_radius[scanIndex][pixelIndex];
+    pRecordInfo->satellite.altitude = geo.alt_sat[scanIndex][pixelIndex];
+    pRecordInfo->satellite.earth_radius = geo.earth_rad[scanIndex][pixelIndex];
 
     // Information on clouds
 
-    auto cloud_fraction = reinterpret_cast<const float(*)[pixelSize]>(cloud.cloud_frac.data());
-    auto cloud_top_pressure = reinterpret_cast<const float(*)[pixelSize]>(cloud.cloud_pres.data());
-
-    pRecordInfo->satellite.cloud_fraction = cloud_fraction[scanIndex][pixelIndex];
-    pRecordInfo->satellite.cloud_top_pressure = cloud_top_pressure[scanIndex][pixelIndex];
+    pRecordInfo->satellite.cloud_fraction = cloud.cloud_frac[scanIndex][pixelIndex];
+    pRecordInfo->satellite.cloud_top_pressure = cloud.cloud_pres[scanIndex][pixelIndex];
 
     // Get spectra
 
     obs_group = pOrbitFile->current_file.getGroup(pOrbitFile->root_name+((pixelType==3)?pOrbitFile->mode_bs:pOrbitFile->mode)+gome1netcdf_bandName[selected_band]+"/OBSERVATIONS");
-
-    // auto spec = reinterpret_cast<const float(*)[det_size]>(spe.data());
 
     obs_group.getVar("radiance",start,count,4,(float)0.,spe);
     obs_group.getVar("radiance_precision",start,count,4,(float)0.,err);
@@ -1213,10 +1269,10 @@ void GOME1NETCDF_Cleanup(void)
 
     pOrbitFile->calibration = calib();
     pOrbitFile->irradiance = refspec();
-    pOrbitFile->ground_geodata = geodata();
-    pOrbitFile->ground_clouddata = clouddata();
-    pOrbitFile->backscan_geodata = geodata();
-    pOrbitFile->backscan_clouddata = clouddata();
+    pOrbitFile->ground_geodata.resize(0, 0);
+    pOrbitFile->ground_clouddata.resize(0, 0);
+    pOrbitFile->backscan_geodata.resize(0, 0);
+    pOrbitFile->backscan_clouddata.resize(0, 0);
 
     pOrbitFile->scanline_indexes.clear();
     pOrbitFile->scanline_pixtype.clear();
@@ -1291,32 +1347,19 @@ static void get_ref_info2(GOME1NETCDF_ORBIT_FILE *pOrbitFile,GOME1NETCDF_REF *re
   // Global declarations
 
   GOME1NETCDF_REF *pRef;
-  geodata geo;
   int pixelSize;
 
   // Declare substition variables for ground pixels
 
-  geo=pOrbitFile->ground_geodata;                                               // do not work ???
-  pixelSize=3;
-
-  auto sza_gr = reinterpret_cast<const float(*)[pixelSize][3]>(geo.sza.data());
-  auto lat_gr =  reinterpret_cast<const float(*)[pixelSize]>(geo.lat.data());
-  auto lon_gr =  reinterpret_cast<const float(*)[pixelSize]>(geo.lon.data());
-  auto cloud_gr =  reinterpret_cast<const float(*)[pixelSize]>(pOrbitFile->ground_clouddata.cloud_frac.data());
+  auto& geo_gr=pOrbitFile->ground_geodata;
+  auto& cloud_gr = pOrbitFile->ground_clouddata.cloud_frac;
 
   // Declare substition variables for backscan pixels
 
-  geo=pOrbitFile->backscan_geodata;
-  pixelSize=1;
+  auto& geo_bs=pOrbitFile->backscan_geodata;
+  auto& cloud_bs = pOrbitFile->backscan_clouddata.cloud_frac;
 
-  auto sza_bs = reinterpret_cast<const float(*)[pixelSize][3]>(geo.sza.data());
-  auto lat_bs =  reinterpret_cast<const float(*)[pixelSize]>(geo.lat.data());
-  auto lon_bs =  reinterpret_cast<const float(*)[pixelSize]>(geo.lon.data());
-
-  auto cloud_bs =  reinterpret_cast<const float(*)[pixelSize]>(pOrbitFile->backscan_clouddata.cloud_frac.data());
-
-  for (int i=0;i<pOrbitFile->specNumber;i++)
-   {
+  for (int i=0;i<pOrbitFile->specNumber;i++) {
     // Declarations
 
     size_t scanIndex=pOrbitFile->scanline_indexes[i];                           // index in the ground pixel scanlines or backscan scanlines
@@ -1328,15 +1371,12 @@ static void get_ref_info2(GOME1NETCDF_ORBIT_FILE *pOrbitFile,GOME1NETCDF_REF *re
     pRef=&ref_list[i];
 
     pRef->pixelType=pixelType;
-    pRef->sza=(pixelType==3)?sza_bs[scanIndex][pixelIndex][1]:sza_gr[scanIndex][pixelIndex][1];
-    pRef->latitude=(pixelType==3)?lat_bs[scanIndex][pixelIndex]:lat_gr[scanIndex][pixelIndex];
-    pRef->longitude=(pixelType==3)?lon_bs[scanIndex][pixelIndex]:lon_gr[scanIndex][pixelIndex];
-    pRef->cloudFraction=(pixelType==3)?cloud_bs[scanIndex][pixelIndex]:cloud_gr[scanIndex][pixelIndex];
-
-   }
-
-
- }
+    pRef->sza = (pixelType == 3) ? geo_bs.sza[scanIndex][pixelIndex][1] : geo_gr.sza[scanIndex][pixelIndex][1];
+    pRef->latitude = (pixelType == 3) ? geo_bs.lat[scanIndex][pixelIndex] : geo_gr.lat[scanIndex][pixelIndex];
+    pRef->longitude = (pixelType == 3) ? geo_bs.lon[scanIndex][pixelIndex] : geo_gr.lon[scanIndex][pixelIndex];
+    pRef->cloudFraction = (pixelType == 3) ? cloud_bs[scanIndex][pixelIndex] : cloud_gr[scanIndex][pixelIndex];
+  }
+}
 
 static bool use_as_reference(GOME1NETCDF_REF *pRef,const FENO *feno)
  {
@@ -1359,7 +1399,7 @@ static bool use_as_reference(GOME1NETCDF_REF *pRef,const FENO *feno)
  }
 
 // create a list of all spectra that match reference selection criteria for one or more analysis windows.
-static int find_ref_spectra(struct ref_list *(*selected_spectra)[NUM_VZA_REFS], struct ref_list **list_handle)
+static int find_ref_spectra(boost::multi_array<struct ref_list*, 2>& selected_spectra, struct ref_list **list_handle)
  {
   // zero-initialize
   for (int i=0; i<NFeno; ++i)
@@ -1475,15 +1515,15 @@ static int show_ref_info(int i_row, const FENO *pTabFeno, const struct reference
     mediateResponseCellDataDouble(plotPageRef, i_row, 3 + i_column,refs[i].stretch, responseHandle);
     ++i_row;
     const char* labelfmt = "Reference %s";
-    char plot_label[strlen(labelfmt) +strlen(pixeltype[i])];
-    sprintf(plot_label, labelfmt, pixeltype[i]);
+    auto plot_label = std::make_unique<char[]>(strlen(labelfmt) + strlen(pixeltype[i]));
+    sprintf(plot_label.get(), labelfmt, pixeltype[i]);
     plot_data_t spectrum_data;
     spectrum_data.x = pTabFeno->LambdaRef;
     spectrum_data.y = refs[i].spectrum;
     spectrum_data.length = refs[i].n_wavel;
     spectrum_data.curveName[0] = '\0';
 
-    mediateResponsePlotData(plotPageRef,&spectrum_data,1,Spectrum,forceAutoScale,plot_label,"Wavelength (nm)","Intensity", responseHandle);
+    mediateResponsePlotData(plotPageRef,&spectrum_data,1,Spectrum,forceAutoScale,plot_label.get(), "Wavelength (nm)", "Intensity", responseHandle);
   }
   return ++i_row;
 }
@@ -1515,7 +1555,7 @@ RC GOME1NETCDF_NewRef(ENGINE_CONTEXT *pEngineContext,void *responseHandle) {
 
   // for each analysis window: selected spectra per VZA bin
   // the same spectrum can be used in multiple analysis windows.
-  struct ref_list *selected_spectra[NFeno][NUM_VZA_REFS];
+  boost::multi_array<struct ref_list*, 2> selected_spectra(boost::extents[NFeno][NUM_VZA_REFS]);
 
   // list_handle: list of references to same set of spectra, used for
   // memory management.  In this list, each spectrum appears only once.
@@ -1544,13 +1584,11 @@ RC GOME1NETCDF_NewRef(ENGINE_CONTEXT *pEngineContext,void *responseHandle) {
             // We may not find references for every VZA bin/analysis
             // window.  At this point we just emit a warning (it's not a
             // problem until we *need* that during retrieval for that bin).
-
-  #define MESSAGE " for analysis window %s and VZA bin %d"
-            const int length = strlen(MESSAGE) + strlen(pTabFeno->windowName) + strlen(TOSTRING(MAX_FENO));
-            char tmp[length];
-            sprintf(tmp, MESSAGE, pTabFeno->windowName, indexFenoColumn); // TODO convert ref number back to bin for error message
-  #undef MESSAGE
-            ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_REFERENCE_SELECTION, tmp);
+            const char *message_format = " for analysis window% s and VZA bin% d";
+            auto length = strlen(message_format) + strlen(pTabFeno->windowName) + strlen(TOSTRING(MAX_FENO));
+            auto tmp = std::make_unique<char[]>(length);
+            sprintf(tmp.get(), message_format, pTabFeno->windowName, indexFenoColumn); // TODO convert ref number back to bin for error message
+            ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_REFERENCE_SELECTION, tmp.get());
             continue;
            }
           struct reference *ref = &vza_refs[i][indexFenoColumn];
@@ -1790,4 +1828,3 @@ EndGOME1NETCDF_LoadAnalysis:
 
   return rc;
 }
-

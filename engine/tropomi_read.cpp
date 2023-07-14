@@ -35,6 +35,8 @@
 #include <cassert>
 #include <cmath>
 
+#include "boost/multi_array.hpp"
+
 #include "tropomi.h"
 #include "tropomi_read.h"
 #include "netcdfwrapper.h"
@@ -56,8 +58,9 @@ using std::vector;
 using std::set;
 using std::stringstream;
 using std::map;
-using namespace std;
 
+template<typename T>
+using array2d = boost::const_multi_array_ref<T, 2>;
 
 // create an array {"BAND1", "BAND2", ... } in same order as the
 // tropomiSpectralBand enum:
@@ -784,10 +787,12 @@ static vector<std::array<vector<earth_ref>, MAX_GROUNDPIXEL>> find_matching_spec
     geo_group.getVar("solar_zenith_angle", start_obs, count_obs, szas.data());
     obsGroup.getVar("ground_pixel_quality", start_obs, count_obs, ground_pixel_quality.data());
 
-    auto latitudes = reinterpret_cast<float (*)[size_groundpixel]>(lats.data());
-    auto longitudes = reinterpret_cast<float (*)[size_groundpixel]>(lons.data());
-    auto szangles = reinterpret_cast<float (*)[size_groundpixel]>(szas.data());
-    auto groundpixelqualityflags = reinterpret_cast<unsigned char (*)[size_groundpixel]>(ground_pixel_quality.data());
+
+    auto extent = boost::extents[orbit_scanline][size_groundpixel];
+    array2d<float> latitudes(lats.data(), extent);
+    array2d<float> longitudes(lons.data(), extent);
+    array2d<float> szangles(szas.data(), extent);
+    array2d<unsigned char> groundpixelqualityflags(ground_pixel_quality.data(), extent);
     const static unsigned char groundpixel_quality_mask = SOLAR_ECLIPSE | DESCENDING | NIGHT
       | GEO_BOUNDARY_CROSSING | GEOLOCATION_ERROR; // filter everything except SUN_GLINT_POSSIBLE
 

@@ -8,6 +8,7 @@
 #include <cstring>
 
 #include <H5Cpp.h>
+#include "boost/multi_array.hpp"
 
 #include "omps_read.h"
 #include "dir_iter.h"
@@ -30,6 +31,9 @@ using std::cerr; using std::endl;
 using std::vector;
 using std::set;
 using std::string;
+
+template<typename T>
+using array2d = boost::const_multi_array_ref<T, 2>;
 
 namespace {
 
@@ -208,9 +212,11 @@ namespace {
     readData(orbitFile, lons, "BinScheme1/GeolocationData/Longitude");
     readData(orbitFile, lats, "BinScheme1/GeolocationData/Latitude");
     readData(orbitFile, szas, "BinScheme1/GeolocationData/SolarZenithAngle");
-    auto longitudes = reinterpret_cast<float (*)[nXTrack]>(&lons[0]);
-    auto latitudes = reinterpret_cast<float (*)[nXTrack]>(&lats[0]);
-    auto solarzenithangles = reinterpret_cast<float (*)[nXTrack]>(&szas[0]);
+
+    auto extent = boost::extents[nMeasurements][nXTrack];
+    array2d<float> longitudes(lons.data(), extent);
+    array2d<float> latitudes(lats.data(), extent);
+    array2d<float> solarzenithangles(szas.data(), extent);
 
     for(unsigned int i=0; i<nMeasurements; ++i) {
       for(unsigned int j = 0; j < nXTrack; ++j) {
@@ -426,11 +432,14 @@ RC OMPS_read(ENGINE_CONTEXT *pEngineContext,int record) {
     radianceError.read(pEngineContext->buffers.sigmaSpec, H5::PredType::NATIVE_DOUBLE, memspace, s);
     radianceError.close();
 
-    auto irradiances = reinterpret_cast<double (*)[currentOrbit.nLambda]>(&currentOrbit.irradiances[0]);
-    auto irradiance_lambdas = reinterpret_cast<double (*)[currentOrbit.nLambda]>(&currentOrbit.wavelengths[0]);
+    auto extent = boost::extents[currentOrbit.nXTrack][currentOrbit.nLambda];
+    array2d<double> irradiances(currentOrbit.irradiances.data(), extent);
+    array2d<double> irradiance_lambdas(currentOrbit.wavelengths.data(), extent);
 
-    memcpy(pEngineContext->buffers.irrad, irradiances[indexXTrack], currentOrbit.nLambda*sizeof(irradiances[0][0]));
-    memcpy(pEngineContext->buffers.lambda_irrad, irradiance_lambdas[indexXTrack], currentOrbit.nLambda*sizeof(irradiance_lambdas[0][0]));
+    for (size_t i = 0; i < currentOrbit.nLambda; ++i) {
+        pEngineContext->buffers.irrad[i] = irradiances[indexXTrack][i];
+        pEngineContext->buffers.lambda_irrad[i] = irradiance_lambdas[indexXTrack][i];
+    }
 
   } catch(...) {
     cerr << "error in " <<  __func__ <<endl;
@@ -472,15 +481,18 @@ RC OMPS_load_analysis(ENGINE_CONTEXT *pEngineContext,void *responseHandle) {
 
   int useKurucz = 0;
 
-  auto wavelengths = reinterpret_cast<double (*)[currentOrbit.nLambda]>(&currentOrbit.wavelengths[0]);
-  auto irradiances = reinterpret_cast<double (*)[currentOrbit.nLambda]>(&currentOrbit.irradiances[0]);
+  auto extent = boost::extents[currentOrbit.nXTrack][currentOrbit.nLambda];
+  array2d<double> wavelengths(currentOrbit.wavelengths.data(), extent);
+  array2d<double> irradiances(currentOrbit.irradiances.data(), extent);
 
   for(size_t j=0; j<currentOrbit.nXTrack; ++j) {
     for(int i=0; i<NFeno; ++i) {
       FENO *pTabFeno=&TabFeno[j][i];
       pTabFeno->NDET = currentOrbit.nLambda;
-      memcpy(pTabFeno->LambdaRef, wavelengths[j], currentOrbit.nLambda*sizeof(double));
-      memcpy(pTabFeno->Sref, irradiances[j], currentOrbit.nLambda*sizeof(double));
+      for (size_t k = 0; k < currentOrbit.nLambda; ++k) {
+          pTabFeno->LambdaRef[k] = wavelengths[j][k];
+          pTabFeno->Sref[k] = irradiances[j][k];
+      }
 
       rc=VECTOR_NormalizeVector(pTabFeno->Sref-1,pTabFeno->NDET,&pTabFeno->refNormFact, __func__);
       if(rc)

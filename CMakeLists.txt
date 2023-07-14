@@ -1,4 +1,8 @@
-cmake_minimum_required(VERSION 3.8.0)
+cmake_minimum_required(VERSION 3.8.0...3.26)
+
+if(${CMAKE_VERSION} VERSION_LESS 3.12)
+    cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
+endif()
 
 project(qdoas)
 
@@ -47,6 +51,7 @@ endif(MSVC)
 find_package(Qt5 COMPONENTS Core Gui Widgets Xml PrintSupport REQUIRED)
 find_package(Qwt REQUIRED)
 
+find_package(Boost REQUIRED)
 find_package(CODA REQUIRED)
 find_package(GSL REQUIRED)
 find_package(HDF5 REQUIRED COMPONENTS CXX)
