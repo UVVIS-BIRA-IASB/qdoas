@@ -34,7 +34,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "CPreferences.h"
 
 #include "constants.h"
-
+#include "visual_c_compat.h"
 #include "debugutil.h"
 #include <stdio.h>
 

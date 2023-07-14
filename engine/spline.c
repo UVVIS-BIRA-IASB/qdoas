@@ -67,6 +67,15 @@
 #include "spline.h"
 #include "doas.h"
 
+#ifdef _MSC_VER
+// Visual C does not know C99 restrict keyword
+#define restrict
+#define COUNT_LEADING_ZEROS __lzcnt
+#else
+// count leading zeros in GCC
+#define COUNT_LEADING_ZEROS __builtin_clzl
+#endif
+
 // -----------------------------------------------------------------------------
 // FUNCTION      SPLINE_Deriv2
 // -----------------------------------------------------------------------------
@@ -188,10 +197,10 @@ RC SPLINE_Deriv2(const double *X, const double *Y,double *Y2,int n,const char *c
 
    The ceil of the binary log of x is given by the position of the
    first non-zero bit in the binary representation of x.*/
-unsigned int log2_ceil (unsigned long x) {
+unsigned log2_ceil (unsigned long x) {
   if (x <= 1) return 0;
   // number of bits in x, minus the number of leading zeroes: 
-  return (8*sizeof(x))-__builtin_clzl(x-1);
+  return (8*sizeof(x))-COUNT_LEADING_ZEROS(x-1);
 }
 
 /*! \brief linear or cubic spline interpolation
@@ -219,7 +228,7 @@ RC SPLINE_Vector(const double *restrict xa, const double *restrict ya, const dou
   // if na is a power of 2 we need exactly log_2(na) steps to find
   // xlo.  if na is not a power of 2, the number of steps is log_2
   // of the next power of 2.
-  const unsigned int num_steps = log2_ceil(na);
+  const unsigned num_steps = log2_ceil(na);
 
   // Browse new absissae
   for (int i=0; i<nb; ++i) {
@@ -257,7 +266,7 @@ RC SPLINE_Vector(const double *restrict xa, const double *restrict ya, const dou
         xlo += size;
     }
 
-    int k = xlo-xa;
+    size_t k = xlo-xa;
     double xhi=xlo[1];
     double h=xhi-*xlo;
     

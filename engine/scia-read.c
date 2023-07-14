@@ -93,6 +93,7 @@
 #include "vector.h"
 #include "zenithal.h"
 #include "winthrd.h"
+#include "visual_c_compat.h"
 
 #include "ref_list.h"
 

@@ -62,6 +62,7 @@
 // =======
 
 #include "comdefs.h"
+#include "visual_c_compat.h"
 #include "winfiles.h"
 #include <stdio.h>
 #include <string.h>

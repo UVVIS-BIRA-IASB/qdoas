@@ -76,7 +76,6 @@
 #include <dirent.h>
 #include <assert.h>
 #include <stdio.h>
-#include <strings.h>
 
 #include "gdp_bin_read.h"
 
@@ -92,6 +91,7 @@
 #include "zenithal.h"
 #include "output.h"
 #include "ref_list.h"
+#include "visual_c_compat.h"
 
 // ====================
 // CONSTANTS DEFINITION

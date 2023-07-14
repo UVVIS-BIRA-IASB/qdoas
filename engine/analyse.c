@@ -126,7 +126,6 @@
 #include <ctype.h>
 #include <math.h>
 #include <assert.h>
-#include <strings.h>
 
 #ifndef WIN32
 // for "is_same_file" implementation on unix:
@@ -164,6 +163,7 @@
 #include "gems_read.h"
 #include "output_netcdf.h"
 #include "matrix_netcdf_read.h"
+#include "visual_c_compat.h"
 
 // ===================
 // Global DECLARATIONS

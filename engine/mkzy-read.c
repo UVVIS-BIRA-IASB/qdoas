@@ -75,7 +75,7 @@
 #include "zenithal.h"
 #include "winthrd.h"
 #include "kurucz.h"
-
+#include  "visual_c_compat.h"
 
 // ====================
 // CONSTANTS DEFINITION

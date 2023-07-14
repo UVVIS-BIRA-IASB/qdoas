@@ -91,6 +91,8 @@
 
 #include "gome1netcdf_read.h"
 #include "netcdfwrapper.h"
+
+#include "visual_c_compat.h"
 #ifdef _WIN32
 #include "dirent.h"
 #endif

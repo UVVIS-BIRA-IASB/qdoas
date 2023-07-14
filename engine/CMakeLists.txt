@@ -1,9 +1,5 @@
 include_directories(../common ../mediator ${netCDF_INCLUDE_DIR} ${CODA_INCLUDE_DIR} ${GSL_INCLUDE_DIRS} ${HDF5_INCLUDE_DIRS})
 
-if(MSVC)
-  include_directories(windows)
-endif()
-
 add_library(engine STATIC
   analyse.c
   analyse.h

@@ -115,13 +115,16 @@
 // DEFINITIONS
 // ===========
 
+#ifndef _MSC_VER
 #include <unistd.h>
+#endif
 #include <string.h>
 
 #include "winfiles.h"
 
 #include "doas.h"
 #include "stdfunc.h"
+#include "visual_c_compat.h"
 
 FILE_TYPE FILES_types[FILE_TYPE_MAX] =
  {

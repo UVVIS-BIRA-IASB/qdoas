@@ -40,6 +40,8 @@ SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB_PREFIX}" CACHE STRING "")
 if(MSVC)
   # Suppress warnings from VC on deprecated POSIX names and unsafe functions
   add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS)
+  # Add dirent.h implementation for windows
+  include_directories(dirent)
 endif(MSVC)
 
 find_package(Qt5 COMPONENTS Core Gui Widgets Xml PrintSupport REQUIRED)

@@ -88,6 +88,7 @@
 // =======
 
 #include <string.h>
+#include "visual_c_compat.h"
 
 #include "winsites.h"
 

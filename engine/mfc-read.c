@@ -83,6 +83,7 @@
 #include "zenithal.h"
 #include "winthrd.h"
 #include "stdfunc.h"
+#include "visual_c_compat.h"
 
 // ================
 // GLOBAL VARIABLES

@@ -66,6 +66,7 @@
 #include "winthrd.h"
 #include "stdfunc.h"
 #include "output.h"
+#include "visual_c_compat.h"
 
 #define MAX_OMI_FILES 500
 

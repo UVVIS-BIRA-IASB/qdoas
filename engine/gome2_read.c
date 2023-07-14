@@ -62,6 +62,7 @@
 #include "zenithal.h"
 #include "winthrd.h"
 #include "ref_list.h"
+#include "visual_c_compat.h"
 
 #include "coda.h"
 

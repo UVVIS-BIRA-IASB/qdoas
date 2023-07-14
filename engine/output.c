@@ -95,6 +95,7 @@
 #include "gome1netcdf_read.h"
 #include "spectrum_files.h"
 #include "gems_read.h"
+#include "visual_c_compat.h"
 
 AMF_SYMBOL *OUTPUT_AmfSpace;                                                 // list of cross sections with associated AMF file
 

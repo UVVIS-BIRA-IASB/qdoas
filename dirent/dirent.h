@@ -1,5 +1,6 @@
 /*
  * Dirent interface for Microsoft Visual Studio
+ * Version 1.23.1
  *
  * Copyright (C) 2006-2012 Toni Ronkko
  * This file is part of dirent.  Dirent may be freely distributed
@@ -298,7 +299,7 @@ static void _wrewinddir (_WDIR* dirp);
 
 static int scandir (const char *dirname, struct dirent ***namelist,
     int (*filter)(const struct dirent*),
-    int (*compare)(const struct dirent**, const struct dirent**));
+    int (*compare)(const void *, const void *));
 
 static int alphasort (const struct dirent **a, const struct dirent **b);
 
@@ -366,7 +367,7 @@ _wopendir(
         /* Compute the length of full path plus zero terminator
          *
          * Note that on WinRT there's no way to convert relative paths
-         * into absolute paths, so just assume it is an absolute path.
+         * into absolute paths, so just assume its an absolute path.
          */
 #       if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP)
             n = wcslen(dirname);
@@ -384,7 +385,7 @@ _wopendir(
              * working directory is changed between opendir() and rewinddir().
              *
              * Note that on WinRT there's no way to convert relative paths
-             * into absolute paths, so just assume it is an absolute path.
+             * into absolute paths, so just assume its an absolute path.
              */
 #           if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP)
                 wcsncpy_s(dirp->patt, n+1, dirname, n);
@@ -451,7 +452,7 @@ _wopendir(
 /*
  * Read next directory entry.
  *
- * Returns pointer to static directory entry which may be overwritten by
+ * Returns pointer to static directory entry which may be overwritted by
  * subsequent calls to _wreaddir().
  */
 static struct _wdirent*
@@ -620,7 +621,7 @@ dirent_first(
 /*
  * Get next directory entry (internal).
  *
- * Returns
+ * Returns 
  */
 static WIN32_FIND_DATAW*
 dirent_next(
@@ -642,7 +643,7 @@ dirent_next(
             /* Got a file */
             p = &dirp->data;
         } else {
-            /* The very last entry has been processed or an error occurred */
+            /* The very last entry has been processed or an error occured */
             FindClose (dirp->handle);
             dirp->handle = INVALID_HANDLE_VALUE;
             p = NULL;
@@ -663,7 +664,7 @@ dirent_next(
  */
 static DIR*
 opendir(
-    const char *dirname)
+    const char *dirname) 
 {
     struct DIR *dirp;
     int error;
@@ -741,7 +742,7 @@ readdir(
 /*
  * Read next directory entry into called-allocated buffer.
  *
- * Returns zero on success.  If the end of directory stream is reached, then
+ * Returns zero on sucess.  If the end of directory stream is reached, then
  * sets result to NULL and returns zero.
  */
 static int
@@ -803,7 +804,7 @@ readdir_r(
 
             /*
              * Cannot convert file name to multi-byte string so construct
-             * an erroneous directory entry and return that.  Note that
+             * an errornous directory entry and return that.  Note that
              * we cannot return NULL as that would stop the processing
              * of directory entries completely.
              */
@@ -876,7 +877,7 @@ scandir(
     const char *dirname,
     struct dirent ***namelist,
     int (*filter)(const struct dirent*),
-    int (*compare)(const struct dirent**, const struct dirent**))
+    int (*compare)(const void*, const void*))
 {
     struct dirent **files = NULL;
     size_t size = 0;
@@ -936,7 +937,7 @@ scandir(
             /* Read directory entry to temporary area */
             if (readdir_r (dir, tmp, &entry) == /*OK*/0) {
 
-                /* Did we get an entry? */
+                /* Did we got an entry? */
                 if (entry != NULL) {
                     int pass;
 
@@ -964,8 +965,7 @@ scandir(
                      * End of directory stream reached => sort entries and
                      * exit.
                      */
-                    qsort (files, size, sizeof (void*),
-                        (int (*) (const void*, const void*)) compare);
+                    qsort (files, size, sizeof (void*), compare);
                     break;
 
                 }
@@ -1026,6 +1026,7 @@ versionsort(
     return alphasort (a, b);
 }
 
+
 /* Convert multi-byte string to wide character string */
 static int
 dirent_mbstowcs_s(
@@ -1036,83 +1037,46 @@ dirent_mbstowcs_s(
     size_t count)
 {
     int error;
-    int n;
-    size_t len;
-    UINT cp;
-    DWORD flags;
 
-    /* Determine code page for multi-byte string */
-    if (AreFileApisANSI ()) {
-        /* Default ANSI code page */
-        cp = GetACP ();
-    } else {
-        /* Default OEM code page */
-        cp = GetOEMCP ();
-    }
+#if defined(_MSC_VER)  &&  _MSC_VER >= 1400
 
-    /*
-     * Determine flags based on the character set.  For more information,
-     * please see https://docs.microsoft.com/fi-fi/windows/desktop/api/stringapiset/nf-stringapiset-multibytetowidechar
-     */
-    switch (cp) {
-    case 42:
-    case 50220:
-    case 50221:
-    case 50222:
-    case 50225:
-    case 50227:
-    case 50229:
-    case 57002:
-    case 57003:
-    case 57004:
-    case 57005:
-    case 57006:
-    case 57007:
-    case 57008:
-    case 57009:
-    case 57010:
-    case 57011:
-    case 65000:
-        /* MultiByteToWideChar does not support MB_ERR_INVALID_CHARS */
-        flags = 0;
-        break;
+    /* Microsoft Visual Studio 2005 or later */
+    error = mbstowcs_s (pReturnValue, wcstr, sizeInWords, mbstr, count);
 
-    default:
-        /*
-         * Ask MultiByteToWideChar to return an error if a multi-byte
-         * character cannot be converted to a wide-character.
-         */
-        flags = MB_ERR_INVALID_CHARS;
-    }
+#else
 
-    /* Compute the length of input string without zero-terminator */
-    len = 0;
-    while (mbstr[len] != '\0'  &&  len < count) {
-        len++;
-    }
+    /* Older Visual Studio or non-Microsoft compiler */
+    size_t n;
 
-    /* Convert to wide-character string */
-    n = MultiByteToWideChar(
-        /* Source code page */ cp,
-        /* Flags */ flags,
-        /* Pointer to string to convert */ mbstr,
-        /* Size of multi-byte string */ (int) len,
-        /* Pointer to output buffer */ wcstr,
-        /* Size of output buffer */ (int)sizeInWords - 1
-    );
+    /* Convert to wide-character string (or count characters) */
+    n = mbstowcs (wcstr, mbstr, sizeInWords);
+    if (!wcstr  ||  n < count) {
 
-    /* Ensure that output buffer is zero-terminated */
-    wcstr[n] = '\0';
+        /* Zero-terminate output buffer */
+        if (wcstr  &&  sizeInWords) {
+            if (n >= sizeInWords) {
+                n = sizeInWords - 1;
+            }
+            wcstr[n] = 0;
+        }
 
-    /* Return length of wide-character string with zero-terminator */
-    *pReturnValue = (size_t) (n + 1);
+        /* Length of resuting multi-byte string WITH zero terminator */
+        if (pReturnValue) {
+            *pReturnValue = n + 1;
+        }
 
-    /* Return zero if conversion succeeded */
-    if (n > 0) {
+        /* Success */
         error = 0;
+
     } else {
+
+        /* Could not convert string */
         error = 1;
+
     }
+
+#endif
+
     return error;
 }
 
@@ -1125,77 +1089,47 @@ dirent_wcstombs_s(
     const wchar_t *wcstr,
     size_t count)
 {
-    int n;
     int error;
-    UINT cp;
-    size_t len;
-    BOOL flag = 0;
-    LPBOOL pflag;
 
-    /* Determine code page for multi-byte string */
-    if (AreFileApisANSI ()) {
-        /* Default ANSI code page */
-        cp = GetACP ();
-    } else {
-        /* Default OEM code page */
-        cp = GetOEMCP ();
-    }
+#if defined(_MSC_VER)  &&  _MSC_VER >= 1400
 
-    /* Compute the length of input string without zero-terminator */
-    len = 0;
-    while (wcstr[len] != '\0'  &&  len < count) {
-        len++;
-    }
+    /* Microsoft Visual Studio 2005 or later */
+    error = wcstombs_s (pReturnValue, mbstr, sizeInBytes, wcstr, count);
 
-    /*
-     * Determine if we can ask WideCharToMultiByte to return information on
-     * broken characters.  For more information, please see
-     * https://docs.microsoft.com/en-us/windows/desktop/api/stringapiset/nf-stringapiset-widechartomultibyte
-     */
-    switch (cp) {
-    case CP_UTF7:
-    case CP_UTF8:
-        /*
-         * WideCharToMultiByte fails if we request information on default
-         * characters.  This is just a nuisance but doesn't affect the
-         * conversion: if Windows is configured to use UTF-8, then the default
-         * character should not be needed anyway.
-         */
-        pflag = NULL;
-        break;
+#else
 
-    default:
-        /*
-         * Request that WideCharToMultiByte sets the flag if it uses the
-         * default character.
-         */
-        pflag = &flag;
-    }
+    /* Older Visual Studio or non-Microsoft compiler */
+    size_t n;
 
-    /* Convert wide-character string to multi-byte character string */
-    n = WideCharToMultiByte(
-        /* Target code page */ cp,
-        /* Flags */ 0,
-        /* Pointer to unicode string */ wcstr,
-        /* Length of unicode string */ (int) len,
-        /* Pointer to output buffer */ mbstr,
-        /* Size of output buffer */ (int)sizeInBytes - 1,
-        /* Default character */ NULL,
-        /* Whether default character was used or not */ pflag
-    );
+    /* Convert to multi-byte string (or count the number of bytes needed) */
+    n = wcstombs (mbstr, wcstr, sizeInBytes);
+    if (!mbstr  ||  n < count) {
 
-    /* Ensure that output buffer is zero-terminated */
-    mbstr[n] = '\0';
+        /* Zero-terminate output buffer */
+        if (mbstr  &&  sizeInBytes) {
+            if (n >= sizeInBytes) {
+                n = sizeInBytes - 1;
+            }
+            mbstr[n] = '\0';
+        }
 
-    /* Return length of multi-byte string with zero-terminator */
-    *pReturnValue = (size_t) (n + 1);
+        /* Length of resulting multi-bytes string WITH zero-terminator */
+        if (pReturnValue) {
+            *pReturnValue = n + 1;
+        }
 
-    /* Return zero if conversion succeeded without using default characters */
-    if (n > 0  &&  flag == 0) {
+        /* Success */
         error = 0;
+
     } else {
+
+        /* Cannot convert string */
         error = 1;
+
     }
+
+#endif
+
     return error;
 }
 
@@ -1222,3 +1156,4 @@ dirent_set_errno(
 }
 #endif
 #endif /*DIRENT_H*/
+
