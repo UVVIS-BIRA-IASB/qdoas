@@ -634,11 +634,11 @@ static void free_ref_candidates( struct omi_ref_spectrum *reflist) {
   }
 }
 
-static void free_row_references(struct omi_ref_list *(*row_references)[NFeno][OMI_TOTAL_ROWS])
+static void free_row_references(struct omi_ref_list *(*row_references)[OMI_TOTAL_ROWS])
 {
   for(int i=0; i<NFeno; i++) {
     for(int j=0; j<OMI_TOTAL_ROWS; j++) {
-      struct omi_ref_list *tempref,*omi_ref = (*row_references)[i][j];
+      struct omi_ref_list *tempref,*omi_ref = row_references[i][j];
       while(omi_ref != NULL) {
         tempref = omi_ref->next;
         free(omi_ref);
@@ -653,7 +653,7 @@ static void free_row_references(struct omi_ref_list *(*row_references)[NFeno][OM
  * spectra matching the search criteria for the automatic reference
  * spectrum for one or more analysis windows in a list.
  */
-static RC find_matching_spectra(const ENGINE_CONTEXT *pEngineContext, struct omi_orbit_file *orbit_file, struct omi_ref_list *(*row_references)[NFeno][OMI_TOTAL_ROWS], struct omi_ref_spectrum **first)
+static RC find_matching_spectra(const ENGINE_CONTEXT *pEngineContext, struct omi_orbit_file *orbit_file, struct omi_ref_list *(*row_references)[OMI_TOTAL_ROWS], struct omi_ref_spectrum **first)
 {
   RC rc = 0;
 
@@ -696,8 +696,8 @@ static RC find_matching_spectra(const ENGINE_CONTEXT *pEngineContext, struct omi
             }
             struct omi_ref_list *list_item = malloc(sizeof(struct omi_ref_list));
             list_item->reference = newref;
-            list_item->next = (*row_references)[analysis_window][row];
-            (*row_references)[analysis_window][row] = list_item; // add reference to the list of spectra for this analysis window/row
+            list_item->next = row_references[analysis_window][row];
+            row_references[analysis_window][row] = list_item; // add reference to the list of spectra for this analysis window/row
           }
         }
       }
@@ -715,9 +715,9 @@ static RC find_matching_spectra(const ENGINE_CONTEXT *pEngineContext, struct omi
 static void average_spectrum( double *average, double *errors, const struct omi_ref_list *spectra, const double *wavelength_grid) {
   int nWavel = spectra->reference->orbit_file->nWavel;
 
-  double tempspectrum[nWavel];
-  double temperrors[nWavel];
-  double derivs[nWavel];
+  double *tempspectrum = malloc(nWavel * sizeof(*tempspectrum));
+  double *temperrors = malloc(nWavel * sizeof(*temperrors));
+  double *derivs = malloc(nWavel * sizeof(*derivs));
 
   for(int i=0; i<nWavel; i++) {
     average[i] = 0.;
@@ -746,15 +746,18 @@ static void average_spectrum( double *average, double *errors, const struct omi_
     average[i] /= n_spectra;
     errors[i] = sqrt(errors[i])/n_spectra; // std deviation of the average of n_spectra independent gaussian variables
   }
+  free(tempspectrum);
+  free(temperrors);
+  free(derivs);
 }
 
 static RC setup_automatic_reference(ENGINE_CONTEXT *pEngineContext, void *responseHandle)
 {
   // keep a NFeno*OMI_TOTAL_ROWS array of matching spectra for every detector row & analysis window
-  struct omi_ref_list *(*row_references)[NFeno][OMI_TOTAL_ROWS] = malloc(NFeno * OMI_TOTAL_ROWS * sizeof(struct omi_ref_list*));
+  struct omi_ref_list *(*row_references)[OMI_TOTAL_ROWS] = malloc(NFeno * OMI_TOTAL_ROWS * sizeof(struct omi_ref_list*));
   for(int analysis_window = 0; analysis_window<NFeno; analysis_window++) {
     for(int row = 0; row < OMI_TOTAL_ROWS; row++) {
-      (*row_references)[analysis_window][row] = NULL;
+      row_references[analysis_window][row] = NULL;
     }
   }
   // list containing the actual data of the selected spectra
@@ -797,7 +800,7 @@ static RC setup_automatic_reference(ENGINE_CONTEXT *pEngineContext, void *respon
         if(pTabFeno->hidden || (pTabFeno->refSpectrumSelectionMode!=ANLYS_REF_SELECTION_MODE_AUTOMATIC) ) {
           continue;
         }
-        struct omi_ref_list *reflist = (*row_references)[analysis_window][row];
+        struct omi_ref_list *reflist = row_references[analysis_window][row];
         if(reflist != NULL) {
           average_spectrum(pTabFeno->Sref, pTabFeno->SrefSigma, reflist, pTabFeno->LambdaRef);
           VECTOR_NormalizeVector(pTabFeno->Sref-1,n_wavel,&pTabFeno->refNormFact, __func__);

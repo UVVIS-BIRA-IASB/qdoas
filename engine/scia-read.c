@@ -1431,7 +1431,7 @@ static bool use_as_reference(const struct scia_geoloc *record, const FENO *feno)
 }
 
 // create a list of all spectra that match reference selection criteria for one or more analysis windows.
-static int find_ref_spectra(struct ref_list *selected_spectra[NFeno][NUM_VZA_REFS], struct ref_list **list_handle) {
+static int find_ref_spectra(struct ref_list *(*selected_spectra)[NUM_VZA_REFS], struct ref_list **list_handle) {
   int rc = 0;
   // zero-initialize
   for (int i=0; i<NFeno; ++i) {
@@ -1543,7 +1543,7 @@ RC SciaNewRef(ENGINE_CONTEXT *pEngineContext,void *responseHandle) {
 
   // for each analysis window: selected spectra per VZA bin
   // the same spectrum can be used in multiple analysis windows.
-  struct ref_list *selected_spectra[NFeno][NUM_VZA_REFS];
+  struct ref_list* (*selected_spectra)[NUM_VZA_REFS] = malloc(NFeno * sizeof(*selected_spectra));
 
   // list_handle: list of references to same set of spectra, used for
   // memory management.  In this list, each spectrum appears only once.
@@ -1563,12 +1563,12 @@ RC SciaNewRef(ENGINE_CONTEXT *pEngineContext,void *responseHandle) {
 
       for (size_t j=0; j<NUM_VZA_REFS; ++j) {
         if (selected_spectra[i][j] == NULL) {
-#define MESSAGE " for analysis window %s and VZA bin %zu"
-          const int length = strlen(MESSAGE) + strlen(pTabFeno->windowName) + strlen(TOSTRING(MAX_FENO));
-          char tmp[length];
-          sprintf(tmp, MESSAGE, pTabFeno->windowName, j); // TODO convert ref number back to bin for error message
-#undef MESSAGE
+          const char* message = " for analysis window %s and VZA bin %zu";
+          const int length = 1 + strlen(message) + strlen(pTabFeno->windowName) + strlen(TOSTRING(MAX_FENO));
+          char* tmp = malloc(length);
+          sprintf(tmp, message, pTabFeno->windowName, j); // TODO convert ref number back to bin for error message
           ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_REFERENCE_SELECTION, tmp);
+          free(tmp);
           continue;
         }
         struct reference *ref = &vza_refs[i][j];
@@ -1600,6 +1600,8 @@ RC SciaNewRef(ENGINE_CONTEXT *pEngineContext,void *responseHandle) {
   // for 'list_handle', we also free the gome_ref_spectrum* pointers,
   // and the double* pointers 'lambda' & 'spectrum':
   free_ref_list(list_handle, FREE_DATA);
+
+  free(selected_spectra);
 
   return rc;
  }

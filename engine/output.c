@@ -229,32 +229,32 @@ static void save_analysis_data(struct output_field *output_field, int recordno, 
   switch(output_field->memory_type)
     {
     case OUTPUT_INT:
-      ((func_int) get_data)(output_field, ((int (*)[ncols])data)[recordno], pEngineContext, indexFenoColumn, index_calib);
+      ((func_int) get_data)(output_field, ((int*)data) + recordno * ncols, pEngineContext, indexFenoColumn, index_calib);
       break;
     case OUTPUT_SHORT:
-      ((func_short) get_data)(output_field, ((short (*)[ncols])data)[recordno], pEngineContext, indexFenoColumn, index_calib);
+      ((func_short) get_data)(output_field, ((short*)data) + recordno * ncols, pEngineContext, indexFenoColumn, index_calib);
       break;
     case OUTPUT_USHORT:
-      ((func_ushort) get_data)(output_field, ((unsigned short (*)[ncols])data)[recordno], pEngineContext, indexFenoColumn, index_calib);
+      ((func_ushort) get_data)(output_field, ((unsigned short*)data) + recordno * ncols, pEngineContext, indexFenoColumn, index_calib);
       break;
     case OUTPUT_STRING:
-      ((func_string) get_data)(output_field, ((char* (*)[ncols])data)[recordno], pEngineContext, indexFenoColumn, index_calib);
+      ((func_string) get_data)(output_field, ((char* *)data) + recordno * ncols, pEngineContext, indexFenoColumn, index_calib);
       break;
     case OUTPUT_FLOAT:
-      ((func_float) get_data)(output_field, ((float (*)[ncols])data)[recordno], pEngineContext, indexFenoColumn, index_calib);
+      ((func_float) get_data)(output_field, ((float*)data) + recordno * ncols, pEngineContext, indexFenoColumn, index_calib);
       break;
-    case OUTPUT_RESIDUAL:      
+    case OUTPUT_RESIDUAL:
     case OUTPUT_DOUBLE:
-      ((func_double) get_data)(output_field, ((double (*)[ncols])data)[recordno], pEngineContext, indexFenoColumn, index_calib);
+      ((func_double) get_data)(output_field, ((double*)data) + recordno * ncols, pEngineContext, indexFenoColumn, index_calib);
       break;
     case OUTPUT_DATE:
-      ((func_date) get_data)(output_field, ((struct date (*)[ncols])data)[recordno], pEngineContext, indexFenoColumn, index_calib);
+      ((func_date) get_data)(output_field, ((struct date*)data) + recordno * ncols, pEngineContext, indexFenoColumn, index_calib);
       break;
     case OUTPUT_TIME:
-      ((func_time) get_data)(output_field, ((struct time (*)[ncols])data)[recordno], pEngineContext, indexFenoColumn, index_calib);
+      ((func_time) get_data)(output_field, ((struct time*)data) + recordno * ncols, pEngineContext, indexFenoColumn, index_calib);
       break;
     case OUTPUT_DATETIME:
-      ((func_datetime) get_data)(output_field, ((struct datetime (*)[ncols])data)[recordno], pEngineContext, indexFenoColumn, index_calib);
+      ((func_datetime) get_data)(output_field, ((struct datetime*)data) + recordno * ncols, pEngineContext, indexFenoColumn, index_calib);
       break;
     }
 }
@@ -270,31 +270,31 @@ static void save_calib_data(struct output_field *output_field, int index_calib) 
   switch(output_field->memory_type)
     {
     case OUTPUT_INT:
-      ((func_int) get_data)(output_field,  ((int (*)[ncols])data)[index_calib], NULL, row, index_calib);
+      ((func_int)get_data)(output_field, ((int*)data) + index_calib * ncols, NULL, row, index_calib);
       break;
     case OUTPUT_SHORT:
-      ((func_short) get_data)(output_field,  ((short (*)[ncols])data)[index_calib], NULL, row, index_calib);
+     ((func_short) get_data)(output_field, ((short *)data) + index_calib * ncols, NULL, row, index_calib);
       break;
     case OUTPUT_USHORT:
-      ((func_ushort) get_data)(output_field,  ((unsigned short (*)[ncols])data)[index_calib], NULL, row, index_calib);
+      ((func_ushort) get_data)(output_field, ((unsigned short *)data) + index_calib * ncols, NULL, row, index_calib);
       break;
     case OUTPUT_STRING:
-      ((func_string) get_data)(output_field,  ((char* (*)[ncols])data)[index_calib], NULL, row, index_calib);
+      ((func_string) get_data)(output_field, ((char* *)data) + index_calib * ncols, NULL, row, index_calib);
       break;
     case OUTPUT_FLOAT:
-      ((func_float) get_data)(output_field,  ((float (*)[ncols])data)[index_calib], NULL, row, index_calib);
+      ((func_float) get_data)(output_field, ((float *)data) + index_calib * ncols, NULL, row, index_calib);
       break;
     case OUTPUT_DOUBLE:
-      ((func_double) get_data)(output_field,  ((double (*)[ncols])data)[index_calib], NULL, row, index_calib);
+      ((func_double) get_data)(output_field, ((double *)data) + index_calib * ncols, NULL, row, index_calib);
       break;
     case OUTPUT_DATE:
-      ((func_date) get_data)(output_field,  ((struct date (*)[ncols])data)[index_calib], NULL, row, index_calib);
+      ((func_date) get_data)(output_field, ((struct date *)data) + index_calib * ncols, NULL, row, index_calib);
       break;
     case OUTPUT_TIME:
-      ((func_time) get_data)(output_field,  ((struct time (*)[ncols])data)[index_calib], NULL, row, index_calib);
+      ((func_time) get_data)(output_field, ((struct time *)data) + index_calib * ncols, NULL, row, index_calib);
       break;
     case OUTPUT_DATETIME:
-      ((func_datetime) get_data)(output_field,  ((struct datetime (*)[ncols])data)[index_calib], NULL, row, index_calib);
+      ((func_datetime) get_data)(output_field, ((struct datetime *)data) + index_calib * ncols, NULL, row, index_calib);
       break;
     case OUTPUT_RESIDUAL:  
     break;
@@ -1530,7 +1530,7 @@ static int register_calibration(int kurucz_index, int index_row, int index_feno)
   for (int indexTabCross=0;indexTabCross<pTabFeno->NTabCross;indexTabCross++) {
     CROSS_RESULTS *pTabCrossResults = &pTabFeno->TabCrossResults[indexTabCross];
     char *symbol_name = WorkSpace[pTabFeno->TabCross[indexTabCross].Comp].symbolName;
-    char symbol_name_brackets[strlen(symbol_name)+2+1];
+    char *symbol_name_brackets = malloc(strlen(symbol_name)+2+1);
     sprintf(symbol_name_brackets,"(%s)",symbol_name);
 
     struct calibconfig {
@@ -1565,7 +1565,7 @@ static int register_calibration(int kurucz_index, int index_row, int index_feno)
 
     for(unsigned int i=0; i<sizeof(calibrationfields)/sizeof(calibrationfields[0]); i++) {
       if(calibrationfields[i].register_field) {
-        char fieldname[strlen(calibrationfields[i].output_name) + strlen(calibrationfields[i].symbol_name) +1];
+        char* fieldname = malloc(strlen(calibrationfields[i].output_name) + strlen(calibrationfields[i].symbol_name) +1);
         sprintf(fieldname, "%s%s", calibrationfields[i].output_name, calibrationfields[i].symbol_name);
         struct output_field newfield = calibrationfields[i].fieldconfig; // copy all non-zero fields from 'fieldconfig'
         newfield.basic_fieldname=fieldname;
@@ -1573,11 +1573,15 @@ static int register_calibration(int kurucz_index, int index_row, int index_feno)
         newfield.index_row=index_row;
         newfield.index_cross=indexTabCross;
         rc = register_calibration_field(newfield);
-        if (rc != ERROR_ID_NO) return rc;
+        free(fieldname);
+        if (rc != ERROR_ID_NO)
+            break;
       }
     }
+    free(symbol_name_brackets);
+    if (rc != ERROR_ID_NO)
+        break;
   }
-
   return rc;
 }
 
@@ -2284,14 +2288,13 @@ RC OUTPUT_CheckPath(ENGINE_CONTEXT *pEngineContext,char *path,int format) {
     // create the filename as it will be generated in the output routines:
     const char *extension = output_file_extensions[format];
     size_t namelen = strlen(output_path) + strlen(extension);
-    char filename[1+namelen];
+    char *filename_tmp = malloc(1+namelen);
     char *ptr;
 
-    strcpy(filename, output_path);
+    strcpy(filename_tmp, output_path);
 
-
-    if ((ptr=strrchr(filename,PATH_SEP))==NULL)             // avoid problem when dot is used in the directory path as "./<filename>
-     ptr=filename;
+    if ((ptr=strrchr(filename_tmp,PATH_SEP))==NULL)             // avoid problem when dot is used in the directory path as "./<filename>
+     ptr=filename_tmp;
     else
      ptr++;
 
@@ -2299,25 +2302,26 @@ RC OUTPUT_CheckPath(ENGINE_CONTEXT *pEngineContext,char *path,int format) {
 
     if ((format!=ASCII) || (strrchr(ptr,'.')!=NULL))     // ASCII should accept any extensions (.dat, .txt, ...)
      {
-      remove_extension(filename); // if user has added a filename extension .asc/.he5/..., remove it
-      strcat(filename, extension); // add proper extension
+      remove_extension(filename_tmp); // if user has added a filename extension .asc/.he5/..., remove it
+      strcat(filename_tmp, extension); // add proper extension
      }
 
-    FILE *test = fopen(filename, "a");
+    FILE *test = fopen(filename_tmp, "a");
 
     if (test == NULL) {
-      rc = ERROR_SetLast("Output Path configuration error" , ERROR_TYPE_FATAL, ERROR_ID_FILE_OPEN, filename);
+      rc = ERROR_SetLast("Output Path configuration error" , ERROR_TYPE_FATAL, ERROR_ID_FILE_OPEN, filename_tmp);
     } else {
       fclose(test);
       switch (format) {
     
       case NETCDF:
-        rc = netcdf_allow_file(filename, &pEngineContext->project.asciiResults);
+        rc = netcdf_allow_file(filename_tmp, &pEngineContext->project.asciiResults);
         break;
       case ASCII: // writing to ASCII is always ok (append)
         break;
       }
     }
+    free(filename_tmp);
   } else // otherwise: automatic output files: file names will be generated based on the input files.
          // We can only check if the target directory exists
 
@@ -2355,7 +2359,7 @@ RC OUTPUT_FlushBuffers(ENGINE_CONTEXT *pEngineContext)
   pEngineContext->outputPath=(THRD_id==THREAD_TYPE_EXPORT)? pExport->path: pResults->path;
 
   // select records for output according to date/site
-  bool selected_records[outputNbRecords];
+  bool *selected_records  = malloc(outputNbRecords * sizeof(*selected_records));
 
  rc=OutputBuildFileName(pEngineContext,outputFileName);
 
@@ -2446,6 +2450,7 @@ RC OUTPUT_FlushBuffers(ENGINE_CONTEXT *pEngineContext)
 
   outputNbRecords=0;
   pEngineContext->lastSavedRecord=0;
+  free(selected_records);
 
   return rc;
 }

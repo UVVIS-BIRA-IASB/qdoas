@@ -119,45 +119,45 @@ static void print_output_field(FILE *fp, const struct output_field *thefield, in
 
   switch(thefield->memory_type) {
   case OUTPUT_INT:
-    for(size_t i=0; i<ncols; i++,fprintf(fp,"\t")) fprintf(fp,thefield->format, ((int (*)[ncols])thefield->data)[recordno][i]);
+    for(size_t i=0; i<ncols; i++,fprintf(fp,"\t")) fprintf(fp,thefield->format, ((int *)thefield->data)[recordno * ncols + i]);
     break;
   case OUTPUT_SHORT:
-    for(size_t i=0; i<ncols; i++,fprintf(fp,"\t")) fprintf(fp,thefield->format, ((short (*)[ncols])thefield->data)[recordno][i]);
+    for(size_t i=0; i<ncols; i++,fprintf(fp,"\t")) fprintf(fp,thefield->format, ((short *)thefield->data)[recordno * ncols + i]);
     break;
   case OUTPUT_USHORT:
-    for(size_t i=0; i<ncols; i++,fprintf(fp,"\t")) fprintf(fp,thefield->format, ((unsigned short (*)[ncols])thefield->data)[recordno][i]);
+    for(size_t i=0; i<ncols; i++,fprintf(fp,"\t")) fprintf(fp,thefield->format, ((unsigned short *)thefield->data)[recordno * ncols + i]);
     break;
   case OUTPUT_STRING:
-    for(size_t i=0; i<ncols; i++,fprintf(fp,"\t")) fprintf(fp,thefield->format, ((char* (*)[ncols])thefield->data)[recordno][i]);
+    for(size_t i=0; i<ncols; i++,fprintf(fp,"\t")) fprintf(fp,thefield->format, ((char* *)thefield->data)[recordno * ncols + i]);
     break;
   case OUTPUT_FLOAT:
     for(size_t i=0; i<ncols; i++,fprintf(fp,"\t"))
-     if (((float (*)[ncols])thefield->data)[recordno][i]<9.969e36)
-      fprintf(fp,thefield->format, ((float (*)[ncols])thefield->data)[recordno][i]);
+     if (((float *)thefield->data)[recordno * ncols + i]<9.969e36)
+      fprintf(fp,thefield->format, ((float *)thefield->data)[recordno * ncols + i]);
      else
       fprintf(fp,thefield->format,(float)999.999);
     break;
   case OUTPUT_DOUBLE:
-    for(size_t i=0; i<ncols; i++,fprintf(fp,"\t")) fprintf(fp,thefield->format, ((double (*)[ncols])thefield->data)[recordno][i]);
+    for(size_t i=0; i<ncols; i++,fprintf(fp,"\t")) fprintf(fp,thefield->format, ((double *)thefield->data)[recordno * ncols + i]);
     break;
   case OUTPUT_DATE:
     for(size_t i=0; i<ncols; i++,fprintf(fp,"\t")) {
-      struct date *thedate = &((struct date (*)[ncols])thefield->data)[recordno][i];
+      struct date *thedate = &((struct date *)thefield->data)[recordno * ncols + i];
       fprintf(fp, thefield->format,  thedate->da_day, thedate->da_mon, thedate->da_year);
     }
     break;
   case OUTPUT_TIME:
     for(size_t i=0; i<ncols; i++,fprintf(fp,"\t")) {
-      struct time *thetime = &((struct time (*)[ncols])thefield->data)[recordno][i];
+      struct time *thetime = &((struct time *)thefield->data)[recordno * ncols + i];
       fprintf(fp, thefield->format, thetime->ti_hour, thetime->ti_min, thetime->ti_sec );
     }
     break;
   case OUTPUT_DATETIME:
     for(size_t i=0; i<ncols; i++,fprintf(fp,"\t")) {
-      struct date *thedate = &((struct datetime (*)[ncols])thefield->data)[recordno][i].thedate;
-      struct time *thetime = &((struct datetime (*)[ncols])thefield->data)[recordno][i].thetime;
-      int millis = ((struct datetime (*)[ncols])thefield->data)[recordno][i].millis;
-      int micros = ((struct datetime (*)[ncols])thefield->data)[recordno][i].microseconds;
+      struct date *thedate = &((struct datetime *)thefield->data)[recordno * ncols + i].thedate;
+      struct time *thetime = &((struct datetime *)thefield->data)[recordno * ncols + i].thetime;
+      int millis = ((struct datetime *)thefield->data)[recordno * ncols + i].millis;
+      int micros = ((struct datetime *)thefield->data)[recordno * ncols + i].microseconds;
       fprintf(fp, thefield->format, thedate->da_year, thedate->da_mon, thedate->da_day, thetime->ti_hour, thetime->ti_min, thetime->ti_sec,
               (millis != -1) ? millis : micros );
     }
@@ -220,36 +220,36 @@ static void print_output_field_value(FILE *fp, const struct output_field *thefie
 
   switch(thefield->memory_type) {
   case OUTPUT_INT:
-    fprintf(fp,strFormat, ((int (*)[ncols])thefield->data)[recordno][col]);
+    fprintf(fp,strFormat, ((int *)thefield->data)[recordno * ncols + col]);
     break;
   case OUTPUT_SHORT:
-    fprintf(fp,strFormat, ((short (*)[ncols])thefield->data)[recordno][col]);
+    fprintf(fp,strFormat, ((short *)thefield->data)[recordno * ncols + col]);
     break;
   case OUTPUT_USHORT:
-    fprintf(fp,strFormat, ((unsigned short (*)[ncols])thefield->data)[recordno][col]);
+    fprintf(fp,strFormat, ((unsigned short *)thefield->data)[recordno * ncols + col]);
     break;
   case OUTPUT_STRING:
-    fprintf(fp,strFormat, ((char* (*)[ncols])thefield->data)[recordno][col]);
+    fprintf(fp,strFormat, ((char* *)thefield->data)[recordno * ncols + col]);
     break;
   case OUTPUT_FLOAT:
-    fprintf(fp,strFormat, ((float (*)[ncols])thefield->data)[recordno][col]);
+    fprintf(fp,strFormat, ((float *)thefield->data)[recordno * ncols + col]);
     break;
   case OUTPUT_DOUBLE:
-    fprintf(fp,strFormat, ((double (*)[ncols])thefield->data)[recordno][col]);
+    fprintf(fp,strFormat, ((double *)thefield->data)[recordno * ncols + col]);
     break;
   case OUTPUT_DATE:
-    thedate = &((struct date (*)[ncols])thefield->data)[recordno][col];
+    thedate = &((struct date *)thefield->data)[recordno * ncols + col];
     fprintf(fp, thefield->format,  thedate->da_day, thedate->da_mon, thedate->da_year);
     break;
   case OUTPUT_TIME:
-    thetime = &((struct time (*)[ncols])thefield->data)[recordno][col];
+    thetime = &((struct time *)thefield->data)[recordno * ncols + col];
     fprintf(fp, thefield->format, thetime->ti_hour, thetime->ti_min, thetime->ti_sec );
     break;
   case OUTPUT_DATETIME:
-    thedate = &((struct datetime (*)[ncols])thefield->data)[recordno][col].thedate;
-    thetime = &((struct datetime (*)[ncols])thefield->data)[recordno][col].thetime;
-    millis = ((struct datetime (*)[ncols])thefield->data)[recordno][col].millis;
-    micros = ((struct datetime (*)[ncols])thefield->data)[recordno][col].microseconds;
+    thedate = &((struct datetime *)thefield->data)[recordno * ncols + col].thedate;
+    thetime = &((struct datetime *)thefield->data)[recordno * ncols + col].thetime;
+    millis = ((struct datetime *)thefield->data)[recordno * ncols + col].millis;
+    micros = ((struct datetime *)thefield->data)[recordno * ncols + col].microseconds;
 
     if ((strchr(thefield->format,'/')!=NULL) && (strchr(thefield->format,':')!=NULL))
      fprintf(fp, thefield->format, thedate->da_day, thedate->da_mon, thedate->da_year, thetime->ti_hour, thetime->ti_min, thetime->ti_sec);
@@ -318,13 +318,13 @@ static void print_spectra(FILE *fp, const struct output_field *lambda, const str
 
   if ((lambda!=NULL) && (spectra!=NULL))
    for(ncols = lambda->data_cols,i=0; i<ncols; i++)
-    fprintf(fp,"%#12.6f %#12.6f\n",((double(*)[ncols])lambda->data)[recordno][i],((double(*)[ncols])spectra->data)[recordno][i]);
+    fprintf(fp,"%#12.6f %#12.6f\n",((double *)lambda->data)[ncols * recordno + i],((double *)spectra->data)[ncols * recordno + i]);
   else if (lambda!=NULL)
    for(ncols = lambda->data_cols,i=0; i<ncols; i++)
-    fprintf(fp,"%#12.6f\n",((double(*)[ncols])lambda->data)[recordno][i]);
+    fprintf(fp,"%#12.6f\n",((double *)lambda->data)[ncols * recordno + i]);
   else if (spectra!=NULL)
    for(ncols = spectra->data_cols,i=0; i<ncols; i++)
-    fprintf(fp,"%#12.6f\n",((double(*)[ncols])spectra->data)[recordno][i]);
+    fprintf(fp,"%#12.6f\n",((double *)spectra->data)[ncols * recordno + i]);
  }
 
 /*! \brief Save data + calibration and/or spectra */

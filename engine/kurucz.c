@@ -1058,9 +1058,9 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
   pKurucz->KuruczFeno[indexFeno].have_calibration = true;
 
   // store calibration shift/stretch factors:
-  double calib_shift[pKurucz->Nb_Win];
-  double calib_stretch[pKurucz->Nb_Win];
-  double calib_stretch2[pKurucz->Nb_Win];
+  double *calib_shift = malloc(pKurucz->Nb_Win * sizeof(*calib_shift));
+  double *calib_stretch = malloc(pKurucz->Nb_Win * sizeof(*calib_stretch));
+  double *calib_stretch2 = malloc(pKurucz->Nb_Win * sizeof(*calib_stretch2));
 
   if (((shiftPoly=(double *)MEMORY_AllocDVector("KURUCZ_Spectrum ","shiftPoly",0,oldNDET-1))==NULL) ||
         ((spectrumData=(plot_data_t *)MEMORY_AllocBuffer(__func__,"spectrumData",pKurucz->Nb_Win*2,sizeof(plot_data_t),0,MEMORY_TYPE_STRUCT))==NULL))
@@ -1662,7 +1662,11 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
     }
   }
 
- EndKuruczSpectrum:
+EndKuruczSpectrum:
+
+  free(calib_shift);
+  free(calib_stretch);
+  free(calib_stretch2);
 
   KURUCZ_indexLine=indexLine+1;
 

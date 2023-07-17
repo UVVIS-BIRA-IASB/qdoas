@@ -1127,7 +1127,7 @@ static void XsDifferences(double **A,int DimL)
 static void Orthogonalization(double **A, int DimL) {
   if (NOrtho) { // if no orthogonal base, cross sections can not be orthogonalized to another cross section
 
-    double NormSet[Feno->NTabCross];
+    double *NormSet = malloc(Feno->NTabCross * sizeof(*NormSet));
 
     NormSet[0]=VECTOR_Norm(A[Feno->TabCross[OrthoSet[0]].IndSvdA],DimL);
     for (int i=1;i<NOrtho;++i) {
@@ -1158,6 +1158,7 @@ static void Orthogonalization(double **A, int DimL) {
       if (pTabCross->IndSvdA && (pTabCross->IndOrthog==ORTHOGONAL_BASE))
        OrthogonalizeToCross(j,NormSet,NOrtho,A,DimL);
     }
+    free(NormSet);
   }
 }
 
@@ -3203,7 +3204,7 @@ RC ANALYSE_Function(double *spectrum_orig, double *reference, const double *Sigm
       }
 
       rc = LINEAR_decompose(fitprops->linfit, fitprops->SigmaSqr, fitprops->covar);
-      double xP[fitprops->DimP];
+      double *xP = malloc(fitprops->DimP * sizeof(*xP));
       double *fitParamsP=xP-1; // linear fitting functions assume index starts at 1.
       if (rc == ERROR_ID_NO) rc = LINEAR_solve(fitprops->linfit, b, fitParamsP);
       if (rc != ERROR_ID_NO)
@@ -3233,7 +3234,8 @@ RC ANALYSE_Function(double *spectrum_orig, double *reference, const double *Sigm
         ANALYSE_t[i]*=tau;                // tau*exp(-optical depth)
 
         Yfit[k-1]=ANALYSE_t[i]-ANALYSE_tc[i];
-       }
+      }
+      free(xP);
     }
   }
 
@@ -4038,8 +4040,8 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
           // DEBUG_Start(ENGINE_dbgFile,"Test",(analyseDebugMask=DEBUG_FCTTYPE_MEM),7,(analyseDebugVar=DEBUG_DVAR_YES),0); // !debugResetFlag++);
 #endif
 
-          double residuals[n_wavel];
-          memcpy(residuals, ANALYSE_zeros, n_wavel * sizeof(double));
+          double *residuals = malloc(n_wavel * sizeof(*residuals));
+          memcpy(residuals, ANALYSE_zeros, n_wavel * sizeof(*residuals));
 
           for(i = 0; i<n_wavel;i++)
            Feno->spikes[i] = 0;
@@ -4080,6 +4082,7 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
 
               ((num_repeats_ring<=1) || ((fabs(rms_residual_old)>EPSILON) && (fabs(rms_residual-rms_residual_old)>pAnalysisOptions->convergence))) &&
               !(rc=reinit_analysis(Feno, n_wavel))); // SVD matrix must be initialized again when pixels are removed.
+          free(residuals);
 
           #if defined(__DEBUG_) && __DEBUG_
           // DEBUG_Stop("Test");

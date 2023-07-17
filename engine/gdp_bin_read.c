@@ -882,7 +882,7 @@ static bool use_as_reference(const GDP_BIN_INFO *record, const FENO *feno) {
 }
 
 // create a list of all spectra that match reference selection criteria for one or more analysis windows.
-static int find_ref_spectra(struct ref_list *selected_spectra[NFeno][NUM_VZA_REFS], struct ref_list **list_handle) {
+static int find_ref_spectra(struct ref_list *(*selected_spectra)[NUM_VZA_REFS], struct ref_list **list_handle) {
   // zero-initialize
   for (int i=0; i<NFeno; ++i) {
     for (size_t j=0; j<NUM_VZA_REFS; ++j) {
@@ -991,7 +991,7 @@ static int show_ref_info(int i_row, const FENO *pTabFeno, const struct reference
     mediateResponseCellDataDouble(plotPageRef, i_row, 3 + i_column,refs[i].stretch, responseHandle);
     ++i_row;
     const char* labelfmt = "Reference %s";
-    char plot_label[strlen(labelfmt) +strlen(pixeltype[i])];
+    char *plot_label = malloc(strlen(labelfmt) +strlen(pixeltype[i]));
     sprintf(plot_label, labelfmt, pixeltype[i]);
     plot_data_t spectrum_data;
     spectrum_data.x = pTabFeno->LambdaRef;
@@ -1000,6 +1000,7 @@ static int show_ref_info(int i_row, const FENO *pTabFeno, const struct reference
     spectrum_data.curveName[0] = '\0';
 
     mediateResponsePlotData(plotPageRef,&spectrum_data,1,Spectrum,forceAutoScale,plot_label,"Wavelength (nm)","Intensity", responseHandle);
+    free(plot_label);
   }
   return ++i_row;
 }
@@ -1033,7 +1034,7 @@ static RC GdpBinNewRef(const ENGINE_CONTEXT *pEngineContext,void *responseHandle
 
   // for each analysis window: selected spectra per VZA bin
   // the same spectrum can be used in multiple analysis windows.
-  struct ref_list *selected_spectra[NFeno][NUM_VZA_REFS];
+  struct ref_list* (*selected_spectra)[NUM_VZA_REFS] = malloc(NFeno * sizeof(*selected_spectra));
 
   // list_handle: list of references to same set of spectra, used for
   // memory management.  In this list, each spectrum appears only once.
@@ -1052,12 +1053,12 @@ static RC GdpBinNewRef(const ENGINE_CONTEXT *pEngineContext,void *responseHandle
 
       for (size_t j=0; j<NUM_VZA_REFS; ++j) {
         if (selected_spectra[i][j] == NULL) {
-#define MESSAGE " for analysis window %s and pixel type %zu"
-          const int length = strlen(MESSAGE) + strlen(pTabFeno->windowName) + strlen(TOSTRING(MAX_FENO));
-          char tmp[length];
-          sprintf(tmp, MESSAGE, pTabFeno->windowName, j);
-#undef MESSAGE
+          const char* message = " for analysis window %s and pixel type %zu";
+          const int length = 1 + strlen(message) + strlen(pTabFeno->windowName) + strlen(TOSTRING(MAX_FENO));
+          char* tmp = malloc(length);
+          sprintf(tmp, message, pTabFeno->windowName, j);
           ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_REFERENCE_SELECTION, tmp);
+          free(tmp);
           continue;
         }
         struct reference *ref = &vza_refs[i][j];
@@ -1092,19 +1093,22 @@ static RC GdpBinNewRef(const ENGINE_CONTEXT *pEngineContext,void *responseHandle
   // and the double* pointers 'lambda' & 'spectrum':
   free_ref_list(list_handle, FREE_DATA);
 
+  // finally, free our selected_spectra buffer itself.
+  free(selected_spectra);
+
   return rc;
 }
 
 // pixeltype 0 = east, 1 = center, 2 = west
 RC GDP_BIN_get_vza_ref(int pixel_type, int index_feno, FENO *feno) {
   const struct reference *ref = &vza_refs[index_feno][pixel_type];
-#define MESSAGE " for analysis window %s and pixel type %d"
-  char tmp[strlen(MESSAGE) + strlen(feno->windowName)];
-  sprintf(tmp, MESSAGE, feno->windowName, index_feno);
-#undef MESSAGE
+  const char* message = " for analysis window %s and pixel type %d";
+  char *tmp = malloc(1 + strlen(message) + strlen(feno->windowName));
+  sprintf(tmp, message, feno->windowName, index_feno);
   if  (!ref->n_spectra) {
     return ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_REFERENCE_SELECTION, tmp);
   }
+  free(tmp);
 
   assert((size_t) feno->NDET == ref->n_wavel);
 
