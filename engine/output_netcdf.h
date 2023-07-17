@@ -1,14 +1,12 @@
 #ifndef OUTPUT_NETCDF_H
 #define OUTPUT_NETCDF_H
 
-#include "doas.h"
-
-#include "output_common.h"
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include "doas.h"
+#include "output_common.h"
 
   RC netcdf_open(const ENGINE_CONTEXT *pEngineContext, const char *filename,int num_records);
 

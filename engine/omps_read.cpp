@@ -11,9 +11,9 @@
 #include "boost/multi_array.hpp"
 
 #include "omps_read.h"
-#include "dir_iter.h"
 
 extern "C" {
+#include "dir_iter.h"
 #include "analyse.h"
 #include "kurucz.h"
 #include "mediate.h"

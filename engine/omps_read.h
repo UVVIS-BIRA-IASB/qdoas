@@ -1,11 +1,11 @@
 #ifndef OMPS_READ_H
 #define OMPS_READ_H
 
-#include "doas.h"
-
 #if defined(__cplusplus)
 extern "C" {
 #endif
+
+#include "doas.h"
 
   RC OMPS_read(ENGINE_CONTEXT *pEngineContext,int recordNo);
 
