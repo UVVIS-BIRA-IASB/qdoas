@@ -2,12 +2,14 @@ name: qdoas-build
 channels:
   - conda-forge
 dependencies:
+  - boost
   - cmake
   - pkg-config
   - coda
   - gsl
-  - hdfeos2
-  - hdfeos5
+  - hdf4
   - libnetcdf
   - qt
   - qwt
+  - zlib
+
