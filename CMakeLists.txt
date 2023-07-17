@@ -72,6 +72,8 @@ set(netCDF_INCLUDE_DIR  "${netCDF_INCLUDE_DIRS}")
 
 add_definitions(-DQDOAS_VERSION="${QDOAS_VERSION}" -DQDOAS_DATE="${QDOAS_DATE}")
 
+add_definitions(-DQWT_DLL)
+
 add_subdirectory(common)
 add_subdirectory(engine)
 add_subdirectory(mediator)

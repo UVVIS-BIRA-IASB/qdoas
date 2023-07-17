@@ -1,4 +1,4 @@
-include_directories(../common ../engine ${netCDF_INCLUDE_DIR} ${CODA_INCLUDE_DIR} ${GSL_INCLUDE_DIRS} ${HDF5_INCLUDE_DIRS})
+include_directories(../common ../engine ${netCDF_INCLUDE_DIR} ${CODA_INCLUDE_DIR})
 
 add_library(mediate STATIC
   mediate_xsconv_output_netcdf.cpp
@@ -25,7 +25,6 @@ add_library(mediate STATIC
   mediate_usamp.h
   mediate_xsconv.c
   mediate_xsconv.h
-
 )
 
 target_compile_features(engine PUBLIC cxx_std_11)

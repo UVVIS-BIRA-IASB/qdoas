@@ -1,4 +1,4 @@
-include_directories(../common ../engine ../mediator ${QWT_INCLUDE_DIR} ${GSL_INCLUDE_DIRS} ${HDF5_INCLUDE_DIRS})
+include_directories(../common ../engine ../mediator ${QWT_INCLUDE_DIR})
 
 add_executable(convolution
   ../common/QdoasVersion.h
@@ -30,9 +30,7 @@ target_link_libraries(convolution
   Qt5::Widgets Qt5::PrintSupport Qt5::Xml
   ${QWT_LIBRARY}
   ${CODA_LIBRARY}
-  ${GSL_LIBRARIES}
-  ${HDF5_LIBRARIES}
-   ${netCDF_LIBRARIES}
+  ${netCDF_LIBRARIES}
 )
 
 if(APPLE)

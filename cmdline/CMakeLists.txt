@@ -1,4 +1,4 @@
-include_directories(../common ../engine ../mediator ../qdoas ../convolution ../ring ../usamp ${GSL_INCLUDE_DIRS})
+include_directories(../common ../engine ../mediator ../qdoas ../convolution ../ring ../usamp)
 
 add_executable(doas_cl
   ../qdoas/CQdoasConfigHandler.cpp
@@ -24,9 +24,7 @@ target_link_libraries(doas_cl
   common engine mediate 
   Qt5::Core Qt5::Xml
   ${CODA_LIBRARY}
-  ${GSL_LIBRARIES}
-  ${HDF5_LIBRARIES}
-   ${netCDF_LIBRARIES}
+  ${netCDF_LIBRARIES}
 )
 
 install(TARGETS doas_cl DESTINATION ${BIN_PREFIX})

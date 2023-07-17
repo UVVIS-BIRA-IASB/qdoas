@@ -1,4 +1,4 @@
-include_directories(../engine ../mediator ${QWT_INCLUDE_DIR}  ${netCDF_INCLUDE_DIR} ${CODA_INCLUDE_DIR} ${GSL_INCLUDE_DIRS} ${HDF5_INCLUDE_DIRS})
+include_directories(../engine ../mediator ${QWT_INCLUDE_DIR}  ${netCDF_INCLUDE_DIR})
 
 add_library(common STATIC
   CConfigHandler.cpp
@@ -49,6 +49,7 @@ add_library(common STATIC
   QdoasVersion.h
   RefCountPtr.h
   debugutil.h
+  visual_c_compat.h
 )
 
 target_compile_features(common PUBLIC cxx_std_11)
