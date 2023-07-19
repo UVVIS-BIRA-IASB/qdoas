@@ -60,11 +60,21 @@ extern "C" {
 #include "vector.h"
 }
 
+#include <Eigen/Dense>
+
+typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> Matrix2d;
+typedef Eigen::ColPivHouseholderQR<Matrix2d> MatrixQR;
+
 #define EPS 2.2204e-016
 
 struct qr {
   gsl_matrix *A;
   gsl_vector *tau;
+};
+
+struct eigen_qr {
+  Matrix2d *A;
+  MatrixQR *QR;
 };
 
 // linear system of m equations and n unknowns
@@ -75,6 +85,7 @@ struct linear_system {
   union {
     struct qr qr;
     struct svd svd;
+    struct eigen_qr qr_eigen;
   } decomposition;
 };
 
@@ -109,6 +120,10 @@ struct linear_system*LINEAR_alloc(int m, int n, enum linear_fit_mode mode) {
     s->decomposition.qr.A = gsl_matrix_alloc(m, n);
     s->decomposition.qr.tau = gsl_vector_alloc(n);
     break;
+  case DECOMP_EIGEN_QR:
+    s->decomposition.qr_eigen.A = new Matrix2d(m, n);
+    s->decomposition.qr_eigen.QR = new MatrixQR(m, n);
+    break;
   }
 
   #if defined(__DEBUG_) && __DEBUG_
@@ -137,6 +152,13 @@ struct linear_system *LINEAR_from_matrix(const double *const *a, int m, int n, e
       }
     }
     break;
+  case DECOMP_EIGEN_QR:
+    for (int i=0; i<s->m; ++i) {
+      for (int j=0; j<s->n; ++j) {
+	(*s->decomposition.qr_eigen.A)(i, j) = a[1+j][1+i];
+      }
+    }
+    break;
   }
   return s;
 }
@@ -159,6 +181,8 @@ void LINEAR_free(struct linear_system *s) {
     gsl_matrix_free(s->decomposition.qr.A);
     gsl_vector_free(s->decomposition.qr.tau);
     break;
+  case DECOMP_EIGEN_QR:
+    delete s->decomposition.qr_eigen.A;
   }
 
   delete[] s->norms;
@@ -180,7 +204,11 @@ void LINEAR_set_column(struct linear_system *s, int n, const double *values) {
     for (int i=0; i<s->m; ++i) {
       gsl_matrix_set(s->decomposition.qr.A,i, n-1, values[1+i]);
     }
-      gsl_vector_view colj = gsl_matrix_column(s->decomposition.qr.A, n-1);
+    break;
+  case DECOMP_EIGEN_QR:
+    for (int i=0; i<s->m; ++i) {
+      (*s->decomposition.qr_eigen.A)(i, n-1) = values[1+i];
+    }
     break;
   }
 }
@@ -201,6 +229,11 @@ void LINEAR_set_weight(struct linear_system *s, const double *sigma) {
     for (int i=0; i< s->m; ++i) {
       gsl_vector_view rowi = gsl_matrix_row(s->decomposition.qr.A, i);
       gsl_vector_scale(&rowi.vector, 1.0/sigma[i]);
+    }
+    break;
+  case DECOMP_EIGEN_QR:
+    for (int i=0; i< s->m; ++i) {
+      s->decomposition.qr_eigen.A->row(i) /= sigma[i];
     }
     break;
   }
@@ -283,6 +316,38 @@ int LINEAR_decompose(struct linear_system *s, double *sigmasquare, double **cova
     gsl_matrix_free(cholesky);
   }
     break;
+  case DECOMP_EIGEN_QR: {
+    // normalisation:
+    for (int j=0; j<s->n; ++j) {
+      auto col_j = s->decomposition.qr_eigen.A->col(j);
+      s->norms[j] = col_j.squaredNorm();
+      if (s->norms[j] == 0.)
+	return ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_NORMALIZE);
+      s->norms[j] = sqrt(s->norms[j]);
+      col_j /= s->norms[j];
+    }
+    s->decomposition.qr_eigen.QR->compute(*s->decomposition.qr_eigen.A);
+
+    // Compute covariance.
+    // The covariance matrix is given by the inverse of A' * A.  Unfortunately, Eigen does not seem to provide a way to
+    // reuse the matrix R from our QR decomposition, which is also the Cholesky factor of A' * A.  Therefore, we compute
+    // the inverse of A' * A again, using Cholesky decomposition.
+    const auto& matrix_A = *s->decomposition.qr_eigen.A;
+    Matrix2d matrix_covar = (matrix_A.transpose() * matrix_A).llt().solve(Eigen::MatrixXd::Identity(s->n, s->n));
+    if (covar != NULL) {
+      for (int i=0; i<s->n; ++i) {
+	for (int j=0; j<s->n; ++j) {
+	  covar[1+i][1+j] = matrix_covar(i, j) / (s->norms[i]*s->norms[j]);
+        }
+      }
+    }
+    if (sigmasquare != NULL) {
+      for (int i=0; i<s->n; ++i) {
+        sigmasquare[1+i] = matrix_covar(i, i) / (s->norms[i]*s->norms[i]);
+      }
+    }
+  }
+    break;
   }
   return rc;
 }
@@ -311,8 +376,14 @@ int LINEAR_solve(const struct linear_system *s, const double *b, double *x) {
     gsl_vector_free(residual);
   }
     break;
+  case DECOMP_EIGEN_QR: {
+    // Define Eigen vectors mapping the existing buffers b and x (b and x index starts at 1):
+    Eigen::Map<const Eigen::VectorXd> vb(b+1, s->m);
+    Eigen::Map<Eigen::VectorXd> vx(x+1, s->n);
+    vx = s->decomposition.qr_eigen.QR->solve(vb);
   }
-
+    break;
+  }
   // divide solution by normalization factor
   for (int i=0; i< s->n; ++i) {
     x[1+i]/=s->norms[i];

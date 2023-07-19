@@ -84,6 +84,7 @@ find_package(Qwt REQUIRED)
 
 find_package(Boost REQUIRED)
 find_package(CODA REQUIRED)
+find_package(Eigen3 REQUIRED)
 find_package(GSL REQUIRED)
 find_package(HDF5 REQUIRED COMPONENTS CXX)
 find_package(netCDF QUIET)

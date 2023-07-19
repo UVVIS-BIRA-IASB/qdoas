@@ -61,7 +61,8 @@
 
 enum linear_fit_mode {
   DECOMP_SVD,
-  DECOMP_QR
+  DECOMP_QR,
+  DECOMP_EIGEN_QR
 };
 
 struct linear_system;

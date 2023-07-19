@@ -2962,7 +2962,7 @@ RC ANALYSE_Function(double *spectrum_orig, double *reference, const double *Sigm
       if (Feno->analysisMethod==OPTICAL_DENSITY_FIT) {
         // clean up old linear fit environment:
         LINEAR_free(fitprops->linfit);
-        fitprops->linfit = LINEAR_alloc(Npts,NewDimC,DECOMP_QR);
+        fitprops->linfit = LINEAR_alloc(Npts,NewDimC,DECOMP_EIGEN_QR);
       }
 
       // ----------------------------------------------------
@@ -3195,7 +3195,7 @@ RC ANALYSE_Function(double *spectrum_orig, double *reference, const double *Sigm
         }
       }
       LINEAR_free(fitprops->linfit);
-      fitprops->linfit = LINEAR_from_matrix((const double **)fitprops->P, Npts,fitprops->DimP,DECOMP_QR);
+      fitprops->linfit = LINEAR_from_matrix((const double **)fitprops->P, Npts,fitprops->DimP,DECOMP_EIGEN_QR);
       if (SigmaY != NULL) {
         LINEAR_set_weight(fitprops->linfit, SigmaY);
         for (int i=0; i<fitprops->DimP; ++i) {
