@@ -46,6 +46,7 @@
 //
 //  ----------------------------------------------------------------------------
 
+extern "C" {
 #include <assert.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -57,6 +58,7 @@
 #include "comdefs.h"
 #include "svd.h"
 #include "vector.h"
+}
 
 #define EPS 2.2204e-016
 
@@ -82,8 +84,8 @@ struct linear_system*LINEAR_alloc(int m, int n, enum linear_fit_mode mode) {
   DEBUG_FunctionBegin((char *)__func__,DEBUG_FCTTYPE_APPL|DEBUG_FCTTYPE_MEM);
 #endif
   
-  struct linear_system *s = malloc(sizeof(*s));
-  s->norms = malloc(n * sizeof(*s->norms));
+  struct linear_system *s = new linear_system();
+  s->norms = new double[n];
   s->m = m;
   s->n = n;
   s->mode = mode;
@@ -159,8 +161,8 @@ void LINEAR_free(struct linear_system *s) {
     break;
   }
 
-  free(s->norms);
-  free(s);
+  delete[] s->norms;
+  delete s;
   
   #if defined(__DEBUG_) && __DEBUG_
   DEBUG_FunctionStop((char *)__func__,0);
@@ -332,7 +334,7 @@ void LINEAR_pinv(const struct linear_system *s, double **pinv) {
   // pinv(A) = V * W^{-1} * U'
   const struct svd *psvd = &s->decomposition.svd;
 
-  double tolerance = max(s->m,s->n)*psvd->W[1]*EPS;
+  double tolerance = std::max(s->m,s->n)*psvd->W[1]*EPS;
   // singular values less than tolerance are treated as zero
   int r;
   for (r=1; r<=s->n && psvd->W[r]>tolerance; ++r);
@@ -378,7 +380,7 @@ int LINEAR_fit_poly(int num_eqs, int poly_order, const double *a, const double *
   // Solution of the system weighted by errors
   double *b_sigma = NULL;
   if (sigma!=NULL) {
-    b_sigma = malloc(num_eqs*sizeof(*b_sigma));
+    b_sigma = new double[num_eqs];
     if (b_sigma == NULL) {
       rc = ERROR_ID_ALLOC;
       goto cleanup;
@@ -400,7 +402,7 @@ int LINEAR_fit_poly(int num_eqs, int poly_order, const double *a, const double *
  cleanup:
   MEMORY_ReleaseDMatrix(__func__, "A", A, 1, 1);
   LINEAR_free(linsys);
-  free(b_sigma);
+  delete[] b_sigma;
 
   #if defined(__DEBUG_) && __DEBUG_
   DEBUG_FunctionStop((char *)__func__,rc);

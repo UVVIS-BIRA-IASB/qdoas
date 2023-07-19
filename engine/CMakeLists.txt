@@ -41,7 +41,7 @@ add_library(engine STATIC
   gome2_read.h
   kurucz.c
   kurucz.h
-  linear_system.c
+  linear_system.cpp
   linear_system.h
   matrix.c
   matrix.h
