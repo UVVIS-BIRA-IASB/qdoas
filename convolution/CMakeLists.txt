@@ -1,5 +1,3 @@
-include_directories(../common ../engine ../mediator ${QWT_INCLUDE_DIR})
-
 add_executable(convolution
   ../common/QdoasVersion.h
   ../common/CPreferences.cpp
@@ -29,9 +27,8 @@ target_link_libraries(convolution
   common mediate engine
   Qt5::Widgets Qt5::PrintSupport Qt5::Xml
   ${QWT_LIBRARY}
-  ${CODA_LIBRARY}
-  ${netCDF_LIBRARIES}
-)
+  )
+target_include_directories(convolution PRIVATE ${QWT_INCLUDE_DIR})
 
 if(APPLE)
   install(TARGETS convolution DESTINATION qdoas.app/Contents/MacOS)

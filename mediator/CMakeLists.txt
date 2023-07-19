@@ -1,5 +1,3 @@
-include_directories(../common ../engine ${netCDF_INCLUDE_DIR} ${CODA_INCLUDE_DIR})
-
 add_library(mediate STATIC
   mediate_xsconv_output_netcdf.cpp
   mediate_xsconv_output_netcdf.h
@@ -27,11 +25,13 @@ add_library(mediate STATIC
   mediate_xsconv.h
 )
 
-target_compile_features(engine PUBLIC cxx_std_11)
+target_compile_features(mediate PUBLIC cxx_std_11)
 set_property(TARGET mediate PROPERTY C_STANDARD 99)
-target_link_libraries(mediate
+target_link_libraries(mediate PRIVATE
   engine
   Qt5::Core
   ${netCDF_LIBRARIES}
 )
-# message( FATAL_ERROR "Your message" )
+target_include_directories(mediate PRIVATE ${netCDF_INCLUDE_DIR})
+target_include_directories(mediate PUBLIC ../common ../engine)
+

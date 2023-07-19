@@ -1,5 +1,3 @@
-include_directories(../common ../mediator ${netCDF_INCLUDE_DIR} ${CODA_INCLUDE_DIR})
-
 add_library(engine STATIC
   analyse.c
   analyse.h
@@ -117,8 +115,12 @@ add_library(engine STATIC
   zenithal.c
   zenithal.h
 )
-target_link_libraries(engine PRIVATE Boost::boost GSL::gsl GSL::gslcblas ${HDF5_CXX_LIBRARIES})
-target_include_directories(engine PRIVATE ${HDF5_INCLUDE_DIRS})
+target_link_libraries(engine PRIVATE Boost::boost GSL::gsl GSL::gslcblas
+  ${HDF5_CXX_LIBRARIES}
+  ${CODA_LIBRARY}
+  ${NETCDF_LIBRARIES})
+target_include_directories(engine PRIVATE ${netCDF_INCLUDE_DIR} ${CODA_INCLUDE_DIR} ${HDF5_INCLUDE_DIRS})
+target_include_directories(engine PUBLIC ../common ../mediator)
 
 target_compile_features(engine PUBLIC cxx_std_11)
 set_property(TARGET engine PROPERTY C_STANDARD 99)

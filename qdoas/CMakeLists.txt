@@ -1,5 +1,3 @@
-include_directories(../common ../engine ../mediator ${QWT_INCLUDE_DIR})
-
 add_executable(qdoas MACOSX_BUNDLE
   ../common/QdoasVersion.h
   ../common/CPreferences.cpp
@@ -102,16 +100,15 @@ add_executable(qdoas MACOSX_BUNDLE
 )
 
 add_definitions(-DAPP_QDOAS)
-link_directories(${netCDF_LIBRARY_DIR})
 
 target_compile_features(qdoas PUBLIC cxx_std_11)
 target_link_libraries(qdoas
   common engine mediate
   Qt5::Widgets Qt5::PrintSupport Qt5::Xml
   ${QWT_LIBRARY}
-  ${CODA_LIBRARY}
-  ${netCDF_LIBRARIES}
 )
+target_include_directories(qdoas PRIVATE ${QWT_INCLUDE_DIR})
+
 set_target_properties(qdoas PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/resources/qdoas.plist)
 set_source_files_properties(../resources/qdoas.icns PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 

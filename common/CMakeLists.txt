@@ -1,5 +1,3 @@
-include_directories(../engine ../mediator ${QWT_INCLUDE_DIR}  ${netCDF_INCLUDE_DIR})
-
 add_library(common STATIC
   CConfigHandler.cpp
   CConfigHandler.h
@@ -54,6 +52,8 @@ add_library(common STATIC
 
 target_compile_features(common PUBLIC cxx_std_11)
 target_link_libraries(common Qt5::Widgets Qt5::PrintSupport Qt5::Xml)
+target_include_directories(common PRIVATE ${QWT_INCLUDE_DIR})
+target_include_directories(common PUBLIC ../engine ../mediator)
 
 if(APPLE)
   add_definitions(-DQDOAS_HELP_PATH="../Resources/Help")

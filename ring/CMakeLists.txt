@@ -1,5 +1,3 @@
-include_directories(../common ../engine ../mediator ${QWT_INCLUDE_DIR})
-
 add_executable(ring
   ../common/QdoasVersion.h
   ../common/CPreferences.cpp
@@ -26,7 +24,8 @@ target_link_libraries(ring
   common mediate engine
   Qt5::Widgets Qt5::PrintSupport Qt5::Xml
   ${QWT_LIBRARY}
-)
+  )
+target_include_directories(ring PRIVATE ${QWT_INCLUDE_DIR})
 
 if(APPLE)
   install(TARGETS ring DESTINATION qdoas.app/Contents/MacOS)
