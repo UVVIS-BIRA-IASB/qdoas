@@ -122,5 +122,10 @@ target_link_libraries(engine PRIVATE Boost::boost GSL::gsl GSL::gslcblas
 target_include_directories(engine PRIVATE ${netCDF_INCLUDE_DIR} ${CODA_INCLUDE_DIR} ${HDF5_INCLUDE_DIRS})
 target_include_directories(engine PUBLIC ../common ../mediator)
 
+find_library(HDF4_MFHDF mfhdf)
+if (HDF4_MFHDF)
+target_link_libraries(engine PRIVATE ${HDF4_MFHDF})
+endif (HDF4_MFHDF)
+
 target_compile_features(engine PUBLIC cxx_std_11)
 set_property(TARGET engine PROPERTY C_STANDARD 99)
