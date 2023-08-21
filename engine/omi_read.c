@@ -895,264 +895,304 @@ static RC OmiGetSwathData(struct omi_orbit_file *pOrbitFile, const ENGINE_CONTEX
   struct omi_data *pData = &pOrbitFile->omiSwath->dataFields;
   RC rc=ERROR_ID_NO;
 
-  struct omi_buffer swathdata[] =
-    {
-      {"MeasurementQualityFlags", pData->measurementQualityFlags},
-      {"InstrumentConfigurationId", pData->instrumentConfigurationId},
-      {"WavelengthReferenceColumn", pData->wavelengthReferenceColumn},
-      {"Time",pData->time},
-      {"SecondsInDay",pData->secondsInDay},
-      {"SpacecraftLatitude", pData->spacecraftLatitude},
-      {"SpacecraftLongitude", pData->spacecraftLongitude},
-      {"SpacecraftAltitude", pData->spacecraftAltitude},
-      {"Latitude", pData->latitude},
-      {"Longitude", pData->longitude},
-      {"SolarZenithAngle", pData->solarZenithAngle},
-      {"SolarAzimuthAngle", pData->solarAzimuthAngle},
-      {"ViewingZenithAngle", pData->viewingZenithAngle},
-      {"ViewingAzimuthAngle", pData->viewingAzimuthAngle},
-      {"TerrainHeight", pData->terrainHeight},
-      {"GroundPixelQualityFlags", pData->groundPixelQualityFlags}
-	};
+  struct omi_buffer swathdata[] = {
+                                   {"MeasurementQualityFlags", pData->measurementQualityFlags},
+                                   {"InstrumentConfigurationId", pData->instrumentConfigurationId},
+                                   {"WavelengthReferenceColumn", pData->wavelengthReferenceColumn},
+                                   {"Time",pData->time},
+                                   {"SecondsInDay",pData->secondsInDay},
+                                   {"SpacecraftLatitude", pData->spacecraftLatitude},
+                                   {"SpacecraftLongitude", pData->spacecraftLongitude},
+                                   {"SpacecraftAltitude", pData->spacecraftAltitude},
+                                   {"Latitude", pData->latitude},
+                                   {"Longitude", pData->longitude},
+                                   {"SolarZenithAngle", pData->solarZenithAngle},
+                                   {"SolarAzimuthAngle", pData->solarAzimuthAngle},
+                                   {"ViewingZenithAngle", pData->viewingZenithAngle},
+                                   {"ViewingAzimuthAngle", pData->viewingAzimuthAngle},
+                                   {"TerrainHeight", pData->terrainHeight},
+                                   {"GroundPixelQualityFlags", pData->groundPixelQualityFlags}
+ };
 
- 
+  char ee[300];
+  sprintf(ee,"%s%s",pOrbitFile->swathpath,"Data_Fields/RadianceMantissa");
+  rc = coda_cursor_goto(&pOrbitFile->cursor,ee);
+  assert(rc == 0);
+  rc = coda_cursor_read_int16_array(&pOrbitFile->cursor,&pData->temp_RadianceMantissa[0],coda_array_ordering_c);
+  assert(rc == 0);
+  sprintf(ee,"%s%s",pOrbitFile->swathpath,"Data_Fields/RadianceExponent");
+  rc = coda_cursor_goto(&pOrbitFile->cursor,ee);
+  assert(rc == 0);
+  rc = coda_cursor_read_int8_array(&pOrbitFile->cursor,&pData->temp_RadianceExponent[0],coda_array_ordering_c);
+  assert(rc == 0);
 
-   char ee[300];
-   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Data_Fields/RadianceMantissa");
-   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
-   assert(coda_cursor_read_int16_array(&pOrbitFile->cursor,&pData->temp_RadianceMantissa[0],coda_array_ordering_c)==0);
-    sprintf(ee,"%s%s",pOrbitFile->swathpath,"Data_Fields/RadianceExponent");
-   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
-   assert(coda_cursor_read_int8_array(&pOrbitFile->cursor,&pData->temp_RadianceExponent[0],coda_array_ordering_c)==0);
+  sprintf(ee,"%s%s",pOrbitFile->swathpath,"Data_Fields/RadiancePrecisionMantissa");
+  rc = coda_cursor_goto(&pOrbitFile->cursor,ee);
+  assert(rc == 0);
+  rc = coda_cursor_read_int16_array(&pOrbitFile->cursor,&pData->temp_RadiancePrecisionMantissa[0],coda_array_ordering_c);
+  assert(rc == 0);
 
-   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Data_Fields/RadiancePrecisionMantissa");
-   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
-   assert(coda_cursor_read_int16_array(&pOrbitFile->cursor,&pData->temp_RadiancePrecisionMantissa[0],coda_array_ordering_c)==0);
-
-   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/ViewingAzimuthAngle");
-   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
-   assert(coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->viewingAzimuthAngle[0],coda_array_ordering_c)==0);
+  sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/ViewingAzimuthAngle");
+  rc = coda_cursor_goto(&pOrbitFile->cursor,ee);
+  assert(rc == 0);
+  rc = coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->viewingAzimuthAngle[0],coda_array_ordering_c);
+  assert(rc == 0);
   
-   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/TerrainHeight");
-   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
-   assert(coda_cursor_read_int16_array(&pOrbitFile->cursor,&pData->terrainHeight[0],coda_array_ordering_c)==0);
+  sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/TerrainHeight");
+  rc = coda_cursor_goto(&pOrbitFile->cursor,ee);
+  assert(rc == 0);
+  rc = coda_cursor_read_int16_array(&pOrbitFile->cursor,&pData->terrainHeight[0],coda_array_ordering_c);
+  assert(rc == 0);
    
-   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/ViewingZenithAngle");
-   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
-   assert(coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->viewingZenithAngle[0],coda_array_ordering_c)==0);
+  sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/ViewingZenithAngle");
+  rc = coda_cursor_goto(&pOrbitFile->cursor,ee);
+  assert(rc == 0);
+  rc = coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->viewingZenithAngle[0],coda_array_ordering_c);
+  assert(rc == 0);
+
+  sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/SolarAzimuthAngle");
+  rc = coda_cursor_goto(&pOrbitFile->cursor,ee);
+  assert(rc == 0);
+  rc = coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->solarAzimuthAngle[0],coda_array_ordering_c);
+  assert(rc == 0);
    
-   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/SolarAzimuthAngle");
-   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
-   assert(coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->solarAzimuthAngle[0],coda_array_ordering_c)==0);
+  sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/SolarZenithAngle");
+  rc = coda_cursor_goto(&pOrbitFile->cursor,ee);
+  assert(rc == 0);
+  rc = coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->solarZenithAngle[0],coda_array_ordering_c);
+  assert(rc == 0);
+
+  sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/Longitude");
+  rc = coda_cursor_goto(&pOrbitFile->cursor,ee);
+  assert(rc == 0);
+  rc = coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->longitude[0],coda_array_ordering_c);
+  assert(rc == 0);
    
-   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/SolarZenithAngle");
-   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
-   assert(coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->solarZenithAngle[0],coda_array_ordering_c)==0);
+  sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/Latitude");
+  rc = coda_cursor_goto(&pOrbitFile->cursor,ee);
+  assert(rc == 0);
+  rc = coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->latitude[0],coda_array_ordering_c);
+  assert(rc == 0);
 
-   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/Longitude");
-   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
-   assert(coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->longitude[0],coda_array_ordering_c)==0);
+  sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/Time/Time");
+  rc = coda_cursor_goto(&pOrbitFile->cursor,ee);
+  assert(rc == 0);
+  rc = coda_cursor_read_double_array(&pOrbitFile->cursor,&pData->time[0],coda_array_ordering_c);
+  assert(rc == 0);
 
+  sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/GroundPixelQualityFlags");
+  rc = coda_cursor_goto(&pOrbitFile->cursor,ee);
+  assert(rc == 0);
+  rc = coda_cursor_read_uint16_array(&pOrbitFile->cursor,&pData->groundPixelQualityFlags[0],coda_array_ordering_c);
+  assert(rc == 0);
+
+  sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/XTrackQualityFlags");
+  if(coda_cursor_goto(&pOrbitFile->cursor,ee)==0){
+    pData->have_xtrack_quality_flags = true;
+    rc = coda_cursor_read_uint8_array(&pOrbitFile->cursor,&pData->xtrackQualityFlags[0],coda_array_ordering_c);
+    assert(rc == 0);
+  } else {
+    pData->have_xtrack_quality_flags = false;
+  }
+
+  sprintf(ee,"%s%s",pOrbitFile->swathpath,"Data_Fields/MeasurementQualityFlags/MeasurementQualityFlags");
+  rc = coda_cursor_goto(&pOrbitFile->cursor,ee);
+  assert(rc == 0);
+  rc = coda_cursor_read_uint16_array(&pOrbitFile->cursor,&pData->measurementQualityFlags[0],coda_array_ordering_c);
+  assert(rc == 0);
    
-   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/Latitude");
-   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
-   assert(coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->latitude[0],coda_array_ordering_c)==0);
+  sprintf(ee,"%s%s",pOrbitFile->swathpath,"Data_Fields/WavelengthReferenceColumn/WavelengthReferenceColumn");
+  rc = coda_cursor_goto(&pOrbitFile->cursor,ee);
+  assert(rc == 0);
+  rc = coda_cursor_read_int16_array(&pOrbitFile->cursor,&pData->wavelengthReferenceColumn[0],coda_array_ordering_c);
+  assert(rc == 0);
+
+  sprintf(ee,"%s%s",pOrbitFile->swathpath,"Data_Fields/InstrumentConfigurationId/InstrumentConfigurationId");
+  rc = coda_cursor_goto(&pOrbitFile->cursor,ee);
+  assert(rc == 0);
+  rc = coda_cursor_read_uint8_array(&pOrbitFile->cursor,&pData->instrumentConfigurationId[0],coda_array_ordering_c);
+  assert(rc == 0);
+
+  sprintf(ee,"%s%s",pOrbitFile->swathpath,"Data_Fields/PixelQualityFlags");
+  rc = coda_cursor_goto(&pOrbitFile->cursor,ee);
+  assert(rc == 0);
+  rc = coda_cursor_read_uint16_array(&pOrbitFile->cursor,&pData->pixelQualityFlags[0],coda_array_ordering_c);
+  assert(rc == 0);
    
-   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/Time/Time");
-   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
-   assert(coda_cursor_read_double_array(&pOrbitFile->cursor,&pData->time[0],coda_array_ordering_c)==0);
+  sprintf(ee,"%s%s",pOrbitFile->swathpath,"Data_Fields/WavelengthCoefficient");
+  rc = coda_cursor_goto(&pOrbitFile->cursor,ee);
+  assert(rc == 0);
+  rc = coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->spec_wavelengthcoeff[0],coda_array_ordering_c);
+  assert(rc == 0);
 
-   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/GroundPixelQualityFlags");
-   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
-   assert(coda_cursor_read_uint16_array(&pOrbitFile->cursor,&pData->groundPixelQualityFlags[0],coda_array_ordering_c)==0);
+  sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/SpacecraftAltitude/SpacecraftAltitude");
+  rc = coda_cursor_goto(&pOrbitFile->cursor,ee);
+  assert(rc == 0);
+  rc = coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->spacecraftAltitude[0],coda_array_ordering_c);
+  assert(rc == 0);
 
-   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/XTrackQualityFlags");
-   if(coda_cursor_goto(&pOrbitFile->cursor,ee)==0){
-	   pData->have_xtrack_quality_flags = true;
-	   assert(coda_cursor_read_uint8_array(&pOrbitFile->cursor,&pData->xtrackQualityFlags[0],coda_array_ordering_c)==0);
-   }
-   else  pData->have_xtrack_quality_flags = false;
+  sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/SpacecraftLongitude/SpacecraftLongitude");
+  rc = coda_cursor_goto(&pOrbitFile->cursor,ee);
+  assert(rc == 0);
+  rc = coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->spacecraftLongitude[0],coda_array_ordering_c);
+  assert(rc == 0);
 
-   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Data_Fields/MeasurementQualityFlags/MeasurementQualityFlags");
-   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
-   assert(coda_cursor_read_uint16_array(&pOrbitFile->cursor,&pData->measurementQualityFlags[0],coda_array_ordering_c)==0);
+  sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/SpacecraftLatitude/SpacecraftLatitude");
+  rc = coda_cursor_goto(&pOrbitFile->cursor,ee);
+  assert(rc == 0);
+  rc = coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->spacecraftLatitude[0],coda_array_ordering_c);
+  assert(rc == 0);
 
-   
-   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Data_Fields/WavelengthReferenceColumn/WavelengthReferenceColumn");
-   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
-   assert(coda_cursor_read_int16_array(&pOrbitFile->cursor,&pData->wavelengthReferenceColumn[0],coda_array_ordering_c)==0);
+  sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/SecondsInDay/SecondsInDay");
+  rc = coda_cursor_goto(&pOrbitFile->cursor,ee);
+  assert(rc == 0);
+  rc = coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->secondsInDay[0],coda_array_ordering_c);
+  assert(rc == 0);
 
-   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Data_Fields/InstrumentConfigurationId/InstrumentConfigurationId");
-   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
-   assert(coda_cursor_read_uint8_array(&pOrbitFile->cursor,&pData->instrumentConfigurationId[0],coda_array_ordering_c)==0);
-
-   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Data_Fields/PixelQualityFlags");
-   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
-   assert(coda_cursor_read_uint16_array(&pOrbitFile->cursor,&pData->pixelQualityFlags[0],coda_array_ordering_c)==0);
-   
-   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Data_Fields/WavelengthCoefficient");
-   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
-   assert(coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->spec_wavelengthcoeff[0],coda_array_ordering_c)==0);
-
-   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/SpacecraftAltitude/SpacecraftAltitude");
-   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
-   assert(coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->spacecraftAltitude[0],coda_array_ordering_c)==0);
-
-   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/SpacecraftLongitude/SpacecraftLongitude");
-   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
-   assert(coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->spacecraftLongitude[0],coda_array_ordering_c)==0);
-
-   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/SpacecraftLatitude/SpacecraftLatitude");
-   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
-   assert(coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->spacecraftLatitude[0],coda_array_ordering_c)==0);
-   
-   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/SecondsInDay/SecondsInDay");
-   assert(coda_cursor_goto(&pOrbitFile->cursor,ee)==0);
-   assert(coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->secondsInDay[0],coda_array_ordering_c)==0);
-   
   // normalize longitudes: should be in the range 0-360
   for (int i=0; i< (pOrbitFile->nMeasurements * pOrbitFile->nXtrack); i++) {
     if(pData->longitude[i] < 0.)
       pData->longitude[i] += 360.;
   }
 
-
   return rc;
 }
 
 
 static RC OmiOpen(struct omi_orbit_file *pOrbitFile,const char *swathName, const ENGINE_CONTEXT *pEngineContext)
-  {
+{
 	  
-	  RC rc = ERROR_ID_NO;
-	  if (	pEngineContext->project.instrumental.omi.spectralType== PRJCT_INSTR_OMI_TYPE_UV1){
-		  pOrbitFile->swathpath="/Earth_UV_1_Swath/";
-	  }
-	  else if (pEngineContext->project.instrumental.omi.spectralType== PRJCT_INSTR_OMI_TYPE_UV2){
-		  pOrbitFile->swathpath="/Earth_UV_2_Swath/";
-	  }
-	  else if (pEngineContext->project.instrumental.omi.spectralType== PRJCT_INSTR_OMI_TYPE_VIS){
-		  pOrbitFile->swathpath="/Earth_VIS_Swath/";
-	  }
-	  else{
-		  assert(0);
-	  }
-	  coda_init();
-	  coda_set_option_perform_boundary_checks(0);
-	  assert(coda_open(pOrbitFile->omiFileName,&pOrbitFile->product)==0);
-	  coda_cursor_set_product(&pOrbitFile->cursor, pOrbitFile->product);
-	  	 
-	  long int dims[3];
-	  char str_sw[200];
-	  sprintf(str_sw, "%s%s", pOrbitFile->swathpath,"Data_Fields/RadianceMantissa");
-	  int ppz=coda_cursor_goto(&pOrbitFile->cursor,str_sw);
-	  assert(ppz==0);
-	  int nd=0;
-	  assert(coda_cursor_get_array_dim(&pOrbitFile->cursor,&nd,dims)==0);
-	  pOrbitFile->nMeasurements=(long)dims[0];
-	  pOrbitFile->nXtrack=(long)dims[1];
-	  pOrbitFile->nWavel=(long)dims[2];
-	  pOrbitFile->specNumber=pOrbitFile->nMeasurements*pOrbitFile->nXtrack;
-	  if (!pOrbitFile->specNumber) {
-		  return ERROR_SetLast(__func__,ERROR_TYPE_FATAL,ERROR_ID_FILE_EMPTY,pOrbitFile->omiFileName);
-	  }
-	  rc=OMI_AllocateSwath(&pOrbitFile->omiSwath,pOrbitFile->nMeasurements,pOrbitFile->nXtrack,pOrbitFile->nWavel);
-	  if (!rc) {
-		  // Retrieve information on records from Data fields and Geolocation fields
-		  rc=OmiGetSwathData(pOrbitFile, pEngineContext);
-	  }
-	  if (!rc) {
-		  // Read orbit number and date from HDF-EOS metadata
-		  rc=read_orbit_metadata(pOrbitFile);
-	  }
-  
-  
-coda_close(pOrbitFile->product);
-coda_done();					
-
-
-
-	  return rc;
+  RC rc = ERROR_ID_NO;
+  if (pEngineContext->project.instrumental.omi.spectralType== PRJCT_INSTR_OMI_TYPE_UV1){
+    pOrbitFile->swathpath="/Earth_UV_1_Swath/";
   }
+  else if (pEngineContext->project.instrumental.omi.spectralType== PRJCT_INSTR_OMI_TYPE_UV2){
+    pOrbitFile->swathpath="/Earth_UV_2_Swath/";
+  }
+  else if (pEngineContext->project.instrumental.omi.spectralType== PRJCT_INSTR_OMI_TYPE_VIS){
+    pOrbitFile->swathpath="/Earth_VIS_Swath/";
+  }
+  else{
+    assert(0);
+  }
+  coda_init();
+  coda_set_option_perform_boundary_checks(0);
+  rc = coda_open(pOrbitFile->omiFileName,&pOrbitFile->product);
+  assert(rc == 0);
+  coda_cursor_set_product(&pOrbitFile->cursor, pOrbitFile->product);
+	  	 
+  long int dims[3];
+  char str_sw[200];
+  sprintf(str_sw, "%s%s", pOrbitFile->swathpath,"Data_Fields/RadianceMantissa");
+  int ppz=coda_cursor_goto(&pOrbitFile->cursor,str_sw);
+  assert(ppz==0);
+  int nd=0;
+  rc = coda_cursor_get_array_dim(&pOrbitFile->cursor,&nd,dims);
+  assert(rc == 0);
+  pOrbitFile->nMeasurements=(long)dims[0];
+  pOrbitFile->nXtrack=(long)dims[1];
+  pOrbitFile->nWavel=(long)dims[2];
+  pOrbitFile->specNumber=pOrbitFile->nMeasurements*pOrbitFile->nXtrack;
+  if (!pOrbitFile->specNumber) {
+    return ERROR_SetLast(__func__,ERROR_TYPE_FATAL,ERROR_ID_FILE_EMPTY,pOrbitFile->omiFileName);
+  }
+  rc=OMI_AllocateSwath(&pOrbitFile->omiSwath,pOrbitFile->nMeasurements,pOrbitFile->nXtrack,pOrbitFile->nWavel);
+  if (!rc) {
+    // Retrieve information on records from Data fields and Geolocation fields
+    rc=OmiGetSwathData(pOrbitFile, pEngineContext);
+  }
+  if (!rc) {
+    // Read orbit number and date from HDF-EOS metadata
+    rc=read_orbit_metadata(pOrbitFile);
+  }
+
+  coda_close(pOrbitFile->product);
+  coda_done();
+  return rc;
+}
 
 static RC OMI_LoadReference(int spectralType, const char *refFile, struct omi_ref **return_ref)
 {
-	char * irr, * irrprec, * irrexp, * pixelq , * wave, * refstr;
-	if (	spectralType== PRJCT_INSTR_OMI_TYPE_UV1){
-		irr="/Sun_Volume_UV_1_Swath/Data_Fields/IrradianceMantissa";
-		irrprec="/Sun_Volume_UV_1_Swath/Data_Fields/IrradiancePrecisionMantissa";
-		irrexp="/Sun_Volume_UV_1_Swath/Data_Fields/IrradianceExponent";
-		pixelq="/Sun_Volume_UV_1_Swath/Data_Fields/PixelQualityFlags";
-		wave="/Sun_Volume_UV_1_Swath/Data_Fields/WavelengthCoefficient";
-		refstr="/Sun_Volume_UV_1_Swath/Data_Fields/WavelengthReferenceColumn/WavelengthReferenceColumn";
-	}
-	else if (spectralType== PRJCT_INSTR_OMI_TYPE_UV2){
-		irr="/Sun_Volume_UV_2_Swath/Data_Fields/IrradianceMantissa";
-		irrprec="/Sun_Volume_UV_2_Swath/Data_Fields/IrradiancePrecisionMantissa";
-		irrexp="/Sun_Volume_UV_2_Swath/Data_Fields/IrradianceExponent";
-		pixelq="/Sun_Volume_UV_2_Swath/Data_Fields/PixelQualityFlags";
-		wave="/Sun_Volume_UV_2_Swath/Data_Fields/WavelengthCoefficient";
-		refstr="/Sun_Volume_UV_2_Swath/Data_Fields/WavelengthReferenceColumn/WavelengthReferenceColumn";
-	}
-	else if (spectralType== PRJCT_INSTR_OMI_TYPE_VIS){
-		irr="/Sun_Volume_VIS_Swath/Data_Fields/IrradianceMantissa";
-		irrprec="/Sun_Volume_VIS_Swath/Data_Fields/IrradiancePrecisionMantissa";
-		irrexp="/Sun_Volume_VIS_Swath/Data_Fields/IrradianceExponent";
-		pixelq="/Sun_Volume_VIS_Swath/Data_Fields/PixelQualityFlags";
-		wave="/Sun_Volume_VIS_Swath/Data_Fields/WavelengthCoefficient";
-		refstr="/Sun_Volume_VIS_Swath/Data_Fields/WavelengthReferenceColumn/WavelengthReferenceColumn";
-	}
-	else{
-		assert(0);
-	}
-	coda_product *product=NULL;
-	coda_cursor cursor;
-	coda_init();
-	coda_set_option_perform_boundary_checks(0);
-	assert(coda_open(refFile,&product)==0);
-	coda_cursor_set_product(&cursor, product);
-	assert(coda_cursor_goto(&cursor,irr)==0);
-	long  dims[3];	int nd;
-	assert(coda_cursor_get_array_dim(&cursor,&nd,dims)==0);
-	int16 *temp_Mantissa= (int16 *)malloc(dims[0]*dims[1]*dims[2]*sizeof(*temp_Mantissa));
-	int16 *temp_PrecisionMantissa= (int16 *)malloc(dims[0]*dims[1]*dims[2]*sizeof(*temp_PrecisionMantissa));
-	int8_t *temp_Exponent= (int8_t *)malloc(dims[0]*dims[1]*dims[2]*sizeof(*temp_Exponent));
-	unsigned short *temp_pixelq= (unsigned short *)malloc(dims[0]*dims[1]*dims[2]*sizeof(*temp_pixelq));
-	float *temp_wave= (float *)malloc(dims[0]*dims[1]*OMI_NUM_COEFFICIENTS*sizeof(*temp_wave));
-	int16 *refcol= (int16 *)malloc(dims[0]*sizeof(*refcol));
-	assert(coda_cursor_read_int16_array(&cursor,temp_Mantissa,coda_array_ordering_c)==0);
+  const char * irr, * irrprec, * irrexp, * pixelq , * wave, * refstr;
+  if (spectralType== PRJCT_INSTR_OMI_TYPE_UV1){
+    irr="/Sun_Volume_UV_1_Swath/Data_Fields/IrradianceMantissa";
+    irrprec="/Sun_Volume_UV_1_Swath/Data_Fields/IrradiancePrecisionMantissa";
+    irrexp="/Sun_Volume_UV_1_Swath/Data_Fields/IrradianceExponent";
+    pixelq="/Sun_Volume_UV_1_Swath/Data_Fields/PixelQualityFlags";
+    wave="/Sun_Volume_UV_1_Swath/Data_Fields/WavelengthCoefficient";
+    refstr="/Sun_Volume_UV_1_Swath/Data_Fields/WavelengthReferenceColumn/WavelengthReferenceColumn";
+  }
+  else if (spectralType== PRJCT_INSTR_OMI_TYPE_UV2){
+    irr="/Sun_Volume_UV_2_Swath/Data_Fields/IrradianceMantissa";
+    irrprec="/Sun_Volume_UV_2_Swath/Data_Fields/IrradiancePrecisionMantissa";
+    irrexp="/Sun_Volume_UV_2_Swath/Data_Fields/IrradianceExponent";
+    pixelq="/Sun_Volume_UV_2_Swath/Data_Fields/PixelQualityFlags";
+    wave="/Sun_Volume_UV_2_Swath/Data_Fields/WavelengthCoefficient";
+    refstr="/Sun_Volume_UV_2_Swath/Data_Fields/WavelengthReferenceColumn/WavelengthReferenceColumn";
+  }
+  else if (spectralType== PRJCT_INSTR_OMI_TYPE_VIS){
+    irr="/Sun_Volume_VIS_Swath/Data_Fields/IrradianceMantissa";
+    irrprec="/Sun_Volume_VIS_Swath/Data_Fields/IrradiancePrecisionMantissa";
+    irrexp="/Sun_Volume_VIS_Swath/Data_Fields/IrradianceExponent";
+    pixelq="/Sun_Volume_VIS_Swath/Data_Fields/PixelQualityFlags";
+    wave="/Sun_Volume_VIS_Swath/Data_Fields/WavelengthCoefficient";
+    refstr="/Sun_Volume_VIS_Swath/Data_Fields/WavelengthReferenceColumn/WavelengthReferenceColumn";
+  }
+  else{
+    assert(0);
+  }
+  coda_product *product=NULL;
+  coda_cursor cursor;
+  coda_init();
+  coda_set_option_perform_boundary_checks(0);
+  RC rc = coda_open(refFile, &product);
+
+  assert(rc==0);
+  coda_cursor_set_product(&cursor, product);
+  rc = coda_cursor_goto(&cursor,irr);
+  assert(rc==0);
+  long dims[3];
+  int nd;
+  rc = coda_cursor_get_array_dim(&cursor,&nd,dims);
+  assert(rc==0);
+  int16 *temp_Mantissa= (int16 *)malloc(dims[0]*dims[1]*dims[2]*sizeof(*temp_Mantissa));
+  int16 *temp_PrecisionMantissa= (int16 *)malloc(dims[0]*dims[1]*dims[2]*sizeof(*temp_PrecisionMantissa));
+  int8_t *temp_Exponent= (int8 *)malloc(dims[0]*dims[1]*dims[2]*sizeof(*temp_Exponent));
+  unsigned short *temp_pixelq= (unsigned short *)malloc(dims[0]*dims[1]*dims[2]*sizeof(*temp_pixelq));
+  float *temp_wave= (float *)malloc(dims[0]*dims[1]*OMI_NUM_COEFFICIENTS*sizeof(*temp_wave));
+  int16_t *refcol= (int16 *)malloc(dims[0]*sizeof(*refcol));
+  rc = coda_cursor_read_int16_array(&cursor,temp_Mantissa,coda_array_ordering_c);
+  assert(rc==0);
+
+  int pp=coda_cursor_goto(&cursor,irrprec);
+  assert(pp==0);
+
+  pp=coda_cursor_read_int16_array(&cursor,temp_PrecisionMantissa,coda_array_ordering_c);
+  assert(pp==0);
+  pp=coda_cursor_goto(&cursor,irrexp);
+  assert(pp==0);
+
+  pp=coda_cursor_read_int8_array(&cursor,temp_Exponent,coda_array_ordering_c);
+  assert(pp==0);
 	
-	int pp=coda_cursor_goto(&cursor,irrprec);
-	assert(pp==0);
+  pp=coda_cursor_read_int16_array(&cursor,temp_PrecisionMantissa,coda_array_ordering_c);
+  pp=coda_cursor_goto(&cursor,pixelq);
+  assert(pp==0);
 
-	pp=coda_cursor_read_int16_array(&cursor,temp_PrecisionMantissa,coda_array_ordering_c);
-	assert(pp==0);
-	pp=coda_cursor_goto(&cursor,irrexp);
-	assert(pp==0);
+  pp=coda_cursor_read_uint16_array(&cursor,temp_pixelq,coda_array_ordering_c);
+  assert(pp==0);
 
-	pp=coda_cursor_read_int8_array(&cursor,temp_Exponent,coda_array_ordering_c);
-	assert(pp==0);
+  pp=coda_cursor_goto(&cursor,wave);
+  pp=coda_cursor_read_float_array(&cursor,temp_wave,coda_array_ordering_c);
+  assert(pp==0);
 	
-	pp=coda_cursor_read_int16_array(&cursor,temp_PrecisionMantissa,coda_array_ordering_c);
-	pp=coda_cursor_goto(&cursor,pixelq);
-	assert(pp==0);
-
-	pp=coda_cursor_read_uint16_array(&cursor,temp_pixelq,coda_array_ordering_c);
-	assert(pp==0);
-
-	pp=coda_cursor_goto(&cursor,wave);
-	pp=coda_cursor_read_float_array(&cursor,temp_wave,coda_array_ordering_c);
-	assert(pp==0);
-	
-	assert(pp==0);
-	pp=coda_cursor_goto(&cursor,refstr);
-	pp=coda_cursor_read_int16_array(&cursor,refcol,coda_array_ordering_c);
-	assert(pp==0);
+  assert(pp==0);
+  pp=coda_cursor_goto(&cursor,refstr);
+  pp=coda_cursor_read_int16_array(&cursor,refcol,coda_array_ordering_c);
+  assert(pp==0);
 	
   struct omi_ref *pRef=&OMI_ref[omiRefFilesN];
-  RC rc=ERROR_ID_NO;
   const int32 n_xtrack = dims[1];
-
   const int32 n_wavel = dims[2];
 
   OMI_AllocateReference(omiRefFilesN,n_xtrack,n_wavel);
