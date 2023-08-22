@@ -849,7 +849,12 @@ RC EngineSetFile(ENGINE_CONTEXT *pEngineContext,const char *fileName,void *respo
        // ---------------------------------------------------------------------------
      }
 
-   pEngineContext->n_alongtrack=(ANALYSE_swathSize>0)?pEngineContext->recordNumber/ANALYSE_swathSize:pEngineContext->recordNumber;
+   if (!pEngineContext->n_alongtrack && ANALYSE_swathSize) {
+     pEngineContext->n_alongtrack=pEngineContext->recordNumber/ANALYSE_swathSize;
+   }
+   if (pEngineContext->project.instrumental.readOutFormat == PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF) {
+     pEngineContext->n_alongtrack=(ANALYSE_swathSize>0)?pEngineContext->recordNumber/ANALYSE_swathSize:pEngineContext->recordNumber;
+   }
 
    // Return
 
