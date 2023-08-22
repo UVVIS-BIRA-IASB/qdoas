@@ -112,13 +112,13 @@ struct omi_data {
   float          *solarAzimuthAngle;
   float          *viewingZenithAngle;
   float          *viewingAzimuthAngle;
-	int16        *temp_RadianceMantissa;
-	int16        *temp_RadiancePrecisionMantissa;
-	int8_t        *temp_RadianceExponent;
+  int16        *temp_RadianceMantissa;
+  int16        *temp_RadiancePrecisionMantissa;
+  int8_t        *temp_RadianceExponent;
   short          *terrainHeight;
   unsigned short *groundPixelQualityFlags;
-	unsigned short *pixelQualityFlags;
-	float *spec_wavelengthcoeff;
+  unsigned short *pixelQualityFlags;
+  float *spec_wavelengthcoeff;
   uint8_t        *xtrackQualityFlags;
   short *wavelengthReferenceColumn;
   unsigned short *measurementQualityFlags;
@@ -158,12 +158,12 @@ struct omi_orbit_file { // description of an orbit
   long       nMeasurements,
     nXtrack,                    // number of detector tracks (normally 60)
     nWavel;
-   coda_cursor  cursor;
-	coda_product *product;
+  coda_cursor  cursor;
+  coda_product *product;
 
   int year, month, day;         // orbit date
   int number;                   // orbit number
-	char *swathpath;          ///Earth_UV_1_Swath or /Earth_UV_2_Swath or /Earth_VIS_Swath
+  char *swathpath;          ///Earth_UV_1_Swath or /Earth_UV_2_Swath or /Earth_VIS_Swath
 };
 
 /* Before calculating the automatic reference spectrum, we build a
@@ -183,7 +183,7 @@ struct omi_ref_spectrum {
 
 /* List of spectra to be used in the automatic reference calculation
  * for a single pair (analysiswindow, detector row).
-  */
+ */
 struct omi_ref_list {
   struct omi_ref_spectrum *reference;
   struct omi_ref_list *next;
@@ -305,29 +305,29 @@ static RC OMI_AllocateReference(INDEX indexRef,int nSpectra,int nPoints)
  *  NONSTRICT: also use pixels which are slightly affected or corrected (flag 2,3 or 4)
  */
 bool omi_use_track(int quality_flag, enum omi_xtrack_mode mode)
- {
-   bool result;
-   if (quality_flag == OMI_XTRACK_NOTUSED) {
-     result = false;
-   } else {
-     quality_flag &= 7; // reduce to bits 0-2
-     switch(mode)
-       {
-       case XTRACKQF_IGNORE:
-         result = true;
-         break;
-       case XTRACKQF_STRICT:
-         result = (quality_flag == 0);
-         break;
-       case XTRACKQF_NONSTRICT:
-         result = (quality_flag == 0 || quality_flag == 2 || quality_flag == 3 || quality_flag == 4);
-         break;
-       default:
-         result = true;
-       }
-   }
-   return result;
- }
+{
+  bool result;
+  if (quality_flag == OMI_XTRACK_NOTUSED) {
+    result = false;
+  } else {
+    quality_flag &= 7; // reduce to bits 0-2
+    switch(mode)
+      {
+      case XTRACKQF_IGNORE:
+        result = true;
+        break;
+      case XTRACKQF_STRICT:
+        result = (quality_flag == 0);
+        break;
+      case XTRACKQF_NONSTRICT:
+        result = (quality_flag == 0 || quality_flag == 2 || quality_flag == 3 || quality_flag == 4);
+        break;
+      default:
+        result = true;
+      }
+  }
+  return result;
+}
 
 /*! \brief check if automatic reference creation was successful for this row */
 bool omi_has_automatic_reference(int row)
@@ -359,13 +359,13 @@ static void omi_free_swath_data(struct omi_swath_earth *pSwath)
       {"time",data->time},
       {"groundPixelQualityFlags",data->groundPixelQualityFlags},
       {"xtrackQualityFlags",data->xtrackQualityFlags},
-	  {"temp_RadianceMantissa"  ,      data->temp_RadianceMantissa},
-	  {"temp_RadiancePrecisionMantissa" ,       data->temp_RadiancePrecisionMantissa},
-	  {"temp_RadianceExponent",       data->temp_RadianceExponent},
-	  {"pixelQualityFlags",	data->pixelQualityFlags},
-	  {"spec_wavelengthcoeff",	data->spec_wavelengthcoeff}
+      {"temp_RadianceMantissa"  ,      data->temp_RadianceMantissa},
+      {"temp_RadiancePrecisionMantissa" ,       data->temp_RadiancePrecisionMantissa},
+      {"temp_RadianceExponent",       data->temp_RadianceExponent},
+      {"pixelQualityFlags",	data->pixelQualityFlags},
+      {"spec_wavelengthcoeff",	data->spec_wavelengthcoeff}
 
-	};
+    };
     for(unsigned int i=0; i<sizeof(omi_swath_buffers)/sizeof(omi_swath_buffers[0]); i++) {
       void *ptr = omi_swath_buffers[i].bufferptr;
       if (ptr != NULL)
@@ -414,41 +414,41 @@ void OMI_TrackSelection(const char *omiTrackSelection,bool *use_row)
   else
     {
       for (const char *ptr=omiTrackSelection;(int)(ptr-omiTrackSelection)<=256;ptr++)
-    {
-      if (resetFlag)
         {
-          memset(str,0,256);
-          n=0;
-          resetFlag=0;
+          if (resetFlag)
+            {
+              memset(str,0,256);
+              n=0;
+              resetFlag=0;
+            }
+
+          if ((*ptr>='0') && (*ptr<='9'))
+            str[n++]=*ptr;
+          else if ((*ptr==':') || (*ptr=='-'))
+            {
+              number1=atoi(str);
+              rangeFlag=1;
+              resetFlag=1;
+            }
+          else if ((*ptr==',') || (*ptr==';') || (*ptr=='\0'))
+            {
+              number2=atoi(str);
+
+              if (!rangeFlag)
+                number1=number2;
+
+              if ((number1>0) && (number1<MAX_SWATHSIZE) && (number2>0) && (number2<MAX_SWATHSIZE))
+                for (i=number1-1;i<number2;i++)
+                  use_row[i]=true;
+
+              number1=number2=-1;
+              rangeFlag=0;
+              resetFlag=1;
+
+              if (*ptr=='\0')
+                break;
+            }
         }
-
-      if ((*ptr>='0') && (*ptr<='9'))
-        str[n++]=*ptr;
-      else if ((*ptr==':') || (*ptr=='-'))
-        {
-          number1=atoi(str);
-          rangeFlag=1;
-          resetFlag=1;
-        }
-      else if ((*ptr==',') || (*ptr==';') || (*ptr=='\0'))
-        {
-          number2=atoi(str);
-
-          if (!rangeFlag)
-        number1=number2;
-
-          if ((number1>0) && (number1<MAX_SWATHSIZE) && (number2>0) && (number2<MAX_SWATHSIZE))
-        for (i=number1-1;i<number2;i++)
-          use_row[i]=true;
-
-          number1=number2=-1;
-          rangeFlag=0;
-          resetFlag=1;
-
-          if (*ptr=='\0')
-        break;
-        }
-    }
     }
 }
 
@@ -687,9 +687,9 @@ static RC find_matching_spectra(const ENGINE_CONTEXT *pEngineContext, struct omi
               newref->spectrum = malloc(orbit_file->nWavel * sizeof(*newref->spectrum));
               newref->errors = malloc(orbit_file->nWavel * sizeof(*newref->errors));
               newref->wavelengths = malloc(orbit_file->nWavel * sizeof(*newref->wavelengths));
-			  long dd[3]={orbit_file->nMeasurements,orbit_file->nXtrack,orbit_file->nWavel};
-			  unsigned short *groundPixelQualityFlags;
-			  uint8_t        *xtrackQualityFlags;
+              long dd[3]={orbit_file->nMeasurements,orbit_file->nXtrack,orbit_file->nWavel};
+              unsigned short *groundPixelQualityFlags;
+              uint8_t        *xtrackQualityFlags;
               rc = omi_load_spectrum(OMI_SPEC_RAD, orbit_file->sw_id, measurement, row, orbit_file->nWavel, newref->wavelengths, newref->spectrum, newref->errors, NULL,&orbit_file->omiSwath->dataFields.temp_RadianceMantissa[0],&orbit_file->omiSwath->dataFields.temp_RadiancePrecisionMantissa[0],&orbit_file->omiSwath->dataFields.temp_RadianceExponent[0],&orbit_file->omiSwath->dataFields.pixelQualityFlags[0],&orbit_file->omiSwath->dataFields.spec_wavelengthcoeff[0],dd,&orbit_file->omiSwath->dataFields.wavelengthReferenceColumn[0]);			  
               if(rc)
                 goto end_find_matching_spectra;
@@ -711,7 +711,7 @@ static RC find_matching_spectra(const ENGINE_CONTEXT *pEngineContext, struct omi
 /* Calculate the automatic reference spectrum by averaging all spectra
    in the list.  The error on the automatic reference (for each pixel)
    is calculated as 1/n_spectra * sqrt(sum (sigma_i)^2)
-   */
+*/
 static void average_spectrum( double *average, double *errors, const struct omi_ref_list *spectra, const double *wavelength_grid) {
   int nWavel = spectra->reference->orbit_file->nWavel;
 
@@ -804,7 +804,7 @@ static RC setup_automatic_reference(ENGINE_CONTEXT *pEngineContext, void *respon
         if(reflist != NULL) {
           average_spectrum(pTabFeno->Sref, pTabFeno->SrefSigma, reflist, pTabFeno->LambdaRef);
           VECTOR_NormalizeVector(pTabFeno->Sref-1,n_wavel,&pTabFeno->refNormFact, __func__);
-      pTabFeno->ref_description = automatic_reference_info(reflist);
+          pTabFeno->ref_description = automatic_reference_info(reflist);
         } else{
           char errormessage[250];
           sprintf( errormessage, "Can not find reference spectra for row %d and analysis window_%s", row, pTabFeno->windowName);
@@ -826,12 +826,12 @@ static RC setup_automatic_reference(ENGINE_CONTEXT *pEngineContext, void *respon
 // leap seconds we have to subtract from the TAI value.
 static void tai_to_utc(double tai, float utc_seconds_in_day, struct tm *result, int *ms) {
   static struct tm start_tai = { .tm_sec = 0,
-                                 .tm_min = 0,
-                                 .tm_hour = 0,
-                                 .tm_mday = 1,
-                                 .tm_mon = 0, // month since jan (-> 0-11)
-                                 .tm_year = 93, // year since 1900
-                                 .tm_isdst = 0 };
+    .tm_min = 0,
+    .tm_hour = 0,
+    .tm_mday = 1,
+    .tm_mon = 0, // month since jan (-> 0-11)
+    .tm_year = 93, // year since 1900
+    .tm_isdst = 0 };
 
   // get seconds since epoch of 1/1/1993 00:00:00 UTC
   time_t time_epoch = STD_timegm(&start_tai);
@@ -896,23 +896,23 @@ static RC OmiGetSwathData(struct omi_orbit_file *pOrbitFile, const ENGINE_CONTEX
   RC rc=ERROR_ID_NO;
 
   struct omi_buffer swathdata[] = {
-                                   {"MeasurementQualityFlags", pData->measurementQualityFlags},
-                                   {"InstrumentConfigurationId", pData->instrumentConfigurationId},
-                                   {"WavelengthReferenceColumn", pData->wavelengthReferenceColumn},
-                                   {"Time",pData->time},
-                                   {"SecondsInDay",pData->secondsInDay},
-                                   {"SpacecraftLatitude", pData->spacecraftLatitude},
-                                   {"SpacecraftLongitude", pData->spacecraftLongitude},
-                                   {"SpacecraftAltitude", pData->spacecraftAltitude},
-                                   {"Latitude", pData->latitude},
-                                   {"Longitude", pData->longitude},
-                                   {"SolarZenithAngle", pData->solarZenithAngle},
-                                   {"SolarAzimuthAngle", pData->solarAzimuthAngle},
-                                   {"ViewingZenithAngle", pData->viewingZenithAngle},
-                                   {"ViewingAzimuthAngle", pData->viewingAzimuthAngle},
-                                   {"TerrainHeight", pData->terrainHeight},
-                                   {"GroundPixelQualityFlags", pData->groundPixelQualityFlags}
- };
+    {"MeasurementQualityFlags", pData->measurementQualityFlags},
+    {"InstrumentConfigurationId", pData->instrumentConfigurationId},
+    {"WavelengthReferenceColumn", pData->wavelengthReferenceColumn},
+    {"Time",pData->time},
+    {"SecondsInDay",pData->secondsInDay},
+    {"SpacecraftLatitude", pData->spacecraftLatitude},
+    {"SpacecraftLongitude", pData->spacecraftLongitude},
+    {"SpacecraftAltitude", pData->spacecraftAltitude},
+    {"Latitude", pData->latitude},
+    {"Longitude", pData->longitude},
+    {"SolarZenithAngle", pData->solarZenithAngle},
+    {"SolarAzimuthAngle", pData->solarAzimuthAngle},
+    {"ViewingZenithAngle", pData->viewingZenithAngle},
+    {"ViewingAzimuthAngle", pData->viewingAzimuthAngle},
+    {"TerrainHeight", pData->terrainHeight},
+    {"GroundPixelQualityFlags", pData->groundPixelQualityFlags}
+  };
 
   char ee[300];
   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Data_Fields/RadianceMantissa");
@@ -1262,12 +1262,12 @@ static RC omi_load_spectrum(int spec_type, int32 sw_id, int32 measurement, int32
 
   // read wavelengths:
   if(lambda != NULL) {
-	  int16 refcol;
-	  refcol=refcoll[measurement];
+    int16 refcol;
+    refcol=refcoll[measurement];
     float32 wavelength_coeff[OMI_NUM_COEFFICIENTS];
-    	for (int j=0; j<OMI_NUM_COEFFICIENTS; j++) {
-		wavelength_coeff[j]=wavecoeff[ii_wave+j];
-	}
+    for (int j=0; j<OMI_NUM_COEFFICIENTS; j++) {
+      wavelength_coeff[j]=wavecoeff[ii_wave+j];
+    }
 	    
     // store wavelength in lambda
     omi_calculate_wavelengths(wavelength_coeff, refcol, n_wavel, lambda);
@@ -1277,34 +1277,34 @@ static RC omi_load_spectrum(int spec_type, int32 sw_id, int32 measurement, int32
   // (ir-)radiance mantissae, exponents & pixel quality have dimension (nMeasurement x nXtrack x nWavel)
   if(spectrum != NULL || sigma != NULL) {
     if(spectrum != NULL) {
-		  for (int j=0; j<n_wavel; j++) {
+      for (int j=0; j<n_wavel; j++) {
 			  
-			  mantissa[j]=spec_mantissa[ii_rad+j];
-			  exponent[j]=spec_exponent[ii_rad+j];
-			  assert(mantissa[j]==spec_mantissa[ii_rad+j]);
-		  }
-        omi_make_double(mantissa, exponent, n_wavel, spectrum);
-        omi_interpolate_errors(mantissa,n_wavel,lambda,spectrum);
+        mantissa[j]=spec_mantissa[ii_rad+j];
+        exponent[j]=spec_exponent[ii_rad+j];
+        assert(mantissa[j]==spec_mantissa[ii_rad+j]);
       }
+      omi_make_double(mantissa, exponent, n_wavel, spectrum);
+      omi_interpolate_errors(mantissa,n_wavel,lambda,spectrum);
     }
-    if(sigma != NULL) {
-		  for (int j=0; j<n_wavel; j++) {
-				  precisionmantissa[j]=spec_precisionmantissa[ii_rad+j];
-			  assert(precisionmantissa[j]==spec_precisionmantissa[ii_rad+j]);
-		  }
-		  omi_make_double(precisionmantissa, exponent, n_wavel, sigma);
-        omi_interpolate_errors(precisionmantissa,n_wavel,lambda,sigma);
-      }
+  }
+  if(sigma != NULL) {
+    for (int j=0; j<n_wavel; j++) {
+      precisionmantissa[j]=spec_precisionmantissa[ii_rad+j];
+      assert(precisionmantissa[j]==spec_precisionmantissa[ii_rad+j]);
+    }
+    omi_make_double(precisionmantissa, exponent, n_wavel, sigma);
+    omi_interpolate_errors(precisionmantissa,n_wavel,lambda,sigma);
+  }
     
 
 
   if(pixelQualityFlags != NULL){
-  for (int j=0; j<n_wavel; j++) {
-	  //here can the filtering on pixelqualityflag be implemented. 
-// pixelQualityFlags[j]=pixelq[ii_rad+j];
+    for (int j=0; j<n_wavel; j++) {
+      //here can the filtering on pixelqualityflag be implemented.
+      // pixelQualityFlags[j]=pixelq[ii_rad+j];
+    }
   }
-}
-   free(mantissa);
+  free(mantissa);
   free(precisionmantissa);
   free(exponent);
   
@@ -1322,7 +1322,7 @@ static void omi_calculate_wavelengths(float32 wavelength_coeff[], int16 refcol, 
     lambda[i] = 0.;
     int j;
     for (j=OMI_NUM_COEFFICIENTS-1; j>=0 ; j--) {
-		/* printf("%f",wavelength_coeff[j]); */
+      /* printf("%f",wavelength_coeff[j]); */
       lambda[i] = lambda[i]*x + (double)wavelength_coeff[j];
     }
   }
@@ -1548,8 +1548,8 @@ static void get_omi_record_data(RECORD_INFO *pRecord, const struct omi_orbit_fil
 // -----------------------------------------------------------------------------
 
 RC  OMI_read_earth(ENGINE_CONTEXT *pEngineContext,int recordNo)
-  {
-	  // assert(0);
+{
+  // assert(0);
   // Initializations
   const struct omi_orbit_file *pOrbitFile = &current_orbit_file; // pointer to the current orbit
 
@@ -1600,7 +1600,7 @@ RC  OMI_read_earth(ENGINE_CONTEXT *pEngineContext,int recordNo)
     }
     memcpy(pEngineContext->buffers.lambda_irrad,OMI_ref[0].omiRefLambda[i_crosstrack],sizeof(double)*pOrbitFile->nWavel);
     memcpy(pEngineContext->buffers.irrad,OMI_ref[0].omiRefSpectrum[i_crosstrack],sizeof(double)*pOrbitFile->nWavel);
-    }
+  }
 
   return rc;
 }
@@ -1613,7 +1613,7 @@ RC OMI_get_orbit_date(int *year, int *month, int *day) {
 }
 
 /*! read the orbit number and start date from the HDF4 file attribute
-    "CoreMetadata.0" */
+  "CoreMetadata.0" */
 static RC read_orbit_metadata(struct omi_orbit_file *orbit) {
   /* OMI files have metadata stored as a formatted text string in an
    * HDF SD attribute field. NASA provides the "SDP Toolkit" library

@@ -126,9 +126,9 @@ struct linear_system*LINEAR_alloc(int m, int n, enum linear_fit_mode mode) {
     break;
   }
 
-  #if defined(__DEBUG_) && __DEBUG_
+#if defined(__DEBUG_) && __DEBUG_
   DEBUG_FunctionStop((char *)__func__,0);
-  #endif
+#endif
   
   return s;
 }
@@ -188,9 +188,9 @@ void LINEAR_free(struct linear_system *s) {
   delete[] s->norms;
   delete s;
   
-  #if defined(__DEBUG_) && __DEBUG_
+#if defined(__DEBUG_) && __DEBUG_
   DEBUG_FunctionStop((char *)__func__,0);
-  #endif
+#endif
 }
 
 void LINEAR_set_column(struct linear_system *s, int n, const double *values) {
@@ -270,9 +270,7 @@ int LINEAR_decompose(struct linear_system *s, double *sigmasquare, double **cova
       gsl_vector_view colj = gsl_matrix_column(s->decomposition.qr.A, j);
       s->norms[j]=0.;
       for (int i=0; i<s->m; ++i) {
-        
         s->norms[j] += gsl_vector_get(&colj.vector, i)*gsl_vector_get(&colj.vector, i);
-//        if (i>=s->m-6) printf("j:%d  s->norms[%d]=%lf\n",j,i,s->norms[j]);
       }
       if (s->norms[j] == 0.)
         return ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_NORMALIZE);
@@ -475,14 +473,14 @@ int LINEAR_fit_poly(int num_eqs, int poly_order, const double *a, const double *
   LINEAR_free(linsys);
   delete[] b_sigma;
 
-  #if defined(__DEBUG_) && __DEBUG_
+#if defined(__DEBUG_) && __DEBUG_
   DEBUG_FunctionStop((char *)__func__,rc);
-  #endif
+#endif
   
   return rc;
 }
 
 double LINEAR_GetNorm(const struct linear_system *s,int indexNorm)
- {
+{
   return s->norms[indexNorm];
- }
+}
