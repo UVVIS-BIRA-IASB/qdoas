@@ -4,6 +4,13 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
     cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 endif()
 
+project(qdoas)
+
+set(VERSION 3.5.0)
+set(QDOAS_VERSION "3.5.0" CACHE STRING "")
+set(QDOAS_DATE "21 December 2022" CACHE STRING "")
+
+
 get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 
 if(isMultiConfig)
@@ -34,14 +41,6 @@ set(CMAKE_EXE_LINKER_FLAGS_ASAN
 set(CMAKE_SHARED_LINKER_FLAGS_ASAN
     "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -fsanitize=address" CACHE STRING
     "Linker lags to be used to create shared libraries for Asan build type." FORCE)
-
-
-project(qdoas)
-
-set(VERSION 3.5.0)
-set(QDOAS_VERSION "3.5.0" CACHE STRING "")
-set(QDOAS_DATE "21 December 2022" CACHE STRING "")
-
 
 
 function(list_transform_prepend var prefix)
