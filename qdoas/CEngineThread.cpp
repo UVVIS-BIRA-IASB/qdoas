@@ -39,7 +39,8 @@ CEngineThread::CEngineThread(CQdoasEngineController *parent) :
   // get an engine context
   CEngineResponse *resp = new CEngineResponseMessage;
 
-  assert(mediateRequestCreateEngineContext(&m_engineContext, resp) == 0);
+  int rc = mediateRequestCreateEngineContext(&m_engineContext, resp);
+  assert(rc == 0);
   delete resp;
 }
 
@@ -56,7 +57,8 @@ CEngineThread::~CEngineThread()
 
   CEngineResponse *resp = new CEngineResponseMessage;
 
-  assert(mediateRequestDestroyEngineContext(m_engineContext, resp) == 0);
+  int rc = mediateRequestDestroyEngineContext(m_engineContext, resp);
+  assert(rc == 0);
   delete resp;
 }
 
