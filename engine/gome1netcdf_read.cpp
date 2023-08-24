@@ -1514,16 +1514,15 @@ static int show_ref_info(int i_row, const FENO *pTabFeno, const struct reference
     mediateResponseCellDataDouble(plotPageRef, i_row, 2 + i_column,refs[i].shift, responseHandle);
     mediateResponseCellDataDouble(plotPageRef, i_row, 3 + i_column,refs[i].stretch, responseHandle);
     ++i_row;
-    const char* labelfmt = "Reference %s";
-    auto plot_label = std::make_unique<char[]>(strlen(labelfmt) + strlen(pixeltype[i]));
-    sprintf(plot_label.get(), labelfmt, pixeltype[i]);
+    string labelfmt("Reference ");
+    labelfmt += pixeltype[i];
     plot_data_t spectrum_data;
     spectrum_data.x = pTabFeno->LambdaRef;
     spectrum_data.y = refs[i].spectrum;
     spectrum_data.length = refs[i].n_wavel;
     spectrum_data.curveName[0] = '\0';
 
-    mediateResponsePlotData(plotPageRef,&spectrum_data,1,Spectrum,forceAutoScale,plot_label.get(), "Wavelength (nm)", "Intensity", responseHandle);
+    mediateResponsePlotData(plotPageRef,&spectrum_data,1,Spectrum,forceAutoScale, labelfmt.c_str(), "Wavelength (nm)", "Intensity", responseHandle);
   }
   return ++i_row;
 }
@@ -1575,36 +1574,30 @@ RC GOME1NETCDF_NewRef(ENGINE_CONTEXT *pEngineContext,void *responseHandle) {
 
       if ((pTabFeno->hidden!=1) &&
           (pTabFeno->useKurucz!=ANLYS_KURUCZ_SPEC) &&
-          (pTabFeno->refSpectrumSelectionMode==ANLYS_REF_SELECTION_MODE_AUTOMATIC))
-       {
+          (pTabFeno->refSpectrumSelectionMode==ANLYS_REF_SELECTION_MODE_AUTOMATIC)) {
+	if (selected_spectra[i][indexFenoColumn] == NULL) {
+	  // We may not find references for every VZA bin/analysis
+	  // window.  At this point we just emit a warning (it's not a
+	  // problem until we *need* that during retrieval for that bin).
+	  std::stringstream message;
+	  message << " for analysis window " << pTabFeno->windowName
+		  << " and VZA bin num " << indexFenoColumn;
+	  ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_REFERENCE_SELECTION, message.str().c_str());
+	  continue;
+	}
+	struct reference *ref = &vza_refs[i][indexFenoColumn];
 
-        //for (size_t j=0; j<NUM_VZA_REFS; ++j) {
-          if (selected_spectra[i][indexFenoColumn] == NULL)
-           {
-            // We may not find references for every VZA bin/analysis
-            // window.  At this point we just emit a warning (it's not a
-            // problem until we *need* that during retrieval for that bin).
-            const char *message_format = " for analysis window% s and VZA bin% d";
-            auto length = strlen(message_format) + strlen(pTabFeno->windowName) + strlen(TOSTRING(MAX_FENO));
-            auto tmp = std::make_unique<char[]>(length);
-            sprintf(tmp.get(), message_format, pTabFeno->windowName, indexFenoColumn); // TODO convert ref number back to bin for error message
-            ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_REFERENCE_SELECTION, tmp.get());
-            continue;
-           }
-          struct reference *ref = &vza_refs[i][indexFenoColumn];
+	rc = average_ref_spectra(selected_spectra[i][indexFenoColumn], pTabFeno->LambdaRef, pTabFeno->NDET, ref);
 
-          rc = average_ref_spectra(selected_spectra[i][indexFenoColumn], pTabFeno->LambdaRef, pTabFeno->NDET, ref);
+	if (rc != ERROR_ID_NO)
+	  goto cleanup;
 
-          if (rc != ERROR_ID_NO)
-            goto cleanup;
+	// align ref w.r.t irradiance reference:
+	double sigma_shift, sigma_stretch, sigma_stretch2; // not used here...
 
-          // align ref w.r.t irradiance reference:
-          double sigma_shift, sigma_stretch, sigma_stretch2; // not used here...
-
-          rc = ANALYSE_fit_shift_stretch(1, 0, pTabFeno->SrefEtalon, ref->spectrum,
-                                         &ref->shift, &ref->stretch, &ref->stretch2,
-                                         &sigma_shift, &sigma_stretch, &sigma_stretch2);
-
+	rc = ANALYSE_fit_shift_stretch(1, 0, pTabFeno->SrefEtalon, ref->spectrum,
+				       &ref->shift, &ref->stretch, &ref->stretch2,
+				       &sigma_shift, &sigma_stretch, &sigma_stretch2);
        }
      }
    }
