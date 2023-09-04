@@ -64,6 +64,11 @@
 
 #include "doas.h"
 
+#ifdef _MSC_VER
+// Older Visual C does not know C99 restrict keyword
+#define restrict
+#endif
+
 // -----------------------------------------------------------------------------
 // FUNCTION      VECTOR_Init
 // -----------------------------------------------------------------------------
