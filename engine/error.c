@@ -160,10 +160,12 @@ ERROR_TABLE errorTable[]=
   { ERROR_ID_SQRT_ARG                  , "sqrt argument error"                                                                                                },
   { ERROR_ID_POW                       , "Pow Overflow (check your reference spectrum)"                                                                       },
   { ERROR_ID_NORMALIZE                 , "Vector is 0., cannot normalize"                                                                                     },
+  
+  { ERROR_ID_CALIBRATION_POLYNOMIAL    , "the degree of the polynomial to fit individual points (shift or SFP) should be less than the number of calibration windows" },
 
   // High-level math functions
 
-  { ERROR_ID_SVD_ILLCONDITIONED       , "ill-conditioned matrix"                                                                                            },
+  { ERROR_ID_SVD_ILLCONDITIONED       , "ill-conditioned matrix"                                                                                             },
   { ERROR_ID_SVD_ARG                   , "the number of lines of the matrix to decompose is expected to be higher than the number of columns (%d x %d)"       },
   { ERROR_ID_SPLINE                    , "spline interpolation requests increasing absissae (indexes : %d - %d, values : %g - %g)"                            },
   { ERROR_ID_VOIGT                     , "Voigt function failed (x=%g,y=%g)"                                                                                  },

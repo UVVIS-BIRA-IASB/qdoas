@@ -2149,9 +2149,17 @@ RC KURUCZ_Alloc(const PROJECT *pProject, const double *lambda,INDEX indexKurucz,
   shiftDegree=pKuruczOptions->shiftPolynomial;
 
   rc=ERROR_ID_NO;
-
+  
+  // Check if the degree of the polynomial for the shift of for the stretch is less than the number of calibration windows   
+  
+  if ((pKuruczOptions->shiftPolynomial>=Nb_Win) || (pKuruczOptions->fwhmFit && (pKuruczOptions->fwhmPolynomial>=Nb_Win)))
+   {
+    rc=ERROR_SetLast(__func__,ERROR_TYPE_FATAL,ERROR_ID_CALIBRATION_POLYNOMIAL,"Slit File");
+    goto EndKuruczAlloc;
+   }  
+  
   // Check validity of entry fields in Kurucz tab page of project properties panel
-
+  
   if (pKuruczOptions->fwhmFit)
    {
     pKurucz->fwhmDegree=pKuruczOptions->fwhmPolynomial;
@@ -2170,7 +2178,7 @@ RC KURUCZ_Alloc(const PROJECT *pProject, const double *lambda,INDEX indexKurucz,
     if (rc!=ERROR_ID_NO)
      goto EndKuruczAlloc;
    }
-
+   
   if (((pKurucz->KuruczFeno=(KURUCZ_FENO *)MEMORY_AllocBuffer(__func__,"KuruczFeno",NFeno,sizeof(KURUCZ_FENO),0,MEMORY_TYPE_STRUCT))==NULL) ||
       ((pKurucz->dispAbsolu=(double **)MEMORY_AllocBuffer(__func__,"dispAbsolu",Nb_Win,sizeof(double **),0,MEMORY_TYPE_PTR))==NULL) ||
       ((pKurucz->dispSecX=(double **)MEMORY_AllocBuffer(__func__,"dispSecX",Nb_Win,sizeof(double **),0,MEMORY_TYPE_PTR))==NULL) ||

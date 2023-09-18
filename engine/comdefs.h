@@ -235,6 +235,10 @@ SHORT_DATE;
 #define ERROR_ID_POW                            507                             // pow overflow
 #define ERROR_ID_NORMALIZE                      508                             // vector norm is zero
 
+// Calibration
+
+#define ERROR_ID_CALIBRATION_POLYNOMIAL         601                             // Polynomial degree (shift or slit) should be less than the number of calibration windows
+
 // Output
 
 #define ERROR_ID_AMF                            801                             // AMF not calculated
