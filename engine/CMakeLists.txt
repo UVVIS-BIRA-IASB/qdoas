@@ -115,7 +115,7 @@ add_library(engine STATIC
   zenithal.c
   zenithal.h
 )
-target_link_libraries(engine PRIVATE Boost::boost Eigen3::Eigen GSL::gsl GSL::gslcblas
+target_link_libraries(engine PRIVATE Boost::boost Eigen3::Eigen
   ${HDF5_CXX_LIBRARIES}
   ${CODA_LIBRARY}
   ${NETCDF_LIBRARIES})

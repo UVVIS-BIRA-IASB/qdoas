@@ -51,9 +51,6 @@ extern "C" {
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include "gsl/gsl_matrix.h"
-#include "gsl/gsl_linalg.h"
-
 #include "linear_system.h"
 #include "comdefs.h"
 #include "svd.h"
@@ -67,11 +64,6 @@ typedef Eigen::ColPivHouseholderQR<Matrix2d> MatrixQR;
 
 #define EPS 2.2204e-016
 
-struct qr {
-  gsl_matrix *A;
-  gsl_vector *tau;
-};
-
 struct eigen_qr {
   Matrix2d *A;
   MatrixQR *QR;
@@ -83,7 +75,6 @@ struct linear_system {
   double *norms; // colums of matrix are normalized to avoid numerical issues.
   enum linear_fit_mode mode;
   union {
-    struct qr qr;
     struct svd svd;
     struct eigen_qr qr_eigen;
   } decomposition;
@@ -116,10 +107,6 @@ struct linear_system*LINEAR_alloc(int m, int n, enum linear_fit_mode mode) {
       s->decomposition.svd.W[1+j]=0.;
     }
     break;
-  case DECOMP_QR:
-    s->decomposition.qr.A = gsl_matrix_alloc(m, n);
-    s->decomposition.qr.tau = gsl_vector_alloc(n);
-    break;
   case DECOMP_EIGEN_QR:
     s->decomposition.qr_eigen.A = new Matrix2d(m, n);
     s->decomposition.qr_eigen.QR = new MatrixQR(m, n);
@@ -142,13 +129,6 @@ struct linear_system *LINEAR_from_matrix(const double *const *a, int m, int n, e
     for (int i=1; i <= s->n; ++i){
       for (int j=1; j <= s->m; ++j) {
         s->decomposition.svd.U[i][j] = a[i][j];
-      }
-    }
-    break;
-  case DECOMP_QR:
-    for (int i=0; i<s->m; ++i) {
-      for (int j=0; j<s->n; ++j) {
-        gsl_matrix_set(s->decomposition.qr.A, i, j, a[1+j][1+i]);
       }
     }
     break;
@@ -177,10 +157,6 @@ void LINEAR_free(struct linear_system *s) {
     MEMORY_ReleaseDMatrix(__func__,"V",s->decomposition.svd.V,1,1);
     MEMORY_ReleaseDVector(__func__,"W",s->decomposition.svd.W,1);
     break;
-  case DECOMP_QR:
-    gsl_matrix_free(s->decomposition.qr.A);
-    gsl_vector_free(s->decomposition.qr.tau);
-    break;
   case DECOMP_EIGEN_QR:
     delete s->decomposition.qr_eigen.A;
   }
@@ -198,11 +174,6 @@ void LINEAR_set_column(struct linear_system *s, int n, const double *values) {
   case DECOMP_SVD:
     for (int i=0; i<s->m; ++i) {
       s->decomposition.svd.U[n][1+i] = values[1+i];
-    }
-    break;
-  case DECOMP_QR:
-    for (int i=0; i<s->m; ++i) {
-      gsl_matrix_set(s->decomposition.qr.A,i, n-1, values[1+i]);
     }
     break;
   case DECOMP_EIGEN_QR:
@@ -223,12 +194,6 @@ void LINEAR_set_weight(struct linear_system *s, const double *sigma) {
       for (int j=1; j <= s->m; ++j) {
         s->decomposition.svd.U[i][j] /= sigma[j-1]; // sigma index runs from 0
       }
-    }
-    break;
-  case DECOMP_QR:
-    for (int i=0; i< s->m; ++i) {
-      gsl_vector_view rowi = gsl_matrix_row(s->decomposition.qr.A, i);
-      gsl_vector_scale(&rowi.vector, 1.0/sigma[i]);
     }
     break;
   case DECOMP_EIGEN_QR:
@@ -263,56 +228,6 @@ int LINEAR_decompose(struct linear_system *s, double *sigmasquare, double **cova
         sigmasquare[1+j] /= s->norms[j]*s->norms[j];
       }
     }
-    break;
-  case DECOMP_QR: {
-    // normalisation
-    for (int j=0; j<s->n; ++j) {
-      gsl_vector_view colj = gsl_matrix_column(s->decomposition.qr.A, j);
-      s->norms[j]=0.;
-      for (int i=0; i<s->m; ++i) {
-        s->norms[j] += gsl_vector_get(&colj.vector, i)*gsl_vector_get(&colj.vector, i);
-      }
-      if (s->norms[j] == 0.)
-        return ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_NORMALIZE);
-      s->norms[j] = sqrt(s->norms[j]);
-      gsl_vector_scale(&colj.vector, 1.0/s->norms[j]);
-    }
-    int rc_gsl = gsl_linalg_QR_decomp(s->decomposition.qr.A, s->decomposition.qr.tau);
-    if (rc_gsl)
-      rc = ERROR_ID_SVD_ILLCONDITIONED; // TODO: specific error conditions for QR
-
-    // calculate covariance (A' * A)^-1 = (R' * R)^-1 using cholesky inversion method
-    gsl_matrix *cholesky = gsl_matrix_alloc(s->n, s->n);
-    for(int i=0; i<s->n; ++i) {
-      // after gsl_linalg_QR_decomp(), the diagonal & upper triangle of A contain the matrix R.
-      for (int j=i; j<s->n; ++j) { // diagonal & upper triangle: copy from A:
-        gsl_matrix_set(cholesky, i, j, gsl_matrix_get(s->decomposition.qr.A,i, j));
-      }
-      for (int j=0;j<i; ++j) { // lower triangle part: copy from previous upper triangle:
-        gsl_matrix_set(cholesky, i, j, gsl_matrix_get(cholesky, j, i));
-      }
-    }
-    rc_gsl = gsl_linalg_cholesky_invert(cholesky);
-    if (rc_gsl) {
-      rc = ERROR_ID_SVD_ILLCONDITIONED; // TODO: specific error conditions for QR
-      goto cleanup_qr;
-    }
-
-    if (covar != NULL) {
-      for (int i=0; i<s->n; ++i) {
-        for (int j=0; j<s->n; ++j) {
-          covar[1+i][1+j]=gsl_matrix_get(cholesky, i, j) / (s->norms[i]*s->norms[j]);
-        }
-      }
-    }
-    if (sigmasquare != NULL) {
-      for (int i=0; i<s->n; ++i) {
-        sigmasquare[1+i] = gsl_matrix_get(cholesky, i, i) / (s->norms[i]*s->norms[i]);
-      }
-    }
-    cleanup_qr:
-    gsl_matrix_free(cholesky);
-  }
     break;
   case DECOMP_EIGEN_QR: {
     // normalisation:
@@ -355,24 +270,6 @@ int LINEAR_solve(const struct linear_system *s, const double *b, double *x) {
   switch (s->mode) {
   case DECOMP_SVD:
     rc=SVD_Bksb(&s->decomposition.svd, s->m, s->n, b, x);
-    break;
-  case DECOMP_QR: {
-    gsl_vector *vx = gsl_vector_alloc(s->n);
-    gsl_vector *vb = gsl_vector_alloc(s->m);
-    gsl_vector *residual = gsl_vector_alloc(s->m);
-    for (int i=0; i<s->m; ++i) {
-      gsl_vector_set(vb, i, b[1+i]);
-    }
-    int rc_gsl = gsl_linalg_QR_lssolve(s->decomposition.qr.A, s->decomposition.qr.tau, vb, vx, residual);
-    if (rc_gsl)
-      rc = ERROR_ID_SVD_ILLCONDITIONED; // TODO: specific error conditions for QR
-    for (int i=0; i<s->n; ++i) {
-      x[1+i] = gsl_vector_get(vx, i);
-    }
-    gsl_vector_free(vb);
-    gsl_vector_free(vx);
-    gsl_vector_free(residual);
-  }
     break;
   case DECOMP_EIGEN_QR: {
     // Define Eigen vectors mapping the existing buffers b and x (b and x index starts at 1):
@@ -460,7 +357,7 @@ int LINEAR_fit_poly(int num_eqs, int poly_order, const double *a, const double *
     }
   }
 
-  linsys = LINEAR_from_matrix((const double *const *)A, num_eqs, num_unknowns, DECOMP_QR);
+  linsys = LINEAR_from_matrix((const double *const *)A, num_eqs, num_unknowns, DECOMP_EIGEN_QR);
   LINEAR_set_weight(linsys, sigma);
   // decomposition and solution
   rc = LINEAR_decompose(linsys, NULL, NULL);
