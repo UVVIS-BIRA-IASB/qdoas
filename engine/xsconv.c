@@ -822,7 +822,7 @@ RC XSCONV_ConvertCrossSectionFile(MATRIX_OBJECT *pCross, double lambdaMin,double
 
 RC XSCONV_LoadCrossSectionFile(MATRIX_OBJECT *pCross,char *crossFile,double lambdaMin,double lambdaMax,double shift,int conversionMode)
 {
-  RC rc = rc=MATRIX_Load(crossFile,pCross,0,0,lambdaMin,lambdaMax,1,0,__func__);
+  RC rc = MATRIX_Load(crossFile,pCross,0,0,lambdaMin,lambdaMax,1,0,__func__);
   if(!rc) {
     rc = XSCONV_ConvertCrossSectionFile(pCross, lambdaMin, lambdaMax, shift, conversionMode);
   }

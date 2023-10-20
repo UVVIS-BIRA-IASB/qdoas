@@ -369,7 +369,6 @@ int MATRIX_GetColumnsNumbers(FILE *fp,double *pFirstValue)
 // PURPOSE       Load a matrix from file
 //
 // INPUT         fileName        : te name of the file to load
-//               basel,basec     : resp. the base indexes for lines and columns
 //               nl,nc           : resp. the number of lines and columns of the matrix to load
 //                                 0 to retrieve the dimensions automatically from the file
 //               xmin,xmax       : define a range of values to load for the first column of the matrix
