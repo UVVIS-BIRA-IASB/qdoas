@@ -29,19 +29,6 @@
 //      jeroenv@aeronomie.be
 //      thomas.danckaert@aeronomie.be
 //
-//  This program is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU General Public License
-//  as published by the Free Software Foundation; either version 2
-//  of the License, or (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software Foundation,
-//  Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //  ----------------------------------------------------------------------------
 //
 //  MODULE DESCRIPTION
@@ -72,7 +59,7 @@
 //              With this command, the reference file will be replaced in all analysis windows
 //
 //             /project/analysis_window/files/refone : /bira-iasb/projects/FRM4DOAS/applications/validation_fv002/data/ref_files/stations/VIELSALM/VIELSALM_1691_1_UVVIS_ref_20210729.ref replaced by /bira-iasb/projects/FRM4DOAS/applications/validation_fv002/data/ref_files/stations/VIELSALM/1691_1/2023/ESA-FRM4DOAS-L1.QAQC-BIRA.IASB-VIELSALM-1691-1-20230410T042536Z-20230410T154557Z-fv001-331-ZS.ref (w_o3_320_340)
-//             /project/analysis_window/files/refone : /bira-iasb/projects/FRM4DOAS/applications/validation_fv002/data/ref_files/stations/VIELSALM/VIELSALM_1691_1_UVVIS_ref_20210729.ref replaced by /bira-iasb/projects/FRM4DOAS/applications/validation_fv002/data/ref_files/stations/VIELSALM/1691_1/2023/ESA-FRM4DOAS-L1.QAQC-BIRA.IASB-VIELSALM-1691-1-20230410T042536Z-20230410T154557Z-fv001-331-ZS.ref (w_o4_338_370)
+//             /project/analysis_window/files/refone : /bira-iasb/projects/FRM4DOAS/applications/validation_fv002/data/ref_files/stations/VIELSALM/VIELSALM_1691_1_UVVIS_ref_20210729.ref replaced by /bira-iasb/pdrojects/FRM4DOAS/applications/validation_fv002/data/ref_files/stations/VIELSALM/1691_1/2023/ESA-FRM4DOAS-L1.QAQC-BIRA.IASB-VIELSALM-1691-1-20230410T042536Z-20230410T154557Z-fv001-331-ZS.ref (w_o4_338_370)
 //             /project/analysis_window/files/refone : /bira-iasb/projects/FRM4DOAS/applications/validation_fv002/data/ref_files/stations/VIELSALM/VIELSALM_1691_1_UVVIS_ref_20210729.ref replaced by /bira-iasb/projects/FRM4DOAS/applications/validation_fv002/data/ref_files/stations/VIELSALM/1691_1/2023/ESA-FRM4DOAS-L1.QAQC-BIRA.IASB-VIELSALM-1691-1-20230410T042536Z-20230410T154557Z-fv001-331-ZS.ref (w_no2_411_445)
 //             /project/analysis_window/files/refone : /bira-iasb/projects/FRM4DOAS/applications/validation_fv002/data/ref_files/stations/VIELSALM/VIELSALM_1691_1_UVVIS_ref_20210729.ref replaced by /bira-iasb/projects/FRM4DOAS/applications/validation_fv002/data/ref_files/stations/VIELSALM/1691_1/2023/ESA-FRM4DOAS-L1.QAQC-BIRA.IASB-VIELSALM-1691-1-20230410T042536Z-20230410T154557Z-fv001-331-ZS.ref (w_no2_425_490)
 //             /project/analysis_window/files/refone : /bira-iasb/projects/FRM4DOAS/applications/validation_fv002/data/ref_files/stations/VIELSALM/VIELSALM_1691_1_UVVIS_ref_20210729.ref replaced by /bira-iasb/projects/FRM4DOAS/applications/validation_fv002/data/ref_files/stations/VIELSALM/1691_1/2023/ESA-FRM4DOAS-L1.QAQC-BIRA.IASB-VIELSALM-1691-1-20230410T042536Z-20230410T154557Z-fv001-331-ZS.ref (w_o3_450_540)
