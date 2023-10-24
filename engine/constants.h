@@ -391,6 +391,7 @@ enum _prjctInstrFormat {
   PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF,                                           // 29 netCDF format for FRM4DOAS
   PRJCT_INSTR_FORMAT_GOME1_NETCDF,                                              // 30 netCDF format for GOME1
   PRJCT_INSTR_FORMAT_GEMS,                                                      // 31 GEMS format (Geostationary Environment Monitoring Spectrometer onboard GEO-KOMPSAT-2B geostationary satellite)
+  PRJCT_INSTR_FORMAT_OMIV4,                                                     // 32 OMI Collection 4 format (netCDF4)
   PRJCT_INSTR_FORMAT_MAX
 };
 

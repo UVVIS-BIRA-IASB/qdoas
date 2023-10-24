@@ -39,6 +39,7 @@ class CWInstrGome1Edit;
 class CWInstrGome2Edit;
 class CWInstrSciaEdit;
 class CWInstrOmiEdit;
+class CWInstrOmiV4Edit;
 class CWInstrOmpsEdit;
 class CWInstrTropomiEdit;
 class CWInstrApexEdit;
@@ -97,6 +98,7 @@ Q_OBJECT
   CWInstrMinimumEdit *m_uoftEdit;
   CWInstrMinimumEdit *m_noaaEdit;
   CWInstrOmiEdit *m_omiEdit;
+  CWInstrOmiV4Edit *m_omiV4Edit;
   CWInstrOmpsEdit *m_ompsEdit;
   CWInstrTropomiEdit *m_tropomiEdit;
   CWInstrApexEdit *m_apexEdit;
@@ -426,6 +428,17 @@ class CWInstrOmiEdit : public CWCalibInstrEdit
   QLineEdit *m_pixelQFMaxGapsEdit;
   QRadioButton *m_nonstrictXTrackQF;
   QRadioButton *m_strictXTrackQF;
+};
+
+class CWInstrOmiV4Edit : public CWCalibInstrEdit
+{
+ public:
+  CWInstrOmiV4Edit(const struct instrumental_omiv4 *d, QWidget *parent = 0);
+
+  void apply(struct instrumental_omiv4 *d) const;
+
+ private:
+  QComboBox *m_spectralTypeCombo;
 };
 
 //--------------------------------------------------------------------------

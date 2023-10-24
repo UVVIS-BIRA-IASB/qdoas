@@ -291,7 +291,6 @@ QVariant CWOutputFieldItem::data(int role) const
 
 void getValidFieldFlags(int *validFlags, int instrument,int selectorOrigin)
  {
-   int format=(int)static_cast<enum _prjctInstrFormat>(instrument);
    int satelliteFlag = is_satellite(static_cast<enum _prjctInstrFormat>(instrument));
    int maxdoasFlag = is_maxdoas(static_cast<enum _prjctInstrFormat>(instrument));
 
@@ -673,9 +672,17 @@ void getValidFieldFlags(int *validFlags, int instrument,int selectorOrigin)
       validFlags[PRJCT_RESULTS_SAT_LON]=1;
      }
     break;
-
  // ----------------------------------------------------------------------------
+   case PRJCT_INSTR_FORMAT_OMIV4:
+     {
+      validFlags[PRJCT_RESULTS_INDEX_ALONGTRACK]=1;
+      validFlags[PRJCT_RESULTS_INDEX_CROSSTRACK]=1;
 
+      validFlags[PRJCT_RESULTS_SAT_LAT]=1;
+      validFlags[PRJCT_RESULTS_SAT_LON]=1;
+     }
+     break;
+ // ----------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_OMPS :
      {
       validFlags[PRJCT_RESULTS_LONGIT]=1;

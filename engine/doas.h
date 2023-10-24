@@ -95,6 +95,7 @@ static inline bool is_satellite(enum _prjctInstrFormat format) {
           format==PRJCT_INSTR_FORMAT_GOME1_NETCDF ||
           format==PRJCT_INSTR_FORMAT_SCIA_PDS ||
           format==PRJCT_INSTR_FORMAT_OMI ||
+          format==PRJCT_INSTR_FORMAT_OMIV4 ||
           format==PRJCT_INSTR_FORMAT_OMPS ||
           format==PRJCT_INSTR_FORMAT_TROPOMI ||
           format==PRJCT_INSTR_FORMAT_GOME2);

@@ -79,6 +79,7 @@ CWProjectPropertyEditor::CWProjectPropertyEditor(const QString &projectName, QWi
   m_satelliteFormatCombo->addItem("Tropomi", QVariant(PRJCT_INSTR_FORMAT_TROPOMI));
   m_satelliteFormatCombo->addItem("OMPS", QVariant(PRJCT_INSTR_FORMAT_OMPS));
   m_satelliteFormatCombo->addItem("OMI", QVariant(PRJCT_INSTR_FORMAT_OMI));
+  m_satelliteFormatCombo->addItem("OMI Collection 4", QVariant(PRJCT_INSTR_FORMAT_OMIV4));
   m_satelliteFormatCombo->addItem("GOME1 (netCDF)", QVariant(PRJCT_INSTR_FORMAT_GOME1_NETCDF));
   m_satelliteFormatCombo->addItem("GOME2", QVariant(PRJCT_INSTR_FORMAT_GOME2));
   m_satelliteFormatCombo->addItem("SCIAMACHY L1C (PDS format)", QVariant(PRJCT_INSTR_FORMAT_SCIA_PDS));

@@ -201,6 +201,11 @@ CWProjectTabInstrumental::CWProjectTabInstrumental(const mediate_project_instrum
   index = m_formatStack->addWidget(m_omiEdit);
   m_instrumentToStackIndexMap.insert(std::map<int,int>::value_type(PRJCT_INSTR_FORMAT_OMI, index));
 
+  // omiv4
+  m_omiV4Edit = new CWInstrOmiV4Edit(&(instr->omiv4));
+  index = m_formatStack->addWidget(m_omiV4Edit);
+  m_instrumentToStackIndexMap[PRJCT_INSTR_FORMAT_OMIV4] = index;
+
   // omps
   m_ompsEdit = new CWInstrOmpsEdit();
   index = m_formatStack->addWidget(m_ompsEdit);
@@ -2057,6 +2062,45 @@ void CWInstrOmiEdit::apply(struct instrumental_omi *d) const
   // files
   strcpy(d->calibrationFile, m_fileOneEdit->text().toLocal8Bit().data());
   strcpy(d->transmissionFunctionFile, m_fileTwoEdit->text().toLocal8Bit().data());
+}
+
+//--------------------------------------------------------
+
+CWInstrOmiV4Edit::CWInstrOmiV4Edit(const struct instrumental_omiv4 *d, QWidget *parent) :
+  CWCalibInstrEdit(parent)
+{
+  QVBoxLayout *mainLayout = new QVBoxLayout(this);
+  mainLayout->setMargin(5);
+  mainLayout->setSpacing(5);
+
+  QGridLayout *gridLayout = new QGridLayout;
+
+  int row = 0;
+
+  // spectral
+  gridLayout->addWidget(new QLabel("Spectral Type", this), row, 0);
+  m_spectralTypeCombo = new QComboBox(this);
+  m_spectralTypeCombo->addItem("UV-1", QVariant(PRJCT_INSTR_OMI_TYPE_UV1));
+  m_spectralTypeCombo->addItem("UV-2", QVariant(PRJCT_INSTR_OMI_TYPE_UV2));
+  m_spectralTypeCombo->addItem("Visible", QVariant(PRJCT_INSTR_OMI_TYPE_VIS));
+  gridLayout->addWidget(m_spectralTypeCombo, row, 1);
+  ++row;
+
+  // files
+  helperConstructCalInsFileWidgets(gridLayout, row,
+                   d->calibrationFile, sizeof(d->calibrationFile),
+                   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
+
+  mainLayout->addLayout(gridLayout);
+  mainLayout->addStretch(1);
+
+  // initial values
+
+  // spectral
+  int index = m_spectralTypeCombo->findData(QVariant(d->spectralType));
+  if (index != -1)
+    m_spectralTypeCombo->setCurrentIndex(index);
+
 }
 
 //--------------------------------------------------------
