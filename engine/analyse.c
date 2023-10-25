@@ -3825,6 +3825,7 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
         if (((pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_GOME1_NETCDF) ||
              (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_TROPOMI) ||
              (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_OMI) ||
+             (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_OMIV4) ||
              (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_APEX) ||
              (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_GEMS))
          &&
@@ -3853,6 +3854,7 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
 
         switch (pEngineContext->project.instrumental.readOutFormat) {
            case PRJCT_INSTR_FORMAT_OMI:
+           case PRJCT_INSTR_FORMAT_OMIV4:
            case PRJCT_INSTR_FORMAT_OMPS:
            case PRJCT_INSTR_FORMAT_TROPOMI:
              memcpy(Feno->Lambda,pBuffers->lambda,sizeof(double)*n_wavel);
@@ -3932,6 +3934,7 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
           // to replace by is_satellite !!!!
 
           if (pInstrumental->readOutFormat == PRJCT_INSTR_FORMAT_OMI
+              || pInstrumental->readOutFormat == PRJCT_INSTR_FORMAT_OMIV4
               || pInstrumental->readOutFormat == PRJCT_INSTR_FORMAT_OMPS
               || pInstrumental->readOutFormat == PRJCT_INSTR_FORMAT_TROPOMI
               || pInstrumental->readOutFormat == PRJCT_INSTR_FORMAT_GOME1_NETCDF          // ??????????????????????????????
@@ -5965,6 +5968,7 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
   pTabFeno->useRadAsRef2=0;
   pTabFeno->useRefRow=((pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_GOME1_NETCDF) &&
                        (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_OMI) &&
+                       (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_OMIV4) &&
                        (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_APEX) &&
                        (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_GEMS) &&
                        (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_TROPOMI))?1:pEngineContext->project.instrumental.use_row[indexFenoColumn];
@@ -6042,6 +6046,9 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
       case PRJCT_INSTR_FORMAT_OMI:
         rc=OMI_GetReference(pEngineContext->project.instrumental.omi.spectralType, pTabFeno->ref1,indexFenoColumn,
                             lambdaRefEtalon,SrefEtalon,pTabFeno->SrefSigma,&n_wavel_ref);
+        break;
+      case PRJCT_INSTR_FORMAT_OMIV4:
+        rc=OMIV4_get_irradiance_reference(pTabFeno->ref1, indexFenoColumn, lambdaRefEtalon, SrefEtalon, pTabFeno->SrefSigma);
         break;
       case PRJCT_INSTR_FORMAT_GEMS:
         rc=GEMS_LoadReference(pTabFeno->ref1,indexFenoColumn,lambdaRefEtalon,SrefEtalon,&n_wavel_ref);

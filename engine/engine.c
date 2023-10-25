@@ -75,6 +75,7 @@
 #include "tropomi_read.h"
 #include "omps_read.h"
 #include "omi_read.h"
+#include "omiv4_read.h"
 #include "gdp_bin_read.h"
 #include "gome1netcdf_read.h"
 #include "apex_read.h"
@@ -670,6 +671,7 @@ RC EngineSetFile(ENGINE_CONTEXT *pEngineContext,const char *fileName,void *respo
    // Some satellite measurements have their own functions to open the file
 
    if ((pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_OMI) &&
+       (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_OMIV4) &&
        (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_TROPOMI) &&
        (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_OMPS) &&
        (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_SCIA_PDS) &&
@@ -770,6 +772,10 @@ RC EngineSetFile(ENGINE_CONTEXT *pEngineContext,const char *fileName,void *respo
        rc=OMI_Set(pEngineContext);
        if(!rc)
          rc = OMI_prepare_automatic_reference(pEngineContext, responseHandle);
+       break;
+       // ---------------------------------------------------------------------------
+     case PRJCT_INSTR_FORMAT_OMIV4:
+       rc=OMIV4_set(pEngineContext);
        break;
        // ---------------------------------------------------------------------------
      case PRJCT_INSTR_FORMAT_TROPOMI:
@@ -1003,6 +1009,10 @@ RC EngineReadFile(ENGINE_CONTEXT *pEngineContext,int indexRecord,int dateFlag,in
       // ---------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_OMI :
       pRecord->rc=OMI_read_earth(pEngineContext,indexRecord);
+      break;
+      // ---------------------------------------------------------------------------
+    case PRJCT_INSTR_FORMAT_OMIV4:
+      pRecord->rc=OMIV4_read(pEngineContext, indexRecord);
       break;
       // ---------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_TROPOMI :
@@ -1293,6 +1303,7 @@ RC EngineEndCurrentSession(ENGINE_CONTEXT *pEngineContext)
      GDP_BIN_ReleaseBuffers();
      GOME2_ReleaseBuffers();
      OMI_ReleaseBuffers();
+     OMIV4_cleanup();
      tropomi_cleanup();
      FRM4DOAS_Cleanup();
      GOME1NETCDF_Cleanup();

@@ -24,6 +24,7 @@
 #include "winthrd.h"
 
 #include "omi_read.h"
+#include "omiv4_read.h"
 #include "tropomi_read.h"
 #include "gome1netcdf_read.h"
 #include "apex_read.h"
@@ -407,8 +408,9 @@ void mediateRequestPlotSpectra(ENGINE_CONTEXT *pEngineContext,void *responseHand
      case PRJCT_INSTR_FORMAT_GEMS:
        y_units = "photons / (nm s cm<sup>2</sup>)";
        break;
+     case PRJCT_INSTR_FORMAT_OMIV4:
      case PRJCT_INSTR_FORMAT_TROPOMI:
-       y_units = "10<sup>9</sup> mol photons / (m<sup>3</sup>s)";
+       y_units = "mol photons / (nm s m<sup>2</sup>)";
        break;
      default:
        y_units = "Counts";
@@ -502,6 +504,7 @@ void mediateRequestPlotSpectra(ENGINE_CONTEXT *pEngineContext,void *responseHand
      // satellite formats have an irradiance spectrum
      if (pBuffers->irrad!=NULL
          && ( !(pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_OMI || // for OMI and Tropomi, irradiance is stored in separate file, which is only read during analysis
+                pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_OMIV4 ||
                 pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_TROPOMI ||
                 pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_GEMS ||
                 pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF)
@@ -1213,6 +1216,24 @@ void setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const
 
       break;
       // ----------------------------------------------------------------------------
+    case PRJCT_INSTR_FORMAT_OMIV4:
+
+      for(unsigned int i=0; i<60; ++i) {  // TODO UV1 band (sometimes?) has only 30 rows
+        NDET[i]=1024;
+        pEngineInstrumental->use_row[i]=true;
+      }
+      for(unsigned int i=60; i<MAX_SWATHSIZE; ++i) {
+        NDET[i]=0;
+        pEngineInstrumental->use_row[i]=false;
+      }
+
+      pEngineInstrumental->omi.spectralType=pMediateInstrumental->omiv4.spectralType;
+
+      strcpy(pEngineInstrumental->calibrationFile,pMediateInstrumental->omiv4.calibrationFile);     // calibration file
+      strcpy(pEngineInstrumental->instrFunction,pMediateInstrumental->omiv4.transmissionFunctionFile);     // instrumental function file
+
+      break;
+      // ----------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_TROPOMI:
 
       for (int i=0; i<MAX_SWATHSIZE; ++i) {
@@ -1224,7 +1245,7 @@ void setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const
       strcpy(pEngineInstrumental->tropomi.reference_orbit_dir, pMediateInstrumental->tropomi.reference_orbit_dir);
 
       strcpy(pEngineInstrumental->calibrationFile,pMediateInstrumental->tropomi.calibrationFile);     // calibration file
-     strcpy(pEngineInstrumental->instrFunction,pMediateInstrumental->tropomi.instrFunctionFile);     // instrumental function file
+      strcpy(pEngineInstrumental->instrFunction,pMediateInstrumental->tropomi.instrFunctionFile);     // instrumental function file
 
       OMI_TrackSelection(pMediateInstrumental->tropomi.trackSelection,pEngineInstrumental->use_row);
 
@@ -1698,6 +1719,9 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
    switch(pInstrumental->readOutFormat) {
    case PRJCT_INSTR_FORMAT_OMI:
      ANALYSE_swathSize = 60;
+     break;
+   case PRJCT_INSTR_FORMAT_OMIV4:
+     rc = OMIV4_init_irradiances(analysisWindows, numberOfWindows, pEngineContext);
      break;
    case PRJCT_INSTR_FORMAT_GOME1_NETCDF:
      ANALYSE_swathSize = 4;   // the number of pixel types

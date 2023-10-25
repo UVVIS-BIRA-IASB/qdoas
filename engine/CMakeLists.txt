@@ -61,6 +61,8 @@ add_library(engine STATIC
   oceanoptics.c
   omi_read.c
   omi_read.h
+  omiv4_read.cpp
+  omiv4_read.h
   omps_read.cpp
   omps_read.h
   output.c
