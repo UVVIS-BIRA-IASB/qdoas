@@ -5,6 +5,7 @@
 #define strncasecmp _strnicmp
 #define strcasecmp _stricmp
 #define getcwd _getcwd
+#define timegm _mkgmtime
 #endif
 
 #endif

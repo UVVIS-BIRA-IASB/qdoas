@@ -13,6 +13,8 @@ add_library(engine STATIC
   constants.h
   curfit.c
   curfit.h
+  date_util.h
+  date_util.cpp
   debug.c
   dir_iter.h
   doas.h

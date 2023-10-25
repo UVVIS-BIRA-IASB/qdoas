@@ -33,6 +33,7 @@
 #include <dirent.h>
 #include <stdio.h>
 #include <math.h>
+#include <time.h>
 
 #include <hdf.h>
 /* #include <HdfEosDef.h> */
@@ -50,7 +51,6 @@
 #include "vector.h"
 #include "zenithal.h"
 #include "winthrd.h"
-#include "stdfunc.h"
 #include "output.h"
 #include "visual_c_compat.h"
 
@@ -820,7 +820,7 @@ static void tai_to_utc(double tai, float utc_seconds_in_day, struct tm *result, 
     .tm_isdst = 0 };
 
   // get seconds since epoch of 1/1/1993 00:00:00 UTC
-  time_t time_epoch = STD_timegm(&start_tai);
+  time_t time_epoch = timegm(&start_tai);
 
   // for observations after the leap second (for example the last observation
   // from 2012/06/30, 23:59:60), the number of seconds in the UTC day can be

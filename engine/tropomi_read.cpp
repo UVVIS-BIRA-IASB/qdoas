@@ -27,11 +27,11 @@
 #include "tropomi_read.h"
 #include "netcdfwrapper.h"
 #include "dir_iter.h"
+#include "date_util.h"
 
 extern "C" {
 #include "winthrd.h"
 #include "comdefs.h"
-#include "stdfunc.h"
 #include "engine_context.h"
 #include "mediate.h"
 #include "analyse.h"
@@ -133,7 +133,7 @@ static size_t size_spectral; // number of wavelengths per spectrum
 static size_t size_scanline; // number of measurements (i.e. along track)
 static size_t size_groundpixel; // number of detector rows (i.e. cross-track)
 
-static time_t reference_time; // since orbit start date
+static time_t reference_time; // orbit start date
 static vector<float> delta_time; // number of milliseconds after reference_time
 static string current_filename="";
 
@@ -164,36 +164,6 @@ static void getDate(int delta_t, struct datetime *date_time, int *pMs) {
   *pMs = static_cast<int>(delta_t) % 1000;
   date_time->millis=*pMs;
 
-}
-
-static void set_reference_time(const string& utc_date) {
-  int year,month,day;
-  std::istringstream utc(utc_date);
-
-  utc >> year;
-  utc.ignore(1,'-');
-  utc >> month;
-  utc.ignore(1,'-');
-  utc >> day;
-
-  struct tm t = {
-    0,  // seconds of minutes from 0 to 61
-    0,  // minutes of hour from 0 to 59
-    0,  // hours of day from 0 to 24
-    day,  // day of month from 1 to 31
-    month - 1,  // month of year from 0 to 11
-    year - 1900, // year since 1900
-    0,  // days since sunday
-    0,  // days since January 1st
-    0, // have daylight savings time?
-#if defined(__GNUC__) && !defined(__MINGW32__) // initialize extra fields available in GCC but not in MinGW32
-    0, // Seconds east of UTC
-    0  // Timezone abbreviation
-#endif
-  };
-
-   // get number of seconds since 1/1/1970, UTC
-  reference_time = STD_timegm(&t);
 }
 
 static geodata read_geodata(const NetCDFGroup& geo_group, size_t n_scanline, size_t n_groundpixel) {
@@ -240,7 +210,7 @@ int tropomi_set(ENGINE_CONTEXT *pEngineContext) {
 
     current_band = band_names[pEngineContext->project.instrumental.tropomi.spectralBand];
 
-    set_reference_time(current_file.getAttText("time_reference"));
+    reference_time = parse_utc_date(current_file.getAttText("time_reference"));
 
     NetCDFGroup obsGroup = current_file.getGroup(current_band + "_RADIANCE/STANDARD_MODE/OBSERVATIONS");
 
@@ -268,7 +238,6 @@ int tropomi_set(ENGINE_CONTEXT *pEngineContext) {
       instrGroup.getVar("nominal_wavelength", start_wl, count_wl, nominal_wavelengths[i].data());
     }
     fill_nominal_wavelengths = instrGroup.getFillValue<double>("nominal_wavelength");
-
 
     const auto geo_group = current_file.getGroup(current_band + "_RADIANCE/STANDARD_MODE/GEODATA");
     current_geodata = read_geodata(geo_group, size_scanline, size_groundpixel);

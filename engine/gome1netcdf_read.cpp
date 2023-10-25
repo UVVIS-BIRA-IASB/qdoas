@@ -84,12 +84,11 @@
 #include "dirent.h"
 #endif
 #include "dir_iter.h"
-
+#include "date_util.h"
 
 extern "C" {
 #include "winthrd.h"
 #include "comdefs.h"
-#include "stdfunc.h"
 #include "engine_context.h"
 #include "engine.h"
 #include "mediate.h"
@@ -373,36 +372,6 @@ static void getDate(GOME1NETCDF_ORBIT_FILE *pOrbitFile,double delta_t, struct da
   pTime->ti_sec = thedate.tm_sec;
 
   date_time->millis = static_cast<int>((delta_t-floor(delta_t))*1000.+0.1); // % 1000;
-}
-
-static void set_reference_time(GOME1NETCDF_ORBIT_FILE *pOrbitFile,const string& utc_date) {
-  int year,month,day;
-  std::istringstream utc(utc_date);
-
-  utc >> year;
-  utc.ignore(1,'-');
-  utc >> month;
-  utc.ignore(1,'-');
-  utc >> day;
-
-  struct tm t = {
-    0,  // seconds of minutes from 0 to 61
-    0,  // minutes of hour from 0 to 59
-    0,  // hours of day from 0 to 24
-    day,  // day of month from 1 to 31
-    month - 1,  // month of year from 0 to 11
-    year - 1900, // year since 1900
-    0,  // days since sunday
-    0,  // days since January 1st
-    0, // have daylight savings time?
-#if defined(__GNUC__) && !defined(__MINGW32__) // initialize extra fields available in GCC but not in MinGW32
-    0, // Seconds east of UTC
-    0  // Timezone abbreviation
-#endif
-  };
-
-   // get number of seconds since 1/1/1970, UTC
-  pOrbitFile->reference_time = STD_timegm(&t);
 }
 
 // -----------------------------------------------------------------------------
@@ -797,7 +766,7 @@ RC GOME1NETCDF_Set(ENGINE_CONTEXT *pEngineContext)
         pOrbitFile->current_file = NetCDFFile(pOrbitFile->fileName,NC_NOWRITE);                 // open file
         pOrbitFile->root_name = pOrbitFile->current_file.getName();                             // get the root name (should be the file name)
         root_group = pOrbitFile->current_file.getGroup(pOrbitFile->root_name);                  // go to the root
-        set_reference_time(pOrbitFile,pOrbitFile->current_file.getAttText("time_reference"));   // get the reference time
+        pOrbitFile->reference_time = parse_utc_date(pOrbitFile->current_file.getAttText("time_reference"));   // get the reference time
 
         pOrbitFile->scan_size=
         pOrbitFile->scan_size_bs=
