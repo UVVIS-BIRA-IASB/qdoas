@@ -345,6 +345,7 @@ void CWProjectTabInstrumental::apply(mediate_project_instrumental_t *instr) cons
   m_uoftEdit->apply(&(instr->uoft));
   m_noaaEdit->apply(&(instr->noaa));
   m_omiEdit->apply(&(instr->omi));
+  m_omiV4Edit->apply(&(instr->omiv4));
   m_ompsEdit->apply();
   m_tropomiEdit->apply(&(instr->tropomi));
   m_apexEdit->apply(&(instr->apex));
@@ -2101,6 +2102,16 @@ CWInstrOmiV4Edit::CWInstrOmiV4Edit(const struct instrumental_omiv4 *d, QWidget *
   if (index != -1)
     m_spectralTypeCombo->setCurrentIndex(index);
 
+}
+
+void CWInstrOmiV4Edit::apply(struct instrumental_omiv4 *d) const
+{
+  // spectral
+  d->spectralType = m_spectralTypeCombo->itemData(m_spectralTypeCombo->currentIndex()).toInt();
+
+  // files
+  strcpy(d->calibrationFile, m_fileOneEdit->text().toLocal8Bit().data());
+  strcpy(d->transmissionFunctionFile, m_fileTwoEdit->text().toLocal8Bit().data());
 }
 
 //--------------------------------------------------------
