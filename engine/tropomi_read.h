@@ -20,7 +20,7 @@ extern "C" {
 #endif
 
   // load reference spectra, set NDET[] and use_row[] arrays.
-  int tropomi_init(const char *ref_filename, ENGINE_CONTEXT *pEngineContext, int *n_wavel_temp);
+  int tropomi_init(const char *ref_filename, const ENGINE_CONTEXT *pEngineContext, int *n_wavel_temp);
 
   int tropomi_prepare_automatic_reference(ENGINE_CONTEXT *pEngineContext, void *responseHandle);
 

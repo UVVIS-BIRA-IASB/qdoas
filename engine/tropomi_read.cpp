@@ -442,7 +442,7 @@ static vector<vector<double>> loadRadAsRef(const NetCDFFile& filename, const cha
   return result;
 }
 
-int tropomi_init(const char *ref_filename, ENGINE_CONTEXT *pEngineContext,int* n_wavel_temp) {
+int tropomi_init(const char *ref_filename, const ENGINE_CONTEXT *pEngineContext,int* n_wavel_temp) {
 
   NetCDFFile refFile(ref_filename);
   RC rc = ERROR_ID_NO;
