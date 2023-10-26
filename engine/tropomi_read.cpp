@@ -134,37 +134,9 @@ static size_t size_scanline; // number of measurements (i.e. along track)
 static size_t size_groundpixel; // number of detector rows (i.e. cross-track)
 
 static time_t reference_time; // orbit start date
-static vector<float> delta_time; // number of milliseconds after reference_time
+static vector<int> delta_time; // number of milliseconds after reference_time
 static string current_filename="";
 
-// replace by functions using QDateTime?
-static void getDate(int delta_t, struct datetime *date_time, int *pMs) {
-  // TODO: handle UTC leap seconds?  Is this possible? (no UTC time info in file?)
-  time_t thetime = reference_time + delta_t/1000;
-
-  struct date *pDate = &date_time->thedate;
-  struct time *pTime = &date_time->thetime;
-
-  struct tm thedate;
-#ifndef _WIN32
-  gmtime_r(&thetime, &thedate);
-#else
-  struct tm *time = gmtime(&thetime);
-  thedate = *time;
-#endif
-
-  pDate->da_year = thedate.tm_year + 1900;
-  pDate->da_mon = thedate.tm_mon + 1; // month, from 1 to 12
-  pDate->da_day = thedate.tm_mday;
-
-  pTime->ti_hour = thedate.tm_hour;
-  pTime->ti_min = thedate.tm_min;
-  pTime->ti_sec = thedate.tm_sec;
-
-  *pMs = static_cast<int>(delta_t) % 1000;
-  date_time->millis=*pMs;
-
-}
 
 static geodata read_geodata(const NetCDFGroup& geo_group, size_t n_scanline, size_t n_groundpixel) {
 
@@ -394,8 +366,7 @@ int tropomi_read(ENGINE_CONTEXT *pEngineContext,int record) {
   pRecord->useErrors = 1;
   get_geodata(pRecord, current_geodata, record);
 
-  int ms;
-  getDate(delta_time[indexScanline], &pRecord->present_datetime, &ms);
+  get_utc_date(reference_time, delta_time[indexScanline], &pRecord->present_datetime);
 
   return rc;
 }

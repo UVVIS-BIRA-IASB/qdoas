@@ -3,6 +3,8 @@
 
 #include <time.h>
 
+#include "comdefs.h"
+
 #ifdef _MCS_VER
 #define timegm _mkgmtime
 #endif
@@ -35,4 +37,30 @@ time_t parse_utc_date(const std::string& utc_date) {
   };
 
   return timegm(&t);
+}
+
+// Combine UTC reference time and number of milliseconds delta_t into a UTC date and time for the measurement, and milliseconds.
+void get_utc_date(time_t ref_time, int delta_t, struct datetime *date_time) {
+  time_t thetime = ref_time + delta_t/1000;
+
+  struct date *pDate = &date_time->thedate;
+  struct time *pTime = &date_time->thetime;
+
+  struct tm thedate;
+#ifndef _WIN32
+  gmtime_r(&thetime, &thedate);
+#else
+  struct tm *time = gmtime(&thetime);
+  thedate = *time;
+#endif
+
+  pDate->da_year = thedate.tm_year + 1900;
+  pDate->da_mon = thedate.tm_mon + 1; // month, from 1 to 12
+  pDate->da_day = thedate.tm_mday;
+
+  pTime->ti_hour = thedate.tm_hour;
+  pTime->ti_min = thedate.tm_min;
+  pTime->ti_sec = thedate.tm_sec;
+
+  date_time->millis = delta_t % 1000;
 }
