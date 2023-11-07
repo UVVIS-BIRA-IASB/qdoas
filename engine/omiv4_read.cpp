@@ -438,3 +438,13 @@ int OMIV4_get_irradiance_reference(const char* file_name, int pixel, double *lam
   }
   return 0;
 }
+
+int OMIV4_get_orbit_date(int *year, int *month, int *day) {
+  struct datetime reference_datetime;
+  get_utc_date(reference_time, 0, &reference_datetime);
+  const auto& date = reference_datetime.thedate;
+  *year = date.da_year;
+  *month = date.da_mon;
+  *day = date.da_day;
+  return 0;
+}

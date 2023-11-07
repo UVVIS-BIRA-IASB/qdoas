@@ -76,6 +76,7 @@
 #include "gdp_bin_read.h"
 #include "omps_read.h"
 #include "omi_read.h"
+#include "omiv4_read.h"
 #include "gome2_read.h"
 #include "scia-read.h"
 #include "gome1netcdf_read.h"
@@ -2041,6 +2042,9 @@ static RC get_orbit_date(const ENGINE_CONTEXT *pEngineContext, int *orbit_year, 
   switch (pEngineContext->project.instrumental.readOutFormat) {
   case PRJCT_INSTR_FORMAT_OMI:
     rc = OMI_get_orbit_date(orbit_year, orbit_month, orbit_day);
+    break;
+  case PRJCT_INSTR_FORMAT_OMIV4:
+    rc = OMIV4_get_orbit_date(orbit_year, orbit_month, orbit_day);
     break;
   case PRJCT_INSTR_FORMAT_TROPOMI:
     rc = tropomi_get_orbit_date(orbit_year, orbit_month, orbit_day);
