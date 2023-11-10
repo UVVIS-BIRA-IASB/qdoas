@@ -350,6 +350,12 @@ private:
   inline int ncGetAttr(int varid, char const *name, std::vector<double>& d) const {
     return nc_get_att_double(groupid, varid, name, d.data());
   }
+  inline int ncGetAttr(int varid, char const *name, std::vector<signed char>& c) const {
+    return nc_get_att_schar(groupid, varid, name, c.data());
+  }
+  inline int ncGetAttr(int varid, char const *name, std::vector<unsigned char>& c) const {
+    return nc_get_att_uchar(groupid, varid, name, c.data());
+  }
   inline int ncGetAttr(int varid, char const *name, std::vector<short>& d) const {
     return nc_get_att_short(groupid, varid, name, d.data());
   }
@@ -411,6 +417,16 @@ inline unsigned short default_fillvalue() {
 template<>
 inline char default_fillvalue() {
   return NC_FILL_CHAR;
+}
+
+template<>
+inline signed char default_fillvalue() {
+  return NC_FILL_BYTE;
+}
+
+template<>
+inline unsigned char default_fillvalue() {
+  return NC_FILL_UBYTE;
 }
 
 template<>
