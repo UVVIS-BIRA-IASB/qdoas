@@ -5989,9 +5989,11 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
   if (((Sref=pTabFeno->Sref=(double *)MEMORY_AllocDVector((char *)__func__,"Sref",0,n_wavel-1))==NULL) ||
       ((SrefEtalon=pTabFeno->SrefEtalon=(double *)MEMORY_AllocDVector((char *)__func__,"SrefEtalon",0,n_wavel))==NULL) ||
 
-      ((is_satellite(pEngineContext->project.instrumental.readOutFormat) || 
-      ((pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_ASCII) && (pEngineContext->project.instrumental.ascii.format==PRJCT_INSTR_ASCII_FORMAT_COLUMN_EXTENDED)))
-        &&
+      ((is_satellite(pEngineContext->project.instrumental.readOutFormat) ||
+      ((pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_ASCII) &&                     // column-extended ascii format is used for ground-based activitiesor any synthetic spectra
+       (pEngineContext->project.instrumental.ascii.format==PRJCT_INSTR_ASCII_FORMAT_COLUMN_EXTENDED) &&      // a third columns can be used for errors only and only if errors are fitted
+       (pEngineContext->project.analysis.fitWeighting!=PRJCT_ANLYS_FIT_WEIGHTING_NONE))) &&                  // otherwise, the reference spectrum should contain only two columns
+
        ((pTabFeno->SrefSigma=(double *)MEMORY_AllocDVector((char *)__func__,"SrefSigma",0,n_wavel))==NULL)) ||
 
       ((lambdaRef=(double *)MEMORY_AllocDVector((char *)__func__,"lambdaRef",0,n_wavel))==NULL) ||
