@@ -85,9 +85,9 @@ Building QDOAS from sources requires :
 * [CODA](https://atmospherictoolbox.org/coda/)
 * [HDF4/MFHDF](https://support.hdfgroup.org/products/hdf4/)
 * [HDF5/HDF5\_CPP/HDF5\_HL/HDF5\_HL\_CPP](https://www.hdfgroup.org/downloads/hdf5/)
-* [HDF-EOS](https://www.hdfeos.org/)
 * [NETCDF](https://www.unidata.ucar.edu/software/netcdf/)
-* [GSL](https://www.gnu.org/software/gsl/)
+* [Boost](https://www.boost.org)
+* [Eigen](https://eigen.tuxfamily.org)
 
 ### Compilation and installation
 
@@ -117,9 +117,6 @@ The following people contributed to the S/W :
 * **Caroline FAYT, Jonas VLIETINCK, Thomas DANCKAERT and Michel VAN ROOZENDAEL** from BIRA-IASB
 * **Sander NIEMEIJER, Ian PRICE** from S&T
 
-## License
-
-QDOAS is free, open source and distributed under the [GNU GPL version 2.0](http://www.gnu.org/licenses/gpl-2.0.html).
 In case of publication of results obtained using QDOAS, please mention the [QDOAS S/W user manual]((http://uv-vis.aeronomie.be/software/QDOAS/QDOAS_manual.pdf)) in the reference and the authors in the acknowledgements (see above).
 
 ## Acknowledgements
