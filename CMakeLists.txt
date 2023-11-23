@@ -7,8 +7,8 @@ endif()
 project(qdoas)
 
 set(VERSION 3.5.0)
-set(QDOAS_VERSION "3.5.0" CACHE STRING "")
-set(QDOAS_DATE "21 December 2022" CACHE STRING "")
+set(QDOAS_VERSION "3.6.0" CACHE STRING "")
+set(QDOAS_DATE "23 November 2023" CACHE STRING "")
 
 
 get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)

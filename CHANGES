@@ -1,3 +1,16 @@
+3.6.0 2023-11-23
+~~~~~~~~~~~~~~~~
+
+* License changed from GPLv2 to a BSD 3-clause type license.
+* Various changes to allow compilation with Microsoft Visual C++.
+* Replace GSL depedendency with Eigen.
+* Remove HDF-EOS2 dependency.
+* Remove support for a few older ground-based instrument data formats which are no longer used.
+* doas_cl can now use trigger lists created by another software  in parallel
+* FRM4DOAS format adapted for imagers
+* Can save residual spectra in NetCDF output format.
+* Write sensor, fitting interval and spectral band in NetCDF metadata.
+
 3.5.0 2022-12-21
 ~~~~~~~~~~~~~~~~
 
