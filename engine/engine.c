@@ -776,6 +776,9 @@ RC EngineSetFile(ENGINE_CONTEXT *pEngineContext,const char *fileName,void *respo
        // ---------------------------------------------------------------------------
      case PRJCT_INSTR_FORMAT_OMIV4:
        rc=OMIV4_set(pEngineContext);
+       if (!rc && pEngineContext->analysisRef.refAuto) {
+         rc = OMIV4_prepare_automatic_reference(pEngineContext, responseHandle);
+       }
        break;
        // ---------------------------------------------------------------------------
      case PRJCT_INSTR_FORMAT_TROPOMI:

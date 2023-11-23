@@ -8,6 +8,11 @@
  * qdoas@aeronomie.be
  */
 
+#include <cassert>
+#include <cmath>
+#include <algorithm>
+#include <filesystem>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -15,7 +20,7 @@
 #include <memory>
 #include <tuple>
 
-#include "boost/multi_array.hpp"
+#include <boost/multi_array.hpp>
 
 #include "netcdfwrapper.h"
 #include "date_util.h"
@@ -34,9 +39,34 @@ extern "C" {
 using std::string;
 using std::vector;
 using std::map;
+namespace fs = std::filesystem;
+
+template<typename T>
+using array2d = boost::const_multi_array_ref<T, 2>;
 
 namespace {
-    struct geodata {
+  const map<int, const string> band_names = {
+    {PRJCT_INSTR_OMI_TYPE_UV1, "BAND1"},
+    {PRJCT_INSTR_OMI_TYPE_UV2, "BAND2"},
+    {PRJCT_INSTR_OMI_TYPE_VIS, "BAND3"}};
+
+  class orbit_file;
+  class spectrum;
+
+  std::unique_ptr<orbit_file> current_orbit;
+
+  // An automatic radiance reference is generated from all radiance files in the same directory as current orbit file.
+  // Keep the list of those files:
+  vector<string> reference_orbit_files;
+
+  // irradiance spectra for each row, for each irradiance filename:
+  map<string,vector<spectrum>> irradiance_references;
+
+  // track if we have initialized NDET already.  In analysis mode, this is initialized
+  // based on irradiance references; in browse/export mode, this is initialized during OMIV4_set
+  bool have_init_ndet = false;
+
+  struct geodata {
     vector<float> sza, vza, saa,  vaa,
       lon, lat,
       lon_bounds, lat_bounds,
@@ -45,6 +75,11 @@ namespace {
 
   struct spectrum {
     spectrum(size_t size_spectral=0) : lambda(size_spectral), spec(size_spectral), sigma(size_spectral) {}
+    spectrum(vector<double> lambda, vector<double> spec, vector<double> sigma) : lambda(lambda), spec(spec), sigma(sigma) {
+      if (lambda.size() != spec.size() || lambda.size() != sigma.size()) {
+        throw std::runtime_error("Spectrum wavelength, radiance and sigma vectors must have equal size.");
+      }
+    }
     vector<double> lambda;
     vector<double> spec;
     vector<double> sigma;
@@ -68,6 +103,71 @@ namespace {
       ++delta_i_ref;
     }
     return wavelengths;
+  }
+
+  vector<spectrum> load_irradiance_ref(const string& filename, const string& band) {
+    NetCDFFile refFile(filename);
+    auto irrObsGroup = refFile.getGroup(band + "_IRRADIANCE/STANDARD_MODE/OBSERVATIONS");
+    auto instrGroup = refFile.getGroup(band + "_IRRADIANCE/STANDARD_MODE/INSTRUMENT");
+    // get dimensions:
+    size_t size_pixel = irrObsGroup.dimLen("pixel");
+    size_t nlambda = irrObsGroup.dimLen("spectral_channel");
+
+    size_t start_lref[] = {0};
+    size_t count_lref[] = {1};
+    int ref_col_irr;
+    instrGroup.getVar("wavelength_reference_column", start_lref, count_lref, &ref_col_irr);
+    size_t wavelength_coeffs_irr = instrGroup.dimLen("n_wavelength_poly");
+
+    vector<spectrum> result(size_pixel);
+    for(size_t i=0; i<size_pixel; ++i) {
+      spectrum& ref_pixel = result[i];
+
+      // irradiance & irradiance_noise have dimensions
+      // (time, scanline, pixel, spectral_channel)
+      size_t start_irr[] = {0, 0, i, 0};
+      size_t count_irr[] = {1, 1, 1, nlambda};
+
+      // calibrated_wavelength has dimensions
+      // (time, pixel, spectral_channel)
+      size_t start_lambda[] = {0, i, 0};
+      size_t count_lambda[] = {1, 1, nlambda};
+
+      auto lambda = get_wavelengths(instrGroup, 0, i, nlambda, wavelength_coeffs_irr, ref_col_irr);
+      vector<double> irra(nlambda);
+      vector<double> noise(nlambda);
+
+      irrObsGroup.getVar("irradiance", start_irr, count_irr, irra.data());
+      irrObsGroup.getVar("irradiance_noise", start_irr, count_irr, noise.data());
+
+      const double fill_irra = irrObsGroup.getFillValue<double>("irradiance");
+      const double fill_noise = irrObsGroup.getFillValue<double>("irradiance_noise");
+
+      size_t num_wavelengths = 0;
+      double lambda_last = 0.;
+      for (size_t j=0; j<nlambda; ++j) {
+        double lj = lambda[j];
+        double ij = irra[j];
+        double nj = noise[j];
+        if (ij != fill_irra && nj != fill_noise) {
+          ++num_wavelengths;
+          lambda_last = lj;
+          ref_pixel.lambda.push_back(lj);
+          ref_pixel.spec.push_back(ij);
+          ref_pixel.sigma.push_back(ij/(std::pow(10.0, nj/10.0)));
+        }
+      }
+      // If we skipped some fill values, fill the end of the buffer with dummy values:
+      for (size_t j=num_wavelengths; j<nlambda; ++j) {
+        lambda_last += 1.;
+        ref_pixel.lambda.push_back(lambda_last);
+        ref_pixel.spec.push_back(0.);
+        ref_pixel.sigma.push_back(1.);
+      }
+      assert(ref_pixel.spec.size() == nlambda);
+    }
+
+    return result;
   }
 
   class orbit_file {
@@ -106,7 +206,7 @@ namespace {
       read_geodata();
     }
 
-    void get_geodata(RECORD_INFO *pRecord, int record) {
+    void get_record_geodata(RECORD_INFO *pRecord, int record) {
       pRecord->latitude= orbit_geodata.lat[record-1];
       pRecord->longitude= orbit_geodata.lon[record-1];
       pRecord->Zm= orbit_geodata.sza[record-1];
@@ -126,8 +226,7 @@ namespace {
       pRecord->satellite.altitude = orbit_geodata.sat_alt[record-1];
     }
 
-    void get_radiance(size_t i_scanline, size_t i_pixel,
-                      double *lambda, double *spec, double *sigma) {
+    spectrum radiance(size_t i_scanline, size_t i_pixel) {
       // dimensions of radiance & error are
       // ('time','scanline','ground_pixel','spectral_channel')
       const size_t start[] = {0, i_scanline, i_pixel, 0};
@@ -135,40 +234,40 @@ namespace {
 
       const auto obsGroup = ncfile.getGroup(band + "_RADIANCE/STANDARD_MODE/OBSERVATIONS");
       vector<double> rad(size_spectral);
+      vector<double> sigma;
       vector<signed char> rad_noise(size_spectral);
       obsGroup.getVar("radiance", start, count, rad.data());
       obsGroup.getVar("radiance_noise", start, count, rad_noise.data() );
 
       const auto instrGroup = ncfile.getGroup(band + "_RADIANCE/STANDARD_MODE/INSTRUMENT");
-      const vector<double> wavel = get_wavelengths(instrGroup, i_scanline, i_pixel, size_spectral,
+      vector<double> wavel = get_wavelengths(instrGroup, i_scanline, i_pixel, size_spectral,
                                                     size_wavelength_coeffs, wavelength_ref_col);
-      // copy non-fill values to buffers:
-      size_t j=0;
-      for (size_t i=0; i<rad.size(); ++i) {
-        double li = wavel[i];
+
+      // calculate radiance random error; use radiance fill value if noise variable contains a fill value.
+      for (size_t i=0; i < rad.size(); ++i) {
         double ri = rad[i];
         double ni = rad_noise[i];
-
-        if (ri != radiance_fill && ni != noise_fill) {
-          lambda[j]=li;
-          spec[j]=ri;
-          sigma[j]=ri/(std::pow(10.0, ni/10.0));
-          j++;
+        if (ni != radiance_fill) {
+          sigma.push_back(ri/(std::pow(10.0, ni/10.0)));
+        } else {
+          sigma.push_back(radiance_fill);
         }
       }
 
-      if (j == 0) {
-        // All fill values, can't use this spectrum:
-        throw std::runtime_error("Spectrum consists of only fill values");
+      return spectrum(std::move(wavel), std::move(rad), std::move(sigma));
+    }
+
+    vector<vector<double>> nominal_wavelengths() {
+      vector<vector<double>> result(size_groundpixel);
+      NetCDFGroup instrGroup = ncfile.getGroup(band + "_RADIANCE/STANDARD_MODE/INSTRUMENT");
+      size_t count_wl[] = {1, 1, size_spectral};
+
+      for(size_t i=0; i<size_groundpixel; ++i) {
+        result[i].resize(size_spectral);
+        size_t start_wl[] = {0, i, 0};
+        instrGroup.getVar("wavelength", start_wl, count_wl, result[i].data());
       }
-      // If we have not filled the buffer completely due to fill values, fill up with dummy values at the end:
-      double last_lambda = lambda[j-1];
-      for (size_t i=j; j<rad.size(); ++i) {
-        last_lambda+=1;
-        lambda[i]=last_lambda;
-        spec[i]=0;
-        sigma[i]=1;
-      }
+      return result;
     }
 
     void get_datetime(size_t i_scanline, struct datetime *date_time) {
@@ -181,10 +280,17 @@ namespace {
       day = orbit_day;
     }
 
+    const string& get_filename() {return filename;};
+    const string& get_band() {return band;}
+
     size_t n_records() {return size_scanline * size_groundpixel;}
     size_t n_alongtrack() {return size_scanline;}
     size_t n_crosstrack() {return size_groundpixel;}
     size_t n_lambda() {return size_spectral;}
+
+    double fill_value() {return radiance_fill;}
+
+    const geodata& get_geodata() {return orbit_geodata;}
 
   private:
     const string filename;
@@ -242,22 +348,164 @@ namespace {
     }
 
   };
+
+  vector<string> find_reference_orbits(const string& filename) {
+    vector<string> result;
+    const size_t prefix_len = strlen("OMI-Aura_L1-OML1BRXX"); // length of the standard OMI L1B radiance filename prefix
+    const string prefix(string(fs::path(filename).filename()).substr(0, prefix_len));
+    for (auto && f: fs::directory_iterator(fs::path(filename).parent_path())) {
+      const string basename = f.path().filename();
+      // keep only files in same directory starting with <prefix> and ending with ".nc":
+      if (basename.rfind(prefix, 0) == 0 &&
+          basename.compare(basename.size() - 3, 3, ".nc") == 0) {
+        result.push_back(f.path());
+      }
+    }
+    return result;
+  }
+
+  // check if an earthshine observation matches selection criteria to include it in the earthshine reference.
+  bool use_as_reference(double lon, double lat, double sza, const FENO *pTabFeno) {
+    float lon_min = pTabFeno->refLonMin;
+    float lon_max = pTabFeno->refLonMax;
+    float lat_min = pTabFeno->refLatMin;
+    float lat_max = pTabFeno->refLatMax;
+    float sza_min = pTabFeno->refSZA - pTabFeno->refSZADelta;
+    float sza_max = pTabFeno->refSZA + pTabFeno->refSZADelta;
+
+    // if a range (0.0,0.0) is chosen ( < EPSILON), we don't select based on this parameter
+    bool use_lon = lon_max - lon_min > EPSILON;
+    bool use_lat = lat_max - lat_min > EPSILON;
+    bool use_sza = sza_max - sza_min > EPSILON;
+
+    bool lon_ok = false;
+    bool lat_ok = false;
+    bool sza_ok = false;
+    if (lon_min <= lon && lon_max >= lon)
+      lon_ok = true;
+    if (lat_min <= lat && lat_max >= lat)
+      lat_ok =true;
+    if (sza_min <= sza && sza_max >= sza)
+      sza_ok = true;
+
+    return(lon_ok || !use_lon)
+      && (lat_ok || !use_lat)
+      && (sza_ok || !use_sza);
+  }
+
+  void prepare_automatic_reference(ENGINE_CONTEXT *pEngineContext, const vector<string>& reference_orbit_files, void *responseHandle) {
+    // Reference spectra per TabFeno which needs them:
+    map<int, vector<vector<double>>> reference_spectra;
+    map<int, vector<vector<double>>> reference_sigmasquared;
+    map<int, vector<vector<size_t>>> num_spectra;
+
+    for (int win=0; win!=NFeno; ++win) {
+      // Take TabFeno for row 0; radiance ref settings should be equal for all rows.
+      const FENO *pTabFeno = &TabFeno[0][win];
+      if(!pTabFeno->hidden
+         && pTabFeno->useKurucz!=ANLYS_KURUCZ_SPEC
+         && pTabFeno->refSpectrumSelectionMode==ANLYS_REF_SELECTION_MODE_AUTOMATIC) {
+        auto& refs = reference_spectra[win];
+        auto& sigmas = reference_sigmasquared[win];
+        auto& counts = num_spectra[win];
+        for (size_t row=0; row != current_orbit->n_crosstrack(); ++row) {
+          // Initialize a vector of 0's for every row.
+          refs.push_back(vector<double>(current_orbit->n_lambda()));
+          sigmas.push_back(vector<double>(current_orbit->n_lambda()));
+          counts.push_back(vector<size_t>(current_orbit->n_lambda()));
+        }
+      }
+    }
+
+    for (const string& f: reference_orbit_files) {
+      orbit_file orbit(f, current_orbit->get_band());
+      // Loop over all observations in the orbit, check if an observation should be used in the automatic reference for one or more analysis windows
+      const auto& geo = orbit.get_geodata();
+      auto extent = boost::extents[orbit.n_alongtrack()][orbit.n_crosstrack()];
+      const array2d<float> latitudes(geo.lat.data(), extent);
+      const array2d<float> longitudes(geo.lon.data(), extent);
+      const array2d<float> szangles(geo.sza.data(), extent);
+      for (size_t scan=0; scan != orbit.n_alongtrack(); ++scan) {
+        for (size_t row=0; row != orbit.n_crosstrack(); ++row){
+          // placeholder for the actual spectrum.  We will fill it with the radiance for (scan, row) as
+          // soon as we find an analysis window which can use it in the reference.
+          std::optional<spectrum> radiance;
+
+          const float lon_l2 = longitudes[scan][row];
+          const float lon = lon_l2 >= 0. ? lon_l2 : lon_l2 + 360.; // longitudes in range [0., 360.]
+          const float lat = latitudes[scan][row];
+          const float sza = szangles[scan][row];
+          for (int win=0; win!=NFeno; ++win) {
+            const FENO *pTabFeno = &TabFeno[row][win];
+            if (pTabFeno->hidden) continue;
+
+            if(pTabFeno->useKurucz!=ANLYS_KURUCZ_SPEC
+               && pTabFeno->refSpectrumSelectionMode==ANLYS_REF_SELECTION_MODE_AUTOMATIC
+               && use_as_reference(lon,lat,sza,pTabFeno)) {
+              // read the spectrum if it hasn't been read yet:
+              if (!radiance.has_value()) {
+                radiance = orbit.radiance(scan,row);
+              }
+
+              auto& refs = reference_spectra[win];
+              auto& sigmas = reference_sigmasquared[win];
+              auto& counts = num_spectra[win];
+
+              const spectrum& rad = radiance.value();
+              // add non-fill values to average radiance and error
+              for (size_t i=0; i!=current_orbit->n_lambda(); ++i) {
+                double ri = rad.spec[i];
+                double si = rad.sigma[i];
+                if (ri != orbit.fill_value() && si != orbit.fill_value()) {
+                  refs[row][i] += ri;
+                  sigmas[row][i] += si*si;
+                  ++counts[row][i];
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // We assume nominal_wavelength grid for the current orbit file is valid for all radiances used.
+    vector<vector<double>> wavelengths = current_orbit->nominal_wavelengths();
+    for (auto& iref : reference_spectra) {
+      auto& [win, refs] = iref;
+      auto& sigmas = reference_sigmasquared[win];
+      auto& counts = num_spectra[win];
+
+      for (size_t row=0; row!=refs.size(); ++row) {
+        // Average radiances and errors
+        for (size_t i=0; i!=current_orbit->n_lambda(); ++i) {
+          refs[row][i] /= counts[row][i];
+          sigmas[row][i] = std::sqrt(sigmas[row][i])/counts[row][i];
+        }
+
+        // Interpolate onto reference grid
+        auto& tabFeno = TabFeno[row][win];
+        const size_t n_wavel = tabFeno.NDET;
+        vector<double> derivs(wavelengths[row].size());
+        int rc = SPLINE_Deriv2(wavelengths[row].data(), refs[row].data(), derivs.data() , derivs.size(), __func__);
+        if (rc) {
+          throw std::runtime_error("Error performing spline interpolation on radiance reference spectrum.");
+        }
+        SPLINE_Vector(wavelengths[row].data(), refs[row].data(), derivs.data(), derivs.size(), tabFeno.LambdaRef, tabFeno.Sref, n_wavel, SPLINE_CUBIC);
+        VECTOR_NormalizeVector(tabFeno.Sref-1, n_wavel, &tabFeno.refNormFact, __func__);
+      }
+    }
+
+    for(int i=0; i<ANALYSE_swathSize; i++) {
+      // fit wavelength shift between calibrated solar irradiance
+      // and automatic reference spectrum and apply this shift to
+      // absorption crosssections
+      int rc = ANALYSE_AlignReference(pEngineContext,2,responseHandle,i);
+      if (rc) {
+        throw std::runtime_error("Error aligning radiance reference with calibrated irradiance spectrum.");
+      }
+    }
+  }
 }
-
-static const map<int, const string> band_names = {
-  {PRJCT_INSTR_OMI_TYPE_UV1, "BAND1"},
-  {PRJCT_INSTR_OMI_TYPE_UV2, "BAND2"},
-  {PRJCT_INSTR_OMI_TYPE_VIS, "BAND3"}};
-
-static std::unique_ptr<orbit_file> current_orbit;
-
-// irradiance spectra for each row, for each irradiance filename:
-static map<string,vector<spectrum>> irradiance_references;
-
-// track if we have initialized NDET already.  In analysis mode, this is initialized
-// based on irradiance references; in browse/export mode, this is initialized during OMIV4_set
-static bool have_init_ndet = false;
-
 
 void OMIV4_cleanup() {
   current_orbit.reset();
@@ -265,6 +513,7 @@ void OMIV4_cleanup() {
   have_init_ndet = false;
 
   irradiance_references.clear();
+  reference_orbit_files.clear();
 }
 
 int OMIV4_read(ENGINE_CONTEXT *pEngineContext,int record) {
@@ -293,10 +542,42 @@ int OMIV4_read(ENGINE_CONTEXT *pEngineContext,int record) {
   }
 
   try {
-    current_orbit->get_radiance(indexScanline, indexPixel,
-                           pEngineContext->buffers.lambda,
-                           pEngineContext->buffers.spectrum,
-                           pEngineContext->buffers.sigmaSpec);
+    const auto& spec = current_orbit->radiance(indexScanline, indexPixel);
+
+    auto lambda = pEngineContext->buffers.lambda;
+    auto spectrum =pEngineContext->buffers.spectrum;
+    auto sigma =pEngineContext->buffers.sigmaSpec;
+
+    // Fill pEngineContext buffers:
+    //  - drop pixels with fill values,
+    //  - shift non-fill values forward,
+    //  - fill up the remaining space at the end with dummy values.
+    size_t j=0;
+    for (size_t i=0; i<current_orbit->n_lambda(); ++i) {
+      double li = spec.lambda[i];
+      double ri = spec.spec[i];
+      double si = spec.sigma[i];
+
+      if (ri != current_orbit->fill_value() && si != current_orbit->fill_value()) {
+        lambda[j]=li;
+        spectrum[j]=ri;
+        sigma[j]=si;
+        j++;
+      }
+    }
+
+    if (j == 0) {
+      // All fill values, can't use this spectrum:
+      throw std::runtime_error("Spectrum consists of only fill values");
+    }
+    // If we have not filled the buffer completely due to fill values, fill up with dummy values at the end:
+    double last_lambda = lambda[j-1];
+    for (size_t i=j; j<current_orbit->n_lambda(); ++i) {
+      last_lambda+=1;
+      lambda[i]=last_lambda;
+      spectrum[i]=0;
+      sigma[i]=1;
+    }
   } catch(std::runtime_error& e) {
     rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, e.what());
   }
@@ -307,7 +588,7 @@ int OMIV4_read(ENGINE_CONTEXT *pEngineContext,int record) {
   pRecord->i_crosstrack = indexPixel;
 
   pRecord->useErrors = 1;
-  current_orbit->get_geodata(pRecord, record);
+  current_orbit->get_record_geodata(pRecord, record);
   current_orbit->get_datetime(indexScanline, &pRecord->present_datetime);
 
   return rc;
@@ -336,79 +617,12 @@ int OMIV4_set(ENGINE_CONTEXT *pEngineContext) {
   return rc;
 }
 
-static vector<spectrum> loadReference(const string& filename, const string& band) {
-  NetCDFFile refFile(filename);
-  auto irrObsGroup = refFile.getGroup(band + "_IRRADIANCE/STANDARD_MODE/OBSERVATIONS");
-  auto instrGroup = refFile.getGroup(band + "_IRRADIANCE/STANDARD_MODE/INSTRUMENT");
-  // get dimensions:
-  size_t size_pixel = irrObsGroup.dimLen("pixel");
-  size_t nlambda = irrObsGroup.dimLen("spectral_channel");
-
-  size_t start_lref[] = {0};
-  size_t count_lref[] = {1};
-  int ref_col_irr;
-  instrGroup.getVar("wavelength_reference_column", start_lref, count_lref, &ref_col_irr);
-  size_t wavelength_coeffs_irr = instrGroup.dimLen("n_wavelength_poly");
-
-  vector<spectrum> result(size_pixel);
-  for(size_t i=0; i<size_pixel; ++i) {
-    spectrum& ref_pixel = result[i];
-
-    // irradiance & irradiance_noise have dimensions
-    // (time, scanline, pixel, spectral_channel)
-    size_t start_irr[] = {0, 0, i, 0};
-    size_t count_irr[] = {1, 1, 1, nlambda};
-
-    // calibrated_wavelength has dimensions
-    // (time, pixel, spectral_channel)
-    size_t start_lambda[] = {0, i, 0};
-    size_t count_lambda[] = {1, 1, nlambda};
-
-    auto lambda = get_wavelengths(instrGroup, 0, i, nlambda, wavelength_coeffs_irr, ref_col_irr);
-    vector<double> irra(nlambda);
-    vector<double> noise(nlambda);
-
-    irrObsGroup.getVar("irradiance", start_irr, count_irr, irra.data());
-    irrObsGroup.getVar("irradiance_noise", start_irr, count_irr, noise.data());
-
-    const double fill_irra = irrObsGroup.getFillValue<double>("irradiance");
-    const double fill_noise = irrObsGroup.getFillValue<double>("irradiance_noise");
-
-    size_t num_wavelengths = 0;
-    double lambda_last = 0.;
-    for (size_t j=0; j<nlambda; ++j) {
-      double lj = lambda[j];
-      double ij = irra[j];
-      double nj = noise[j];
-      if (ij != fill_irra && nj != fill_noise) {
-        ++num_wavelengths;
-        lambda_last = lj;
-        ref_pixel.lambda.push_back(lj);
-        ref_pixel.spec.push_back(ij);
-        ref_pixel.sigma.push_back(ij/(std::pow(10.0, nj/10.0)));
-      }
-    }
-    // If we skipped some fill values, fill the end of the buffer with dummy values:
-    for (size_t j=num_wavelengths; j<nlambda; ++j) {
-      lambda_last += 1.;
-      ref_pixel.lambda.push_back(lambda_last);
-      ref_pixel.spec.push_back(0.);
-      ref_pixel.sigma.push_back(1.);
-    }
-    assert(ref_pixel.spec.size() == nlambda);
-  }
-
-  return result;
-}
-
-
 // Initialize OMI state from irradiance references:
 // - Set spectral band string
 // - Initialize ANALYSE_swathSize and NDET[] based on input file dimensions
 // - Read the irradiance references per detector row, for each analysis window
 //
 // TODO: check: if running browse/export spectra (or run calibration?) this function is not called -> make sure any required variables are properly initialized in that case as well
-// TODO: check size_spectral / from irradiance matches what is found for radiance in OMIV4_set
 int OMIV4_init_irradiances(const mediate_analysis_window_t* analysis_windows, int num_windows, const ENGINE_CONTEXT* pEngineContext) {
   int rc = 0;
   try {
@@ -423,11 +637,10 @@ int OMIV4_init_irradiances(const mediate_analysis_window_t* analysis_windows, in
       auto i_reference = irradiance_references.find(filename);
       if (i_reference != irradiance_references.end()) {
         // already have this file from a previous analysis window
-        cout << "Skipping file " << filename << ": already loaded." << endl;
         continue;
       }
 
-      auto this_ref = loadReference(analysis_windows[i].refOneFile, band);
+      auto this_ref = load_irradiance_ref(analysis_windows[i].refOneFile, band);
 
       // Different analysis windows may use different irradiance reference spectra, but we only allow one set of
       // dimensions per detector column. -> Check if this reference spectrum has identical dimensions as reference
@@ -469,4 +682,24 @@ int OMIV4_get_irradiance_reference(const char* file_name, int pixel, double *lam
 int OMIV4_get_orbit_date(int *year, int *month, int *day) {
   current_orbit->get_orbit_date(*year, *month, *day);
   return 0;
+}
+
+int OMIV4_prepare_automatic_reference(ENGINE_CONTEXT *pEngineContext, void *responseHandle) {
+  // First check if the current orbit file is part of the set of
+  // reference radiance files, in which case the current radiance
+  // reference is valid and we don't have to do anything
+  if (std::find(reference_orbit_files.begin(), reference_orbit_files.end(), pEngineContext->fileInfo.fileName) != reference_orbit_files.end()) {
+    return ERROR_ID_NO;
+  }
+
+  // If we get here, we need to build a new radiance reference.
+  try {
+    auto ref_files = find_reference_orbits(current_orbit->get_filename());
+    prepare_automatic_reference(pEngineContext, ref_files, responseHandle);
+    // if reference selection was succesful, update the list of current orbit files.
+    reference_orbit_files = std::move(ref_files);
+  } catch (std::runtime_error& e) {
+    return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_REFERENCE_SELECTION, e.what());
+  }
+  return ERROR_ID_NO;
 }

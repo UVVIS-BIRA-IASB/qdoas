@@ -672,6 +672,7 @@ void CWAnalysisWindowPropertyEditor::projectPropertiesChanged()
          //FALL-THROUGH
        case PRJCT_INSTR_FORMAT_SCIA_PDS:
        case PRJCT_INSTR_FORMAT_OMI:
+       case PRJCT_INSTR_FORMAT_OMIV4:
        case PRJCT_INSTR_FORMAT_OMPS:
        case PRJCT_INSTR_FORMAT_TROPOMI:
           m_satelliteFrame->show();
