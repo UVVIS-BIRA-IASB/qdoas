@@ -87,6 +87,7 @@
 #include "date_util.h"
 
 extern "C" {
+#include "stdfunc.h"
 #include "winthrd.h"
 #include "comdefs.h"
 #include "engine_context.h"

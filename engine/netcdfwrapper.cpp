@@ -1,5 +1,8 @@
 #include "netcdfwrapper.h"
 
+extern "C" {
+  #include "comdefs.h"
+}
 
 #include <stdexcept>
 #include <cassert>

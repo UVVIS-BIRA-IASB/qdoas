@@ -9,18 +9,6 @@
 #include <memory>
 
 #include <netcdf.h>
-// #include "nc4internal.h" /* to get name of the special properties file */
-
-extern "C" {
-#include "winthrd.h"
-#include "comdefs.h"
-#include "stdfunc.h"
-#include "engine_context.h"
-#include "mediate.h"
-#include "analyse.h"
-#include "spline.h"
-#include "vector.h"
-}
 
 typedef unsigned int uint;
 
