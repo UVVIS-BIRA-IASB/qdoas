@@ -148,7 +148,7 @@ int NetCDFGroup::varID(const string& varName) const {
   if(rc == NC_NOERR) {
     return id;
   } else {
-    return -1;
+    throw std::runtime_error("Cannot find netCDF variable '"+name+"/"+varName+"'");
   }
 }
 
@@ -157,7 +157,7 @@ int NetCDFGroup::numDims(int varid) const {
   if (nc_inq_varndims(groupid, varid, &ndims) == NC_NOERR) {
     return ndims;
   } else {
-    return -1;
+    throw std::runtime_error("Cannot get number of dimensions for variable '" + varName(varid) + "'");
   }
 }
 
@@ -191,21 +191,26 @@ string NetCDFGroup::varName(int varid) const {
   return {};
 }
 
+
+bool NetCDFGroup::hasDim(const string& dimName) const {
+  int id;
+  return (nc_inq_dimid(groupid, dimName.c_str(), &id) == NC_NOERR);
+}
+
 int NetCDFGroup::dimID(const string& dimName) const {
   int id;
   int rc = nc_inq_dimid(groupid, dimName.c_str(), &id);
 
   if(rc == NC_NOERR) {
     return id;
+  } else {
+    throw std::runtime_error("Cannot find netCDF dimension '"+dimName+"' in group '"+name+"'");
   }
-  else
-    return -1;
 }
 
 
 size_t NetCDFGroup::dimLen(const string& dimName) const {
-  int id=dimID(dimName);
-  return (id!=-1)?dimLen(id):-1;
+  return dimLen(dimID(dimName));
 }
 
 size_t NetCDFGroup::dimLen(int dimid) const {
@@ -226,7 +231,6 @@ string NetCDFGroup::dimName(int dimid) const {
     ss << "Cannot get name of netCDF dimension '" << dimid << "' in group '" << name << "'";
     throw std::runtime_error(ss.str());
   }
-  return NULL;
 }
 
 void NetCDFFile::close() {
@@ -342,7 +346,6 @@ int NetCDFGroup::defDim(const string& dimname, size_t len) {
   } else {
     throw std::runtime_error("Error creating dimension '" + dimname + "'");
   }
-  return -1;
 }
 
 int NetCDFGroup::defVar(const string& varname, const vector<int>& dimids, nc_type xtype) {
@@ -353,7 +356,6 @@ int NetCDFGroup::defVar(const string& varname, const vector<int>& dimids, nc_typ
   } else {
     throw std::runtime_error("Error creating variable '" + varname + "' in group '" + name + "'");
   }
-  return -1;
 }
 
 int NetCDFGroup::defVar(const string& name, const vector<string>& dimnames, nc_type xtype) {
@@ -366,9 +368,8 @@ int NetCDFGroup::defVar(const string& name, const vector<string>& dimnames, nc_t
 }
 
 void NetCDFGroup::defVarChunking(int varid, int storage, size_t *chunksizes) {
-  int rc;
-  if ((rc=nc_def_var_chunking(groupid, varid, storage, chunksizes)) != NC_NOERR) {
-   throw std::runtime_error("Error setting variable chunking for '" + varName(varid) + "' in group '" + name + "'");
+  if (nc_def_var_chunking(groupid, varid, storage, chunksizes) != NC_NOERR) {
+    throw std::runtime_error("Error setting variable chunking for '" + varName(varid) + "' in group '" + name + "'");
   }
 }
 
@@ -412,7 +413,6 @@ string NetCDFGroup::getAttText(const string& name, int varid) {
 double NetCDFGroup::getAttDouble(const string& name, int varid) {
   size_t len;
   double data;
-  ; // len does not include terminating NULL string
   int status = nc_inq_att(groupid, varid, name.c_str(), NULL, &len);
   if (status != NC_NOERR)
     data=0.;

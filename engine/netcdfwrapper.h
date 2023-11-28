@@ -42,7 +42,6 @@ public:
   void release_data_fields(void);
 
   bool hasVar(const std::string& varName) const;
-//  bool hasGrp(const std::string& grpName) const;
   int varID(const std::string& varName) const;
   int numDims(const std::string& varName) const;
   int numDims(int varid) const;
@@ -99,27 +98,23 @@ public:
   }
 
   template<typename T>
-  inline int getVar(int varid, const size_t start[], const size_t count[], T *out) const {
-    return ncGetVar(varid, start, count, out);
-    }
+  inline void getVar(int varid, const size_t start[], const size_t count[], T *out) const {
+    if (ncGetVar(varid, start, count, out) != NC_NOERR) {
+      throw std::runtime_error("Cannot read NetCDF variable '"+name+"/"+varName(varid)+"'");
+    } }
   template<typename T>
-  inline int getVar(const std::string& name, const size_t start[], const size_t count[], T *out) const {
-    return getVar(varID(name), start, count, out);
-    }
+  inline void getVar(const std::string& name, const size_t start[], const size_t count[], T *out) const {
+    getVar(varID(name), start, count, out);
+  }
 
   // This function allocate the vector, initialize it to the default value and if the requested variable exists, retrieves the values
-
   template<typename T>
-  inline int getVar(const std::string& name, const size_t start[], const size_t count[], int num_dims, T fill_value,std::vector<T>& out) const
-   {
+  inline int getVar(const std::string& name, const size_t start[], const size_t count[], int num_dims, T fill_value,std::vector<T>& out) const {
     // Declarations
 
     int idim,                                                                     // browse dimensions
-        max_dim,                                                                  // number of dimensions (should be the size of start and count vectors
-        i,
-        rc;                                                                        // browse elements of vector var
-
-    rc=-1;
+      max_dim,                                                                  // number of dimensions (should be the size of start and count vectors
+      i;                                                                        // browse elements of vector var
 
     // Get the number of elements  to allocate
 
@@ -133,19 +128,23 @@ public:
     // Initialize the vector to fill value
 
     for (i=0;i<max_dim;i++)
-     out[i]=fill_value;
+      out[i]=fill_value;
 
-    if (hasVar(name))
-     rc=getVar(name,start,count,out.data());
-
-    return rc;
-   }
+    try {
+      if (hasVar(name)) {
+        getVar(name,start,count,out.data());
+        return 0;
+      }
+    } catch (std::runtime_error& e) {
+    }
+    return -1;
+  }
 
 
   template<typename T>
   inline void putVar(int varid, const size_t start[], const size_t count[], T *in) {
     if (ncPutVar(varid, start, count, in) != NC_NOERR) {
-      // !!! throw std::runtime_error("Cannot write NetCDF variable '"+name+"/"+varName(varid)+"'");
+      throw std::runtime_error("Cannot write NetCDF variable '"+name+"/"+varName(varid)+"'");
     } }
   template<typename T>
   inline void putVar(const std::string& name, const size_t start[], const size_t count[], T *in) {
@@ -153,8 +152,7 @@ public:
   template<typename T>
   inline void putVar(int varid, T *in) {
     if (ncPutVar(varid,in) != NC_NOERR) {
-     // return error !!!
-     // throw std::runtime_error("Cannot write NetCDF variable '"+name+"/"+varName(varid)+"'");
+      throw std::runtime_error("Cannot write NetCDF variable '"+name+"/"+varName(varid)+"'");
     } }
   template<typename T>
   inline void putVar(const std::string& name, T *in) {
@@ -190,7 +188,7 @@ public:
         errstream << rc;
         break;
       }
-      // !!! throw std::runtime_error(errstream.str() );
+      throw std::runtime_error(errstream.str() );
     }
   }
   template<typename T>
@@ -220,6 +218,7 @@ public:
   NetCDFGroup getGroup(const std::string& groupName) const;
   NetCDFGroup defGroup(const std::string& groupName);
 
+  bool hasDim(const std::string& dimName) const;
   int defDim(const std::string& dimName, size_t len);
   int dimID(const std::string& dimName) const;
   size_t dimLen(const std::string& dimName) const;

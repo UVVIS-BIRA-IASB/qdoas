@@ -197,12 +197,13 @@ RC FRM4DOAS_Set(ENGINE_CONTEXT *pEngineContext)
     pEngineContext->n_alongtrack=root_group.dimLen("number_of_records");
     pEngineContext->n_crosstrack=1;                                             // spectra should be one dimension only
 
-    if ((det_size=root_group.dimLen("detector_size"))==-1)                      // get the number of pixels of the detector
-     {
-      det_size=root_group.dimLen("spectral_dim");
-      if ((pEngineContext->n_crosstrack=root_group.dimLen("spatial_dim"))==-1)
-       pEngineContext->n_crosstrack=1;
-     }
+    if (root_group.hasDim("detector_size")) {
+        det_size=root_group.dimLen("detector_size");
+      } else {
+        det_size=root_group.dimLen("spectral_dim");
+        pEngineContext->n_crosstrack=root_group.hasDim("spatial_dim") ?
+          root_group.dimLen("spatial_dim") : 1;
+      }
 
     ANALYSE_swathSize = pEngineContext->n_crosstrack;                           // to further move to FRM4DOAS_init
     for (int i=0;i<ANALYSE_swathSize;i++)

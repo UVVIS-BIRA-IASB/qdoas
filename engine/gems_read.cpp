@@ -273,7 +273,7 @@ int GEMS_Set(ENGINE_CONTEXT *pEngineContext) {
       sscanf(str.c_str(),"%04d%02d%02d",&gems_orbit_year,&gems_orbit_month,&gems_orbit_day);
      }
     
-    has_radiance=(radiance_file.dimID("dim_image_x")!=-1)?true:false;
+    has_radiance=radiance_file.hasDim("dim_image_x");
     has_irradiance=!has_radiance;
 
     n_images = (has_radiance)?radiance_file.dimLen("dim_image_x"):1;
@@ -340,7 +340,7 @@ int GEMS_Read(ENGINE_CONTEXT *pEngineContext, int record)
    {
     try
      {
-      if ((THRD_id==THREAD_TYPE_KURUCZ) || (radiance_file.dimID("dim_image_x")==-1))
+      if ((THRD_id==THREAD_TYPE_KURUCZ) || !radiance_file.hasDim("dim_image_x"))
        {
         const size_t start[] = {(wve_reordering_flag)?i_crosstrack:0,(wve_reordering_flag)?0:i_crosstrack}; 
         const size_t count[] = {(wve_reordering_flag)?1:n_wve,(wve_reordering_flag)?n_wve:1};         
@@ -350,7 +350,7 @@ int GEMS_Read(ENGINE_CONTEXT *pEngineContext, int record)
         radiance_file.getVar("wavelength", start, count, pEngineContext->buffers.lambda);
         radiance_file.getVar("image_pixel_values", start, count, pEngineContext->buffers.spectrum);
        }
-      else if (radiance_file.dimID("dim_image_x")!=-1)
+      else if (radiance_file.hasDim("dim_image_x"))
        {
         const size_t start_s[] = {(wve_reordering_flag)?i_alongtrack:0,i_crosstrack,(wve_reordering_flag)?0:i_alongtrack};
         const size_t count_s[] = {(wve_reordering_flag)?1:n_wve,1,(wve_reordering_flag)?n_wve:1};
