@@ -129,5 +129,5 @@ if (HDF4_MFHDF)
 target_link_libraries(engine PRIVATE ${HDF4_MFHDF})
 endif (HDF4_MFHDF)
 
-target_compile_features(engine PUBLIC cxx_std_11)
+target_compile_features(engine PUBLIC cxx_std_17)
 set_property(TARGET engine PROPERTY C_STANDARD 99)
