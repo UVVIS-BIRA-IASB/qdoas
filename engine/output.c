@@ -1628,10 +1628,11 @@ static int register_analysis_field(const struct output_field* fieldcontent, int 
   sprintf(full_fieldname, "%s%s", newfield->basic_fieldname, symbol_name);
   newfield->fieldname = full_fieldname;
   newfield->windowname = strdup(window_name);
-
+  
   newfield->data = NULL;
   if (newfield->data_cols == 0) // data_cols = 1 as a default
     newfield->data_cols = 1;
+  
   newfield->index_feno = index_feno;
   newfield->get_tabfeno = (outputRunCalib) ? &get_tabfeno_calib : &get_tabfeno_analysis;
   newfield->index_calib = (outputRunCalib) ? index_calib : ITEM_NONE;
@@ -1710,12 +1711,12 @@ static int register_analysis_output(const PRJCT_RESULTS *pResults, int indexFeno
     { (outputRunCalib) ? -1 : PRJCT_RESULTS_ERROR_FLAG,
       { .basic_fieldname = "processing_error", .format = FORMAT_INT, .memory_type = OUTPUT_INT,
         .get_data = (func_void) &get_processing_error_flag} },
-    { (outputRunCalib) ? -1 : PRJCT_RESULTS_RESIDUAL_SPECTRUM,
+    { (outputRunCalib || !pTabFeno->saveResidualsFlag) ? -1 : PRJCT_RESULTS_RESIDUAL_SPECTRUM,
       { .basic_fieldname = "residual_spectrum", .format = FORMAT_DOUBLE, .memory_type = OUTPUT_RESIDUAL,
         .get_data = (func_void) &get_residual_spectrum, .data_cols=pTabFeno->fit_properties.DimL} }
 
   };
-
+  
   size_t arr_length = sizeof(analysis_infos)/sizeof(analysis_infos[0]);
   int refUnique=((pTabFeno->refMaxdoasSelectionMode==ANLYS_MAXDOAS_REF_SZA) ||
                  (pTabFeno->refSpectrumSelectionScanMode==ANLYS_MAXDOAS_REF_SCAN_BEFORE) ||
@@ -2510,7 +2511,7 @@ RC OUTPUT_SaveResults(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
 // ====================
 
 /* Return the byte size of a datatype. */
-size_t output_get_size(enum output_datatype datatype,int ncols) {
+size_t output_get_size(enum output_datatype datatype) {
   switch(datatype) {
   case OUTPUT_STRING:
     return sizeof(char*);
@@ -2531,7 +2532,7 @@ size_t output_get_size(enum output_datatype datatype,int ncols) {
     return sizeof(double);
     break;
   case OUTPUT_RESIDUAL:
-    return sizeof(double)*ncols; 
+    return sizeof(double); 
   case OUTPUT_DATE:
     return sizeof(struct date);
     break;
@@ -2689,7 +2690,7 @@ RC OUTPUT_LocalAlloc(ENGINE_CONTEXT *pEngineContext)
       struct output_field *pfield = &output_data_analysis[i];
       output_field_clear(pfield); // first clear data, then update "data_rows" value, because data_rows is used to determine number of entries we have to free
       pfield->data_rows = output_data_rows;
-      pfield->data = calloc(pfield->data_rows * pfield->data_cols , output_get_size(pfield->memory_type,pfield->data_cols));
+      pfield->data = calloc(pfield->data_rows * pfield->data_cols , output_get_size(pfield->memory_type));
     }
     for (unsigned int i=0; i<calib_num_fields; i++) {
       struct output_field *calib_field = &output_data_calib[i];
