@@ -58,7 +58,7 @@ static int nref=0;
 
 struct data_fields {
   vector<float> sza, saa, vza, vaa, lon, lat, exp_time;
-  vector <unsigned short> gpqf,snow_index,alt;   // ground pixel quality flag
+  vector <int> gpqf,snow_index,alt;   // ground pixel quality flag
   vector <unsigned char> xqf;    // xtrack quality flag
   vector <double> acq_time;
 };
@@ -101,7 +101,7 @@ static void read_data_fields(NetCDFFile& orbit_file) //,bool *use_row,INDEX *use
     {"image_acquisition_time", radiance_file_data.acq_time}
   };
   
-  std::pair<string, vector<unsigned short>&> ifields[] = {
+  std::pair<string, vector<int>&> ifields[] = {
     {"ground_pixel_quality_flag", radiance_file_data.gpqf},
     {"snow_index", radiance_file_data.snow_index},
     {"terrain_height", radiance_file_data.alt}
