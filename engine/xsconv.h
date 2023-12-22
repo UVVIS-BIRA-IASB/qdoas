@@ -30,7 +30,8 @@ extern "C" {
   RC   XSCONV_ConvertCrossSectionFile(MATRIX_OBJECT *pCross, double lambdaMin,double lambdaMax,double shift,int conversionMode);
 
   // Convolution functions
-  RC   XSCONV_GetFwhm(double *lambda,double *slit,double *deriv2,int nl,int slitType,double *slitParam);
+  void XSCONV_get_slit_center(const double *lambda, const double *slit, int nl, double *lambda_center, double *f_center);
+  RC   XSCONV_GetFwhm(const double *lambda, const double *slit, const double *deriv2,int nl,int slitType,double *slitParam);
   RC   XSCONV_TypeNone(MATRIX_OBJECT *pXsnew,MATRIX_OBJECT *pXshr);
   RC   XSCONV_TypeGauss(const double *lambda, const double *Spec, const double *SDeriv2,double lambdaj,double dldj,double *SpecConv,double fwhm,double n,int slitType, int ndet);
   RC   XSCONV_TypeStandard(MATRIX_OBJECT *pXsnew,INDEX indexLambdaMin,INDEX indexLambdaMax,const MATRIX_OBJECT *pXshr,const MATRIX_OBJECT *pI, double *Ic,int slitType,const MATRIX_OBJECT *slitMatrix, double *slitParam,int wveDptFlag);

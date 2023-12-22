@@ -458,30 +458,46 @@ RC XsconvFctBuild(double *slitLambda,double *slitVector,int slitSize,int slitTyp
 // DATA PROCESSING
 // ===============
 
+
+
+// ------------------------
+// XSCONV_get_slit_center :
+// ------------------------
+//
+// For sampled slit functions (from a file), find the maximum value
+// and the corresponding wavelength.
+void XSCONV_get_slit_center(const double *lambda, const double *slit, int nl, double *lambda_center, double *f_center) {
+  *f_center = 0.;
+  for (int i=0; i!=nl; ++i) {
+    if (slit[i] > *f_center) {
+      *f_center = slit[i];
+      *lambda_center = lambda[i];
+    }
+  }
+}
+
 // --------------------------------------------------------
 // XSCONV_GetFwhm : Get slit function full width half way up
 // --------------------------------------------------------
 
-RC XSCONV_GetFwhm(double *lambda,double *slit,double *deriv2,int nl,int slitType,double *slitParam)
+RC XSCONV_GetFwhm(const double *lambda, const double *slit, const double *deriv2,int nl,int slitType,double *slitParam)
  {
   // Declarations
 
-  double max,lmin,lmax,l1,l2,x,x0;                         // search for wavelengths giving function at half way up
+  double lmin,lmax,l1,l2,x;                         // search for wavelengths giving function at half way up
 
-  // Initializations
-
-  x0=(double)0.;
+  double x0=0.;
 
   if (slitType==SLIT_TYPE_FILE) {
     // Get the value of function half way up
 
-    SPLINE_Vector(lambda,slit,deriv2,nl,&x0,&max,1,SPLINE_CUBIC);
-
-    max*=(double)0.5;
+    double lambda_center, max;
+    XSCONV_get_slit_center(lambda, slit, nl, &lambda_center, &max);
+    max *= 0.5;
 
     // Search for the wavelength in the left part giving the value of function half way up
 
-    for (lmin=lambda[0],lmax=(double)0.,l1=lmin*0.5,x=(double)0.;
+    for (lmin=lambda[0],lmax=lambda_center,l1=lmin*0.5,x=(double)0.;
         (lmin<lmax) && fabs(x-max)>1.e-5;l1=(lmin+lmax)*0.5) {
       SPLINE_Vector(lambda,slit,deriv2,nl,&l1,&x,1,SPLINE_CUBIC);
 
@@ -493,7 +509,7 @@ RC XSCONV_GetFwhm(double *lambda,double *slit,double *deriv2,int nl,int slitType
 
     // Search for the wavelength in the right part giving the value of function half way up
 
-    for (lmin=(double)0.,lmax=lambda[nl-1],l2=lmax*0.5,x=(double)0.;
+    for (lmin=lambda_center,lmax=lambda[nl-1],l2=lmax*0.5,x=(double)0.;
         (lmin<lmax) && fabs(x-max)>1.e-5;l2=(lmin+lmax)*0.5) {
       SPLINE_Vector(lambda,slit,deriv2,nl,&l2,&x,1,SPLINE_CUBIC);
 
@@ -1276,17 +1292,8 @@ RC XSCONV_TypeStandard(MATRIX_OBJECT *pXsnew,INDEX indexLambdaMin,INDEX indexLam
         // We always use slit_col1 here, to match what is done during
         // calibration (KuruczConvolveSolarSpectrum in kurucz.c).
         //
-        // TODO: for low-sampled slit functions, lambda of maximum
-        // might not be a good measure of the center => perform an
-        // interpolation here and in KuruczConvolveSolarSpectrum.
-        double lambda_center = 0.;
-        double slit_max = 0.;
-        for (int i=0; i<slitTmp.nl; ++i) {
-          if (slit_col1[i] > slit_max) {
-            slit_max = slit_col1[i];
-            lambda_center = lambda_orig[i];
-          }
-        }
+        double lambda_center, slit_max;
+        XSCONV_get_slit_center(lambda_orig, slit_col1, slitTmp.nl, &lambda_center, &slit_max);
 
         for (i=0;i<slitTmp.nl;i++) {
           // stretch wavelength grid around the center wavelength,
