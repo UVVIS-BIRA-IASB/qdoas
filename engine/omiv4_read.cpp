@@ -45,6 +45,9 @@ template<typename T>
 using array2d = boost::const_multi_array_ref<T, 2>;
 
 namespace {
+  // Due to compression settings of OMI Collection 4 L1B, we need a large NetCDF/HDF5 cache to get acceptable performance.
+  const size_t nc_cache_size = 85 * 1024 * 1024;
+
   const map<int, const string> band_names = {
     {PRJCT_INSTR_OMI_TYPE_UV1, "BAND1"},
     {PRJCT_INSTR_OMI_TYPE_UV2, "BAND2"},
@@ -173,7 +176,8 @@ namespace {
   class orbit_file {
 
   public:
-    orbit_file(string filename, string band) : filename(filename), band(band), ncfile(filename) {
+    orbit_file(string filename, string band) : filename(filename), band(band),
+                                               ncfile(filename, NetCDFFile::Mode::read, nc_cache_size) {
       const auto utc_date = ncfile.getAttText("time_reference");
       reference_time = parse_utc_date(utc_date);
       std::istringstream utc(utc_date);
