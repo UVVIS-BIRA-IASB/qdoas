@@ -139,7 +139,7 @@ RC MATRIX_netcdf_LoadXS(const char *fileName,MATRIX_OBJECT *pMatrix,
     size_t start[2],count[2];
     
     dwve=NULL;
-    current_file = NetCDFFile(fullPath,NC_NOWRITE);                             // open file
+    current_file = NetCDFFile(fullPath);                             // open file
     
     root_group = current_file.getGroup("QDOAS_CROSS_SECTION_FILE");  // go to the root
     

@@ -764,7 +764,7 @@ RC GOME1NETCDF_Set(ENGINE_CONTEXT *pEngineContext)
 
       try
        {
-        pOrbitFile->current_file = NetCDFFile(pOrbitFile->fileName,NC_NOWRITE);                 // open file
+        pOrbitFile->current_file = NetCDFFile(pOrbitFile->fileName);                 // open file
         pOrbitFile->root_name = pOrbitFile->current_file.getName();                             // get the root name (should be the file name)
         root_group = pOrbitFile->current_file.getGroup(pOrbitFile->root_name);                  // go to the root
         pOrbitFile->reference_time = parse_utc_date(pOrbitFile->current_file.getAttText("time_reference"));   // get the reference time

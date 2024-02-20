@@ -189,7 +189,7 @@ RC FRM4DOAS_Set(ENGINE_CONTEXT *pEngineContext)
 
   try
    {
-    current_file = NetCDFFile(pEngineContext->fileInfo.fileName,NC_NOWRITE);     // open file
+    current_file = NetCDFFile(pEngineContext->fileInfo.fileName);     // open file
     root_name = current_file.getName();
 
     NetCDFGroup root_group = current_file.getGroup(root_name);                   // go to the root

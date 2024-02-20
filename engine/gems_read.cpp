@@ -39,6 +39,8 @@ static bool   wve_reordering_flag;
 static int    loadReferenceFlag=0; // if ((THRD_id==THREAD_TYPE_ANALYSIS) && pEngineContext->analysisRef.refAuto)
                                    // N/A here because files of the current orbit are not pre-loaded
 
+static const size_t nc_cache_size = 32 * 1024 * 1024; // Need at least 32MB of cache for acceptable perfomance
+
 // ====================== 
 // STRUCTURES DEFINITIONS
 // ======================
@@ -184,7 +186,7 @@ RC GEMS_LoadReference(const char *filename,int indexFenoColumn,double *lambda,do
       {
        pRef=&ref_list[nref];
 
-       pRef->ref_file=NetCDFFile(filename);
+       pRef->ref_file=NetCDFFile(filename, nc_cache_size);
        pRef->ref_n_wve = pRef->ref_file.dimLen("dim_image_band");
        pRef->ref_n_rows = pRef->ref_file.dimLen("dim_image_y");
        pRef->ref_filename=filename;
@@ -230,7 +232,7 @@ int GEMS_Init(ENGINE_CONTEXT *pEngineContext,const char *ref_filename,int* n_wav
   int rc=ERROR_ID_NO;
   try 
    {
-    NetCDFFile reference_file(ref_filename);
+    NetCDFFile reference_file(ref_filename, nc_cache_size);
     int col_dim = reference_file.dimLen((pEngineContext->radAsRefFlag)?"col_dim":"dim_image_y");
     int spectral_dim = reference_file.dimLen((pEngineContext->radAsRefFlag)?"spectral_dim":"dim_image_band");
     
@@ -264,7 +266,7 @@ int GEMS_Set(ENGINE_CONTEXT *pEngineContext) {
   int rc = 0;
 
   try {
-    radiance_file = NetCDFFile(pEngineContext->fileInfo.fileName);
+    radiance_file = NetCDFFile(pEngineContext->fileInfo.fileName, nc_cache_size);
     radiance_file_data = data_fields();
     
     if (radiance_file.hasAttr("file_generation_time"))

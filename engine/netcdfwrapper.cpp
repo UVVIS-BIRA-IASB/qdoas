@@ -259,40 +259,63 @@ NetCDFFile& NetCDFFile::operator=(NetCDFFile &&other) {
   return *this;
 }
 
-#define NEW_CACHE_SIZE 32000000
-#define NEW_CACHE_NELEMS 2000
-#define NEW_CACHE_PREEMPTION 0.75
+namespace {
+  class NCChunkSetting {
+  public:
+    NCChunkSetting(size_t size=0) {
+      if (size == 0) { // size=0: do nothing
+        do_reset = false;
+        return;
+      }
 
-static int openNetCDF(const string &filename, int mode) {
+      int rc = nc_get_chunk_cache(&size_old, &n_elems, &preemption);
+      if (rc != NC_NOERR) {
+        throw std::runtime_error("Failed to get current NetCDF chunck cache settings.");
+      }
+      rc = nc_set_chunk_cache(size, n_elems, preemption);
+      if (rc != NC_NOERR) {
+        throw std::runtime_error("Failed to set NetCDF chunk cache.");
+      }
+      do_reset = true;
+    }
+
+    ~NCChunkSetting() {
+      if (do_reset) {
+        nc_set_chunk_cache(size_old, n_elems, preemption);
+      }
+    }
+
+  private:
+    bool do_reset;
+    size_t size_old, n_elems;
+    float preemption;
+  };
+};
+
+int NetCDFFile::openNetCDF(const string &filename, NetCDFFile::Mode mode, size_t chunk_size) {
+  NCChunkSetting set_chunks(chunk_size);
   int groupid;
+  int rc = NC_NOERR;
 
-  int rc=NC_NOERR;
-
-  /* Change chunk cache. */
-
-  if ((mode!=NC_NOWRITE) ||
-     ((rc=nc_set_chunk_cache(NEW_CACHE_SIZE, NEW_CACHE_NELEMS,
-          NEW_CACHE_PREEMPTION))==NC_NOERR))
-   {
-
-    rc = nc_open(filename.c_str(), mode, &groupid);
-
-    if (rc != NC_NOERR && mode != NC_NOWRITE) {
-      // file doesn't exist or is not a valid NetCDF file and we are in write mode
-      rc = nc_create(filename.c_str(), NC_NETCDF4, &groupid);
-    }
-    if (rc == NC_NOERR) {
-      return groupid;
-    } else {
-      rc=1;
-      throw std::runtime_error("Error opening netCDF file '" + filename + "'");
-    }
+  switch (mode) {
+  case Mode::read:
+    rc = nc_open(filename.c_str(), NC_NOWRITE, &groupid);
+    break;
+  case Mode::append:
+    rc = nc_open(filename.c_str(), NC_WRITE, &groupid);
+    if (rc != NC_ENOTNC) { // success, or any other error than NC_ENOTNC
+      break;
+    }// fallthrough to also create a new file in case we have append and no valid nc file with that name exists.
+  case Mode::write:
+    rc = nc_create(filename.c_str(), NC_NETCDF4, &groupid);
+    break;
   }
-  return rc;
-}
 
-NetCDFFile::NetCDFFile(const string& filename, int mode) : NetCDFGroup(openNetCDF(filename, mode)),
-                                                           filename(filename) { }
+  if (rc != NC_NOERR) {
+    throw std::runtime_error("Error opening netCDF file '" + filename + "'");
+  }
+  return groupid;
+}
 
 NetCDFFile::~NetCDFFile() {
   // destructor should not throw exceptions

@@ -358,8 +358,17 @@ private:
 // NetCDF file with root group.
 class NetCDFFile : public NetCDFGroup {
 public:
-  NetCDFFile(const std::string& fileName, int mode=NC_NOWRITE);
-  NetCDFFile() : filename() {};
+
+  // File opening modes, as in NetCDF Python API
+  enum class Mode {
+    read, // read existing file
+    write, // write new file, if file with same name already exists, delete it
+    append // write to existing file, create file if it doesn't exist or is not a valid NetCDF file.
+  };
+  NetCDFFile(const std::string& filename, Mode mode=Mode::read, size_t chunk_size=0) : NetCDFGroup(openNetCDF(filename, mode, chunk_size)),
+                                                                                      filename(filename) {}
+  NetCDFFile(const std::string& filename, size_t chunk_size) : NetCDFFile(filename, Mode::read, chunk_size) {}
+  NetCDFFile() : filename("") {};
   ~NetCDFFile();
 
   NetCDFFile(NetCDFFile&& other);
@@ -374,6 +383,8 @@ public:
 
 private:
   std::string filename;
+
+  int openNetCDF(const std::string& fileName, Mode mode, size_t chunk_size=0);
 };
 
 template<>
