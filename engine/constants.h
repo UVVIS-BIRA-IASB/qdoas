@@ -504,7 +504,7 @@ enum _omiSpectralTypes {
   PRJCT_INSTR_OMI_TYPE_MAX
 };
 
-#define MAX_SWATHSIZE 4096 // maximum number of tracks per swath (for satellites)
+#define MAX_SWATHSIZE 2048 // maximum number of tracks per swath (for satellites)
 
 // ----------------
 // RESULTS TAB PAGE
