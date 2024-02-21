@@ -129,19 +129,15 @@ RC MATRIX_netcdf_LoadXS(const char *fileName,MATRIX_OBJECT *pMatrix,
 
   try
    {
-    NetCDFFile current_file;                                                    //!< \details Pointer to the current netCDF file
-    NetCDFGroup root_group;                                                     //!< \details pointer to the first group
     vector<float> wve;                                                          //!< \details vector for wavelengths 
     vector<double> spe;                                                         //!< \details vector for xs at a specific row
     int n_wavelength;                                                           //!< \details number of wavelengths
     int n_rows;                                                                 //!< \details number of rows (for satellites)
-    double *dwve;
+    double *dwve = NULL;
     size_t start[2],count[2];
     
-    dwve=NULL;
-    current_file = NetCDFFile(fullPath);                             // open file
-    
-    root_group = current_file.getGroup("QDOAS_CROSS_SECTION_FILE");  // go to the root
+    NetCDFFile current_file(fullPath, NetCDFFile::Mode::read, 180 * 1024 * 1024);  // open file, use large cache to handle big cross sections.
+    NetCDFGroup root_group = current_file.getGroup("QDOAS_CROSS_SECTION_FILE");  // go to the root
     
     n_wavelength=root_group.dimLen("n_wavelength");      
     n_rows=root_group.dimLen("dim_y");   
