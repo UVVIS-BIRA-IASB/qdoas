@@ -5,7 +5,7 @@
 
 #include "comdefs.h"
 
-#ifdef _MCS_VER
+#ifdef _MSC_VER
 #define timegm _mkgmtime
 #endif
 
