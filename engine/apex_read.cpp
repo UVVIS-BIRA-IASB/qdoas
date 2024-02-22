@@ -103,9 +103,7 @@ int apex_init(const char *reference_filename, ENGINE_CONTEXT *pEngineContext, co
     ANALYSE_swathSize = col_dim;
 
     for (size_t i=0; i< col_dim; ++i) {
-      if (((pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_GOME1_NETCDF) ||
-           (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_GEMS)   ||
-           (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_TROPOMI)) &&
+      if ((pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_GOME1_NETCDF) &&
           (check_size==2)) {
          vector<int> use_row(col_dim);
          const size_t start[] = {0};
@@ -114,9 +112,7 @@ int apex_init(const char *reference_filename, ENGINE_CONTEXT *pEngineContext, co
          if (i==idxColumn){
              *useRow = use_row[i];
          }
-      } else if ((pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_GOME1_NETCDF) &&
-                 (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_GEMS)   &&
-                 (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_TROPOMI)) {
+      } else if (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_GOME1_NETCDF) {
          pEngineContext->project.instrumental.use_row[i] = true;
       }
       if ((check_size == 1) && (spectral_dim > NDET[i]))

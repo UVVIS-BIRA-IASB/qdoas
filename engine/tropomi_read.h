@@ -28,7 +28,7 @@ extern "C" {
 
   int tropomi_set(ENGINE_CONTEXT *pEngineContext);
 
-  int tropomi_get_reference_rad(const char* filename, int pixel, double *lambda, double *spectrum, int n_wavel);
+  int tropomi_get_reference_rad(const char* filename, int pixel, double *lambda, double *spectrum, int n_wavel, int *use_row);
 
   int tropomi_get_reference_irrad(const char* filename, int pixel, double *lambda, double *spectrum, double *sigma, int n_wavel);
 
