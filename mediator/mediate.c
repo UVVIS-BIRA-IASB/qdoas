@@ -2042,6 +2042,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
  handle_errors:
 
    GEMS_CloseReferences();
+   tropomi_clear_reference_cache();
    MATRIX_Free(&hr_solar_temp, __func__);
 
    if (rc!=ERROR_ID_NO) {

@@ -58,14 +58,14 @@ const char* band_names[] = {
 
 static const size_t MAX_GROUNDPIXEL = 450;
 
-//static map<string,vector<vector<double>>> reference_matrix;
-//static map<string,vector<vector<double>>> reference_wavelengths;
 
 namespace {
   // The following struct types are for internal use only.
 
-  static map<string,vector<vector<double>>> reference_radiance;
-  static map<string,vector<vector<double>>> reference_wavelength;
+  typedef map<string,vector<vector<double>>> ReferenceMap;
+
+  static ReferenceMap reference_radiance;
+  static ReferenceMap reference_wavelength;
 
   // irradiance reference
   struct refspec {
@@ -1011,19 +1011,19 @@ int tropomi_prepare_automatic_reference(ENGINE_CONTEXT *pEngineContext, void *re
 int tropomi_get_reference_rad(const char *filename, int pixel, double *lambda, double *spectrum, double *sigma, int n_wavel) {
   int rc = ERROR_ID_NO;
 
-  auto& radiance_reference = reference_radiance[filename];
-  auto& wavelength_reference = reference_wavelength[filename];
+  auto radiance = reference_radiance.find(filename);
+  auto wavelength = reference_wavelength.find(filename);
 
-  try {
-    NetCDFFile refFile(filename);
-    radiance_reference = loadRadAsRef(refFile,"reference_radiance");
-    wavelength_reference = loadRadAsRef(refFile,"reference_wavelength");
-    if (!radiance_reference.size() || !wavelength_reference.size())
-      return ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_REF_DATA, pixel);
-
+  try{
+    if (radiance == reference_radiance.end()) {
+      // reference radiances for this filename not yet loaded
+      NetCDFFile refFile(filename);
+      radiance = reference_radiance.insert(radiance, ReferenceMap::value_type(filename, loadRadAsRef(refFile,"reference_radiance")));
+      wavelength = reference_wavelength.insert(wavelength, ReferenceMap::value_type(filename, loadRadAsRef(refFile,"reference_wavelength")));
+    }
     for (size_t i = 0; i < n_wavel; ++i) {
-      lambda[i] = wavelength_reference.at(pixel)[i];
-      spectrum[i] = radiance_reference.at(pixel)[i];
+      lambda[i] = wavelength->second.at(pixel)[i];
+      spectrum[i] = radiance->second.at(pixel)[i];
     }
   } catch(std::runtime_error& e) {
     rc = ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_TROPOMI_REF, filename, pixel, e.what());
@@ -1059,6 +1059,11 @@ int tropomi_get_orbit_date(int *orbit_year, int *orbit_month, int *orbit_day) {
    return(0);
 }
 
+void tropomi_clear_reference_cache(void) {
+  reference_radiance.clear();
+  reference_wavelength.clear();
+}
+
 void tropomi_cleanup(void) {
   current_file.close();
   current_filename="";
@@ -1073,4 +1078,5 @@ void tropomi_cleanup(void) {
   delta_time.clear();
   irradiance_reference.clear();
   reference_orbit_files.clear();
+  tropomi_clear_reference_cache();
 }

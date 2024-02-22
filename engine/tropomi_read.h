@@ -36,6 +36,8 @@ extern "C" {
 
   void tropomi_cleanup(void);
 
+  void tropomi_clear_reference_cache(void);
+
 #ifdef __cplusplus
 }
 #endif
