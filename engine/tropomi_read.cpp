@@ -1008,7 +1008,7 @@ int tropomi_prepare_automatic_reference(ENGINE_CONTEXT *pEngineContext, void *re
   return ERROR_ID_NO;
 }
 
-int tropomi_get_reference_rad(const char *filename, int pixel, double *lambda, double *spectrum, double *sigma, int n_wavel) {
+int tropomi_get_reference_rad(const char *filename, int pixel, double *lambda, double *spectrum, int n_wavel) {
   int rc = ERROR_ID_NO;
 
   auto radiance = reference_radiance.find(filename);
