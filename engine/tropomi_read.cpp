@@ -943,20 +943,18 @@ int tropomi_prepare_automatic_reference(ENGINE_CONTEXT *pEngineContext, void *re
         if (!pTabFeno->useRefRow) continue;
         if (pTabFeno->hidden || (pTabFeno->refSpectrumSelectionMode!=ANLYS_REF_SELECTION_MODE_AUTOMATIC)) continue;
         const vector<earth_ref>& refs = earth_spectra[window][row];
-//        if (!(rc=tropomi_get_reference(pTabFeno->ref2,row,pTabFeno->LambdaRef,pTabFeno->Sref,pTabFeno->SrefSigma,&n_wavel,0))){
-           if (refs.size()) {
-             for (size_t i=0; i!=wavelength_grid.size(); ++i) {
-               wavelength_grid[i] = pTabFeno->LambdaRef[i];
-             }
-             sum_refs(sum, variance, refs, wavelength_grid);
-             for (size_t i=0; i!=sum.size(); ++i) {
-               pTabFeno->Sref[i]=sum[i]/refs.size();
-               pTabFeno->SrefSigma[i]=std::sqrt(variance[i])/refs.size();
-             }
+        if (refs.size()) {
+          for (size_t i=0; i!=wavelength_grid.size(); ++i) {
+            wavelength_grid[i] = pTabFeno->LambdaRef[i];
+          }
+          sum_refs(sum, variance, refs, wavelength_grid);
+          for (size_t i=0; i!=sum.size(); ++i) {
+            pTabFeno->Sref[i]=sum[i]/refs.size();
+            pTabFeno->SrefSigma[i]=std::sqrt(variance[i])/refs.size();
+          }
 
-             VECTOR_NormalizeVector(pTabFeno->Sref-1,n_wavel,&pTabFeno->refNormFact, __func__);
-           }
-//        }
+          VECTOR_NormalizeVector(pTabFeno->Sref-1,n_wavel,&pTabFeno->refNormFact, __func__);
+        }
       }
     }
 
@@ -1010,45 +1008,42 @@ int tropomi_prepare_automatic_reference(ENGINE_CONTEXT *pEngineContext, void *re
   return ERROR_ID_NO;
 }
 
-int tropomi_get_reference(const char *filename, int pixel, double *lambda, double *spectrum, double *sigma, int n_wavel, const int radAsRef) {
+int tropomi_get_reference_rad(const char *filename, int pixel, double *lambda, double *spectrum, double *sigma, int n_wavel) {
   int rc = ERROR_ID_NO;
 
   auto& radiance_reference = reference_radiance[filename];
   auto& wavelength_reference = reference_wavelength[filename];
 
   try {
-    if (radAsRef){
-       NetCDFFile refFile(filename);
-       radiance_reference = loadRadAsRef(refFile,"reference_radiance");
-       wavelength_reference = loadRadAsRef(refFile,"reference_wavelength");
-       if (!radiance_reference.size() || !wavelength_reference.size())
-         return ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_REF_DATA, pixel);
+    NetCDFFile refFile(filename);
+    radiance_reference = loadRadAsRef(refFile,"reference_radiance");
+    wavelength_reference = loadRadAsRef(refFile,"reference_wavelength");
+    if (!radiance_reference.size() || !wavelength_reference.size())
+      return ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_REF_DATA, pixel);
 
-//       *n_wavel = radiance_reference.size();
-
-       for (size_t i = 0; i < n_wavel; ++i) {
-         lambda[i] = wavelength_reference.at(pixel)[i];
-         spectrum[i] = radiance_reference.at(pixel)[i];
-       }
-    } else {
-       const refspec& r = irradiance_reference.at(pixel);
-       if (!r.irradiance.size() )
-         return ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_REF_DATA, pixel);
-
-//       *n_wavel = r.irradiance.size();
-
-       for (size_t i = 0; i < n_wavel; ++i) {
-         lambda[i] = r.lambda[i];
-         spectrum[i] = r.irradiance[i];
-         sigma[i] = r.sigma[i];
-       }
+    for (size_t i = 0; i < n_wavel; ++i) {
+      lambda[i] = wavelength_reference.at(pixel)[i];
+      spectrum[i] = radiance_reference.at(pixel)[i];
     }
-
   } catch(std::runtime_error& e) {
     rc = ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_TROPOMI_REF, filename, pixel, e.what());
   }
 
   return rc;
+}
+
+int tropomi_get_reference_irrad(const char *filename, int pixel, double *lambda, double *spectrum, double *sigma, int n_wavel) {
+  const refspec& r = irradiance_reference.at(pixel);
+  if (!r.irradiance.size() )
+    return ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_REF_DATA, pixel);
+
+  for (size_t i = 0; i < n_wavel; ++i) {
+    lambda[i] = r.lambda[i];
+    spectrum[i] = r.irradiance[i];
+    sigma[i] = r.sigma[i];
+  }
+
+  return ERROR_ID_NO;
 }
 
 int tropomi_get_orbit_date(int *orbit_year, int *orbit_month, int *orbit_day) {
