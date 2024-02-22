@@ -144,6 +144,7 @@ void LINEAR_free(struct linear_system *s) {
     break;
   case DECOMP_EIGEN_QR:
     delete s->decomposition.qr_eigen.A;
+    delete s->decomposition.qr_eigen.QR;
   }
 
   delete[] s->norms;
