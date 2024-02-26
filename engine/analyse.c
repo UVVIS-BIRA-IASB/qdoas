@@ -3551,17 +3551,21 @@ RC ANALYSE_CurFitMethod(INDEX indexFenoColumn,          // for imagers as OMI, T
           }
         }
 
-        /*  ==================================  */
-        /*  Concentrations Scaling for Display  */
-        /*  ==================================  */
+        /*  =============================================== */
+        /*  Scale concentrations for display, store results */
+        /*  =============================================== */
 
-        if (pTabCross->IndSvdA) { // Cross section, polynomial, linear offset, undersampling
-          // Fitting using SVD -> in SVD+Marquardt, polynomial is also fitted linearly !
+        if (pTabCross->IndSvdA) { // Cross section, polynomial, linear offset, undersampling, resol, common residual
 
           if ((Feno->analysisMethod==OPTICAL_DENSITY_FIT && pTabCross->FitParam==ITEM_NONE) || pTabCross->IndSvdP) {
+            // Linear fitting:
+            // OD mode: cross sections, polynomial, pre-defined parameters (except non-linear offset)
+            // Intensity fitting mode: polynomial, pre-defined parameters Resol, Usamp, Comon residual
             pResults->SlntCol=x[pTabCross->IndSvdA] = fitParamsC[pTabCross->IndSvdA];
+            // In intensity fitting mode, use SvdP index:
+            int linear_index = pTabCross->IndSvdP ? pTabCross->IndSvdP : pTabCross->IndSvdA;
             pResults->SlntErr=Sigma[pTabCross->IndSvdA]= (pTabCross->FitConc!=0)
-              ? sqrt(fit->SigmaSqr[pTabCross->IndSvdA]*scalingFactor)
+              ? sqrt(fit->SigmaSqr[linear_index]*scalingFactor)
               : 0.;
 
             if (WorkSpace[pTabCross->Comp].type==WRK_SYMBOL_CONTINUOUS
@@ -3582,7 +3586,7 @@ RC ANALYSE_CurFitMethod(INDEX indexFenoColumn,          // for imagers as OMI, T
               }                                                                            // to orthogonalize all cross sections (O4, BrO, HCHO...)
             }
           } else {
-            // cross sections in SVD+Marquardt method or Raman in SVD method
+            // Non-linear fitting: cross sections in Intensity fitting mode or Raman in OD mode
             pResults->SlntCol=x[pTabCross->IndSvdA] = (pTabCross->FitConc!=ITEM_NONE)
               ? fitParamsF[pTabCross->FitConc]
               : fitParamsC[TabCross[i].IndSvdA];
@@ -3594,21 +3598,20 @@ RC ANALYSE_CurFitMethod(INDEX indexFenoColumn,          // for imagers as OMI, T
              pResults->SlntCol*= speNormFact/refNormFact;
            }
          }
-
-        /*  =============  */
-        /*  Store results  */
-        /*  =============  */
-
-        else if (pTabCross->FitParam!=ITEM_NONE)
-         pResults->Param=(double)fitParamsF[pTabCross->FitParam]/pTabCross->Fact;
-        else
-         pResults->Param=pTabCross->InitParam;
+        else if (pTabCross->FitParam!=ITEM_NONE) {
+          // SFP, non-linear offset, ...
+          pResults->Param=(double)fitParamsF[pTabCross->FitParam]/pTabCross->Fact;
+          pResults->SigmaParam = Sigmaa[pTabCross->FitParam]/pTabCross->Fact;
+        } else {
+          // Spectrum, Ref (no fit param for ref/spectrum itself, but shift/stretch can be fitted)
+          pResults->Param=pTabCross->InitParam;
+          pResults->SigmaParam=1.;
+        }
 
         pResults->Shift = ( pTabCross->FitShift != ITEM_NONE ) ? (double) fitParamsF[pTabCross->FitShift] : pTabCross->InitShift;
         pResults->Stretch = ( pTabCross->FitStretch != ITEM_NONE ) ? (double) fitParamsF[pTabCross->FitStretch]*StretchFact1 : pTabCross->InitStretch*StretchFact1;
         pResults->Stretch2 = ( pTabCross->FitStretch2 != ITEM_NONE ) ? (double) fitParamsF[pTabCross->FitStretch2]*StretchFact2 : pTabCross->InitStretch2*StretchFact2;
 
-        pResults->SigmaParam = (pTabCross->FitParam != ITEM_NONE) ? Sigmaa[(!pTabCross->IndSvdA)?pTabCross->FitParam:pTabCross->IndSvdA]/pTabCross->Fact : (double)1.;
         pResults->SigmaShift = (pTabCross->FitShift != ITEM_NONE) ? Sigmaa[pTabCross->FitShift] : (double)1.;
         pResults->SigmaStretch = (pTabCross->FitStretch != ITEM_NONE) ? Sigmaa[pTabCross->FitStretch]*StretchFact1 : (double)1.;
         pResults->SigmaStretch2 = (pTabCross->FitStretch2 != ITEM_NONE) ? Sigmaa[pTabCross->FitStretch2]*StretchFact2 : (double)1.;
