@@ -1,3 +1,13 @@
+3.6.3 2024-02-26
+~~~~~~~~~~~~~~~~
+
+* Fix memory leak in linear least squares module.
+* Reduce memory footprint at startup.
+* Speed up reading large NetCDF cross sections (increase cache size).
+* Speed up tropomi radiance ref initialization (read the reference file just once).
+* Fix reading of certain GEMS L1 attributes.
+* Fix a bug in the handling of pre-defined parameter fitting results in intensity fitting mode.
+
 3.6.2 2023-12-18
 ~~~~~~~~~~~~~~~~
 
