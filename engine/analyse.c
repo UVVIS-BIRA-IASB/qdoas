@@ -6158,7 +6158,8 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
       ANALYSE_plotRef=1;
 
       switch(pEngineContext->project.instrumental.readOutFormat) {
-        case PRJCT_INSTR_FORMAT_TROPOMI:
+      case PRJCT_INSTR_FORMAT_TROPOMI:
+      case PRJCT_INSTR_FORMAT_GEMS: //  fall-through: GEMS uses Tropomi rad ref functions
            pTabFeno->useRadAsRef2=1;
            temp_use_row = 1;
            if ((pTabFeno->SrefRadAsRef2=(double *)MEMORY_AllocDVector(__func__,"SrefRadAsRef2",0,pTabFeno->n_wavel_ref2))==NULL ||
@@ -6167,29 +6168,12 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
                rc=ERROR_ID_ALLOC;
            else if (!(rc=tropomi_get_reference_rad(pTabFeno->ref2,indexFenoColumn,pTabFeno->LambdaRadAsRef2,pTabFeno->SrefRadAsRef2,pTabFeno->n_wavel_ref2,&temp_use_row)) &&
                     !(rc=SPLINE_Deriv2(pTabFeno->LambdaRadAsRef2,pTabFeno->SrefRadAsRef2,pTabFeno->Deriv2RadAsRef2,pTabFeno->n_wavel_ref2,__func__))){
-               memcpy(pTabFeno->LambdaRef,lambdaRefEtalon,sizeof(double)*n_wavel_ref);
-               rc=SPLINE_Vector(pTabFeno->LambdaRadAsRef2,pTabFeno->SrefRadAsRef2,pTabFeno->Deriv2RadAsRef2,pTabFeno->n_wavel_ref2,
-                                pTabFeno->LambdaRef,pTabFeno->Sref,n_wavel_ref,SPLINE_CUBIC);
-               if (temp_use_row == 0) {
-                   pTabFeno->useRefRow = false;
-               }
-           }
-           break;
-        case PRJCT_INSTR_FORMAT_GEMS:
-           pTabFeno->useRadAsRef2=1;
-           temp_use_row = 1;
-           if ((pTabFeno->SrefRadAsRef2=(double *)MEMORY_AllocDVector(__func__,"SrefRadAsRef2",0,pTabFeno->n_wavel_ref2))==NULL ||
-               (pTabFeno->LambdaRadAsRef2=(double *)MEMORY_AllocDVector(__func__,"LambdaRadAsRef2",0,pTabFeno->n_wavel_ref2))==NULL ||
-               (pTabFeno->Deriv2RadAsRef2=(double *)MEMORY_AllocDVector(__func__,"Deriv2RadAsRef2",0,pTabFeno->n_wavel_ref2))==NULL)
-               rc=ERROR_ID_ALLOC;
-           else if (!(rc=tropomi_get_reference_rad(pTabFeno->ref2,indexFenoColumn,pTabFeno->LambdaRadAsRef2,pTabFeno->SrefRadAsRef2,pTabFeno->n_wavel_ref2,&temp_use_row)) &&
-                    !(rc=SPLINE_Deriv2(pTabFeno->LambdaRadAsRef2,pTabFeno->SrefRadAsRef2,pTabFeno->Deriv2RadAsRef2,pTabFeno->n_wavel_ref2,__func__))){
-                memcpy(pTabFeno->LambdaRef,lambdaRefEtalon,sizeof(double)*n_wavel_ref);
-                rc=SPLINE_Vector(pTabFeno->LambdaRadAsRef2,pTabFeno->SrefRadAsRef2,pTabFeno->Deriv2RadAsRef2,pTabFeno->n_wavel_ref2,
-                                 pTabFeno->LambdaRef,pTabFeno->Sref,n_wavel_ref,SPLINE_CUBIC);
-                if (temp_use_row == 0) {
-                  pTabFeno->useRefRow = false;
-                }
+             memcpy(pTabFeno->LambdaRef,lambdaRefEtalon,sizeof(double)*n_wavel_ref);
+             rc=SPLINE_Vector(pTabFeno->LambdaRadAsRef2,pTabFeno->SrefRadAsRef2,pTabFeno->Deriv2RadAsRef2,pTabFeno->n_wavel_ref2,
+                              pTabFeno->LambdaRef,pTabFeno->Sref,n_wavel_ref,SPLINE_CUBIC);
+             if (temp_use_row == 0) {
+               pTabFeno->useRefRow = false;
+             }
            }
            break;
         case PRJCT_INSTR_FORMAT_GOME1_NETCDF:
