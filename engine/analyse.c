@@ -6009,18 +6009,11 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
 
   pTabFeno->gomeRefFlag=(!is_satellite(pEngineContext->project.instrumental.readOutFormat))?1:0;
 
-  //   ((pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_TROPOMI) &&   ?????
-                     //    (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_GOME1_NETCDF) &&
-                     //    (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_GDP_BIN) &&
-                     //    (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_SCIA_PDS) &&
-                     //    (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_GOME2) &&
-                     //    (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_OMPS) )?1:0;
-
   //
   // in the case of satellites measurements :
   //
-  //      gomeRefFlag=0 means that irradiance is used as etalon spectrum
-  //      gomeRefFlag=1 means that a reference spectrum is given
+  //      gomeRefFlag=0 means that irradiance from the radiance input file is used as etalon spectrum
+  //      gomeRefFlag=1 means that an external (irradiance) reference spectrum is given
   //
   // in other formats, gomeRefFlag is always equal to 1 even though no
   // reference is given (tropospheric measurements)
