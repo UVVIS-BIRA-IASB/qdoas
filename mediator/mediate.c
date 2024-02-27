@@ -23,6 +23,7 @@
 #include "svd.h"
 #include "winthrd.h"
 
+#include "radiance_ref.h"
 #include "omi_read.h"
 #include "omiv4_read.h"
 #include "tropomi_read.h"
@@ -2077,7 +2078,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
  handle_errors:
 
    GEMS_CloseReferences();
-   tropomi_clear_reference_cache();
+   radiance_ref_clear_cache();
    MATRIX_Free(&hr_solar_temp, __func__);
    MATRIX_Free(&slit_matrix_temp, __func__);
 

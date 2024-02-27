@@ -73,6 +73,8 @@ add_library(engine STATIC
   output_netcdf.cpp
   output_netcdf.h
   output_private.h
+  radiance_ref.h
+  radiance_ref.cpp
   ref_list.c
   ref_list.h
   resource.c
