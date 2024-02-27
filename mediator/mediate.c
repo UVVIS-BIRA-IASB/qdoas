@@ -1731,15 +1731,11 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
      break;
 // TODO: generalize for different analysis windows TROPOMI and APEX
    case PRJCT_INSTR_FORMAT_TROPOMI:
-     pEngineContext->radAsRefFlag=0;
-     if (strlen(analysisWindows[0].refOneFile)){
-       rc = tropomi_init(analysisWindows[0].refOneFile,pEngineContext,&n_wavel_temp1);
-     } else {
-        rc=ERROR_SetLast(__func__,ERROR_TYPE_FATAL,ERROR_ID_FILE_AUTOMATIC);
-     }
-     if (strlen(analysisWindows[0].refTwoFile)){
-       pEngineContext->radAsRefFlag=1;
-       rc = tropomi_init(analysisWindows[0].refTwoFile,pEngineContext,&n_wavel_temp2);
+     rc = tropomi_init_irradiance(analysisWindows[0].refOneFile,
+                                  pEngineContext->project.instrumental.tropomi.spectralBand,
+                                  &n_wavel_temp1);
+     if (!rc) {
+       rc = tropomi_init_radref(analysisWindows[0].refTwoFile,&n_wavel_temp2);
      }
      break;
    case PRJCT_INSTR_FORMAT_OMPS:

@@ -415,35 +415,42 @@ vector<refspec> loadReference(const string& filename, const string& band) {
   return result;
 }
 
-int tropomi_init(const char *ref_filename, const ENGINE_CONTEXT *pEngineContext,int* n_wavel_temp) {
-
-  NetCDFFile refFile(ref_filename);
-  RC rc = ERROR_ID_NO;
+// Set ANALYSE_swathSize and NDET based on irradiance reference; return irradiance spectral dimension.
+int tropomi_init_irradiance(const char *irradiance_file, enum tropomiSpectralBand spectralBand, int* n_wavel) {
   try {
-    if (!pEngineContext->radAsRefFlag){
-      irradiance_reference = loadReference(ref_filename,
-                                      band_names[pEngineContext->project.instrumental.tropomi.spectralBand]);
+    NetCDFFile nc_irrad(irradiance_file);
+
+    const string band(band_names[spectralBand]);
+    auto irrObsGroup = nc_irrad.getGroup(band + "_IRRADIANCE/STANDARD_MODE/OBSERVATIONS");
+    // get dimensions:
+    size_t size_pixel = irrObsGroup.dimLen("pixel");
+    size_t size_spectral = irrObsGroup.dimLen("spectral_channel");
+
+    ANALYSE_swathSize = size_pixel;
+    *n_wavel = size_spectral;
+
+    for (size_t i=0; i != size_pixel; ++i) {
+      NDET[i] = size_spectral;
     }
   } catch(std::runtime_error& e) {
-    rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, e.what());
+    return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, e.what());
   }
+  return ERROR_ID_NO;
+}
 
-  if (pEngineContext->radAsRefFlag){
-     ANALYSE_swathSize = refFile.dimLen("col_dim");
-  } else {
-     ANALYSE_swathSize = irradiance_reference.size();
-  }
-
-  for(int i=0; i<ANALYSE_swathSize; ++i) {
-    if (pEngineContext->radAsRefFlag){
-       *n_wavel_temp = refFile.dimLen("spectral_dim");
-    } else {
-       NDET[i] = irradiance_reference[i].lambda.size();
-       *n_wavel_temp = NDET[i];
+// Return radiance reference spectral dimension; check if "col_dim" matches swath size.
+int tropomi_init_radref(const char *radref_file, int *n_wavel) {
+  try {
+    NetCDFFile nc_rad(radref_file);
+    if (nc_rad.dimLen("col_dim") != ANALYSE_swathSize) {
+      throw std::runtime_error("col_dim for radiance reference '" + string(radref_file) +
+                          "' does not match number of rows from irradiance reference");
     }
+    *n_wavel = nc_rad.dimLen("spectral_dim");
+  } catch(std::runtime_error& e) {
+    return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, e.what());
   }
-
-  return rc;
+  return ERROR_ID_NO;
 }
 
 // simple method to get the basename of a full file name:
