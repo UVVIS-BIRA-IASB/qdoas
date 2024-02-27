@@ -6095,20 +6095,13 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
       case PRJCT_INSTR_FORMAT_GOME1_NETCDF: // we read GOME1 reference in the apex format
         pTabFeno->useRadAsRef1=1;
         temp_use_row = 1;
-        if (pTabFeno->useRefRow == true) {
-           if (!(rc=apex_init(pTabFeno->ref1,pEngineContext,2,indexFenoColumn,&temp_use_row)) &&
-                (temp_use_row==0))
-                pTabFeno->useRefRow = false;
-        } else if (pTabFeno->useRefRow == false) {
-           rc = apex_init(pTabFeno->ref1,pEngineContext,0,0,0);
-        }
         if ((pTabFeno->SrefRadAsRef1=(double *)MEMORY_AllocDVector(__func__,"SrefRadAsRef1",0,pTabFeno->n_wavel_ref1))==NULL ||
             (pTabFeno->LambdaRadAsRef1=(double *)MEMORY_AllocDVector(__func__,"LambdaRadAsRef1",0,pTabFeno->n_wavel_ref1))==NULL ||
-            (pTabFeno->Deriv2RadAsRef1=(double *)MEMORY_AllocDVector(__func__,"Deriv2RadAsRef1",0,pTabFeno->n_wavel_ref1))==NULL)
-            rc=ERROR_ID_ALLOC;
-        else if (!(rc=apex_get_reference(pTabFeno->ref1,indexFenoColumn,pTabFeno->LambdaRadAsRef1,pTabFeno->SrefRadAsRef1,&pTabFeno->n_wavel_ref1)))
-           rc=SPLINE_Deriv2(pTabFeno->LambdaRadAsRef1,pTabFeno->SrefRadAsRef1,pTabFeno->Deriv2RadAsRef1,pTabFeno->n_wavel_ref1,__func__);
-        apex_clean();
+            (pTabFeno->Deriv2RadAsRef1=(double *)MEMORY_AllocDVector(__func__,"Deriv2RadAsRef1",0,pTabFeno->n_wavel_ref1))==NULL) {
+          rc=ERROR_ID_ALLOC;
+        } else if (!(rc=radiance_ref_load(pTabFeno->ref1,indexFenoColumn,pTabFeno->LambdaRadAsRef1,pTabFeno->SrefRadAsRef1,pTabFeno->n_wavel_ref1,&temp_use_row))) {
+          rc=SPLINE_Deriv2(pTabFeno->LambdaRadAsRef1,pTabFeno->SrefRadAsRef1,pTabFeno->Deriv2RadAsRef1,pTabFeno->n_wavel_ref1,__func__);
+        }
         break;
 
       default:
@@ -6152,8 +6145,10 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
       ANALYSE_plotRef=1;
 
       switch(pEngineContext->project.instrumental.readOutFormat) {
+        // Tropomi, GEMS, GOME1_NETCDF use the same radiance reference code.
       case PRJCT_INSTR_FORMAT_TROPOMI:
-      case PRJCT_INSTR_FORMAT_GEMS: //  fall-through: GEMS uses Tropomi rad ref functions
+      case PRJCT_INSTR_FORMAT_GEMS:
+      case PRJCT_INSTR_FORMAT_GOME1_NETCDF:
            pTabFeno->useRadAsRef2=1;
            temp_use_row = 1;
            if ((pTabFeno->SrefRadAsRef2=(double *)MEMORY_AllocDVector(__func__,"SrefRadAsRef2",0,pTabFeno->n_wavel_ref2))==NULL ||
@@ -6169,23 +6164,6 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
                pTabFeno->useRefRow = false;
              }
            }
-           break;
-        case PRJCT_INSTR_FORMAT_GOME1_NETCDF:
-           pTabFeno->useRadAsRef2=1;
-           temp_use_row = 1;
-           if (pTabFeno->useRefRow == true) {
-              if (!(rc=apex_init(pTabFeno->ref2,pEngineContext,2,indexFenoColumn,&temp_use_row)) &&
-                   (temp_use_row==0))
-                   pTabFeno->useRefRow = false;
-           } else // of course : if (pTabFeno->useRefRow == false)
-              rc = apex_init(pTabFeno->ref2,pEngineContext,0,0,0);
-           if ((pTabFeno->SrefRadAsRef2=(double *)MEMORY_AllocDVector(__func__,"SrefRadAsRef2",0,pTabFeno->n_wavel_ref2))==NULL ||
-               (pTabFeno->LambdaRadAsRef2=(double *)MEMORY_AllocDVector(__func__,"LambdaRadAsRef2",0,pTabFeno->n_wavel_ref2))==NULL ||
-               (pTabFeno->Deriv2RadAsRef2=(double *)MEMORY_AllocDVector(__func__,"Deriv2RadAsRef2",0,pTabFeno->n_wavel_ref2))==NULL)
-               rc=ERROR_ID_ALLOC;
-           else if (!(rc=apex_get_reference(pTabFeno->ref2,indexFenoColumn,pTabFeno->LambdaRadAsRef2,pTabFeno->SrefRadAsRef2,&pTabFeno->n_wavel_ref2)))
-              rc=SPLINE_Deriv2(pTabFeno->LambdaRadAsRef2,pTabFeno->SrefRadAsRef2,pTabFeno->Deriv2RadAsRef2,pTabFeno->n_wavel_ref2,__func__);
-           apex_clean();
            break;
         case PRJCT_INSTR_FORMAT_APEX:
            rc=apex_get_reference(pTabFeno->ref2,indexFenoColumn,lambdaRef,Sref,&n_wavel_ref);
