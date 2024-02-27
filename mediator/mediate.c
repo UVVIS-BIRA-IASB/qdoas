@@ -1729,13 +1729,12 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
      if (strlen(analysisWindows[0].refTwoFile))
        rc = GOME1NETCDF_InitRef(analysisWindows[0].refTwoFile,&n_wavel_temp2,pEngineContext);
      break;
-// TODO: generalize for different analysis windows TROPOMI and APEX
    case PRJCT_INSTR_FORMAT_TROPOMI:
-     rc = tropomi_init_irradiance(analysisWindows[0].refOneFile,
+     rc = tropomi_init_irradiances(analysisWindows, numberOfWindows,
                                   pEngineContext->project.instrumental.tropomi.spectralBand,
                                   &n_wavel_temp1);
      if (!rc) {
-       rc = tropomi_init_radref(analysisWindows[0].refTwoFile,&n_wavel_temp2);
+       rc = tropomi_init_radref(analysisWindows, numberOfWindows, &n_wavel_temp2);
      }
      break;
    case PRJCT_INSTR_FORMAT_OMPS:
@@ -1757,6 +1756,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
      // TO SEE LATER WHAT IS NECESSARY FOR THIS FORMAT rc = gems_init(analysisWindows[0].refOneFile,pEngineContext);              // !!! GEMS : if fixed format, just initialize the ANALYSE_swathSize
      break;
    case PRJCT_INSTR_FORMAT_APEX:
+     // TODO: generalize for different analysis windows APEX
      rc = apex_init(analysisWindows[0].refOneFile,pEngineContext);
      break;
    default:

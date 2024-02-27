@@ -70,6 +70,13 @@ namespace {
     vector<double> sigma;
   };
 
+  // a map of irradiance reference spectra for each rad as ref filename
+  // (in case different analysis windows use different radiance references)
+  typedef map<string, vector<refspec>> IrradianceMap;
+
+  // for each irradiance file: irradiance spectra per row:
+  IrradianceMap irradiance_references;
+
   // earthshine spectrum to be used in earthshine reference:
   struct earth_ref {
     const vector<float>& wavelength;
@@ -109,9 +116,6 @@ static const unsigned char MISSING = 1,
   SATURATED = 16,
   TRANSIENT = 32,
   RTS = 64;
-
-// irradiance spectra for each row:
-static vector<refspec> irradiance_reference;
 
 // filenames of the orbits for which the current earthshine reference
 // is valid (i.e. orbits of the same day)
@@ -175,7 +179,11 @@ int tropomi_set(ENGINE_CONTEXT *pEngineContext) {
     current_file = NetCDFFile(pEngineContext->fileInfo.fileName);
     current_filename=pEngineContext->fileInfo.fileName;
 
-    current_band = band_names[pEngineContext->project.instrumental.tropomi.spectralBand];
+    if (current_band == "") {
+      current_band = band_names[pEngineContext->project.instrumental.tropomi.spectralBand];
+    } else {
+      assert(current_band == band_names[pEngineContext->project.instrumental.tropomi.spectralBand]);
+    }
 
     reference_time = parse_utc_date(current_file.getAttText("time_reference"));
 
@@ -252,16 +260,17 @@ int tropomi_read(ENGINE_CONTEXT *pEngineContext,int record) {
   }
 
   if (THRD_id==THREAD_TYPE_ANALYSIS) {
-     // in analysis mode, variables must have been initialized by tropomi_init()
-    assert(irradiance_reference.size() == ANALYSE_swathSize);// || radiance_reference.size() == ANALYSE_swathSize);
+    // in analysis mode, variables must have been initialized by tropomi_init()
+    n_wavel = NDET[indexPixel];
 
-    const refspec& ref = irradiance_reference.at(indexPixel);
-    n_wavel = NDET[indexPixel] = ref.lambda.size(); // 20/04/2020 : it's better to set NDET to the size of the irradiance
-
-    for (size_t i=0; i<ref.lambda.size(); ++i) {
-      pEngineContext->buffers.lambda_irrad[i] = ref.lambda[i];
-      pEngineContext->buffers.irrad[i] = ref.irradiance[i];
+    // We need an irradiance spectrum for the irradiance plot.  We
+    // give the one from the first analysis window.
+    const auto& irrad_ref = irradiance_references.begin()->second.at(indexPixel);
+    for (size_t i=0; i<irrad_ref.lambda.size(); ++i) {
+      pEngineContext->buffers.lambda_irrad[i] = irrad_ref.lambda[i];
+      pEngineContext->buffers.irrad[i] = irrad_ref.irradiance[i];
     }
+
   } else {
     n_wavel = size_spectral;
   }
@@ -415,22 +424,45 @@ vector<refspec> loadReference(const string& filename, const string& band) {
   return result;
 }
 
-// Set ANALYSE_swathSize and NDET based on irradiance reference; return irradiance spectral dimension.
-int tropomi_init_irradiance(const char *irradiance_file, enum tropomiSpectralBand spectralBand, int* n_wavel) {
+// Set current_band, ANALYSE_swathSize and NDET based on irradiance reference; return irradiance spectral dimension.
+int tropomi_init_irradiances(const mediate_analysis_window_t* analysis_windows, int num_windows, enum tropomiSpectralBand spectralBand, int* n_wavel) {
   try {
-    NetCDFFile nc_irrad(irradiance_file);
+    current_band = band_names[spectralBand];
 
-    const string band(band_names[spectralBand]);
-    auto irrObsGroup = nc_irrad.getGroup(band + "_IRRADIANCE/STANDARD_MODE/OBSERVATIONS");
-    // get dimensions:
-    size_t size_pixel = irrObsGroup.dimLen("pixel");
-    size_t size_spectral = irrObsGroup.dimLen("spectral_channel");
+    bool have_set_dimensions = false;
 
-    ANALYSE_swathSize = size_pixel;
-    *n_wavel = size_spectral;
+    for (int i=0; i<num_windows; ++i) {
+      const string filename = analysis_windows[i].refOneFile;
+      // first check if current irradiance file is already loaded
+      auto irradiance = irradiance_references.find(filename);
+      if (irradiance != irradiance_references.end()) {
+        // already have this file from a previous analysis window
+        continue;
+      }
 
-    for (size_t i=0; i != size_pixel; ++i) {
-      NDET[i] = size_spectral;
+      irradiance = irradiance_references.insert(irradiance,
+                                                IrradianceMap::value_type(filename,
+                                                                          loadReference(filename, current_band)));
+      auto size_pixel = irradiance->second.size();
+      auto size_spectral = irradiance->second.at(0).lambda.size();
+
+      if (!have_set_dimensions) {
+          ANALYSE_swathSize = size_pixel;
+          for (size_t i=0; i != size_pixel; ++i) {
+            NDET[i] = size_spectral;
+          }
+          *n_wavel = size_spectral;
+          have_set_dimensions = true;
+      } else {
+        if (size_pixel != ANALYSE_swathSize) {
+          throw std::runtime_error("Number of cross-track pixels in irradiance " + filename + " doesn't match other references.");
+        }
+        for (size_t col=0; col<size_pixel; ++col) {
+          if (NDET[col] != size_spectral) {
+            throw std::runtime_error("Number of wavelengths irradiance " + filename + " doesn't match other references.");
+          }
+        }
+      }
     }
   } catch(std::runtime_error& e) {
     return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, e.what());
@@ -438,15 +470,25 @@ int tropomi_init_irradiance(const char *irradiance_file, enum tropomiSpectralBan
   return ERROR_ID_NO;
 }
 
-// Return radiance reference spectral dimension; check if "col_dim" matches swath size.
-int tropomi_init_radref(const char *radref_file, int *n_wavel) {
+// Return radiance reference spectral dimension; check if "col_dim" matches swath size for all radiance reference files.
+int tropomi_init_radref(const mediate_analysis_window_t* analysis_windows, int num_windows, int *n_wavel) {
   try {
-    NetCDFFile nc_rad(radref_file);
-    if (nc_rad.dimLen("col_dim") != ANALYSE_swathSize) {
-      throw std::runtime_error("col_dim for radiance reference '" + string(radref_file) +
-                          "' does not match number of rows from irradiance reference");
+    bool have_n_wavel;
+    for (int i=0; i!=num_windows; ++i) {
+      const char *radref_file = analysis_windows[i].refTwoFile;
+      NetCDFFile nc_rad(radref_file);
+      if (nc_rad.dimLen("col_dim") != ANALYSE_swathSize) {
+        throw std::runtime_error("col_dim for radiance reference '" + string(radref_file) +
+                                 "' does not match number of rows from irradiance reference");
+      }
+      if (!have_n_wavel) {
+        *n_wavel = nc_rad.dimLen("spectral_dim");
+      } else if (nc_rad.dimLen("spectral_dim") != *n_wavel) {
+        // currently, QDOAS assumes the same spectral dimension for all analysis windows.
+        throw std::runtime_error("spectral_dim for radiance reference '" + string(radref_file) +
+                                 "' does not match spectral dim of radiance references.");
+      }
     }
-    *n_wavel = nc_rad.dimLen("spectral_dim");
   } catch(std::runtime_error& e) {
     return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, e.what());
   }
@@ -989,16 +1031,22 @@ int tropomi_prepare_automatic_reference(ENGINE_CONTEXT *pEngineContext, void *re
 }
 
 int tropomi_get_reference_irrad(const char *filename, int pixel, double *lambda, double *spectrum, double *sigma, int n_wavel) {
-  const refspec& r = irradiance_reference.at(pixel);
-  if (!r.irradiance.size() )
-    return ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_REF_DATA, pixel);
+  try {
+    // irradiance references must already have been loaded by tropomi_init_irradiances:
+    auto irradiance = irradiance_references.find(filename);
 
-  for (size_t i = 0; i < n_wavel; ++i) {
-    lambda[i] = r.lambda[i];
-    spectrum[i] = r.irradiance[i];
-    sigma[i] = r.sigma[i];
+    const refspec& r = irradiance->second.at(pixel);
+    if (!r.irradiance.size() )
+      return ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_REF_DATA, pixel);
+
+    for (size_t i = 0; i < n_wavel; ++i) {
+      lambda[i] = r.lambda[i];
+      spectrum[i] = r.irradiance[i];
+      sigma[i] = r.sigma[i];
+    }
+  } catch(std::runtime_error& e) {
+    return ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_TROPOMI_REF, filename, pixel, e.what());
   }
-
   return ERROR_ID_NO;
 }
 
@@ -1027,6 +1075,6 @@ void tropomi_cleanup(void) {
 
   nominal_wavelengths.clear();
   delta_time.clear();
-  irradiance_reference.clear();
   reference_orbit_files.clear();
+  irradiance_references.clear();
 }

@@ -15,14 +15,16 @@
 #include "doas.h"
 #include "tropomi.h"
 
+typedef struct mediate_analysis_window mediate_analysis_window_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
   // load reference spectra, set NDET[] and use_row[] arrays.
-  int tropomi_init_irradiance(const char *irradiance_file, enum tropomiSpectralBand spectralBand, int* n_wavel);
+  int tropomi_init_irradiances(const mediate_analysis_window_t *analysis_windows, int num_windows, enum tropomiSpectralBand spectralBand, int* n_wavel);
 
-  int tropomi_init_radref(const char *radref_file, int *n_wavel);
+  int tropomi_init_radref(const mediate_analysis_window_t *analysis_windows, int num_windows, int *n_wavel);
 
   int tropomi_prepare_automatic_reference(ENGINE_CONTEXT *pEngineContext, void *responseHandle);
 
