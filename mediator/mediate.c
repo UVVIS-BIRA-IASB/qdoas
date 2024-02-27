@@ -1761,7 +1761,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
      // TO SEE LATER WHAT IS NECESSARY FOR THIS FORMAT rc = gems_init(analysisWindows[0].refOneFile,pEngineContext);              // !!! GEMS : if fixed format, just initialize the ANALYSE_swathSize
      break;
    case PRJCT_INSTR_FORMAT_APEX:
-     rc = apex_init(analysisWindows[0].refOneFile,pEngineContext,1,0,0);
+     rc = apex_init(analysisWindows[0].refOneFile,pEngineContext);
      break;
    default:
      // for all non-imager instruments

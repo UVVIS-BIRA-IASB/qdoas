@@ -1200,7 +1200,7 @@ RC EngineRequestBeginBrowseSpectra(ENGINE_CONTEXT *pEngineContext,const char *sp
       {
        // -----------------------------------------------------------------------
        case PRJCT_INSTR_FORMAT_APEX:
-        rc = apex_init(pEngineContext->fileInfo.fileName,pEngineContext,1,0,0);
+        rc = apex_init(pEngineContext->fileInfo.fileName,pEngineContext);
        break;
        // -----------------------------------------------------------------------
        default:

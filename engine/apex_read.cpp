@@ -95,7 +95,7 @@ static vector<vector<double> > load_reference_radiances(const NetCDFFile& refere
   return radiances;
 }
 
-int apex_init(const char *reference_filename, ENGINE_CONTEXT *pEngineContext, const int check_size, const int idxColumn,int *useRow) {
+int apex_init(const char *reference_filename, ENGINE_CONTEXT *pEngineContext) {
   try {
     NetCDFFile reference_file(reference_filename);
     col_dim = reference_file.dimLen("col_dim");
@@ -103,23 +103,12 @@ int apex_init(const char *reference_filename, ENGINE_CONTEXT *pEngineContext, co
     ANALYSE_swathSize = col_dim;
 
     for (size_t i=0; i< col_dim; ++i) {
-      if ((pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_GOME1_NETCDF) &&
-          (check_size==2)) {
-         vector<int> use_row(col_dim);
-         const size_t start[] = {0};
-         const size_t count[] = {col_dim};
-         reference_file.getVar("use_row", start, count, use_row.data());
-         if (i==idxColumn){
-             *useRow = use_row[i];
-         }
-      } else if (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_GOME1_NETCDF) {
-         pEngineContext->project.instrumental.use_row[i] = true;
-      }
-      if ((check_size == 1) && (spectral_dim > NDET[i]))
-         return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF,
+      pEngineContext->project.instrumental.use_row[i] = true;
+      if (spectral_dim > NDET[i])
+        return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF,
                              "spectral_dim too large. This version supports spectra of maximum length "
                              TOSTRING(APEX_INIT_LENGTH));
-      if (check_size == 1) NDET[i] = spectral_dim;
+      NDET[i] = spectral_dim;
     }
     init_filename = reference_filename;
   } catch(std::runtime_error& e) {

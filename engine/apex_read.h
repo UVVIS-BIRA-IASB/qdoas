@@ -13,7 +13,7 @@
 extern "C" {
 #endif
 
-  int apex_init(const char *reference_file, ENGINE_CONTEXT *pEngineContext,const int check_size,const int idxColumn,int *useRow);
+  int apex_init(const char *reference_file, ENGINE_CONTEXT *pEngineContext);
 
   int apex_set(ENGINE_CONTEXT *pEngineContext);
 
