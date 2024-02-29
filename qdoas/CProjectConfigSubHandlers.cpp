@@ -1100,6 +1100,8 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
          {
       if (str == "all")
         m_instrumental->ccdeev.spectralType = PRJCT_INSTR_MAXDOAS_TYPE_NONE;
+      else if (str == "zenith-only")
+        m_instrumental->ccdeev.spectralType = PRJCT_INSTR_MAXDOAS_TYPE_ZENITH;      
       else if (str == "off-axis")
         m_instrumental->ccdeev.spectralType = PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS;
       else if (str == "direct-sun")
@@ -1107,7 +1109,8 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
       else if (str == "almucantar")
         m_instrumental->ccdeev.spectralType = PRJCT_INSTR_MAXDOAS_TYPE_ALMUCANTAR;
       else
-        return postErrorMessage("Invalid ccdeev Type");
+        m_instrumental->ccdeev.spectralType = PRJCT_INSTR_MAXDOAS_TYPE_ZENITH;
+ //       return postErrorMessage("Invalid ccdeev Type");
      }
   }
   else if (element == "gdpnetcdf") { // GDP netCDF

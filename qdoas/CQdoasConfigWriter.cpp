@@ -716,6 +716,9 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
   case PRJCT_INSTR_MAXDOAS_TYPE_NONE:
     fprintf(fp, "\"all\"");
     break;
+  case PRJCT_INSTR_MAXDOAS_TYPE_ZENITH:
+    fprintf(fp,"\"zenith-only\"");
+    break;
   case PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS:
     fprintf(fp, "\"off-axis\"");
     break;
