@@ -5664,8 +5664,7 @@ RC ANALYSE_LoadNonLinear(ENGINE_CONTEXT *pEngineContext,ANALYSE_NON_LINEAR_PARAM
 
                 // DOAS fitting : only the Raman spectrum is fitted non linearly, other parameters are considered as cross sections
 
-                if (pTabFeno->analysisMethod==OPTICAL_DENSITY_FIT) // && (pTabFeno->indexRing1!=pTabFeno->NTabCross))
-                 {
+                if (pTabFeno->analysisMethod==OPTICAL_DENSITY_FIT) {
                   pTabCross->InitConc=pTabCross->InitParam;
                   pTabCross->DeltaConc=pTabCross->DeltaParam;
                   pTabCross->FitConc=(pTabCross->FitParam!=ITEM_NONE)?1:0;
@@ -5688,13 +5687,11 @@ RC ANALYSE_LoadNonLinear(ENGINE_CONTEXT *pEngineContext,ANALYSE_NON_LINEAR_PARAM
 
                   pTabCross->FitParam=ITEM_NONE;
                   pTabCross->InitParam=(double)0.;
-                 }
-                else
-                 {
+                } else { // Intensity fit
                   pTabCross->InitConc=(double)0.;
-                  pTabCross->FitConc=(pTabFeno->analysisMethod==OPTICAL_DENSITY_FIT)?0:ITEM_NONE;
+                  pTabCross->FitConc=ITEM_NONE;
                   pTabCross->DeltaConc=(double)0.;
-                 }
+                }
                }
              }
 

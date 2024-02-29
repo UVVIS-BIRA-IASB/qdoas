@@ -6,8 +6,8 @@ endif()
 
 project(qdoas)
 
-set(VERSION 3.5.0)
-set(QDOAS_VERSION "3.6.2" CACHE STRING "")
+set(VERSION 3.6.3)
+set(QDOAS_VERSION "3.6.3" CACHE STRING "")
 set(QDOAS_DATE "18 December 2023" CACHE STRING "")
 
 
