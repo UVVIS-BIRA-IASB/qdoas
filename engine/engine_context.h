@@ -684,7 +684,6 @@ struct _engineContext
   int     n_alongtrack, n_crosstrack;
 
   int     refFlag;
-  int     radAsRefFlag;
 
   CALIB_FENO        calibFeno;                                                  // transfer of wavelength calibration options from the project mediator to the analysis mediator
    const char   *outputPath;                                                           // pointer to the output path (from export or output part of the project)

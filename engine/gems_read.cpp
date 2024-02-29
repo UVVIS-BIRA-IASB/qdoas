@@ -228,38 +228,46 @@ RC GEMS_LoadReference(const char *filename,int indexFenoColumn,double *lambda,do
 
    return rc;
  }
- 
-int GEMS_Init(ENGINE_CONTEXT *pEngineContext,const char *ref_filename,int* n_wavel_temp)
- {
-  int rc=ERROR_ID_NO;
-  try 
-   {
+
+int GEMS_init_irradiance(const char *ref_filename, double *lambda, double *spectrum, int *n_wavel_temp) {
+  try {
     NetCDFFile reference_file(ref_filename, nc_cache_size);
-    int col_dim = reference_file.dimLen((pEngineContext->radAsRefFlag)?"col_dim":"dim_image_y");
-    int spectral_dim = reference_file.dimLen((pEngineContext->radAsRefFlag)?"spectral_dim":"dim_image_band");
-    
-    if (!pEngineContext->radAsRefFlag)
-     {
-      if (!(rc=GEMS_LoadReference(ref_filename,0,pEngineContext->buffers.lambda,pEngineContext->buffers.spectrum,n_wavel_temp)))
-       {
-        ANALYSE_swathSize=col_dim;
-        for(int i=0; i<ANALYSE_swathSize; ++i) 
-         NDET[i] = spectral_dim;
-       } 
-     }
-    else if (ANALYSE_swathSize != col_dim) 
-     std::cout << "ERROR: swathSize != col_dim!" << std::endl; 
+    int col_dim = reference_file.dimLen("dim_image_y");
+    int spectral_dim = reference_file.dimLen("dim_image_band");
+
+    int rc = GEMS_LoadReference(ref_filename,0,lambda,spectrum,n_wavel_temp);
+    if (rc) {
+      return rc;
+    }
+
+    ANALYSE_swathSize=col_dim;
+    *n_wavel_temp = spectral_dim;
+    for(int i=0; i<ANALYSE_swathSize; ++i) {
+      NDET[i] = spectral_dim;
+    }
+
+  } catch(std::runtime_error& e) {
+    return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, e.what());
+  }
+  return ERROR_ID_NO;
+}
+
+int GEMS_init_radref(const char *ref_filename, int *n_wavel_temp) {
+  try {
+    NetCDFFile reference_file(ref_filename, nc_cache_size);
+    int col_dim = reference_file.dimLen("col_dim");
+    int spectral_dim = reference_file.dimLen("spectral_dim");
+
+    if (ANALYSE_swathSize != col_dim) {
+      std::cerr << "ERROR: swathSize != col_dim! for rad ref '" << ref_filename << "'" << std::endl;
+    }
 
     *n_wavel_temp = spectral_dim;
-   }  
-  catch(std::runtime_error& e) 
-   {
-    return rc=ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, e.what());
-   }
-   
-  return rc; 
- } 
-  
+  } catch(std::runtime_error& e) {
+    return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, e.what());
+  }
+  return ERROR_ID_NO;
+}
 
 int GEMS_Set(ENGINE_CONTEXT *pEngineContext) {
   bool has_irradiance,has_radiance;

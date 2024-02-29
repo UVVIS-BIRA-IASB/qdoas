@@ -324,7 +324,6 @@ RC EngineCopyContext(ENGINE_CONTEXT *pEngineContextTarget,ENGINE_CONTEXT *pEngin
      pEngineContextTarget->maxdoasScanIndexFlag=pEngineContextSource->maxdoasScanIndexFlag;
      pEngineContextTarget->mfcDoasisFlag=pEngineContextSource->mfcDoasisFlag;
      pEngineContextTarget->refFlag=pEngineContextSource->refFlag;
-     pEngineContextTarget->radAsRefFlag=pEngineContextSource->radAsRefFlag;
      pEngineContextTarget->n_alongtrack=pEngineContextSource->n_alongtrack;
      pEngineContextTarget->n_crosstrack=pEngineContextSource->n_crosstrack;
     }
