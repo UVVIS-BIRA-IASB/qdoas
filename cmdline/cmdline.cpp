@@ -1271,9 +1271,9 @@ int analyseProjectQdoasFile(void *engineContext, CBatchEngineController *control
 
   }
 
-  CEngineResponseMessage *resp = new CEngineResponseMessage;
-  mediateRequestStop(engineContext,resp);
-  delete resp;
+  CEngineResponseMessage resp;
+  mediateRequestStop(engineContext,&resp);
+  resp.process(controller);
 
   TRACE("   end file " << retCode);
 
