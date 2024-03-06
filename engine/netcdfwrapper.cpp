@@ -302,16 +302,23 @@ int NetCDFFile::openNetCDF(const string &filename, NetCDFFile::Mode mode, size_t
     rc = nc_open(filename.c_str(), NC_NOWRITE, &groupid);
     break;
   case Mode::append:
+    // Try to open an existing file:
     rc = nc_open(filename.c_str(), NC_WRITE, &groupid);
-    if (rc != NC_ENOTNC) { // success, or any other error than NC_ENOTNC
+    if (rc == NC_NOERR ||
+        rc == NC_EPERM || rc == NC_ENFILE || rc == NC_ENOMEM || rc == NC_EHDFERR || rc == NC_EDIMMETA) {
+      // If nc_open succeeds, or for specific netCDF errors where we
+      // do not want to blindly clobber the existing file, we are
+      // done:
       break;
-    }// fallthrough to also create a new file in case we have append and no valid nc file with that name exists.
+    }
+    // All other return codes: assume file does not exist ~> fallthrough to nc_create
   case Mode::write:
     rc = nc_create(filename.c_str(), NC_NETCDF4, &groupid);
     break;
   }
 
   if (rc != NC_NOERR) {
+    std::cout << __func__ << ": error, rc = " << rc << std::endl;
     throw std::runtime_error("Error opening netCDF file '" + filename + "'");
   }
   return groupid;

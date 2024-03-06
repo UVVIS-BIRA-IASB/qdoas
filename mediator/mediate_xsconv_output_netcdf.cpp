@@ -123,7 +123,7 @@ RC netcdf_save_convolution(void *engineContext)
   try {
     // Open the file in writing mode
 
-    output_file = NetCDFFile(new_filename , NetCDFFile::Mode::append );
+    output_file = NetCDFFile(new_filename , NetCDFFile::Mode::write );
 
     // Create attributes
 
@@ -360,7 +360,7 @@ RC netcdf_save_ring(void *engineContext)
   try {
     // Open the file in writing mode
 
-    output_file = NetCDFFile(new_filename, NetCDFFile::Mode::append);
+    output_file = NetCDFFile(new_filename, NetCDFFile::Mode::write);
 
     // Create attributes
 

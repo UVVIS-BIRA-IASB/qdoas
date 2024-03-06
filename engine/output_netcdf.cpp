@@ -724,6 +724,7 @@ RC netcdf_allow_file(const char *filename, const PRJCT_RESULTS *results) {
   int rc = ERROR_ID_NO;
   try {
     NetCDFFile test(filename, NetCDFFile::Mode::append);
+    // check if the group we want to create already exists:
     if (test.groupID(results->swath_name) >= 0 ) {
       rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_OUTPUT_NETCDF, filename, results->swath_name);
     }
@@ -792,7 +793,7 @@ RC netcdf_open_calib(const ENGINE_CONTEXT *pEngineContext, const char *filename,
   try {
     // Open the file in writing mode
 
-    output_file_calib = NetCDFFile(new_filename, NetCDFFile::Mode::append);
+    output_file_calib = NetCDFFile(new_filename, NetCDFFile::Mode::write);
 
     // Create attributes
 
