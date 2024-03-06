@@ -1,3 +1,10 @@
+3.6.4 2024-03-06
+~~~~~~~~~~~~~~~~
+
+* Fix missing doas_cl error messages for batch output.
+* Fix failing NetCDF output in batch processing ("automatic") mode.
+* Fix configuration for zenith-only type instruments.
+
 3.6.3 2024-02-26
 ~~~~~~~~~~~~~~~~
 
