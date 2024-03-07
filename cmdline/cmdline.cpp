@@ -211,6 +211,7 @@
 #include <string>
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
+#include <QXmlStreamReader>
 #include <QFile>
 #include <QString>
 #include <QList>
@@ -772,37 +773,25 @@ int batchProcess(commands_t *cmd)
 
 enum BatchTool requiredBatchTool(const QString &filename)
 {
-  enum BatchTool type = UnknownConfig;
+  QFile config_file(filename);
+  config_file.open(QIODevice::ReadOnly);
+  QXmlStreamReader reader(&config_file);
 
-  FILE *fp = fopen(filename.toLocal8Bit().constData(), "r");
-  if (fp != NULL) {
-    char buffer[256];
+  if (reader.readNextStartElement()) {
+    auto toolname = reader.name();
 
-    if (fgets(buffer, sizeof(buffer), fp) != NULL) {
-      // should begin with '<?xml'
-      if (strlen(buffer) > 5 && !strncmp(buffer, "<?xml", 5)) {
-
-    if (fgets(buffer, sizeof(buffer), fp) != NULL) {
-      // opening tag ...
-      int len = strlen(buffer);
-
-      if (len >= 7 && !strncmp(buffer, "<qdoas>", 7))
-        type = Qdoas;
-      else if (len >= 13 && !strncmp(buffer, "<convolution>", 13))
-        type = Convolution;
-      else if (len >= 6 && !strncmp(buffer, "<ring>", 6))
-        type = Ring;
-      else if (len >= 7 && !strncmp(buffer, "<usamp>", 7))
-        type = Usamp;
-
+    if (toolname == "qdoas") {
+      return Qdoas;
+    } else if (toolname == "convolution") {
+      return Convolution;
+    } else if (toolname == "ring") {
+      return Ring;
+    } else if (toolname == "usamp") {
+      return Usamp;
     }
-      }
-    }
-
-    fclose(fp);
   }
-
-  return type;
+  // XML parsing failed or unknown toolname:
+  return UnknownConfig;
 }
 
 //-------------------------------------------------------------------
