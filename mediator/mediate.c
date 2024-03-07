@@ -2526,10 +2526,14 @@ int mediateRequestPrevMatchingCalibrateSpectrum(void *engineContext,
 int mediateRequestStop(void *engineContext,
                void *responseHandle)
  {
-   // Close open files and release allocated buffers to reset the engine context
+   // Close open files, write "automatic" output, and release
+   // allocated buffers to reset the engine context
+   int rc = EngineRequestEndBrowseSpectra((ENGINE_CONTEXT *)engineContext);
 
-   if (EngineRequestEndBrowseSpectra((ENGINE_CONTEXT *)engineContext)!=0)
+   if (rc != 0) {
     ERROR_DisplayMessage(responseHandle);
+    return -1;
+   }
 
    return 0;
  }

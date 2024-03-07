@@ -1261,7 +1261,10 @@ int analyseProjectQdoasFile(void *engineContext, CBatchEngineController *control
   }
 
   CEngineResponseMessage resp;
-  mediateRequestStop(engineContext,&resp);
+  result = mediateRequestStop(engineContext,&resp);
+  if (result == -1)
+    retCode = 1;
+
   resp.process(controller);
 
   TRACE("   end file " << retCode);
@@ -1280,14 +1283,14 @@ int analyseProjectQdoasTreeNode(void *engineContext, CBatchEngineController *con
     if (node->isEnabled()) {
       switch (node->type()) {
       case CProjectConfigTreeNode::eFile:
-    retCode = analyseProjectQdoasFile(engineContext, controller, node->name());
-    break;
+        retCode = analyseProjectQdoasFile(engineContext, controller, node->name());
+        break;
       case CProjectConfigTreeNode::eFolder:
-    retCode = analyseProjectQdoasTreeNode(engineContext, controller, node->firstChild());
-    break;
+        retCode = analyseProjectQdoasTreeNode(engineContext, controller, node->firstChild());
+        break;
       case CProjectConfigTreeNode::eDirectory:
-    retCode = analyseProjectQdoasDirectory(engineContext, controller, node->name(), node->filter(), node->recursive());
-    break;
+        retCode = analyseProjectQdoasDirectory(engineContext, controller, node->name(), node->filter(), node->recursive());
+        break;
       }
     }
 
