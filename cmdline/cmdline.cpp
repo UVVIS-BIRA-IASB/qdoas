@@ -774,23 +774,28 @@ int batchProcess(commands_t *cmd)
 enum BatchTool requiredBatchTool(const QString &filename)
 {
   QFile config_file(filename);
-  config_file.open(QIODevice::ReadOnly);
-  QXmlStreamReader reader(&config_file);
-
-  if (reader.readNextStartElement()) {
-    auto toolname = reader.name();
-
-    if (toolname == "qdoas") {
-      return Qdoas;
-    } else if (toolname == "convolution") {
-      return Convolution;
-    } else if (toolname == "ring") {
-      return Ring;
-    } else if (toolname == "usamp") {
-      return Usamp;
-    }
+  if (!config_file.open(QIODevice::ReadOnly)) {
+    return UnknownConfig; // Can't open the file
   }
-  // XML parsing failed or unknown toolname:
+
+  QXmlStreamReader reader(&config_file);
+  if (!reader.readNextStartElement()) {
+    return UnknownConfig; // XML parsing failed
+  }
+
+  auto toolname = reader.name();
+
+  if (toolname == "qdoas") {
+    return Qdoas;
+  } else if (toolname == "convolution") {
+    return Convolution;
+  } else if (toolname == "ring") {
+    return Ring;
+  } else if (toolname == "usamp") {
+    return Usamp;
+  }
+
+  // XML unknown toolname:
   return UnknownConfig;
 }
 
@@ -1064,12 +1069,13 @@ int analyseProjectQdoas(const CProjectConfigItem *projItem, const QString &outpu
   while (it != filenames.end()) {
     QFileInfo info(*it);
 
-    if (info.isFile())
-        retCode = analyseProjectQdoasFile(engineContext, controller, *it);
-       else if (info.isDir())
-        retCode=analyseProjectQdoasDirectory(engineContext,controller,info.filePath(),fileFilter,1);
-       else
-     retCode=analyseProjectQdoasDirectory(engineContext,controller,info.path(),info.fileName(),1);
+    if (info.isFile()) {
+      retCode = analyseProjectQdoasFile(engineContext, controller, *it);
+      std::cout << "Process file " << it->toStdString() << ", retCode = " << retCode << std::endl;
+    } else if (info.isDir())
+      retCode=analyseProjectQdoasDirectory(engineContext,controller,info.filePath(),fileFilter,1);
+    else
+      retCode=analyseProjectQdoasDirectory(engineContext,controller,info.path(),info.fileName(),1);
 
     ++it;
   }
