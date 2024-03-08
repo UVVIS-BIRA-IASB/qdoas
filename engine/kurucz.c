@@ -2054,18 +2054,21 @@ void KURUCZ_Free(void)
 
     MATRIX_Free(&pKurucz->crossFits,"KURUCZ_Free");
 
-    for (indexWindow=0;indexWindow<pKurucz->Nb_Win;indexWindow++)
-     {
-         if (pKurucz->dispAbsolu[indexWindow]!=NULL)
-          MEMORY_ReleaseDVector("KURUCZ_Free ","dispAbsolu",pKurucz->dispAbsolu[indexWindow],0);
-         if (pKurucz->dispSecX[indexWindow]!=NULL)
+    if (pKurucz->dispAbsolu!=NULL){
+      for (indexWindow=0;indexWindow<pKurucz->Nb_Win;indexWindow++) {
+        if (pKurucz->dispAbsolu[indexWindow]!=NULL)
+           MEMORY_ReleaseDVector("KURUCZ_Free ","dispAbsolu",pKurucz->dispAbsolu[indexWindow],0);
+      }
+      MEMORY_ReleaseBuffer("KURUCZ_Free ","dispAbsolu",pKurucz->dispAbsolu);
+    }
+    if (pKurucz->dispSecX!=NULL) {
+      for (indexWindow=0;indexWindow<pKurucz->Nb_Win;indexWindow++) {
+        if (pKurucz->dispSecX[indexWindow]!=NULL) {
           MEMORY_ReleaseDVector("KURUCZ_Free ","dispSecX",pKurucz->dispSecX[indexWindow],0);
-     }
-
-    if (pKurucz->dispAbsolu!=NULL)
-     MEMORY_ReleaseBuffer("KURUCZ_Free ","dispAbsolu",pKurucz->dispAbsolu);
-    if (pKurucz->dispSecX!=NULL)
-     MEMORY_ReleaseBuffer("KURUCZ_Free ","dispSecX",pKurucz->dispSecX);
+        }
+      }
+      MEMORY_ReleaseBuffer("KURUCZ_Free ","dispSecX",pKurucz->dispSecX);
+    }
 
     if (pKurucz->KuruczFeno!=NULL)
      {

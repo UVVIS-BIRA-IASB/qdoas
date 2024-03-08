@@ -2007,13 +2007,14 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
 
        if ((THRD_id==THREAD_TYPE_KURUCZ) || useKurucz) {
          rc=KURUCZ_Alloc(&pEngineContext->project,pEngineContext->buffers.lambda,indexKurucz,lambdaMin,lambdaMax,indexFenoColumn, &hr_solar_temp);
+         if (rc) {
+           goto handle_errors; // If KURUCZ_Alloc fails, there is a fatal configuration error.
+         }
 
          // the reference spectrum is corrected by the instrument function if any
-
-         if (!rc && useKurucz) {
+         if (useKurucz) {
            rc=KURUCZ_Reference(pEngineContext->buffers.instrFunction,0,saveFlag,1,responseHandle,indexFenoColumn);
          }
-         // make failure of KURUCZ_Alloc on any row a fatal error? (only possible for configurations with errors/bad input files?)
        }
 
        if (!rc && (THRD_id!=THREAD_TYPE_KURUCZ)) {
