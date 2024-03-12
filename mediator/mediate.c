@@ -1647,7 +1647,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
    FENO *pTabFeno;                                                               // pointer to the description of an analysis window
    int indexFeno,indexFenoColumn;                                                // browse analysis windows
    int n_wavel_temp1, n_wavel_temp2;                                             // temporary spectral channel
-   MATRIX_OBJECT hr_solar_temp; // to preload high res solar spectrum
+   MATRIX_OBJECT hr_solar_temp,  slit_matrix_temp;                               // to preload high res solar spectrum and slit function matrix
    RC rc;                                                                        // return code
 
    // Initializations
@@ -1671,6 +1671,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
 
    memset(&calibWindows,0,sizeof(mediate_analysis_window_t));
    memset(&hr_solar_temp, 0, sizeof(hr_solar_temp));
+   memset(&slit_matrix_temp, 0, sizeof(slit_matrix_temp));
 
    memcpy(&calibWindows.crossSectionList,&pEngineContext->calibFeno.crossSectionList,sizeof(cross_section_list_t));
    memcpy(&calibWindows.linear,&pEngineContext->calibFeno.linear,sizeof(struct anlyswin_linear));
@@ -1969,6 +1970,16 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
      } else {
        rc = MATRIX_Load(kurucz_file, &hr_solar_temp, 0, 0, lambdaMin, lambdaMax, 1, 0, __func__);
      }
+
+     if (pKuruczOptions->fwhmType==SLIT_TYPE_FILE) {
+       const char *slitFile = pEngineContext->project.kurucz.slfFile;
+
+       if (!strlen(slitFile)) {
+         rc=ERROR_SetLast(__func__,ERROR_TYPE_FATAL,ERROR_ID_MSGBOX_FIELDEMPTY,"Slit File");
+       } else {
+         rc = MATRIX_Load(slitFile,&slit_matrix_temp, 0, 0, -9999., 9999., 1, 0, __func__);
+       }
+     }
    }
 
    if (rc)
@@ -1978,8 +1989,6 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
 
      if (!pEngineContext->project.instrumental.use_row[indexFenoColumn])
        continue;
-
-
 
      for (indexWindow=0;(indexWindow<NFeno) && !rc;indexWindow++)
       {
@@ -2006,7 +2015,8 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
        // Apply the calibration procedure on the reference spectrum if the wavelength calibration is different from None at least for one spectral window
 
        if ((THRD_id==THREAD_TYPE_KURUCZ) || useKurucz) {
-         rc=KURUCZ_Alloc(&pEngineContext->project,pEngineContext->buffers.lambda,indexKurucz,lambdaMin,lambdaMax,indexFenoColumn, &hr_solar_temp);
+
+         rc=KURUCZ_Alloc(&pEngineContext->project,pEngineContext->buffers.lambda,indexKurucz,lambdaMin,lambdaMax,indexFenoColumn, &hr_solar_temp, &slit_matrix_temp);
          if (rc) {
            goto handle_errors; // If KURUCZ_Alloc fails, there is a fatal configuration error.
          }
@@ -2045,6 +2055,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
    GEMS_CloseReferences();
    tropomi_clear_reference_cache();
    MATRIX_Free(&hr_solar_temp, __func__);
+   MATRIX_Free(&slit_matrix_temp, __func__);
 
    if (rc!=ERROR_ID_NO) {
      ERROR_DisplayMessage(responseHandle);

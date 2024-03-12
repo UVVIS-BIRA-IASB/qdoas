@@ -1594,7 +1594,8 @@ void KURUCZ_Init(int gomeFlag,INDEX indexFenoColumn) {
 
 // Note : lambdaMin, lambdaMax not really used
 
-RC KURUCZ_Alloc(const PROJECT *pProject, const double *lambda,INDEX indexKurucz,double lambdaMin,double lambdaMax,INDEX indexFenoColumn, const MATRIX_OBJECT *hr_solar)
+RC KURUCZ_Alloc(const PROJECT *pProject, const double *lambda,INDEX indexKurucz,double lambdaMin,double lambdaMax,INDEX indexFenoColumn,
+                const MATRIX_OBJECT *hr_solar, const MATRIX_OBJECT *slit_matrix)
  {
   // Declarations
 
@@ -1658,16 +1659,10 @@ RC KURUCZ_Alloc(const PROJECT *pProject, const double *lambda,INDEX indexKurucz,
    {
     pKurucz->fwhmDegree=pKuruczOptions->fwhmPolynomial;
 
-    if (pKuruczOptions->fwhmType==SLIT_TYPE_FILE)
-     {
-      // Load file
-
-      if (!strlen(slitFile))
-       rc=ERROR_SetLast(__func__,ERROR_TYPE_FATAL,ERROR_ID_MSGBOX_FIELDEMPTY,"Slit File");
-      else
-       rc=MATRIX_Load(slitFile,&pKurucz->slitFunction,0,0,
-                     -9999.,9999.,1,0,__func__);
-     }
+    if (pKuruczOptions->fwhmType==SLIT_TYPE_FILE) {
+      // copy the slit function matrix:
+      rc = MATRIX_Copy(&pKurucz->slitFunction, slit_matrix, __func__);
+    }
 
     if (rc!=ERROR_ID_NO)
      goto EndKuruczAlloc;

@@ -75,7 +75,7 @@ RC   KURUCZ_Spectrum(const double *oldLambda, double *newLambda, double *spectru
 RC   KURUCZ_ApplyCalibration(FENO *pTabFeno,double *newLambda,INDEX indexFenoColumn);
 RC   KURUCZ_Reference(double *instrFunction,INDEX refFlag,int saveFlag,int gomeFlag,void *responseHandle,INDEX indexFenoColumn);
 RC   KURUCZ_Alloc(const PROJECT *pProject, const double *lambda, INDEX indexKurucz, double lambdaMin, double lambdaMax,
-                  INDEX indexFenoColumn, const MATRIX_OBJECT *hr_solar);
+                  INDEX indexFenoColumn, const MATRIX_OBJECT *hr_solar, const MATRIX_OBJECT *slit_matrix);
 void KURUCZ_Init(int gomeFlag,INDEX indexFenoColumn);
 void KURUCZ_Free(void);
 
