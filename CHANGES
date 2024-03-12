@@ -1,3 +1,11 @@
+3.6.5 2024-03-12
+~~~~~~~~~~~~~~~~
+
+* Make failure to load calibration settings a fatal error.
+* Make sure error messages from the final output stage are displayed by doas_cl.
+* Use xml parser to determine config file type.  This way, doas_cl recognizes
+  config files edited using other xml tools or libraries.
+
 3.6.4 2024-03-06
 ~~~~~~~~~~~~~~~~
 
