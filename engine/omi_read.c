@@ -501,8 +501,6 @@ static bool valid_reference_file(char *spectrum_file)
 
 // Create the list of all orbit files in the same directory as the given file.
 static RC read_reference_orbit_files(const char *spectrum_file) {
-  RC rc = ERROR_ID_NO;
-
   // clear old reference_orbit_files array
   for(int i=0; i< num_reference_orbit_files; i++) {
     omi_destroy_orbit_file(reference_orbit_files[i]);
@@ -524,25 +522,26 @@ static RC read_reference_orbit_files(const char *spectrum_file) {
 
   struct dirent *fileInfo;
   DIR *hDir = opendir(current_dir);
-  if (hDir != NULL)
-    {
-      while( (fileInfo=readdir(hDir)) && num_reference_orbit_files < MAX_OMI_FILES ) {
-        if(fileInfo->d_name[0] !='.') // better to use 'if (fileInfo->d_type == DT_REG)' ?
-          {
-            reference_orbit_files[num_reference_orbit_files] = malloc(sizeof(struct omi_orbit_file));
-            char *file_name = malloc(strlen(current_dir)+strlen(fileInfo->d_name) +2); //directory + path_sep + filename + trailing \0
-            sprintf(file_name,"%s%c%s",current_dir,PATH_SEP,fileInfo->d_name);
-            reference_orbit_files[num_reference_orbit_files]->omiFileName = file_name;
-            reference_orbit_files[num_reference_orbit_files]->omiSwath = NULL;
-            num_reference_orbit_files++;
-          }
-      }
-      closedir(hDir);
-    }
-  else
-    rc = ERROR_SetLast(__func__,ERROR_TYPE_FATAL,ERROR_ID_FILE_NOT_FOUND,"Omi automatic reference selection");
+  if (hDir == NULL){
+    return ERROR_SetLast(__func__,ERROR_TYPE_FATAL,ERROR_ID_FILE_NOT_FOUND,"Omi automatic reference selection");
+  }
 
-  return rc;
+  while( (fileInfo=readdir(hDir)) && num_reference_orbit_files < MAX_OMI_FILES ) {
+    // Only use files with filename extension ".he4":
+    const char* extension = strrchr(fileInfo->d_name, '.');
+    if(strcmp(extension, ".he4")) {
+      continue;
+    }
+    reference_orbit_files[num_reference_orbit_files] = malloc(sizeof(struct omi_orbit_file));
+    char *file_name = malloc(strlen(current_dir)+strlen(fileInfo->d_name) +2); //directory + path_sep + filename + trailing \0
+    sprintf(file_name,"%s%c%s",current_dir,PATH_SEP,fileInfo->d_name);
+    reference_orbit_files[num_reference_orbit_files]->omiFileName = file_name;
+    reference_orbit_files[num_reference_orbit_files]->omiSwath = NULL;
+    num_reference_orbit_files++;
+  }
+  closedir(hDir);
+
+  return ERROR_ID_NO;
 }
 
 // check if a given spectrum matches the criteria to use it in the automatic reference spectrum
@@ -1497,7 +1496,7 @@ RC OMI_Set(ENGINE_CONTEXT *pEngineContext)
   pEngineContext->recordNumber=0;
   omiSwathOld=ITEM_NONE;
   RC rc=ERROR_ID_NO;
-  /* assert(0); */
+
   // Release old buffers and close file (if open)
   omi_free_swath_data(current_orbit_file.omiSwath);
   /* omi_close_orbit_file(&current_orbit_file); */
@@ -1599,7 +1598,6 @@ static void get_omi_record_data(RECORD_INFO *pRecord, const struct omi_orbit_fil
 
 RC  OMI_read_earth(ENGINE_CONTEXT *pEngineContext,int recordNo)
 {
-  // assert(0);
   // Initializations
   const struct omi_orbit_file *pOrbitFile = &current_orbit_file; // pointer to the current orbit
 
