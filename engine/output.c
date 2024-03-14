@@ -1618,7 +1618,7 @@ static int OutputRegisterParam(const ENGINE_CONTEXT *pEngineContext)
 }
 
 /*! \brief helper function to initialize an output_field containing analysis results. */
-static int register_analysis_field(const struct output_field* fieldcontent, int index_feno, int index_calib, int index_cross, const char *window_name, const char *symbol_name) {
+static void register_analysis_field(const struct output_field* fieldcontent, int index_feno, int index_calib, int index_cross, const char *window_name, const char *symbol_name) {
   if (output_num_fields == MAX_FIELDS) {
     return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_BUG, "Maximum number of analysis output fields reached.");
   }
@@ -1640,7 +1640,6 @@ static int register_analysis_field(const struct output_field* fieldcontent, int 
   newfield->get_cross_results = (outputRunCalib) ? &get_cross_results_calib : &get_cross_results_analysis;
   if (newfield->num_attributes) // if we have attributes, allocate a copy
     newfield->attributes = copy_attributes(newfield->attributes, newfield->num_attributes);
-  return ERROR_ID_NO;
 }
 
 /*! \brief Register output fields related to overall analysis (or run
@@ -1663,9 +1662,7 @@ static int register_analysis_output_field(int field,struct outputconfig analysis
      {
       output->field.get_tabfeno = &get_tabfeno_analysis;
       output->field.resulttype = output->type;
-      int rc = register_analysis_field(&output->field, indexFeno, index_calib, ITEM_NONE, windowName, "");
-      
-      if (rc != ERROR_ID_NO) return rc;
+      register_analysis_field(&output->field, indexFeno, index_calib, ITEM_NONE, windowName, "");
      }
 
    return ERROR_ID_NO;
@@ -1812,9 +1809,13 @@ static int register_cross_results(const PRJCT_RESULTS *pResults, const FENO *pTa
 
       for(unsigned int i=0; i<sizeof(symbol_fitparams)/sizeof(symbol_fitparams[0]); i++) {
         if(symbol_fitparams[i].register_field) {
-          int rc = register_analysis_field(&symbol_fitparams[i].fieldcontent, indexFeno, index_calib, indexTabCross, windowName, symbol_fitparams[i].symbol_name);
-          if (rc != ERROR_ID_NO) return rc;
+          register_analysis_field(&symbol_fitparams[i].fieldcontent, indexFeno, index_calib, indexTabCross, windowName, symbol_fitparams[i].symbol_name);
         }
+      }
+      if (cross_attribs_file != NULL) {
+        free(cross_attribs_file->label);
+        free(cross_attribs_file->value);
+        free(cross_attribs_file);
       }
     }
 
@@ -1847,8 +1848,7 @@ static int register_cross_results(const PRJCT_RESULTS *pResults, const FENO *pTa
                                                  .memory_type = OUTPUT_DOUBLE,
                                                  .get_data = get_data,
                                                  .index_cross2 = indexTabCross2 };
-                int rc = register_analysis_field( &newfield, indexFeno, index_calib, indexTabCross, windowName, symbolName);
-                if (rc != ERROR_ID_NO) return rc;
+                register_analysis_field( &newfield, indexFeno, index_calib, indexTabCross, windowName, symbolName);
               }
     }
   }
