@@ -208,6 +208,7 @@
 #include <cstring>
 #include <ctime>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
@@ -516,17 +517,8 @@ int  batchProcess(commands_t *cmd);
 
 int batchProcessQdoas(commands_t *cmd);
 int readConfigQdoas(commands_t *cmd, QList<const CProjectConfigItem*> &projectItems);
-int analyseProjectQdoas(const CProjectConfigItem *projItem, const QString &outputDir, const QString &calibDir, const QList<QString> &filenames);
-int analyseProjectQdoas(const CProjectConfigItem *projItem, const QString &outputDir,const QString &calibDir);
-int analyseProjectQdoasTrigger(const CProjectConfigItem *projItem, const QString &outputDir,const QString &calibDir,const QString &triggerDir);
 int analyseProjectQdoasPrepare(void **engineContext, const CProjectConfigItem *projItem, const QString &outputDir,const QString &calibDir,
                    CBatchEngineController *controller);
-int analyseProjectQdoasFile(void *engineContext, CBatchEngineController *controller, const QString &filename);
-int analyseProjectQdoasTreeNode(void *engineContext, CBatchEngineController *controller, const CProjectConfigTreeNode *node);
-int analyseProjectQdoasDirectory(void *engineContext, CBatchEngineController *controller, const QString &dir,
-                 const QString &filters, bool recursive);
-
-
 
 int batchProcessConvolution(commands_t *cmd);
 int batchProcessRing(commands_t *cmd);
@@ -537,6 +529,51 @@ int calibSaveSwitch=0;
 int xmlSwitch=0;
 int triggerSwitch=0;
 int verboseMode=0;
+
+
+class QdoasBatch {
+
+public:
+  QdoasBatch(const CProjectConfigItem *projItem, const QString &outputDir, const QString &calibDir, int& rc) :
+    projItem(projItem), outputDir(outputDir), calibDir(calibDir), have_enginecontext(false), rc(rc), files_processed(0) {
+  };
+
+  ~QdoasBatch() {
+    if (have_enginecontext) {
+      CEngineResponseMessage msgResp;
+
+      if (mediateRequestDestroyEngineContext(engineContext, &msgResp) != 0) {
+        msgResp.process(&controller);
+        rc = 1;
+      }
+    }
+  }
+
+  int analyse_project(const QString& triggerDir);
+
+  int analyse_project(const QList<QString> &filenames);
+
+  int analyse_project() {
+    // recursive walk of the files in the config
+    return analyse_treeNode(projItem->rootNode());
+  }
+
+  int analyse_file(const QString &filename);
+
+  int analyse_directory(const QString &dir, const QString &filter, bool recursive);
+
+  int analyse_treeNode(const CProjectConfigTreeNode *node);
+
+private:
+  CBatchEngineController controller;
+  std::unique_ptr<const CProjectConfigItem> projItem;
+  const QString &outputDir;
+  const QString &calibDir;
+  void *engineContext;
+  bool have_enginecontext;
+  int& rc; // for final return code from destructor
+  size_t files_processed; // count number of files found for processing
+};
 
 //-------------------------------------------------------------------
 
@@ -829,7 +866,6 @@ int batchProcessQdoas(commands_t *cmd)
   TRACE("batchProcessQdoas");
 
   QList<const CProjectConfigItem*> projectItems;
-
   int retCode = readConfigQdoas(cmd, projectItems);
 
   if (retCode)
@@ -839,41 +875,30 @@ int batchProcessQdoas(commands_t *cmd)
 
   TRACE("Num Projects = " <<  projectItems.size());
 
+  int rc_batch = 0;
   while (!projectItems.isEmpty() && retCode == 0) {
-
-    if (triggerSwitch)
-     {
-      const CProjectConfigItem *p = projectItems.takeFirst();
-      retCode = analyseProjectQdoasTrigger(p, cmd->outputDir,cmd->calibDir,cmd->triggerDir);
-
-
-      delete p;
-     }
-    else if (!cmd->filenames.isEmpty()) {
+    QdoasBatch batch(projectItems.takeFirst(), cmd->outputDir, cmd->calibDir, rc_batch);
+    if (triggerSwitch) {
+      retCode = batch.analyse_project(cmd->triggerDir);
+    } else if (!cmd->filenames.isEmpty()) {
       // if files were specified on the command-line, then ignore the files in the project.
-      if (projectItems.size() == 1) {
-
-    const CProjectConfigItem *p = projectItems.takeFirst();
-
-    retCode = analyseProjectQdoas(p, cmd->outputDir, cmd->calibDir,cmd->filenames);
-
-    delete p;
+      if (projectItems.size() == 0) { // projectitem was the only project
+        retCode = batch.analyse_project(cmd->filenames);
+      } else { // multiple projects ~> ambiguous which project the input files belong to
+        std::cerr << "ERROR: Configuration contains multiple projects. Use option -a to specify which project to analyse the files with." << std::endl;
+        retCode = -1;
       }
-      else {
-    // error ... dont know which project to use ...
-      }
-    }
-    else {
-      // all projects ... all files ...
-      const CProjectConfigItem *p = projectItems.takeFirst();
-
-      retCode = analyseProjectQdoas(p, cmd->outputDir,cmd->calibDir);
-
-      delete p;
+    } else {
+      retCode = batch.analyse_project();
     }
   }
 
-  // just cleanup
+  // Check for error from QdoasBatch destructor
+  if (rc_batch != 0) {
+    retCode = -1;
+  }
+
+  // cleanup: free remaining projectItems in case we ran into an error in the previous loop
   while (!projectItems.isEmpty())
     delete projectItems.takeFirst();
 
@@ -972,155 +997,58 @@ int readConfigQdoas(commands_t *cmd, QList<const CProjectConfigItem*> &projectIt
   return retCode;
 }
 
-int analyseProjectQdoasTrigger(const CProjectConfigItem *projItem, const QString &outputDir, const QString &calibDir,const QString &triggerDir)
-{
-  void *engineContext;
+int QdoasBatch::analyse_project(const QString& triggerDir) {
   char timestampFile[DOAS_MAX_PATH_LEN+1];
-  int retCode;
-  int nsec=0;
+  int nsec = 0;
+  int retCode = 0;
   timestamp_t last_timestamp;
-  double lastTm,newTm;
-  QList<QString> filenames;
 
-  CBatchEngineController *controller = new CBatchEngineController;
   sprintf(timestampFile,"%s/trigger_qdoas.tmstmp",triggerDir.toLocal8Bit().data());
 
-  if ((lastTm=GetLastTimestamp(timestampFile,&last_timestamp))>0.5)
-   retCode=analyseProjectQdoasPrepare(&engineContext, projItem, outputDir, calibDir, controller);
+  double lastTm=GetLastTimestamp(timestampFile,&last_timestamp);
 
+  QList<QString> filenames;
   filenames.clear();
 
-  if (!retCode)
-   {
-    // wait for new files
+  // wait for new files
 
-    while (!kbhit())
-     {
+  while (!kbhit()) {
 
-       if (nsec==0)
-        {
-         newTm=GetFiles(triggerDir,filenames,lastTm);
+    if (nsec==0)
+      {
+        double newTm=GetFiles(triggerDir,filenames,lastTm);
 
-         if (newTm-lastTm>0.5)
+        if (newTm-lastTm>0.5)
           {
-           lastTm=newTm;
+            lastTm=newTm;
 
-           // loop trigger files ...
+            // loop trigger files ...
 
-           QList<QString>::const_iterator it = filenames.begin();
-           while (it != filenames.end())
-            {
-             QFileInfo info(*it);
-
-             if (info.isFile())
-              retCode = analyseProjectQdoasFile(engineContext, controller, *it);
-
-             ++it;
+            for(QList<QString>::const_iterator it = filenames.begin(); it != filenames.end(); ++it) {
+              QFileInfo info(*it);
+              if (info.isFile())
+                retCode = analyse_file(*it);
             }
 
-           std::cout << "Found files" << std::endl;
-           filenames.clear();
+            std::cout << "Found files" << std::endl;
+            filenames.clear();
           }
-         else
+        else
           std::cout << "Wait for trigger list" << std::endl;
-        }
+      }
 
-       #ifdef _WIN32
-       Sleep(1000L);
-       #else
-       usleep(1000000);
-       #endif
-       nsec=(nsec+1)%TRIGGER_DEFAULT_PAUSE;
-       // retCode = analyseProjectQdoasTreeNode(engineContext, controller, projItem->rootNode());
-     }
-   }
+#ifdef _WIN32
+    Sleep(1000L);
+#else
+    usleep(1000000);
+#endif
+    nsec=(nsec+1)%TRIGGER_DEFAULT_PAUSE;
+  }
 
   SaveTimestamp(timestampFile,lastTm);
-
-  // destroy engine
-  CEngineResponseMessage *msgResp = new CEngineResponseMessage;
-
-  if (mediateRequestDestroyEngineContext(engineContext, msgResp) != 0) {
-    msgResp->process(controller);
-    retCode = 1;
-  }
-
-  delete msgResp;
-
   return retCode;
 }
 
-
-int analyseProjectQdoas(const CProjectConfigItem *projItem, const QString &outputDir, const QString &calibDir, const QList<QString> &filenames)
-{
-  QString fileFilter="*.*";
-  void *engineContext;
-  int retCode;
-
-  CBatchEngineController *controller = new CBatchEngineController;
-
-  retCode = analyseProjectQdoasPrepare(&engineContext, projItem, outputDir, calibDir, controller);
-
-  if (retCode)
-    return retCode;
-
-  // loop over files ...
-  QList<QString>::const_iterator it = filenames.begin();
-  while (it != filenames.end()) {
-    QFileInfo info(*it);
-
-    if (info.isFile()) {
-      retCode = analyseProjectQdoasFile(engineContext, controller, *it);
-      std::cout << "Process file " << it->toStdString() << ", retCode = " << retCode << std::endl;
-    } else if (info.isDir())
-      retCode=analyseProjectQdoasDirectory(engineContext,controller,info.filePath(),fileFilter,1);
-    else
-      retCode=analyseProjectQdoasDirectory(engineContext,controller,info.path(),info.fileName(),1);
-
-    ++it;
-  }
-
-  // destroy engine
-  CEngineResponseMessage *msgResp = new CEngineResponseMessage;
-
-  if (mediateRequestDestroyEngineContext(engineContext, msgResp) != 0) {
-    msgResp->process(controller);
-    retCode = 1;
-  }
-
-  delete msgResp;
-
-  return retCode;
-}
-
-int analyseProjectQdoas(const CProjectConfigItem *projItem, const QString &outputDir,const QString &calibDir)
-{
-  void *engineContext;
-  int retCode;
-
-  CBatchEngineController *controller = new CBatchEngineController;
-
-  retCode = analyseProjectQdoasPrepare(&engineContext, projItem, outputDir, calibDir, controller);
-
-  if (retCode)
-    return retCode;
-
-  // recursive walk of the files in the config
-
-  retCode = analyseProjectQdoasTreeNode(engineContext, controller, projItem->rootNode());
-
-  // destroy engine
-  CEngineResponseMessage *msgResp = new CEngineResponseMessage;
-
-  if (mediateRequestDestroyEngineContext(engineContext, msgResp) != 0) {
-    msgResp->process(controller);
-    retCode = 1;
-  }
-
-  delete msgResp;
-
-  return retCode;
-}
 
 int analyseProjectQdoasPrepare(void **engineContext, const CProjectConfigItem *projItem, const QString &outputDir,const QString &calibDir,
                    CBatchEngineController *controller)
@@ -1177,21 +1105,16 @@ int analyseProjectQdoasPrepare(void **engineContext, const CProjectConfigItem *p
     mediate_analysis_window_t *awDataList = new mediate_analysis_window_t[nWindows];
     mediate_analysis_window_t *awCursor = awDataList;
 
-    QList<const CAnalysisWindowConfigItem*>::const_iterator awIt = awList.begin();
-    while (awIt != awList.end()) {
+    for (QList<const CAnalysisWindowConfigItem*>::const_iterator awIt = awList.begin(); awIt != awList.end(); ++awIt) {
+      // Do not account for disabled analysis windows
 
-         // Do not account for disabled analysis windows
-
-         if ((*awIt)->isEnabled())
-          {
+      if ((*awIt)->isEnabled()) {
         *awCursor = *((*awIt)->properties());
         // mask any display flags ...
         ++awCursor;
-       }
-      else
-       nWindows--;
-
-      ++awIt;
+      } else {
+        nWindows--;
+      }
     }
     if (mediateRequestSetAnalysisWindows(*engineContext, nWindows, awDataList, (!calibSwitch)?THREAD_TYPE_ANALYSIS:THREAD_TYPE_KURUCZ, msgResp) != 0) {
       msgResp->process(controller);
@@ -1216,56 +1139,78 @@ int analyseProjectQdoasPrepare(void **engineContext, const CProjectConfigItem *p
   return retCode;
 }
 
-int analyseProjectQdoasFile(void *engineContext, CBatchEngineController *controller, const QString &filename)
-{
+int QdoasBatch::analyse_project(const QList<QString> &filenames)  {
+  // analyse provided list of files
   int retCode = 0;
-  int result, oldResult;
+  CBatchEngineController controller;
 
-  CEngineResponseBeginAccessFile *beginFileResp = new CEngineResponseBeginAccessFile(filename);
+  for(QList<QString>::const_iterator it = filenames.begin(); it != filenames.end(); ++it) {
+    QFileInfo info(*it);
 
-  result = (!calibSwitch)
+    if (info.isFile()) {
+      retCode = analyse_file(*it);
+    } else if (info.isDir()) {
+      retCode = analyse_directory(info.filePath(), "*.*",1);
+    } else {
+      retCode = analyse_directory(info.path(),info.fileName(),1);
+      if (files_processed == 0) {
+        std::cerr << "ERROR: No files matching pattern '" << info.fileName().toStdString()
+                  << "' in directory '" << info.path().toStdString() << "' or subdirectories." << std::endl;
+        return -1;
+      }
+    }
+  }
+
+  return retCode;
+}
+
+int QdoasBatch::analyse_file(const QString &filename) {
+  if (verboseMode)
+    std::cout << "Processing file " << filename.toStdString() << std::endl;
+
+  ++files_processed;
+  int retCode = 0;
+  // If this is the first file we process, we still have to run analyseProjectQdoasPrepare()
+  if (!have_enginecontext) {
+    retCode = analyseProjectQdoasPrepare(&engineContext, projItem.get(), outputDir, calibDir, &controller);
+
+    if (retCode) {
+      return retCode;
+    }
+    have_enginecontext = true;
+  }
+
+  CEngineResponseBeginAccessFile beginFileResp(filename);
+
+  int result = (!calibSwitch)
     ? mediateRequestBeginAnalyseSpectra(engineContext,
                                         CWorkSpace::instance()->getConfigFile().toLocal8Bit().constData(),
-                                        filename.toLocal8Bit().constData(), beginFileResp)
-    : mediateRequestBeginCalibrateSpectra(engineContext, filename.toLocal8Bit().constData(), beginFileResp);
+                                        filename.toLocal8Bit().constData(), &beginFileResp)
+    : mediateRequestBeginCalibrateSpectra(engineContext, filename.toLocal8Bit().constData(), &beginFileResp);
 
-  beginFileResp->setNumberOfRecords(result);
-  beginFileResp->process(controller);
-
-  delete beginFileResp;
+  beginFileResp.setNumberOfRecords(result);
+  beginFileResp.process(&controller);
 
   if (result == -1)
     return 1;
- // if (verboseMode)
-   std::cout << "Processing file " << filename.toStdString() << std::endl;
 
-  oldResult=-1;
-
+  int oldResult=-1;
   // loop based on the controller ...
-  while (!retCode && controller->active() && (result!=oldResult)) {
-
-    CEngineResponseSpecificRecord *resp = new CEngineResponseSpecificRecord;
+  while (!retCode && controller.active() && (result!=oldResult)) {
+    CEngineResponseSpecificRecord resp;
 
     oldResult=result;
-    result = (!calibSwitch) ? mediateRequestNextMatchingAnalyseSpectrum(engineContext, resp) :
-                              mediateRequestNextMatchingCalibrateSpectrum(engineContext, resp);
+    result = (!calibSwitch) ? mediateRequestNextMatchingAnalyseSpectrum(engineContext, &resp) :
+      mediateRequestNextMatchingCalibrateSpectrum(engineContext, &resp);
 
-    if ((result!=0) && (result!=oldResult))                                     // Try to debug
-     {
-      resp->setRecordNumber(result);
-
-      TRACE("   record : " << result);
-
+    if ((result!=0) && (result!=oldResult)) {
+      resp.setRecordNumber(result);
       if (result == -1)
         retCode = 1;
       else if (verboseMode)
         std::cout << "  completed record " << result << std::endl;
-
-      resp->process(controller);
-     }
-
-    delete resp;
-
+      resp.process(&controller);
+    }
   }
 
   CEngineResponseMessage resp;
@@ -1273,49 +1218,36 @@ int analyseProjectQdoasFile(void *engineContext, CBatchEngineController *control
   if (result == -1)
     retCode = 1;
 
-  resp.process(controller);
-
-  TRACE("   end file " << retCode);
-
+  resp.process(&controller);
   return retCode;
 }
 
-int analyseProjectQdoasTreeNode(void *engineContext, CBatchEngineController *controller, const CProjectConfigTreeNode *node)
-{
+int QdoasBatch::analyse_treeNode(const CProjectConfigTreeNode *node) {
   int retCode = 0;
 
   while (!retCode && node != NULL) {
-
-    TRACE("analyseProjectQdoasTreeNode : " << node->name().toStdString());
-
     if (node->isEnabled()) {
       switch (node->type()) {
       case CProjectConfigTreeNode::eFile:
-        retCode = analyseProjectQdoasFile(engineContext, controller, node->name());
+        retCode = analyse_file(node->name());
         break;
       case CProjectConfigTreeNode::eFolder:
-        retCode = analyseProjectQdoasTreeNode(engineContext, controller, node->firstChild());
+        retCode = analyse_treeNode(node->firstChild());
         break;
       case CProjectConfigTreeNode::eDirectory:
-        retCode = analyseProjectQdoasDirectory(engineContext, controller, node->name(), node->filter(), node->recursive());
+        retCode = analyse_directory(node->name(), node->filter(), node->recursive());
         break;
       }
     }
-
     node = node->nextSibling();
   }
 
   return retCode;
 }
 
-int analyseProjectQdoasDirectory(void *engineContext, CBatchEngineController *controller,
-                 const QString &dir, const QString &filter, bool recursive)
-{
-  TRACE("analyseProjectQdoasDirectory " << dir.toStdString());
-
+int QdoasBatch::analyse_directory(const QString &dir, const QString &filter, bool recursive) {
   int retCode = 0;
   QFileInfoList entries;
-  QFileInfoList::iterator it;
 
   QDir directory(dir);
 
@@ -1323,13 +1255,10 @@ int analyseProjectQdoasDirectory(void *engineContext, CBatchEngineController *co
   if (recursive) {
     entries = directory.entryInfoList(); // all entries ... but only take directories on this pass
 
-    it = entries.begin();
-    while (/*!retCode && */ it != entries.end()) {
+    for (QFileInfoList::iterator it = entries.begin(); it != entries.end(); ++it) {
       if (it->isDir() && !it->fileName().startsWith('.')) {
-
-        retCode = analyseProjectQdoasDirectory(engineContext, controller, it->filePath(), filter, true);
+        retCode = analyse_directory(it->filePath(), filter, true);
       }
-      ++it;
     }
   }
 
@@ -1339,13 +1268,13 @@ int analyseProjectQdoasDirectory(void *engineContext, CBatchEngineController *co
   else
     entries = directory.entryInfoList(QStringList(filter));
 
-  it = entries.begin();
-  while (/* !retCode && */ it != entries.end()) {
+  if (entries.empty()) {
+    return -1;
+  }
+  for (QFileInfoList::iterator it = entries.begin(); it != entries.end(); ++it) {
     if (it->isFile()) {
-
-      retCode = analyseProjectQdoasFile(engineContext, controller, it->filePath());
+      retCode = analyse_file(it->filePath());
     }
-    ++it;
   }
 
   return retCode;
@@ -1444,8 +1373,6 @@ int batchProcessConvolution(commands_t *cmd)
   delete handler;
   delete source;
   delete file;
-
-
 
   return retCode;
 }
