@@ -1199,6 +1199,7 @@ int analyseProjectQdoasPrepare(void **engineContext, const CProjectConfigItem *p
       msgResp = new CEngineResponseVisual;
       retCode = 1;
     }
+    delete[] awDataList;
   }
 
   if (retCode) {
@@ -1211,6 +1212,7 @@ int analyseProjectQdoasPrepare(void **engineContext, const CProjectConfigItem *p
     *engineContext = NULL;
   }
 
+  delete msgResp;
   return retCode;
 }
 
