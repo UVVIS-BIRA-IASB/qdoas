@@ -2,10 +2,9 @@
 
 QDOAS is a cross-platform application based on the long experience of BIRA-IASB (Royal Belgian Institute for Space Aeronomy) in the development and improvement of algorithms for the retrieval of trace gases from UV-Visible spectral measurements (satellite, ground-based, mobile or aircraft-based instruments) using the DOAS (Differential Optical Absorption Spectroscopy).  This software evolves along with the measurement techniques in DOAS. It has been extensively validated in different intercomparison campaigns. The friendly user interface, flexibility and the robustness of the algorithms largely contribute to QDOAS success in the world.
 
-QDOAS is now part of the [Atmospheric Toolbox](https://atmospherictoolbox.org/).
+QDOAS is now part of the [Atmospheric Toolbox](https://atmospherictoolbox.org).
 
-Ready-for-use packages for windows, linux and MAC systems are available. To get the S/W, please, go to the following page and register to get the instructions how to install executables :
-http://uv-vis.aeronomie.be/software/QDOAS/QDOAS_Register.php
+Ready-for-use packages for windows, linux and MAC systems are available from [conda-forge](https://anaconda.org/conda-forge/qdoas), you can install them using the [Miniconda](https://docs.anaconda.com/free/miniconda/index.html) or [Anaconda](https://www.anaconda.com/download) package managers.
 
 This readme.md file summarizes the main features and provides prerequisites and instructions to compile QDOAS.
 
@@ -78,13 +77,13 @@ The GUI is built on the Open-Source version of the Qt-5 toolkit. As a result, QD
 
 Building QDOAS from sources requires :
 
-* C++ compiler (g++ version 4 or higher is recommended, though any compiler that successfully builds QT is sufficient. See the compiler notes on the Qt website for further details)
+* C++ compiler (g++ version 4.8.1 or higher is recommended),
 * [Qt5](http://www.trolltech.com)
-* [QWT](http://sourceforge.net/projects/qwt)
+* [Qwt](http://sourceforge.net/projects/qwt)
 * [CODA](https://atmospherictoolbox.org/coda/)
-* [HDF4/MFHDF](https://support.hdfgroup.org/products/hdf4/)
-* [HDF5/HDF5\_CPP/HDF5\_HL/HDF5\_HL\_CPP](https://www.hdfgroup.org/downloads/hdf5/)
-* [NETCDF](https://www.unidata.ucar.edu/software/netcdf/)
+* [HDF4](https://support.hdfgroup.org/products/hdf4/)
+* [HDF5](https://www.hdfgroup.org/downloads/hdf5/)
+* [NetCDF](https://www.unidata.ucar.edu/software/netcdf/)
 * [Boost](https://www.boost.org)
 * [Eigen](https://eigen.tuxfamily.org)
 
