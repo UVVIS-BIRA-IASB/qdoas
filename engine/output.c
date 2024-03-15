@@ -1618,7 +1618,7 @@ static int OutputRegisterParam(const ENGINE_CONTEXT *pEngineContext)
 }
 
 /*! \brief helper function to initialize an output_field containing analysis results. */
-static void register_analysis_field(const struct output_field* fieldcontent, int index_feno, int index_calib, int index_cross, const char *window_name, const char *symbol_name) {
+static int register_analysis_field(const struct output_field* fieldcontent, int index_feno, int index_calib, int index_cross, const char *window_name, const char *symbol_name) {
   if (output_num_fields == MAX_FIELDS) {
     return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_BUG, "Maximum number of analysis output fields reached.");
   }
@@ -1640,6 +1640,8 @@ static void register_analysis_field(const struct output_field* fieldcontent, int
   newfield->get_cross_results = (outputRunCalib) ? &get_cross_results_calib : &get_cross_results_analysis;
   if (newfield->num_attributes) // if we have attributes, allocate a copy
     newfield->attributes = copy_attributes(newfield->attributes, newfield->num_attributes);
+
+  return ERROR_ID_NO;
 }
 
 /*! \brief Register output fields related to overall analysis (or run
@@ -1656,16 +1658,17 @@ static void register_analysis_field(const struct output_field* fieldcontent, int
 
 static int register_analysis_output_field(int field,struct outputconfig analysis_infos[],size_t *parr_length,int indexFeno, int index_calib, const char *windowName)
  {
+   int rc = ERROR_ID_NO;
    enum _prjctResults indexField=field;
    struct outputconfig *output =  (struct outputconfig *) lfind(&indexField, analysis_infos, parr_length, sizeof(analysis_infos[0]), &compare_record);
     if (output)
      {
       output->field.get_tabfeno = &get_tabfeno_analysis;
       output->field.resulttype = output->type;
-      register_analysis_field(&output->field, indexFeno, index_calib, ITEM_NONE, windowName, "");
+      rc = register_analysis_field(&output->field, indexFeno, index_calib, ITEM_NONE, windowName, "");
      }
 
-   return ERROR_ID_NO;
+   return rc;
  }
 
 static int register_analysis_output(const PRJCT_RESULTS *pResults, int indexFenoColumn,int indexFeno, int index_calib, const char *windowName) {
@@ -1750,6 +1753,8 @@ static int register_analysis_output(const PRJCT_RESULTS *pResults, int indexFeno
   \param [in] windowName name of the analysis window, with suffix "."
 */
 static int register_cross_results(const PRJCT_RESULTS *pResults, const FENO *pTabFeno, int indexFeno, int index_calib, const char *windowName) {
+  int rc = ERROR_ID_NO;
+
   struct analysis_output {
     bool register_field;
     const char *symbol_name;
@@ -1809,14 +1814,16 @@ static int register_cross_results(const PRJCT_RESULTS *pResults, const FENO *pTa
 
       for(unsigned int i=0; i<sizeof(symbol_fitparams)/sizeof(symbol_fitparams[0]); i++) {
         if(symbol_fitparams[i].register_field) {
-          register_analysis_field(&symbol_fitparams[i].fieldcontent, indexFeno, index_calib, indexTabCross, windowName, symbol_fitparams[i].symbol_name);
+          rc = register_analysis_field(&symbol_fitparams[i].fieldcontent, indexFeno, index_calib, indexTabCross, windowName, symbol_fitparams[i].symbol_name);
         }
+        if (rc) break; // break to free memory below
       }
       if (cross_attribs_file != NULL) {
         free(cross_attribs_file->label);
         free(cross_attribs_file->value);
         free(cross_attribs_file);
       }
+      if (rc) return rc;
     }
 
   // register correlation and covariance fields
@@ -1848,11 +1855,12 @@ static int register_cross_results(const PRJCT_RESULTS *pResults, const FENO *pTa
                                                  .memory_type = OUTPUT_DOUBLE,
                                                  .get_data = get_data,
                                                  .index_cross2 = indexTabCross2 };
-                register_analysis_field( &newfield, indexFeno, index_calib, indexTabCross, windowName, symbolName);
+                rc = register_analysis_field(&newfield, indexFeno, index_calib, indexTabCross, windowName, symbolName);
+                if (rc) return rc;
               }
     }
   }
-  return ERROR_ID_NO;
+  return rc;
 }
 
 /*! \brief Set up #output_data_analysis and #output_data_calib to
