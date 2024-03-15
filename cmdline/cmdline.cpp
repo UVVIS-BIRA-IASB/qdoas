@@ -341,7 +341,7 @@ void SaveTimestamp(char *timestampFile,double Tm)
   memset(timestampString,0,256);
 
   if ((fp=fopen(timestampFile,"w+t"))==NULL)
-    std::cout << "Can not create " << timestampFile << std::endl;
+    std::cerr << "Can not create " << timestampFile << std::endl;
   else
    {
     // ZEN_Tm2Str : returns the timestamp as a string YYYYMMDD_hhmmss
@@ -397,7 +397,7 @@ double GetLastTimestamp(char *timestampFile,timestamp_t *pTimestamp)
   if ((fp=fopen(timestampFile,"rt"))==NULL)
    {
     if ((fp=fopen(timestampFile,"w+t"))==NULL)
-     std::cout << "Trigger path " << " do not exist !" << std::endl;
+     std::cerr << "Trigger path " << " do not exist !" << std::endl;
     else
      Tm=GetCurrentTimestamp(pTimestamp);
    }
@@ -644,11 +644,11 @@ enum RunMode parseCommandLine(int argc, char **argv, commands_t *cmd)
             runMode = Batch;
           }
          else
-           std::cout << "Duplicate '-c' option." << std::endl;
+           std::cerr << "Duplicate '-c' option." << std::endl;
         }
         else {
           runMode = Error;
-          std::cout << "Option '-c' requires an argument (configuration file)." << std::endl;
+          std::cerr << "Option '-c' requires an argument (configuration file)." << std::endl;
         }
        }
       // -----------------------------------------------------------------------
@@ -660,7 +660,7 @@ enum RunMode parseCommandLine(int argc, char **argv, commands_t *cmd)
        }
        else {
         runMode = Error;
-        std::cout << "Option '-a' requires an argument (project name)." << std::endl;
+        std::cerr << "Option '-a' requires an argument (project name)." << std::endl;
        }
       }
       // -----------------------------------------------------------------------
@@ -673,7 +673,7 @@ enum RunMode parseCommandLine(int argc, char **argv, commands_t *cmd)
        }
        else {
          runMode = Error;
-         std::cout << "Option '-k' requires an argument (project name)." << std::endl;
+         std::cerr << "Option '-k' requires an argument (project name)." << std::endl;
        }
       }
       // -----------------------------------------------------------------------
@@ -686,7 +686,7 @@ enum RunMode parseCommandLine(int argc, char **argv, commands_t *cmd)
        }
        else {
          runMode = Error;
-         std::cout << "Option '-t' requires an argument (trigger path)." << std::endl;
+         std::cerr << "Option '-t' requires an argument (trigger path)." << std::endl;
        }
       }
       // -----------------------------------------------------------------------
@@ -694,7 +694,7 @@ enum RunMode parseCommandLine(int argc, char **argv, commands_t *cmd)
       else if (!strcmp(argv[i], "-saveref")) {
             calibSaveSwitch=calibSwitch;
             if (!calibSwitch)
-              std::cout << "Warning : Option '-saveref' has effect only with '-k' option." << std::endl;
+              std::cerr << "Warning : Option '-saveref' has effect only with '-k' option." << std::endl;
       }
       // -----------------------------------------------------------------------
       // filename to analyze ...
@@ -705,7 +705,7 @@ enum RunMode parseCommandLine(int argc, char **argv, commands_t *cmd)
        }
        else {
          runMode = Error;
-         std::cout << "Option '-f' requires an argument (filename)." << std::endl;
+         std::cerr << "Option '-f' requires an argument (filename)." << std::endl;
        }
       }
       // -----------------------------------------------------------------------
@@ -717,7 +717,7 @@ enum RunMode parseCommandLine(int argc, char **argv, commands_t *cmd)
         }
         else {
           runMode = Error;
-          std::cout << "Option '-new_irrad' requires an argument (filename)." << std::endl;
+          std::cerr << "Option '-new_irrad' requires an argument (filename)." << std::endl;
         }
       }
       // -----------------------------------------------------------------------
@@ -729,7 +729,7 @@ enum RunMode parseCommandLine(int argc, char **argv, commands_t *cmd)
         }
         else {
           runMode = Error;
-          std::cout << "Option '-xml' requires at least an argument (xmlPath=xmlValue)." << std::endl;
+          std::cerr << "Option '-xml' requires at least an argument (xmlPath=xmlValue)." << std::endl;
         }
       }
       // -----------------------------------------------------------------------
@@ -745,7 +745,7 @@ enum RunMode parseCommandLine(int argc, char **argv, commands_t *cmd)
         }
         else {
           runMode = Error;
-          std::cout << "Option '-o' requires an argument (directory)." << std::endl;
+          std::cerr << "Option '-o' requires an argument (directory)." << std::endl;
         }
       }
       // -----------------------------------------------------------------------
@@ -760,16 +760,16 @@ enum RunMode parseCommandLine(int argc, char **argv, commands_t *cmd)
     else
     {
       runMode = Error;
-      std::cout << "Invalid argument '" << argv[i] << "'" << std::endl;
+      std::cerr << "Invalid argument '" << argv[i] << "'" << std::endl;
     }
     ++i;
   }
 
   if ((runMode==None) && calibSaveSwitch && !calibSwitch)
-   std::cout << "Warning : -new_irrad switch to use only with -k option; ignored " << std::endl;
+   std::cerr << "Warning : -new_irrad switch to use only with -k option; ignored " << std::endl;
   else if (!cmd->filenames.isEmpty() && triggerSwitch)
    {
-    std::cout << "Warning : -t/-trigger switch ignored if switch -f is used" << std::endl;
+    std::cerr << "Warning : -t/-trigger switch ignored if switch -f is used" << std::endl;
     triggerSwitch=0;
    }
 
@@ -800,7 +800,7 @@ int batchProcess(commands_t *cmd)
     return batchProcessUsamp(cmd);
     break;
   default:
-    std::cout << "Failed to open or determine configuration file type." << std::endl;
+    std::cerr << "Failed to open or determine configuration file type." << std::endl;
   }
 
   return 1;
@@ -840,20 +840,27 @@ enum BatchTool requiredBatchTool(const QString &filename)
 
 void showUsage()
 {
-  std::cout << "doas_cl -c <config file> [-a/-k <project name>] [-o <output>] [-f <file>]..." << std::endl << std::endl;
-  std::cout << "    -c <config file>    : A QDoas, convolution, [ring or usamp] config file." << std::endl;
-  std::cout << "                          The tool to invoke is determined from the type of" << std::endl;
-  std::cout << "                          configuration file specified;" << std::endl << std::endl;
-  std::cout << "    -a <project name>   : for QDoas, run analysis on the specified project" << std::endl;
-  std::cout << "    -k <project name>   : for QDoas, run calibration on the specified project" << std::endl << std::endl;
-  std::cout << "    -new_irrad <output> : for QDoas, run calibration, GEMS measurements, calibrated irradiances file" << std::endl << std::endl;
-  std::cout << "    -v                  : verbose on (default is off)" << std::endl << std::endl;
-  std::cout << "    -xml <path=value>   : advanced option to replace the values of some options " << std::endl;
-  std::cout << "                          in the configuration file by new ones." << std::endl;
-  std::cout << "    -t, -trigger <path=value> : advanced option to trigger the files to process" << std::endl;
-  std::cout << "------------------------------------------------------------------------------" << std::endl;
-  std::cout << "doas_cl is a tool of QDoas, a product jointly developed by BIRA-IASB and S[&]T" << std::endl;
-  std::cout << "version: " << cQdoasVersionString << std::endl ;
+  std::cout <<
+    "doas_cl -c <config file> [-a/-k <project name>] [-o <output>] [-f <file>]...\n"
+    "\n"
+    "    -c <config file>    : A QDoas, convolution, [ring or usamp] config file.\n"
+    "                          The tool to invoke is determined from the type of\n"
+    "                          configuration file specified;\n"
+    "\n"
+    "    -a <project name>   : for QDoas, run analysis on the specified project\n"
+    "    -k <project name>   : for QDoas, run calibration on the specified project\n"
+    "\n"
+    "    -new_irrad <output> : for QDoas, run calibration, GEMS measurements, \n"
+    "                          calibrated irradiances file\n"
+    "\n"
+    "    -v                  : verbose on (default is off)\n"
+    "\n"
+    "    -xml <path=value>   : advanced option to replace the values of some options \n"
+    "                          in the configuration file by new ones.\n"
+    "    -t, -trigger <path=value> : advanced option to trigger the files to process\n"
+    "------------------------------------------------------------------------------\n"
+    "doas_cl is a tool of QDoas, a product jointly developed by BIRA-IASB and S[&]T\n"
+    "version: " << cQdoasVersionString << std::endl ;
 }
 
 void showHelp()
@@ -971,7 +978,7 @@ int readConfigQdoas(commands_t *cmd, QList<const CProjectConfigItem*> &projectIt
       }
     }
     else if(xmlSwitch) {
-      std::cout << "-xml switch can only be used when processing a single project.  Use switch -a <projectname>" << std::endl;
+      std::cerr << "-xml switch can only be used when processing a single project.  Use switch -a <projectname>" << std::endl;
       retCode = 1;
     } else {
 
@@ -986,7 +993,7 @@ int readConfigQdoas(commands_t *cmd, QList<const CProjectConfigItem*> &projectIt
 
   }
   else {
-    std::cout << handler->messages().toStdString() << std::endl;
+    std::cerr << handler->messages().toStdString() << std::endl;
     retCode = 1;
   }
 
@@ -1310,8 +1317,6 @@ int batchProcessConvolution(commands_t *cmd)
     if (xmlSwitch)
      CONVXML_Parse(cmd->xmlCommands,&properties);
 
-    // std::cout << "CONVXML_Parse : " << properties.conslit.file.filename << std::endl;
-
     if (!cmd->outputDir.isEmpty() && cmd->outputDir.size() < FILENAME_BUFFER_LENGTH-1) {
       // override the output directory
       strcpy(properties.general.outputFile, cmd->outputDir.toLocal8Bit().data());
@@ -1565,7 +1570,7 @@ int batchProcessUsamp(commands_t *cmd)
        }
 
       if (retCode)
-       std::cout << "Undersampling tool failed, please check your input";
+       std::cerr << "Undersampling tool failed, please check your input";
 
       if (mediateXsconvDestroyContext(engineContext, resp) != 0)
        {
