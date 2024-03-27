@@ -88,12 +88,7 @@ namespace {
     vector<double> sigma;
   };
 
-  vector<double> get_wavelengths(const NetCDFGroup& instrGroup, size_t i_scanline, size_t i_groundpixel, size_t num_wavelengths, size_t num_coeffs, int ref_col){
-    vector<double> coeffs(num_coeffs);
-    const size_t start[] = {0, i_scanline, i_groundpixel, 0};
-    const size_t count[] = {1, 1, 1, num_coeffs};
-    instrGroup.getVar("wavelength_coefficient", start, count, coeffs.data() );
-
+  vector<double> calculate_wavelengths(const vector<double>& coeffs, int ref_col, size_t num_wavelengths) {
     vector <double> wavelengths(num_wavelengths);
     // compute wavelength using polynomial sum_0^N-1 ( c(n) * (i - i_ref)^n)
     int delta_i_ref = -ref_col;  // (i - iref) for i = 0...
@@ -108,38 +103,66 @@ namespace {
     return wavelengths;
   }
 
+  vector<double> get_wavelengths(const NetCDFGroup& instrGroup, size_t i_scanline, size_t i_groundpixel, size_t num_wavelengths, size_t num_coeffs, int ref_col){
+    vector<double> coeffs(num_coeffs);
+
+    const size_t start[] = {0, i_scanline, i_groundpixel, 0};
+    const size_t count[] = {1, 1, 1, num_coeffs};
+
+    instrGroup.getVar("wavelength_coefficient", start, count, coeffs.data() );
+
+    return calculate_wavelengths(coeffs, ref_col, num_wavelengths);
+  }
+
+  vector<double> get_wavelengths_irrad(const NetCDFGroup& instrGroup, size_t i_pixel, size_t num_wavelengths){
+    size_t start_lref[] = {0};
+    size_t count_lref[] = {1};
+    int ref_col;
+    instrGroup.getVar("wavelength_reference_column", start_lref, count_lref, &ref_col);
+
+    size_t num_coeffs = instrGroup.dimLen("n_wavelength_poly");
+    vector<double> coeffs(num_coeffs);
+
+    const size_t start[] = {0, 0, i_pixel, 0};
+    const size_t count[] = {1, 1, 1, num_coeffs};
+
+    const size_t *pstart = start;
+    const size_t *pcount = count;
+    // mean irradiance spectrum doesn't have a "scanline" dimension
+    // for the wavelength_coefficient variable => use the last 3 start[]/count[] entries.
+    if (instrGroup.numDims("wavelength_coefficient") == 3) {
+      pstart = &start[1];
+      pcount = &count[1];
+    }
+
+    instrGroup.getVar("wavelength_coefficient", pstart, pcount, coeffs.data() );
+
+    return calculate_wavelengths(coeffs, ref_col, num_wavelengths);
+
+  }
+
   vector<spectrum> load_irradiance_ref(const string& filename, const string& band) {
     NetCDFFile refFile(filename);
     auto irrObsGroup = refFile.getGroup(band + "_IRRADIANCE/STANDARD_MODE/OBSERVATIONS");
     auto instrGroup = refFile.getGroup(band + "_IRRADIANCE/STANDARD_MODE/INSTRUMENT");
     // get dimensions:
     size_t size_pixel = irrObsGroup.dimLen("pixel");
-    size_t nlambda = irrObsGroup.dimLen("spectral_channel");
-
-    size_t start_lref[] = {0};
-    size_t count_lref[] = {1};
-    int ref_col_irr;
-    instrGroup.getVar("wavelength_reference_column", start_lref, count_lref, &ref_col_irr);
-    size_t wavelength_coeffs_irr = instrGroup.dimLen("n_wavelength_poly");
+    size_t nlambda = irrObsGroup.hasDim("spectral_channel") ?
+      irrObsGroup.dimLen("spectral_channel") :
+      irrObsGroup.dimLen("spectral");  // mean irradiance spectrum uses dimension name "spectral"
 
     vector<spectrum> result(size_pixel);
     for(size_t i=0; i<size_pixel; ++i) {
       spectrum& ref_pixel = result[i];
 
+      auto lambda = get_wavelengths_irrad(instrGroup, i, nlambda);
+      vector<double> irra(nlambda);
+      vector<double> noise(nlambda);
+
       // irradiance & irradiance_noise have dimensions
       // (time, scanline, pixel, spectral_channel)
       size_t start_irr[] = {0, 0, i, 0};
       size_t count_irr[] = {1, 1, 1, nlambda};
-
-      // calibrated_wavelength has dimensions
-      // (time, pixel, spectral_channel)
-      size_t start_lambda[] = {0, i, 0};
-      size_t count_lambda[] = {1, 1, nlambda};
-
-      auto lambda = get_wavelengths(instrGroup, 0, i, nlambda, wavelength_coeffs_irr, ref_col_irr);
-      vector<double> irra(nlambda);
-      vector<double> noise(nlambda);
-
       irrObsGroup.getVar("irradiance", start_irr, count_irr, irra.data());
       irrObsGroup.getVar("irradiance_noise", start_irr, count_irr, noise.data());
 
