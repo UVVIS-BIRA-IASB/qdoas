@@ -5,7 +5,8 @@
 
 #include "comdefs.h"
 
-#ifdef _MSC_VER
+//#ifdef _MSC_VER
+#if defined(WIN32) && WIN32
 #define timegm _mkgmtime
 #endif
 

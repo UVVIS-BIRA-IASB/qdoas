@@ -179,7 +179,7 @@ double output_flux(const ENGINE_CONTEXT *pEngineContext, double wavelength, int 
       flux+=pEngineContext->buffers.spectrum[i];  // !!! spectra are previously divided by the integration time in OUTPUT_SaveResults
 
     flux/=(double)(imax-imin+1);
-    
+
    }
   return flux;
 }
@@ -282,7 +282,7 @@ static void save_calib_data(struct output_field *output_field, int index_calib) 
     case OUTPUT_DATETIME:
       ((func_datetime) get_data)(output_field, ((struct datetime *)data) + index_calib * ncols, NULL, row, index_calib);
       break;
-    case OUTPUT_RESIDUAL:  
+    case OUTPUT_RESIDUAL:
     break;
   }
 }
@@ -1627,11 +1627,11 @@ static int register_analysis_field(const struct output_field* fieldcontent, int 
   sprintf(full_fieldname, "%s%s", newfield->basic_fieldname, symbol_name);
   newfield->fieldname = full_fieldname;
   newfield->windowname = strdup(window_name);
-  
+
   newfield->data = NULL;
   if (newfield->data_cols == 0) // data_cols = 1 as a default
     newfield->data_cols = 1;
-  
+
   newfield->index_feno = index_feno;
   newfield->get_tabfeno = (outputRunCalib) ? &get_tabfeno_calib : &get_tabfeno_analysis;
   newfield->index_calib = (outputRunCalib) ? index_calib : ITEM_NONE;
@@ -1659,7 +1659,7 @@ static int register_analysis_output_field(int field,struct outputconfig analysis
  {
    int rc = ERROR_ID_NO;
    enum _prjctResults indexField=field;
-   struct outputconfig *output =  (struct outputconfig *) lfind(&indexField, analysis_infos, parr_length, sizeof(analysis_infos[0]), &compare_record);
+   struct outputconfig *output =  (struct outputconfig *) lfind(&indexField, analysis_infos, (unsigned int *)parr_length, sizeof(analysis_infos[0]), &compare_record);
     if (output)
      {
       output->field.get_tabfeno = &get_tabfeno_analysis;
@@ -1672,7 +1672,7 @@ static int register_analysis_output_field(int field,struct outputconfig analysis
 
 static int register_analysis_output(const PRJCT_RESULTS *pResults, int indexFenoColumn,int indexFeno, int index_calib, const char *windowName) {
 
-  FENO *pTabFeno=&TabFeno[indexFenoColumn][indexFeno];  
+  FENO *pTabFeno=&TabFeno[indexFenoColumn][indexFeno];
   struct outputconfig analysis_infos[] = {
 
     { (outputRunCalib) ? -1 : PRJCT_RESULTS_REFZM, // no REFZM in "run calibration" mode
@@ -1715,13 +1715,13 @@ static int register_analysis_output(const PRJCT_RESULTS *pResults, int indexFeno
         .get_data = (func_void) &get_residual_spectrum, .data_cols=pTabFeno->fit_properties.DimL} }
 
   };
-  
+
   size_t arr_length = sizeof(analysis_infos)/sizeof(analysis_infos[0]);
   int refUnique=((pTabFeno->refMaxdoasSelectionMode==ANLYS_MAXDOAS_REF_SZA) ||
                  (pTabFeno->refSpectrumSelectionScanMode==ANLYS_MAXDOAS_REF_SCAN_BEFORE) ||
                  (pTabFeno->refSpectrumSelectionScanMode==ANLYS_MAXDOAS_REF_SCAN_AFTER))?1:0;
 
-  
+
   for(int i = 0; i<pResults->fieldsNumber; i++)
    {
     if ((pResults->fieldsFlag[i]!=PRJCT_RESULTS_REFNUMBER) || refUnique)
@@ -2274,7 +2274,7 @@ RC OUTPUT_CheckPath(ENGINE_CONTEXT *pEngineContext,char *path,int format) {
   } else {
     fileName = output_path_end + 1; // skip path separator
   }
-  
+
   if ( strlen(fileName) != 0 && strcmp("automatic", fileName) != 0 ) {
     // if an output filename is specified and it is not 'automatic':
     // check if we can write to the file
@@ -2305,7 +2305,7 @@ RC OUTPUT_CheckPath(ENGINE_CONTEXT *pEngineContext,char *path,int format) {
     } else {
       fclose(test);
       switch (format) {
-    
+
       case NETCDF:
         rc = netcdf_allow_file(filename_tmp, &pEngineContext->project.asciiResults);
         break;
@@ -2333,7 +2333,7 @@ RC OUTPUT_CheckPath(ENGINE_CONTEXT *pEngineContext,char *path,int format) {
       // directory -> will not work, throw error
       rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_DIR_NOT_FOUND, "\"\"", ", please specify a directory in the project's Output Path");
     }
-    
+
   return rc;
 }
 
@@ -2491,14 +2491,14 @@ RC OUTPUT_SaveResults(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
   }
 
   // Rebuild spectrum for fluxes and color indexes computation
-  
+
   if ((THRD_id!=THREAD_TYPE_EXPORT) && (pRecordInfo->NSomme!=0) && (pRecordInfo->Tint!=(double)0.)) {
     double *Spectrum= pEngineContext->buffers.spectrum;
 
     for (int i=0;i<n_wavel;i++)
       Spectrum[i]/=(double)pRecordInfo->Tint;
   }
-  
+
   if ((int)outputNbRecords<pEngineContext->recordNumber)
     OutputSaveRecord(pEngineContext,indexFenoColumn);
 
@@ -2537,7 +2537,7 @@ size_t output_get_size(enum output_datatype datatype) {
     return sizeof(double);
     break;
   case OUTPUT_RESIDUAL:
-    return sizeof(double); 
+    return sizeof(double);
   case OUTPUT_DATE:
     return sizeof(struct date);
     break;
@@ -2754,7 +2754,7 @@ void OUTPUT_Free(void)
   -1.*/
 enum output_format output_get_format(const char *fileext) {
   size_t num_formats = sizeof(output_file_extensions)/sizeof(output_file_extensions[0]);
-  const char **array_offset = (const char **) lfind(fileext, output_file_extensions, &num_formats, sizeof(output_file_extensions[0]), &compare_string);
+  const char **array_offset = (const char **) lfind(fileext, output_file_extensions, (unsigned int *)&num_formats, sizeof(output_file_extensions[0]), &compare_string);
   if (array_offset)
     return array_offset - output_file_extensions; // offset in the array output_file_extensions corresponds to the enum value
   else

@@ -54,6 +54,10 @@
 #include "output.h"
 #include "visual_c_compat.h"
 
+#if defined(WIN32) && WIN32
+#define timegm _mkgmtime
+#endif
+
 #define MAX_OMI_FILES 500
 
 // Omi field names for readout routines:
@@ -110,7 +114,7 @@ struct omi_data {
   unsigned short *measurementQualityFlags;
   unsigned char *instrumentConfigurationId;
   bool have_xtrack_quality_flags;
-	
+
 };
 
 struct omi_spectrum {
@@ -482,7 +486,7 @@ static RC OMI_AllocateSwath(struct omi_swath_earth **swath, const int n_alongtra
       ((pData->viewingAzimuthAngle=(float *)MEMORY_AllocBuffer(__func__,"viewingAzimuthAngle",nRecords,sizeof(float),0,MEMORY_TYPE_FLOAT))==NULL) ||
       ((pData->terrainHeight=(short *)MEMORY_AllocBuffer(__func__,"terrainHeight",nRecords,sizeof(short),0,MEMORY_TYPE_SHORT))==NULL) ||
       ((pData->groundPixelQualityFlags=(unsigned short *)MEMORY_AllocBuffer(__func__,"groundPixelQualityFlags",nRecords,sizeof(unsigned short),0,MEMORY_TYPE_USHORT))==NULL) ||
-      ((pData->xtrackQualityFlags=(uint8_t *)MEMORY_AllocBuffer(__func__,"xtrackQualityFlags",nRecords,sizeof(unsigned short),0,MEMORY_TYPE_STRING))==NULL) || ((pData->temp_RadianceMantissa=(int16 *)MEMORY_AllocBuffer(__func__,"temp_RadianceMantissa",nRecords*n_wavel,sizeof(int16),0,MEMORY_TYPE_SHORT))==NULL) || ((pData->temp_RadiancePrecisionMantissa=(int16 *)MEMORY_AllocBuffer(__func__,"temp_RadiancePrecisionMantissa",nRecords*n_wavel,sizeof(int16),0,MEMORY_TYPE_SHORT))==NULL) || ((pData->temp_RadianceExponent=(int8_t *)MEMORY_AllocBuffer(__func__,"temp_RadianceExponent",nRecords*n_wavel,sizeof(int8),0,MEMORY_TYPE_STRING))==NULL) ||   ((pData->pixelQualityFlags=(unsigned short *)MEMORY_AllocBuffer(__func__,"pixelQualityFlags",nRecords*n_wavel,sizeof(unsigned short),0,MEMORY_TYPE_USHORT))==NULL) || ((pData->spec_wavelengthcoeff=(float *)MEMORY_AllocBuffer(__func__,"spec_wavelengthcoeff",nRecords*OMI_NUM_COEFFICIENTS,sizeof(float),0,MEMORY_TYPE_FLOAT))==NULL) ) 
+      ((pData->xtrackQualityFlags=(uint8_t *)MEMORY_AllocBuffer(__func__,"xtrackQualityFlags",nRecords,sizeof(unsigned short),0,MEMORY_TYPE_STRING))==NULL) || ((pData->temp_RadianceMantissa=(int16 *)MEMORY_AllocBuffer(__func__,"temp_RadianceMantissa",nRecords*n_wavel,sizeof(int16),0,MEMORY_TYPE_SHORT))==NULL) || ((pData->temp_RadiancePrecisionMantissa=(int16 *)MEMORY_AllocBuffer(__func__,"temp_RadiancePrecisionMantissa",nRecords*n_wavel,sizeof(int16),0,MEMORY_TYPE_SHORT))==NULL) || ((pData->temp_RadianceExponent=(int8_t *)MEMORY_AllocBuffer(__func__,"temp_RadianceExponent",nRecords*n_wavel,sizeof(int8),0,MEMORY_TYPE_STRING))==NULL) ||   ((pData->pixelQualityFlags=(unsigned short *)MEMORY_AllocBuffer(__func__,"pixelQualityFlags",nRecords*n_wavel,sizeof(unsigned short),0,MEMORY_TYPE_USHORT))==NULL) || ((pData->spec_wavelengthcoeff=(float *)MEMORY_AllocBuffer(__func__,"spec_wavelengthcoeff",nRecords*OMI_NUM_COEFFICIENTS,sizeof(float),0,MEMORY_TYPE_FLOAT))==NULL) )
     rc=ERROR_ID_ALLOC;
 
 
@@ -675,7 +679,7 @@ static RC find_matching_spectra(const ENGINE_CONTEXT *pEngineContext, struct omi
               long dd[3]={orbit_file->nMeasurements,orbit_file->nXtrack,orbit_file->nWavel};
               unsigned short *groundPixelQualityFlags;
               uint8_t        *xtrackQualityFlags;
-              rc = omi_load_spectrum(OMI_SPEC_RAD, orbit_file->sw_id, measurement, row, orbit_file->nWavel, newref->wavelengths, newref->spectrum, newref->errors, NULL,&orbit_file->omiSwath->dataFields.temp_RadianceMantissa[0],&orbit_file->omiSwath->dataFields.temp_RadiancePrecisionMantissa[0],&orbit_file->omiSwath->dataFields.temp_RadianceExponent[0],&orbit_file->omiSwath->dataFields.pixelQualityFlags[0],&orbit_file->omiSwath->dataFields.spec_wavelengthcoeff[0],dd,&orbit_file->omiSwath->dataFields.wavelengthReferenceColumn[0]);			  
+              rc = omi_load_spectrum(OMI_SPEC_RAD, orbit_file->sw_id, measurement, row, orbit_file->nWavel, newref->wavelengths, newref->spectrum, newref->errors, NULL,&orbit_file->omiSwath->dataFields.temp_RadianceMantissa[0],&orbit_file->omiSwath->dataFields.temp_RadiancePrecisionMantissa[0],&orbit_file->omiSwath->dataFields.temp_RadianceExponent[0],&orbit_file->omiSwath->dataFields.pixelQualityFlags[0],&orbit_file->omiSwath->dataFields.spec_wavelengthcoeff[0],dd,&orbit_file->omiSwath->dataFields.wavelengthReferenceColumn[0]);
               if(rc)
                 goto end_find_matching_spectra;
             }
@@ -930,7 +934,7 @@ static RC OmiGetSwathData(struct omi_orbit_file *pOrbitFile, const ENGINE_CONTEX
   rc = coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->viewingAzimuthAngle[0],coda_array_ordering_c);
   if (rc)
     return rc;
-  
+
   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/TerrainHeight");
   rc = coda_cursor_goto(&pOrbitFile->cursor,ee);
   if (rc)
@@ -938,7 +942,7 @@ static RC OmiGetSwathData(struct omi_orbit_file *pOrbitFile, const ENGINE_CONTEX
   rc = coda_cursor_read_int16_array(&pOrbitFile->cursor,&pData->terrainHeight[0],coda_array_ordering_c);
   if (rc)
     return rc;
-   
+
   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/ViewingZenithAngle");
   rc = coda_cursor_goto(&pOrbitFile->cursor,ee);
   if (rc)
@@ -954,7 +958,7 @@ static RC OmiGetSwathData(struct omi_orbit_file *pOrbitFile, const ENGINE_CONTEX
   rc = coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->solarAzimuthAngle[0],coda_array_ordering_c);
   if (rc)
     return rc;
-   
+
   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/SolarZenithAngle");
   rc = coda_cursor_goto(&pOrbitFile->cursor,ee);
   if (rc)
@@ -970,7 +974,7 @@ static RC OmiGetSwathData(struct omi_orbit_file *pOrbitFile, const ENGINE_CONTEX
   rc = coda_cursor_read_float_array(&pOrbitFile->cursor,&pData->longitude[0],coda_array_ordering_c);
   if (rc)
     return rc;
-   
+
   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Geolocation_Fields/Latitude");
   rc = coda_cursor_goto(&pOrbitFile->cursor,ee);
   if (rc)
@@ -1012,7 +1016,7 @@ static RC OmiGetSwathData(struct omi_orbit_file *pOrbitFile, const ENGINE_CONTEX
   rc = coda_cursor_read_uint16_array(&pOrbitFile->cursor,&pData->measurementQualityFlags[0],coda_array_ordering_c);
   if (rc)
     return rc;
-   
+
   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Data_Fields/WavelengthReferenceColumn/WavelengthReferenceColumn");
   rc = coda_cursor_goto(&pOrbitFile->cursor,ee);
   if (rc)
@@ -1036,7 +1040,7 @@ static RC OmiGetSwathData(struct omi_orbit_file *pOrbitFile, const ENGINE_CONTEX
   rc = coda_cursor_read_uint16_array(&pOrbitFile->cursor,&pData->pixelQualityFlags[0],coda_array_ordering_c);
   if (rc)
     return rc;
-   
+
   sprintf(ee,"%s%s",pOrbitFile->swathpath,"Data_Fields/WavelengthCoefficient");
   rc = coda_cursor_goto(&pOrbitFile->cursor,ee);
   if (rc)
@@ -1089,7 +1093,7 @@ static RC OmiGetSwathData(struct omi_orbit_file *pOrbitFile, const ENGINE_CONTEX
 
 static RC OmiOpen(struct omi_orbit_file *pOrbitFile,const char *swathName, const ENGINE_CONTEXT *pEngineContext)
 {
-	  
+
   RC rc = ERROR_ID_NO;
   if (pEngineContext->project.instrumental.omi.spectralType== PRJCT_INSTR_OMI_TYPE_UV1){
     pOrbitFile->swathpath="/Earth_UV_1_Swath/";
@@ -1221,7 +1225,7 @@ static RC OMI_LoadReference(int spectralType, const char *refFile, struct omi_re
   rc=coda_cursor_read_int8_array(&cursor,temp_Exponent,coda_array_ordering_c);
   if (rc)
     goto cleanup1;
-	
+
   rc=coda_cursor_read_int16_array(&cursor,temp_PrecisionMantissa,coda_array_ordering_c);
   rc=coda_cursor_goto(&cursor,pixelq);
   if (rc)
@@ -1235,14 +1239,14 @@ static RC OMI_LoadReference(int spectralType, const char *refFile, struct omi_re
   rc=coda_cursor_read_float_array(&cursor,temp_wave,coda_array_ordering_c);
   if (rc)
     goto cleanup1;
-	
+
   if (rc)
     goto cleanup1;
   rc=coda_cursor_goto(&cursor,refstr);
   rc=coda_cursor_read_int16_array(&cursor,refcol,coda_array_ordering_c);
   if (rc)
     goto cleanup1;
-	
+
   struct omi_ref *pRef=&OMI_ref[omiRefFilesN];
   const int32 n_xtrack = dims[1];
   const int32 n_wavel = dims[2];
@@ -1252,9 +1256,9 @@ static RC OMI_LoadReference(int spectralType, const char *refFile, struct omi_re
   strcpy(pRef->omiRefFileName,refFile);
   pRef->nXtrack=n_xtrack;
   pRef->nWavel=n_wavel;
- 
+
   for (int indexSpectrum=0; indexSpectrum < pRef->nXtrack; indexSpectrum++) {
-	  
+
     rc = omi_load_spectrum(OMI_SPEC_IRRAD, 0, 0, indexSpectrum, n_wavel,
                            pRef->omiRefLambda[indexSpectrum],
                            pRef->omiRefSpectrum[indexSpectrum],
@@ -1272,7 +1276,7 @@ static RC OMI_LoadReference(int spectralType, const char *refFile, struct omi_re
  cleanup2: // cleanup when no memory was allocated
   coda_close(product);
   coda_done();
-  
+
   if (!rc) {
     ++omiRefFilesN;
     for(int i=0; i<n_xtrack; ++i) {
@@ -1320,17 +1324,17 @@ static RC omi_load_spectrum(int spec_type, int32 sw_id, int32 measurement, int32
     for (int j=0; j<OMI_NUM_COEFFICIENTS; j++) {
       wavelength_coeff[j]=wavecoeff[ii_wave+j];
     }
-	    
+
     // store wavelength in lambda
     omi_calculate_wavelengths(wavelength_coeff, refcol, n_wavel, lambda);
-	
+
   }
 
   // (ir-)radiance mantissae, exponents & pixel quality have dimension (nMeasurement x nXtrack x nWavel)
   if(spectrum != NULL || sigma != NULL) {
     if(spectrum != NULL) {
       for (int j=0; j<n_wavel; j++) {
-			  
+
         mantissa[j]=spec_mantissa[ii_rad+j];
         exponent[j]=spec_exponent[ii_rad+j];
         assert(mantissa[j]==spec_mantissa[ii_rad+j]);
@@ -1500,16 +1504,16 @@ RC OMI_Set(ENGINE_CONTEXT *pEngineContext)
   // Release old buffers and close file (if open)
   omi_free_swath_data(current_orbit_file.omiSwath);
   /* omi_close_orbit_file(&current_orbit_file); */
- 
+
 
   current_orbit_file.omiFileName = malloc(strlen(pEngineContext->fileInfo.fileName)+1);
   strcpy(current_orbit_file.omiFileName,pEngineContext->fileInfo.fileName);
   current_orbit_file.specNumber=0;
- 
+
 
   rc=OmiOpen(&current_orbit_file,OMI_EarthSwaths[pEngineContext->project.instrumental.omi.spectralType],pEngineContext);
   // Open the file
-  
+
 
   if (!rc) {
     pEngineContext->recordNumber=current_orbit_file.specNumber;
@@ -1752,7 +1756,7 @@ void OMI_ReleaseBuffers(void) {
   /* omi_close_orbit_file(&current_orbit_file); */
 
   num_reference_orbit_files = 0;
-  
+
   omiRefFilesN=0; // the total number of files to browse in one shot
   omiTotalRecordNumber=0;
   omiSwathOld=ITEM_NONE;
