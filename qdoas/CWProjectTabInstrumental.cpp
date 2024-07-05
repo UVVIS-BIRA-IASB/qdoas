@@ -84,7 +84,7 @@ CWProjectTabInstrumental::CWProjectTabInstrumental(const mediate_project_instrum
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
   mainLayout->addSpacing(25);
-
+  
   // QGridLayout *topLayout = new QGridLayout;
 
   m_formatStack = new QStackedWidget(this);
@@ -94,7 +94,7 @@ CWProjectTabInstrumental::CWProjectTabInstrumental(const mediate_project_instrum
   m_asciiEdit = new CWInstrAsciiEdit(&(instr->ascii));
   index = m_formatStack->addWidget(m_asciiEdit);
   m_instrumentToStackIndexMap.insert(std::map<int,int>::value_type(PRJCT_INSTR_FORMAT_ASCII, index));
-  
+
   #ifdef PRJCT_INSTR_FORMAT_OLD
 
   // logger
@@ -126,7 +126,7 @@ CWProjectTabInstrumental::CWProjectTabInstrumental(const mediate_project_instrum
   m_ccdHa94Edit = new CWInstrCcdEdit(&(instr->ccdha94));
   index = m_formatStack->addWidget(m_ccdHa94Edit);
   m_instrumentToStackIndexMap.insert(std::map<int,int>::value_type(PRJCT_INSTR_FORMAT_CCD_HA_94, index));
-  
+
   #endif
 
   // saozvis
@@ -153,7 +153,7 @@ CWProjectTabInstrumental::CWProjectTabInstrumental(const mediate_project_instrum
   m_mfcbiraEdit = new CWInstrMfcbiraEdit(&(instr->mfcbira));
   index = m_formatStack->addWidget(m_mfcbiraEdit);
   m_instrumentToStackIndexMap.insert(std::map<int,int>::value_type(PRJCT_INSTR_FORMAT_MFC_BIRA, index));
-  
+
   #ifdef PRJCT_INSTR_FORMAT_OLD
   // rasas
   m_rasasEdit = new CWInstrMinimumEdit(&(instr->rasas));
@@ -250,37 +250,37 @@ CWProjectTabInstrumental::CWProjectTabInstrumental(const mediate_project_instrum
   m_frm4doasEdit = new CWInstrFrm4doasEdit(&(instr->frm4doas));
   index = m_formatStack->addWidget(m_frm4doasEdit);
   m_instrumentToStackIndexMap.insert(std::map<int,int>::value_type(PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF, index));
-
-  // Site
   
+  // Site
+
   m_siteFrame = new QFrame(this);
   m_siteFrame->setFrameStyle(QFrame::NoFrame);
-  
+
   QHBoxLayout *siteLayout=new(QHBoxLayout),
               *saaLayout=new(QHBoxLayout);
   QVBoxLayout *topLayout = new QVBoxLayout(m_siteFrame);
-              
+
   QLabel *siteLabel,*saaLabel;
 
   m_siteCombo = new CWSiteListCombo(m_siteFrame); // automatically populated
-  
+
   siteLabel=new QLabel("Site", m_siteFrame);
   siteLabel->setFixedWidth(100);
-  
+
   siteLayout->addWidget(siteLabel);
   siteLayout->addWidget(m_siteCombo);
-  
+
   saaLabel=new QLabel("SAA convention", m_siteFrame);
   saaLabel->setFixedWidth(100);
 
   m_saaSRadioButton = new QRadioButton("-180..180, 0 degree South", m_siteFrame);
   m_saaNRadioButton = new QRadioButton("0-360, 0 degree North", m_siteFrame);
-  
+
   saaLayout->addWidget(saaLabel);
-  saaLayout->addWidget(m_saaSRadioButton);  
+  saaLayout->addWidget(m_saaSRadioButton);
   saaLayout->addWidget(m_saaNRadioButton);
   saaLayout->addStretch(1);
-  
+
   topLayout->addLayout(siteLayout);
   topLayout->addLayout(saaLayout);
 
@@ -298,7 +298,7 @@ CWProjectTabInstrumental::CWProjectTabInstrumental(const mediate_project_instrum
   index = m_siteCombo->findText(QString(instr->siteName));
   if (index != -1)
     m_siteCombo->setCurrentIndex(index);
-  
+
   if (instr->saaConvention == PRJCT_INSTR_SAA_SOUTH)
     m_saaSRadioButton->setChecked(true);
   else if (instr->saaConvention == PRJCT_INSTR_SAA_NORTH)
@@ -1246,19 +1246,30 @@ CWInstrFrm4doasEdit::CWInstrFrm4doasEdit(const struct instrumental_frm4doas *d, 
   QString tmpStr;
   int row = 0;
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
-  //  QHBoxLayout *groupLayout = new QHBoxLayout;
+  QHBoxLayout *groupLayout = new QHBoxLayout;
   QGridLayout *gridLayout = new QGridLayout;
 
-  mainLayout->addWidget(m_strayLightConfig);
-
+  m_imagersGroup=new QGroupBox("Imagers", this);
+  m_imagersGroup->setCheckable(false);
+  
+  QHBoxLayout *imagersLayout=new QHBoxLayout(m_imagersGroup);
+  m_imagersAverageCheck=new QCheckBox("Average rows", m_imagersGroup);
+  imagersLayout->addWidget(m_imagersAverageCheck);
+  
+  groupLayout->addWidget(m_strayLightConfig);
+  groupLayout->addWidget(m_imagersGroup);
+  groupLayout->addStretch(1);
+  
+  mainLayout->addLayout(groupLayout);
+  
   gridLayout->addWidget(new QLabel("Detector Size", this), row, 0, Qt::AlignRight);             // detector size label
   m_detSizeEdit = new QLineEdit(this);
   m_detSizeEdit->setFixedWidth(cStandardEditWidth);
   m_detSizeEdit->setValidator(new QIntValidator(0, 8192, m_detSizeEdit));
   gridLayout->addWidget(m_detSizeEdit, row, 1, Qt::AlignLeft);
-
+  
   ++row;
-
+  
   // Spectral Type
   gridLayout->addWidget(new QLabel("Spectral Type", this), row, 0);
   m_spectralTypeCombo = new QComboBox(this);
@@ -1280,6 +1291,8 @@ CWInstrFrm4doasEdit::CWInstrFrm4doasEdit(const struct instrumental_frm4doas *d, 
 
   // initialise the values
 
+  m_imagersAverageCheck->setChecked(d->averageRows);
+
   // detector size
   tmpStr.setNum(d->detectorSize);
   m_detSizeEdit->validator()->fixup(tmpStr);
@@ -1299,6 +1312,8 @@ CWInstrFrm4doasEdit::CWInstrFrm4doasEdit(const struct instrumental_frm4doas *d, 
 
 void CWInstrFrm4doasEdit::apply(struct instrumental_frm4doas *d) const
 {
+  d->averageRows=m_imagersAverageCheck->isChecked() ? 1 : 0;
+
   // detector size
   d->detectorSize = m_detSizeEdit->text().toInt();
 
@@ -2222,13 +2237,13 @@ CWInstrGemsEdit::CWInstrGemsEdit(const struct instrumental_gems *pInstrGems, QWi
   mainLayout->addLayout(gridLayout);
 
   int row = 0;
-  
+
 //   gridLayout->addWidget(new QLabel("Binning", this), row, 0);
 //   m_binning = new QSpinBox(this);
 //   m_binning->setRange(1, 2048);
 //   m_binning->setFixedWidth(cStandardEditWidth);
 //   gridLayout->addWidget(m_binning, row, 1);
-//   
+//
 //   ++row;
 
   // Track selection
@@ -2249,7 +2264,7 @@ void CWInstrGemsEdit::apply(struct instrumental_gems *pInstrGems) const
   strcpy(pInstrGems->calibrationFile, m_fileOneEdit->text().toLocal8Bit().data());
   strcpy(pInstrGems->transmissionFunctionFile, m_fileTwoEdit->text().toLocal8Bit().data());
   strcpy(pInstrGems->trackSelection, m_trackSelection->text().toLocal8Bit().data());
-  
+
 //  pInstrGems->binning = m_binning->value();
 }
 

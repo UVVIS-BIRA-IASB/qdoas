@@ -273,7 +273,7 @@ bool CSelectorSubHandler::start(const QString &element, const QXmlAttributes &at
   else if (str == "rc")
     d->selected[d->nSelected] = PRJCT_RESULTS_RC;
   else if (str == "residual_spectrum")
-    d->selected[d->nSelected] = PRJCT_RESULTS_RESIDUAL_SPECTRUM;  
+    d->selected[d->nSelected] = PRJCT_RESULTS_RESIDUAL_SPECTRUM;
   else
     return postErrorMessage("Invalid output field " + str);
 
@@ -689,7 +689,7 @@ bool CProjectInstrumentalSubHandler::start(const QXmlAttributes &atts)
   str = atts.value("format");
   if (str == "ascii")
     m_instrumental->format = PRJCT_INSTR_FORMAT_ASCII;
-#ifdef PRJCT_INSTR_FORMAT_OLD  
+#ifdef PRJCT_INSTR_FORMAT_OLD
   else if (str == "logger")
     m_instrumental->format = PRJCT_INSTR_FORMAT_LOGGER;
   else if (str == "acton")
@@ -702,7 +702,7 @@ bool CProjectInstrumentalSubHandler::start(const QXmlAttributes &atts)
     m_instrumental->format = PRJCT_INSTR_FORMAT_CCD_OHP_96;
   else if (str == "ccdha_94")
     m_instrumental->format = PRJCT_INSTR_FORMAT_CCD_HA_94;
-#endif  
+#endif
   else if (str == "saozvis")
     m_instrumental->format = PRJCT_INSTR_FORMAT_SAOZ_VIS;
   else if (str == "saozefm")
@@ -721,12 +721,12 @@ bool CProjectInstrumentalSubHandler::start(const QXmlAttributes &atts)
     m_instrumental->format = PRJCT_INSTR_FORMAT_MFC_STD;
   else if (str == "mfcbira")
     m_instrumental->format = PRJCT_INSTR_FORMAT_MFC_BIRA;
-#ifdef PRJCT_INSTR_FORMAT_OLD  
+#ifdef PRJCT_INSTR_FORMAT_OLD
   else if (str == "rasas")
     m_instrumental->format = PRJCT_INSTR_FORMAT_RASAS;
   else if (str == "pdasieasoe")
     m_instrumental->format = PRJCT_INSTR_FORMAT_PDASI_EASOE;
-#endif  
+#endif
   else if (str == "ccdeev")
     m_instrumental->format = PRJCT_INSTR_FORMAT_CCD_EEV;
   else if (str == "gdpbin")
@@ -763,7 +763,7 @@ bool CProjectInstrumentalSubHandler::start(const QXmlAttributes &atts)
     else
       return postErrorMessage("Instrumental Site Name too long");
   }
-  
+
   str = atts.value("saa_convention");
   m_instrumental->saaConvention=(!str.isEmpty() && (str=="0-north"))?PRJCT_INSTR_SAA_NORTH:PRJCT_INSTR_SAA_SOUTH;
 
@@ -820,7 +820,7 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     }
 
   }
-#ifdef PRJCT_INSTR_FORMAT_OLD  
+#ifdef PRJCT_INSTR_FORMAT_OLD
   else if (element == "logger") { // LOGGER
     return helperLoadLogger(atts, &(m_instrumental->logger));
 
@@ -873,7 +873,7 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     return helperLoadCcd(atts, &(m_instrumental->ccdha94));
 
   }
-#endif  
+#endif
   else if (element == "saozvis") { // SAOZ VIS
     return helperLoadSaoz(atts, &(m_instrumental->saozvis));
 
@@ -1038,7 +1038,7 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     return helperLoadMinimum(atts, &(m_instrumental->pdasieasoe));
 
   }
-#endif  
+#endif
   else if (element == "ccdeev") { // CCD EEV
     QString str;
 
@@ -1100,8 +1100,6 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
          {
       if (str == "all")
         m_instrumental->ccdeev.spectralType = PRJCT_INSTR_MAXDOAS_TYPE_NONE;
-      else if (str == "zenith-only")
-        m_instrumental->ccdeev.spectralType = PRJCT_INSTR_MAXDOAS_TYPE_ZENITH;      
       else if (str == "off-axis")
         m_instrumental->ccdeev.spectralType = PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS;
       else if (str == "direct-sun")
@@ -1109,8 +1107,7 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
       else if (str == "almucantar")
         m_instrumental->ccdeev.spectralType = PRJCT_INSTR_MAXDOAS_TYPE_ALMUCANTAR;
       else
-        m_instrumental->ccdeev.spectralType = PRJCT_INSTR_MAXDOAS_TYPE_ZENITH;
- //       return postErrorMessage("Invalid ccdeev Type");
+        return postErrorMessage("Invalid ccdeev Type");
      }
   }
   else if (element == "gdpnetcdf") { // GDP netCDF
@@ -1376,8 +1373,8 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
       else
         return postErrorMessage("Track selection string too long");
     str = atts.value("binning");
-    m_instrumental->gems.binning=(!str.isEmpty())?str.toInt():4; 
-     
+    m_instrumental->gems.binning=(!str.isEmpty())?str.toInt():4;
+
     }
 
 
@@ -1401,6 +1398,13 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
   }
   else if (element == "frm4doas") { // FRM4DOAS netCDF
     QString str;
+
+    str = atts.value("average_rows");
+
+    if (!str.isEmpty())
+     m_instrumental->frm4doas.averageRows = (atts.value("average_rows") == "true") ? 1 : 0;
+    else
+     m_instrumental->frm4doas.averageRows=1;
 
     m_instrumental->frm4doas.detectorSize = atts.value("size").toInt();
     m_instrumental->frm4doas.straylight = (atts.value("straylight") == "true") ? 1 : 0;
@@ -1879,7 +1883,7 @@ bool CProjectOutputSubHandler::start(const QXmlAttributes &atts)
   str = atts.value("fileFormat");
   if (!str.isEmpty()) {
     enum output_format format = output_get_format(str.toLocal8Bit().data());
-    if ((format == ASCII)  || (format==NETCDF)) 
+    if ((format == ASCII)  || (format==NETCDF))
      m_output->file_format = format;
     else
      m_output->file_format=ASCII;

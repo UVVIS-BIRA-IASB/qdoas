@@ -100,7 +100,7 @@ CWMoleculesCorrectionCombo::CWMoleculesCorrectionCombo(const QString &excludedSy
      addItem("Slope");
      addItem("Pukite");
      addItem("Mol. ring ...");
-     // addItem("Slope+Mol. ring ...");
+     addItem("Slope+Mol. ring ...");
 }
 
 CMoleculeDoasTableColumnCorrection::CMoleculeDoasTableColumnCorrection(const QString &label, CDoasTable *owner, int columnWidth) :

@@ -1852,6 +1852,14 @@ RC ANALYSE_XsConvolution(FENO *pTabFeno,double *newlambda,
             // Release allocated buffers
             MEMORY_ReleaseDVector((char *)__func__,"raman",raman,0);
             MEMORY_ReleaseDVector((char *)__func__,"solar",solar,0);
+            
+            if ((pTabCross->crossCorrection==ANLYS_CORRECTION_TYPE_SLOPE) &&
+                (pTabCross->indexPukite1!=ITEM_NONE) && (pTabFeno->TabCross[pTabCross->indexPukite1].isPukite==1))
+
+             rc=AnalyseSimplePukiteTerms(newlambda,pTabCross->vector,
+                                        (pTabCross->indexPukite1!=ITEM_NONE)?pTabFeno->TabCross[pTabCross->indexPukite1].vector:NULL,(pTabCross->indexPukite1!=ITEM_NONE)?pTabFeno->TabCross[pTabCross->indexPukite1].Deriv2:NULL,
+                                        (pTabCross->indexPukite2!=ITEM_NONE)?pTabFeno->TabCross[pTabCross->indexPukite2].vector:NULL,(pTabCross->indexPukite2!=ITEM_NONE)?pTabFeno->TabCross[pTabCross->indexPukite2].Deriv2:NULL,
+                                         n_wavel,pTabFeno->lambda0);            
            }
          }
        }

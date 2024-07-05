@@ -375,6 +375,7 @@ extern "C" {
 
   struct instrumental_frm4doas
   {
+    int  averageRows;
     int  detectorSize;
     int  spectralType;
     int  straylight;

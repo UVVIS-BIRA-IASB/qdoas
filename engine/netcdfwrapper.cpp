@@ -204,7 +204,9 @@ int NetCDFGroup::dimID(const string& dimName) const {
   if(rc == NC_NOERR) {
     return id;
   } else {
-    throw std::runtime_error("Cannot find netCDF dimension '"+dimName+"' in group '"+name+"'");
+    return -1;    
+    // return -1 gives the possibility that the required dimension could not exist
+    // throw std::runtime_error("Cannot find netCDF dimension '"+dimName+"' in group '"+name+"'");
   }
 }
 
@@ -218,7 +220,9 @@ size_t NetCDFGroup::dimLen(int dimid) const {
   if (nc_inq_dimlen(groupid, dimid, &len) == NC_NOERR) {
     return len;
   } else {
-    throw std::runtime_error("Cannot get length of netCDF dimension '"+dimName(dimid)+"' in group '"+name+"'");
+     return -1;
+    // return -1 gives the possibility that the required dimension could not exist
+    //throw std::runtime_error("Cannot get length of netCDF dimension '"+dimName(dimid)+"' in group '"+name+"'");
   }
 }
 

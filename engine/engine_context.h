@@ -167,6 +167,12 @@ typedef struct _prjctGemsFormat
  }
 PRJCT_GEMS;
 
+typedef struct _prjctFrm4doasFormat
+ {
+  int averageRows;
+ }
+PRJCT_FRM4DOAS;
+
 typedef struct _prjctInstrumental
  {
   char        observationSite[MAX_ITEM_NAME_LEN+1];                            // index of observation site in list
@@ -190,6 +196,7 @@ typedef struct _prjctInstrumental
   PRJCT_OMI   omi;
   PRJCT_MFC   mfc;
   PRJCT_GEMS  gems;
+  PRJCT_FRM4DOAS frm4doas;
   char       offsetFile[MAX_ITEM_TEXT_LEN];                                 // offset file
   struct instrumental_tropomi tropomi;
   int         offsetFlag;

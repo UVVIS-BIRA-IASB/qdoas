@@ -112,6 +112,7 @@ void initializeMediateProjectInstrumental(mediate_project_instrumental_t *d)
   d->saozvis.spectralRegion=PRJCT_INSTR_SAOZ_REGION_VIS;
 
   d->ascii.lambdaMin=d->ascii.lambdaMax=(double)0.;
+  d->frm4doas.averageRows=1;
   d->saozefm.lambdaMin=d->saozefm.lambdaMax=(double)0.;
   d->mfc.lambdaMin=d->mfc.lambdaMax=(double)0.;
   d->mfcstd.lambdaMin=d->mfcstd.lambdaMax=(double)0.;

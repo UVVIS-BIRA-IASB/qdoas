@@ -1065,9 +1065,9 @@ RC EngineReadFile(ENGINE_CONTEXT *pEngineContext,int indexRecord,int dateFlag,in
                       pEngineContext->recordInfo.gome.pixelType;
 
    const int n_wavel = NDET[i_crosstrack];
-
+   
    pRecord->rc=THRD_SpectrumCorrection(pEngineContext,pEngineContext->buffers.spectrum,n_wavel);
-
+   
    if (pRecord->rc)
      return pRecord->rc;
 

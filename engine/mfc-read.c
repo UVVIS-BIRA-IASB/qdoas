@@ -737,7 +737,7 @@ RC ReliMFC(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int localDay
         tmLocal=pRecord->Tm+timeshift*3600.;
         pRecord->localCalDay=ZEN_FNCaljda(&tmLocal);
         pRecord->localTimeDec=fmod(pRecord->TimeDec+24.+timeshift,(double)24.);
-
+        
         // User constraints
 
 //        if (dateFlag && (pRecord->localCalDay>localDay))

@@ -346,7 +346,7 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
   case PRJCT_INSTR_FORMAT_ASCII:
     fprintf(fp, "\"ascii\"");
     break;
-#ifdef PRJCT_INSTR_FORMAT_OLD    
+#ifdef PRJCT_INSTR_FORMAT_OLD
   case PRJCT_INSTR_FORMAT_LOGGER:
     fprintf(fp, "\"logger\"");
     break;
@@ -365,7 +365,7 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
   case PRJCT_INSTR_FORMAT_CCD_HA_94:
     fprintf(fp, "\"ccdha94\"");
     break;
-#endif    
+#endif
   case PRJCT_INSTR_FORMAT_SAOZ_VIS:
     fprintf(fp, "\"saozvis\"");
     break;
@@ -381,14 +381,14 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
   case PRJCT_INSTR_FORMAT_MFC_BIRA:
     fprintf(fp, "\"mfcbira\"");
     break;
-#ifdef PRJCT_INSTR_FORMAT_OLD    
+#ifdef PRJCT_INSTR_FORMAT_OLD
   case PRJCT_INSTR_FORMAT_RASAS:
     fprintf(fp, "\"rasas\"");
     break;
   case PRJCT_INSTR_FORMAT_PDASI_EASOE:
     fprintf(fp, "\"pdasieasoe\"");
     break;
-#endif    
+#endif
   case PRJCT_INSTR_FORMAT_CCD_EEV:
     fprintf(fp, "\"ccdeev\"");
     break;
@@ -471,8 +471,8 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
 
   tmpStr = pathMgr->simplifyPath(QString(d->ascii.transmissionFunctionFile));
   fprintf(fp, " transmission=\"%s\" />\n", tmpStr.toUtf8().constData());
-  
-#ifdef PRJCT_INSTR_FORMAT_OLD  
+
+#ifdef PRJCT_INSTR_FORMAT_OLD
 
   // logger
   fprintf(fp, "      <logger type=");
@@ -611,7 +611,7 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
   tmpStr = pathMgr->simplifyPath(QString(d->ccdha94.detectorNonLinearityFile));
   fprintf(fp, " dnl=\"%s\" />\n", tmpStr.toUtf8().constData());
 #endif
-  
+
   // saozvis
 
   fprintf(fp, "      <saozvis type=\"%s\"",(d->saozvis.spectralType==PRJCT_INSTR_SAOZ_TYPE_ZENITHAL)?"zenithal":"pointed");
@@ -715,9 +715,6 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
   switch (d->ccdeev.spectralType) {
   case PRJCT_INSTR_MAXDOAS_TYPE_NONE:
     fprintf(fp, "\"all\"");
-    break;
-  case PRJCT_INSTR_MAXDOAS_TYPE_ZENITH:
-    fprintf(fp,"\"zenith-only\"");
     break;
   case PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS:
     fprintf(fp, "\"off-axis\"");
@@ -1060,8 +1057,8 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
 
   // frm4doas
 
-  fprintf(fp, "      <frm4doas size=\"%d\" straylight=\"%s\" lambda_min=\"%g\" lambda_max=\"%g\"",d->frm4doas.detectorSize,
-  (d->frm4doas.straylight ? sTrue : sFalse),d->frm4doas.lambdaMin,d->frm4doas.lambdaMax);
+  fprintf(fp, "      <frm4doas size=\"%d\" straylight=\"%s\" lambda_min=\"%g\" lambda_max=\"%g\" average_rows=\"%s\"",d->frm4doas.detectorSize,
+  (d->frm4doas.straylight ? sTrue : sFalse),d->frm4doas.lambdaMin,d->frm4doas.lambdaMax,(d->frm4doas.averageRows ? sTrue : sFalse));
   tmpStr = pathMgr->simplifyPath(QString(d->frm4doas.calibrationFile));
 
   fprintf(fp, " type=");

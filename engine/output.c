@@ -697,7 +697,6 @@ static void register_field(struct output_field field) {
   *newfield = field;
   newfield->fieldname = strdup(newfield->basic_fieldname);  // allocate a new buffer for the name so we can free() all output_field data later on.
   newfield->windowname = NULL;
-  newfield->windowname = NULL;
   if (newfield->data_cols == 0) // default number of columns is 1
     newfield->data_cols = 1;
   newfield->index_feno = ITEM_NONE;
@@ -2275,7 +2274,7 @@ RC OUTPUT_CheckPath(ENGINE_CONTEXT *pEngineContext,char *path,int format) {
   } else {
     fileName = output_path_end + 1; // skip path separator
   }
-
+  
   if ( strlen(fileName) != 0 && strcmp("automatic", fileName) != 0 ) {
     // if an output filename is specified and it is not 'automatic':
     // check if we can write to the file
@@ -2293,9 +2292,7 @@ RC OUTPUT_CheckPath(ENGINE_CONTEXT *pEngineContext,char *path,int format) {
     else
      ptr++;
 
-    if (strrchr(ptr,'.')==NULL)                            // ASCII format should accept any extension
-
-    if ((format!=ASCII) || (strrchr(ptr,'.')!=NULL))     // ASCII should accept any extensions (.dat, .txt, ...)
+    if ((format!=ASCII) || (strrchr(ptr,'.')==NULL))     // ASCII should accept any extensions (.dat, .txt, ...)
      {
       remove_extension(filename_tmp); // if user has added a filename extension .asc/.he5/..., remove it
       strcat(filename_tmp, extension); // add proper extension
@@ -2336,7 +2333,7 @@ RC OUTPUT_CheckPath(ENGINE_CONTEXT *pEngineContext,char *path,int format) {
       // directory -> will not work, throw error
       rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_DIR_NOT_FOUND, "\"\"", ", please specify a directory in the project's Output Path");
     }
-
+    
   return rc;
 }
 
@@ -2346,7 +2343,7 @@ RC OUTPUT_FlushBuffers(ENGINE_CONTEXT *pEngineContext)
   const PRJCT_EXPORT *pExport = &pProject->exportSpectra;
   const PRJCT_RESULTS *pResults = &pProject->asciiResults; // pointer to results part of project
 
-  selected_format = pResults->file_format;
+  selected_format = (THRD_id==THREAD_TYPE_EXPORT)?ASCII:pResults->file_format;
 
   RC rc=ERROR_ID_NO;
   char outputFileName[MAX_ITEM_TEXT_LEN] = {0};
@@ -2494,8 +2491,8 @@ RC OUTPUT_SaveResults(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
   }
 
   // Rebuild spectrum for fluxes and color indexes computation
-
-  if ((pRecordInfo->NSomme!=0) && (pRecordInfo->Tint!=(double)0.)) {
+  
+  if ((THRD_id!=THREAD_TYPE_EXPORT) && (pRecordInfo->NSomme!=0) && (pRecordInfo->Tint!=(double)0.)) {
     double *Spectrum= pEngineContext->buffers.spectrum;
 
     for (int i=0;i<n_wavel;i++)

@@ -1243,6 +1243,8 @@ void setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const
       NDET[0]=pMediateInstrumental->frm4doas.detectorSize;
       pEngineInstrumental->user=pMediateInstrumental->frm4doas.spectralType;
 
+      pEngineInstrumental->frm4doas.averageRows=pMediateInstrumental->frm4doas.averageRows;
+
       pEngineInstrumental->offsetFlag=pMediateInstrumental->frm4doas.straylight;
       pEngineInstrumental->lambdaMin=pMediateInstrumental->frm4doas.lambdaMin;
       pEngineInstrumental->lambdaMax=pMediateInstrumental->frm4doas.lambdaMax;
@@ -1250,7 +1252,7 @@ void setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const
       strcpy(pEngineInstrumental->calibrationFile,pMediateInstrumental->frm4doas.calibrationFile); // calibration file
       strcpy(pEngineInstrumental->instrFunction,pMediateInstrumental->frm4doas.transmissionFunctionFile); // instrumental function file
 
-      break;
+      break;      
       // ----------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_GEMS :
 
@@ -2253,7 +2255,7 @@ int mediateRequestNextMatchingSpectrum(ENGINE_CONTEXT *pEngineContext,void *resp
                      (latit<min(pProject->spectra.latMin,pProject->spectra.latMax)))))) {
          geoFlag=0;
        }
-
+       
        // Check SZA
 
        if (geoFlag &&
@@ -2321,6 +2323,7 @@ int mediateRequestNextMatchingSpectrum(ENGINE_CONTEXT *pEngineContext,void *resp
    else if (THRD_id==THREAD_TYPE_EXPORT)
     {
         int indexFenoColumn=(pEngineContext->recordNumber - 1) % ANALYSE_swathSize;
+        
         OUTPUT_SaveResults(pEngineContext,indexFenoColumn);
     }
 

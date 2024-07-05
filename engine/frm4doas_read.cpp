@@ -189,22 +189,24 @@ RC FRM4DOAS_Set(ENGINE_CONTEXT *pEngineContext)
 
   try
    {
-    current_file = NetCDFFile(pEngineContext->fileInfo.fileName);     // open file
+    current_file = NetCDFFile(pEngineContext->fileInfo.fileName,NC_NOWRITE);     // open file
     root_name = current_file.getName();
 
     NetCDFGroup root_group = current_file.getGroup(root_name);                   // go to the root
 
     pEngineContext->n_alongtrack=root_group.dimLen("number_of_records");
     pEngineContext->n_crosstrack=1;                                             // spectra should be one dimension only
+    
+    if ((det_size=root_group.dimLen("detector_size"))==-1)                      // get the number of pixels of the detector
+     {
+      PRJCT_FRM4DOAS *pFrm4doas=&pEngineContext->project.instrumental.frm4doas;
 
-    if (root_group.hasDim("detector_size")) {
-        det_size=root_group.dimLen("detector_size");
-      } else {
-        det_size=root_group.dimLen("spectral_dim");
-        pEngineContext->n_crosstrack=root_group.hasDim("spatial_dim") ?
-          root_group.dimLen("spatial_dim") : 1;
-      }
+      det_size=root_group.dimLen("spectral_dim");
 
+      if (pFrm4doas->averageRows || ((pEngineContext->n_crosstrack=root_group.dimLen("spatial_dim"))==-1))
+       pEngineContext->n_crosstrack=1;
+     }
+     
     ANALYSE_swathSize = pEngineContext->n_crosstrack;                           // to further move to FRM4DOAS_init
     for (int i=0;i<ANALYSE_swathSize;i++)
      NDET[i]=det_size;
@@ -257,6 +259,7 @@ RC FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
  {
   // Declarations
 
+  PRJCT_FRM4DOAS *pFrm4doas;
   NetCDFGroup measurements_group;                                                // measurement group in the netCDF file
   RECORD_INFO *pRecordInfo;                                                      // pointer to the record structure in the engine context
   double tmLocal;                                                                // calculation of the local time (in number of seconds)
@@ -271,6 +274,7 @@ RC FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
 
   // Initializations
 
+  pFrm4doas=&pEngineContext->project.instrumental.frm4doas;
   pRecordInfo=&pEngineContext->recordInfo;
   rc = ERROR_ID_NO;
 
@@ -285,6 +289,8 @@ RC FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
     const size_t start[] ={(size_t)i_alongtrack,(pEngineContext->n_crosstrack==1)?0:(size_t)i_crosstrack,0};
     const size_t count[] ={1,(pEngineContext->n_crosstrack==1)?(size_t)det_size:1,(size_t)det_size};       // only one record to load
 
+         // TODO : account for binning
+
     int ndims=(pEngineContext->n_crosstrack==1)?2:3;
 
     // Spectra
@@ -294,10 +300,12 @@ RC FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
       int rcvar;
       measurements_group=current_file.getGroup(root_name+"/RADIANCE/OBSERVATIONS");
 
-      if (pEngineContext->n_crosstrack==1)
+      if (measurements_group.hasVar("radiance"))
        measurements_group.getVar("radiance",start,count,ndims,(float)0.,spe);
-      else
-        measurements_group.getVar("radiance_full_image",start,count,ndims,(float)0.,spe);
+      else if (pFrm4doas->averageRows && measurements_group.hasVar("radiance_averaged_along_spectral_dim"))
+       measurements_group.getVar("radiance_averaged_along_spectral_dim",start,count,ndims,(float)0.,spe);
+      else if (measurements_group.hasVar("radiance_full_image"))
+       measurements_group.getVar("radiance_full_image",start,count,ndims,(float)0.,spe);
 
       if (pEngineContext->buffers.sigmaSpec!=NULL)
        {
