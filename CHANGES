@@ -1,3 +1,12 @@
+3.6.6 2024-07-29
+~~~~~~~~~~~~~~~~
+
+* FRM4DOAS: possibility to read matrix (to consider imagers for example) and average or not rows.
+* Analysis: add Slope + molecular Ring correction.
+* Improve command line tool error handling.
+* Performance improvement when loading input data for imager-type instruments.
+* Various bugfixes.
+
 3.6.5 2024-03-12
 ~~~~~~~~~~~~~~~~
 
