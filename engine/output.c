@@ -1655,20 +1655,26 @@ static int register_analysis_field(const struct output_field* fieldcontent, int 
   \param [in] windowName name of the analysis window, with suffix "."
 */
 
-static int register_analysis_output_field(int field,struct outputconfig analysis_infos[],size_t *parr_length,int indexFeno, int index_calib, const char *windowName)
- {
-   int rc = ERROR_ID_NO;
-   enum _prjctResults indexField=field;
-   struct outputconfig *output =  (struct outputconfig *) lfind(&indexField, analysis_infos, (unsigned int *)parr_length, sizeof(analysis_infos[0]), &compare_record);
-    if (output)
-     {
-      output->field.get_tabfeno = &get_tabfeno_analysis;
-      output->field.resulttype = output->type;
-      rc = register_analysis_field(&output->field, indexFeno, index_calib, ITEM_NONE, windowName, "");
-     }
+static int register_analysis_output_field(int field,struct outputconfig analysis_infos[], unsigned int arr_length, int indexFeno, int index_calib, const char *windowName) {
+  int rc = ERROR_ID_NO;
+  enum _prjctResults indexField = field;
+#ifdef WIN32
+  // For MS C library, lfind takes an unsigned int *
+  unsigned int *parr_length = &arr_length;
+#else
+  // lfind takes size_t
+  size_t arr_length_64 = arr_length;
+  size_t *parr_length = &arr_length_64;
+#endif
+  struct outputconfig *output =  (struct outputconfig *) lfind(&indexField, analysis_infos, parr_length, sizeof(analysis_infos[0]), &compare_record);
+  if (output) {
+    output->field.get_tabfeno = &get_tabfeno_analysis;
+    output->field.resulttype = output->type;
+    rc = register_analysis_field(&output->field, indexFeno, index_calib, ITEM_NONE, windowName, "");
+  }
 
-   return rc;
- }
+  return rc;
+}
 
 static int register_analysis_output(const PRJCT_RESULTS *pResults, int indexFenoColumn,int indexFeno, int index_calib, const char *windowName) {
 
@@ -1716,22 +1722,19 @@ static int register_analysis_output(const PRJCT_RESULTS *pResults, int indexFeno
 
   };
 
-  size_t arr_length = sizeof(analysis_infos)/sizeof(analysis_infos[0]);
+  const unsigned int arr_length = sizeof(analysis_infos)/sizeof(analysis_infos[0]);
   int refUnique=((pTabFeno->refMaxdoasSelectionMode==ANLYS_MAXDOAS_REF_SZA) ||
                  (pTabFeno->refSpectrumSelectionScanMode==ANLYS_MAXDOAS_REF_SCAN_BEFORE) ||
                  (pTabFeno->refSpectrumSelectionScanMode==ANLYS_MAXDOAS_REF_SCAN_AFTER))?1:0;
 
-
-  for(int i = 0; i<pResults->fieldsNumber; i++)
-   {
-    if ((pResults->fieldsFlag[i]!=PRJCT_RESULTS_REFNUMBER) || refUnique)
-     register_analysis_output_field(pResults->fieldsFlag[i],analysis_infos,&arr_length,indexFeno,index_calib,windowName);
-    else
-     {
-      register_analysis_output_field(PRJCT_RESULTS_REFNUMBER_BEFORE,analysis_infos,&arr_length,indexFeno,index_calib,windowName);
-      register_analysis_output_field(PRJCT_RESULTS_REFNUMBER_AFTER,analysis_infos,&arr_length,indexFeno,index_calib,windowName);
-     }
-   }
+  for(int i = 0; i<pResults->fieldsNumber; i++) {
+    if ((pResults->fieldsFlag[i]!=PRJCT_RESULTS_REFNUMBER) || refUnique) {
+      register_analysis_output_field(pResults->fieldsFlag[i], analysis_infos, arr_length, indexFeno, index_calib, windowName);
+    } else {
+      register_analysis_output_field(PRJCT_RESULTS_REFNUMBER_BEFORE, analysis_infos, arr_length, indexFeno, index_calib, windowName);
+      register_analysis_output_field(PRJCT_RESULTS_REFNUMBER_AFTER, analysis_infos, arr_length, indexFeno, index_calib, windowName);
+    }
+  }
 
   return ERROR_ID_NO;
 }
@@ -2753,8 +2756,16 @@ void OUTPUT_Free(void)
   within the array corresponds to the enum value.  If not: return
   -1.*/
 enum output_format output_get_format(const char *fileext) {
-  size_t num_formats = sizeof(output_file_extensions)/sizeof(output_file_extensions[0]);
-  const char **array_offset = (const char **) lfind(fileext, output_file_extensions, (unsigned int *)&num_formats, sizeof(output_file_extensions[0]), &compare_string);
+  unsigned int num_formats = sizeof(output_file_extensions)/sizeof(output_file_extensions[0]);
+#ifdef WIN32
+  // For MS C library, lfind takes an unsigned int *
+  unsigned int pnum_formats = &num_formats;
+#else
+  // lfind takes size_t
+  size_t num_formats_64 = num_formats;
+  size_t *pnum_formats = &num_formats_64;
+#endif
+  const char **array_offset = (const char **) lfind(fileext, output_file_extensions, pnum_formats, sizeof(output_file_extensions[0]), &compare_string);
   if (array_offset)
     return array_offset - output_file_extensions; // offset in the array output_file_extensions corresponds to the enum value
   else
