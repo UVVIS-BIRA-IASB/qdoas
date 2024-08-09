@@ -3085,8 +3085,7 @@ RC ANALYSE_Function(double *spectrum_orig, double *reference, const double *Sigm
           ((!Feno->hidden && ANALYSE_phFilter->hpFilterAnalysis) || ((Feno->hidden==1) && ANALYSE_phFilter->hpFilterCalib)) &&
           ((rc=FILTER_Vector(ANALYSE_phFilter,&reference_shifted[LimMin],&reference_shifted[LimMin],NULL,LimN,PRJCT_FILTER_OUTPUT_HIGH_SUB))!=0))))
     {
-          if (rc==ERROR_ID_LOG)
-     printf("High-pass filtering on reference log error\n");
+     rc=ERROR_SetLast("EndFunction",ERROR_TYPE_WARNING,ERROR_ID_ANALYSIS,analyseIndexRecord,"Error with the selected reference spectrum");
      goto EndFunction;
     }
 
