@@ -2759,7 +2759,7 @@ enum output_format output_get_format(const char *fileext) {
   unsigned int num_formats = sizeof(output_file_extensions)/sizeof(output_file_extensions[0]);
 #ifdef WIN32
   // For MS C library, lfind takes an unsigned int *
-  unsigned int pnum_formats = &num_formats;
+  unsigned int *pnum_formats = &num_formats;
 #else
   // lfind takes size_t
   size_t num_formats_64 = num_formats;
