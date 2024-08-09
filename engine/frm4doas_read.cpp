@@ -336,7 +336,7 @@ RC FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
     short *dts=(short *)frm4doas_data_fields[FRM4DOAS_FIELD_DTS].varData;
     short *dte=(short *)frm4doas_data_fields[FRM4DOAS_FIELD_DTE].varData;
 
-    int idata=i_alongtrack*pEngineContext->n_crosstrack+i_crosstrack;
+    int idata=i_alongtrack; // *pEngineContext->n_crosstrack+i_crosstrack;
 
     pRecordInfo->present_datetime.thedate.da_day=(char)dt[idata*7+2];
     pRecordInfo->present_datetime.thedate.da_mon=(char)dt[idata*7+1];
