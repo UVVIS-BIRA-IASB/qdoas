@@ -1,4 +1,4 @@
-3.6.7 2024-07-30
+3.6.8 2024-09-02
 ~~~~~~~~~~~~~~~~
 
 * FRM4DOAS: possibility to read matrix (to consider imagers for example) and average or not rows.

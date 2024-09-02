@@ -77,9 +77,10 @@ The GUI is built on the Open-Source version of the Qt-5 toolkit. As a result, QD
 
 Building QDOAS from sources requires :
 
+* [CMake](https://cmake.org
 * C++ compiler (g++ version 4.8.1 or higher is recommended),
-* [Qt5](http://www.trolltech.com)
-* [Qwt](http://sourceforge.net/projects/qwt)
+* [Qt5](https://qt.io)
+* [Qwt](https://sourceforge.net/projects/qwt)
 * [CODA](https://atmospherictoolbox.org/coda/)
 * [HDF4](https://support.hdfgroup.org/products/hdf4/)
 * [HDF5](https://www.hdfgroup.org/downloads/hdf5/)
@@ -87,9 +88,15 @@ Building QDOAS from sources requires :
 * [Boost](https://www.boost.org)
 * [Eigen](https://eigen.tuxfamily.org)
 
-### Compilation and installation
+### Compilation
 
-Use CMake
+Generate build files using CMake, e.g. on Linux:
+```
+mkdir build
+cd build
+cmake <CMAKE_OPTIONS> ..
+```
+Depending on your system, `<CMAKE_OPTIONS>` should be replaced by a list of options to point CMake to the location of required libraries, such as `-DBoost_INCLUDE_DIR=/path/to/boost`.  When CMake has finished, compile the code by running `make`.
 
 QDOAS comes in five independent executables or modules :
 
