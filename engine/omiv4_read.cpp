@@ -216,8 +216,8 @@ namespace {
       size_spectral = obsGroup.dimLen("spectral_channel");
       size_groundpixel = obsGroup.dimLen("ground_pixel");
 
-      size_t start[] = {0, 0};
-      size_t count[] = {1, size_scanline};
+      size_t start[] = {0, 0, 0};
+      size_t count[] = {1, size_scanline, size_groundpixel};
       delta_time.resize(size_scanline);
       obsGroup.getVar("delta_time", start, count, delta_time.data());
 
@@ -231,6 +231,8 @@ namespace {
       size_wavelength_coeffs = instrGroup.dimLen("n_wavelength_poly");
 
       read_geodata();
+      xtrack_quality.resize(size_scanline * size_groundpixel);
+      obsGroup.getVar("xtrack_quality", start, count, xtrack_quality.data());
     }
 
     void get_record_geodata(RECORD_INFO *pRecord, int record) {
@@ -318,6 +320,7 @@ namespace {
     double fill_value() {return radiance_fill;}
 
     const geodata& get_geodata() {return orbit_geodata;}
+    const vector<uint16_t>& get_xtrack_quality() {return xtrack_quality;}
 
   private:
     const string filename;
@@ -337,6 +340,7 @@ namespace {
 
     vector<int> delta_time; // number of milliseconds after reference_time
     geodata orbit_geodata;
+    vector<uint16_t> xtrack_quality; // row anomaly impact
     int wavelength_ref_col;
 
     int orbit_year, orbit_month, orbit_day;
@@ -615,6 +619,7 @@ int OMIV4_read(ENGINE_CONTEXT *pEngineContext,int record) {
   pRecord->i_crosstrack = indexPixel;
 
   pRecord->useErrors = 1;
+  pRecord->xtrack_QF = current_orbit->get_xtrack_quality()[record - 1];
   current_orbit->get_record_geodata(pRecord, record);
   current_orbit->get_datetime(indexScanline, &pRecord->present_datetime);
 
