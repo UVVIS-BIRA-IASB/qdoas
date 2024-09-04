@@ -143,6 +143,7 @@
 #include "vector.h"
 #include "zenithal.h"
 #include "omi_read.h"
+#include "omiv4_read.h"
 #include "apex_read.h"
 #include "gdp_bin_read.h"
 #include "raman.h"
