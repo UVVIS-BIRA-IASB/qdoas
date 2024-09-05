@@ -19,6 +19,7 @@
 #include <map>
 #include <memory>
 #include <tuple>
+#include <array>
 
 #include <boost/multi_array.hpp>
 
@@ -383,13 +384,13 @@ namespace {
   vector<string> find_reference_orbits(const string& filename) {
     vector<string> result;
     const size_t prefix_len = strlen("OMI-Aura_L1-OML1BRXX"); // length of the standard OMI L1B radiance filename prefix
-    const string prefix(string(fs::path(filename).filename()).substr(0, prefix_len));
+    const string prefix(fs::path(filename).filename().string().substr(0, prefix_len));
     for (auto && f: fs::directory_iterator(fs::path(filename).parent_path())) {
-      const string basename = f.path().filename();
+      const string basename = f.path().filename().string();
       // keep only files in same directory starting with <prefix> and ending with ".nc":
       if (basename.rfind(prefix, 0) == 0 &&
           basename.compare(basename.size() - 3, 3, ".nc") == 0) {
-        result.push_back(f.path());
+        result.push_back(f.path().string());
       }
     }
     return result;
