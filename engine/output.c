@@ -2608,8 +2608,9 @@ static void* initialize_calibration_buffer(size_t len, enum output_datatype data
   }
     break;
   default:
-    // calibration data should not contain date/time/datetime
+    // calibration data should not contain date/time/datetime type
     assert(false);
+    return NULL;
   }
 }
 
