@@ -16,8 +16,6 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #include <QList>
 
 #include "CPlotPageData.h"
-#include "CImagePageData.h"
-
 
 class CWEditor;
 class CWPlotRegion;

@@ -14,7 +14,6 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #include "CPlotDataSet.h"
 #include "CPlotImage.h"
 #include "CPlotPageData.h"
-#include "CImagePageData.h"
 #include "CTablePageData.h"
 
 // CEngineController is a mediator. It is the interface for the GUI

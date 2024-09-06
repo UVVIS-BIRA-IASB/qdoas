@@ -17,8 +17,6 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 #include "CPlotProperties.h"
 #include "CPlotPageData.h"
-#include "CImagePageData.h"
-
 
 class CWPlotPage;
 
