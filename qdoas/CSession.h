@@ -9,14 +9,13 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #define _CSESSION_H_GUARD
 
 // A data bucket for holding a snap-shot of the state
-// requirede for a browse or analysis session
+// required for a browse or analysis session
 #include <map>
+#include <memory>
 
 #include <QList>
 #include <QStringList>
 #include <QFileInfo>
-
-#include "RefCountPtr.h"
 
 #include "mediate_general.h"
 #include "mediate_project.h"
@@ -87,7 +86,7 @@ class CSessionIterator
 {
  public:
   CSessionIterator();
-  CSessionIterator(const RefCountConstPtr<CSession> &session);
+  CSessionIterator(std::shared_ptr<const CSession> session);
   CSessionIterator(const CSessionIterator &other);
 
   CSessionIterator& operator=(const CSessionIterator &rhs);
@@ -110,7 +109,7 @@ class CSessionIterator
   bool operator!=(const CSessionIterator &rhs) const;
 
  private:
-  RefCountConstPtr<CSession> m_session;
+  std::shared_ptr<const CSession> m_session;
   CSession::sessionmap_t::const_iterator m_mapIt;
   int m_fileIndex;
   int m_offset;

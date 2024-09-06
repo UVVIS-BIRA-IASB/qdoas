@@ -11,12 +11,13 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #include <QFileInfo>
 #include <QStringList>
 
+#include <memory>
+
 #include "CEngineController.h"
 #include "CEngineThread.h"
 
 #include "CSession.h"
 #include "CViewCrossSectionData.h"
-#include "RefCountPtr.h"
 
 #include "mediate_project.h"
 
@@ -60,10 +61,10 @@ Q_OBJECT
   void slotStep();
 
   // session control
-  void slotStartSession(const RefCountPtr<CSession> &session);
+  void slotStartSession(std::shared_ptr<CSession> session);
   void slotStopSession();
 
-  void slotViewCrossSections(const RefCountPtr<CViewCrossSectionData> &awData);
+  void slotViewCrossSections(std::shared_ptr<CViewCrossSectionData> awData);
 
  signals:
   void signalFileListChanged(const QStringList &fileList);
@@ -71,8 +72,8 @@ Q_OBJECT
   void signalCurrentFileChanged(const QString &filename);
   void signalCurrentRecordChanged(int recordNumber, int firstMiddleLast);
 
-  void signalPlotPages(const QList< RefCountConstPtr<CPlotPageData> > &pageList);
-  void signalTablePages(const QList< RefCountConstPtr<CTablePageData> > &pageList);
+  void signalPlotPages(const QList<std::shared_ptr<const CPlotPageData> > &pageList);
+  void signalTablePages(const QList<std::shared_ptr<const CTablePageData> > &pageList);
 
   void signalErrorMessages(int highestErrorLevel, const QString &messages);
 
@@ -85,7 +86,7 @@ Q_OBJECT
   const mediate_project_t *m_currentProject;
   int m_currentRecord, m_numberOfRecords, m_numberOfFiles;
 
-  RefCountPtr<CSession> m_session;
+  std::shared_ptr<CSession> m_session;
   CSessionIterator m_currentIt;
 
   bool m_atEndOfCurrentFile;

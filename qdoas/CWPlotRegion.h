@@ -8,6 +8,8 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #ifndef _CWPLOTREGION_H_GUARD
 #define _CWPLOTREGION_H_GUARD
 
+#include <memory>
+
 #include <QList>
 #include <QScrollArea>
 #include <QString>
@@ -16,7 +18,7 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #include "CPlotProperties.h"
 #include "CPlotPageData.h"
 #include "CImagePageData.h"
-#include "RefCountPtr.h"
+
 
 class CWPlotPage;
 
@@ -27,7 +29,7 @@ class CWPlotRegion : public QScrollArea
 
   void removeAllPages();
   void removePagesExcept(const QList<int> pageNumberList);
-  void addPage(const RefCountConstPtr<CPlotPageData> &page);
+  void addPage(std::shared_ptr<const CPlotPageData> page);
 
   void displayPage(int pageNumber);
   void printVisiblePage(void);
@@ -47,7 +49,7 @@ class CWPlotRegion : public QScrollArea
  private:
   CPlotProperties m_properties;
   CWPlotPage *m_plotPage;
-  std::map< int,RefCountConstPtr<CPlotPageData> > m_pageMap;
+  std::map<int, std::shared_ptr<const CPlotPageData> > m_pageMap;
   int m_activePageNumber;
   QSize m_visibleSize;
 };

@@ -8,9 +8,9 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #define _CENGINECONTROLLER_H_GUARD
 
 #include <QList>
+#include <memory>
 
 #include "CEngineError.h"
-
 #include "CPlotDataSet.h"
 #include "CPlotImage.h"
 #include "CPlotPageData.h"

@@ -52,7 +52,7 @@ Q_OBJECT
   void slotErrorMessages(int highestLevel, const QString &messages);
   void slotRunRing();
 
-  void slotPlotPage(const RefCountConstPtr<CPlotPageData> &page);
+  void slotPlotPage(std::shared_ptr<const CPlotPageData> page);
 
  private:
   QMenuBar *m_menuBar;

@@ -17,6 +17,8 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 #include "debugutil.h"
 
+using std::shared_ptr;
+
 CWPlotRegion::CWPlotRegion(QWidget *parent) :
   QScrollArea(parent),
   m_plotPage(NULL),
@@ -41,8 +43,8 @@ void CWPlotRegion::removeAllPages()
 
 void CWPlotRegion::removePagesExcept(const QList<int> pageNumberList)
 {
-  QList< RefCountConstPtr<CPlotPageData> > retained;
-  std::map< int,RefCountConstPtr<CPlotPageData> >::iterator it;
+  QList<shared_ptr<const CPlotPageData> > retained;
+  std::map< int,shared_ptr<const CPlotPageData> >::iterator it;
 
   // create a list of the pages to be retained
   QList<int>::const_iterator pIt = pageNumberList.begin();
@@ -61,21 +63,21 @@ void CWPlotRegion::removePagesExcept(const QList<int> pageNumberList)
 
   // now put the retained pages back
   while (!retained.isEmpty()) {
-    RefCountConstPtr<CPlotPageData> page(retained.takeFirst());
+   shared_ptr<const CPlotPageData> page(retained.takeFirst());
 
-    m_pageMap.insert(std::map< int,RefCountConstPtr<CPlotPageData> >::value_type(page->pageNumber(), page));
+    m_pageMap.insert(std::map< int,shared_ptr<const CPlotPageData> >::value_type(page->pageNumber(), page));
   }
 
 }
 
-void CWPlotRegion::addPage(const RefCountConstPtr<CPlotPageData> &page)
+void CWPlotRegion::addPage(shared_ptr<const CPlotPageData> page)
 {
   // the page must not already exist
-  std::map< int,RefCountConstPtr<CPlotPageData> >::iterator it = m_pageMap.find(page->pageNumber());
+  std::map< int,shared_ptr<const CPlotPageData> >::iterator it = m_pageMap.find(page->pageNumber());
 
   if (it == m_pageMap.end())
    {
-    m_pageMap.insert(std::map< int,RefCountConstPtr<CPlotPageData> >::value_type(page->pageNumber(), page));
+    m_pageMap.insert(std::map< int,shared_ptr<const CPlotPageData> >::value_type(page->pageNumber(), page));
    }
 
   // else just quietly allow page to be discarded
@@ -84,7 +86,7 @@ void CWPlotRegion::addPage(const RefCountConstPtr<CPlotPageData> &page)
 // Display active page
 void CWPlotRegion::displayPage(int pageNumber)
 {
-  std::map< int,RefCountConstPtr<CPlotPageData> >::iterator it = m_pageMap.find(pageNumber);
+  std::map< int,shared_ptr<const CPlotPageData> >::iterator it = m_pageMap.find(pageNumber);
 
   if (it != m_pageMap.end()) {
     m_activePageNumber = pageNumber;
@@ -122,7 +124,7 @@ int CWPlotRegion::pageDisplayed(void) const
 
 QString CWPlotRegion::pageTitle(int pageNumber) const
 {
-  std::map< int,RefCountConstPtr<CPlotPageData> >::const_iterator it = m_pageMap.find(pageNumber);
+  std::map<int,shared_ptr<const CPlotPageData> >::const_iterator it = m_pageMap.find(pageNumber);
   if (it != m_pageMap.end())
     return (it->second)->title();
 
@@ -131,7 +133,7 @@ QString CWPlotRegion::pageTitle(int pageNumber) const
 
 QString CWPlotRegion::pageTag(int pageNumber) const
 {
-  std::map< int,RefCountConstPtr<CPlotPageData> >::const_iterator it = m_pageMap.find(pageNumber);
+  std::map<int,shared_ptr<const CPlotPageData> >::const_iterator it = m_pageMap.find(pageNumber);
   if (it != m_pageMap.end())
     return (it->second)->tag();
 
@@ -140,7 +142,7 @@ QString CWPlotRegion::pageTag(int pageNumber) const
 
 bool CWPlotRegion::pageExists(int pageNumber, QString &tag) const
 {
-  std::map< int,RefCountConstPtr<CPlotPageData> >::const_iterator it = m_pageMap.find(pageNumber);
+  std::map<int,shared_ptr<const CPlotPageData> >::const_iterator it = m_pageMap.find(pageNumber);
   if (it != m_pageMap.end()) {
     tag = (it->second)->tag();
     return true;

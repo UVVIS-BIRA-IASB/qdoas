@@ -12,7 +12,7 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #include <QList>
 
 #include "CPlotImage.h"
-#include "RefCountPtr.h"
+
 
 class CImagePageData
 {
@@ -25,7 +25,7 @@ class CImagePageData
   int size(void) const;
   const QString& title(void) const;
   const QString& tag(void) const;
-  RefCountConstPtr<CPlotImage> image(int index) const;
+ std::shared_ptr<const CPlotImage> image(int index) const;
 
   void setTitle(const QString &title);
   void setTag(const QString &tag);
@@ -34,7 +34,7 @@ class CImagePageData
  private:
   int m_pageNumber;
   QString m_title, m_tag;
-  QList< RefCountConstPtr<CPlotImage> > m_images;
+  QList<std::shared_ptr<const CPlotImage> > m_images;
 };
 
 inline bool CImagePageData::isEmpty(void) const { return m_images.isEmpty(); }

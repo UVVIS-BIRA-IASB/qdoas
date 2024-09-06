@@ -25,7 +25,7 @@ Q_OBJECT
   virtual void notifyErrorMessages(int highestErrorLevel, const QList<CEngineError> &errorMessages);
 
  signals:
-  void signalPlotPage(const RefCountConstPtr<CPlotPageData> &page);
+  void signalPlotPage(std::shared_ptr<const CPlotPageData> page);
   void signalErrorMessages(int highestErrorLevel, const QString &message);
 };
 

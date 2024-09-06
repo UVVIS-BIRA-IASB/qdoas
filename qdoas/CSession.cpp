@@ -174,10 +174,10 @@ CSessionIterator::CSessionIterator() :
 {
 }
 
-CSessionIterator::CSessionIterator(const RefCountConstPtr<CSession> &session) :
+CSessionIterator::CSessionIterator(std::shared_ptr<const CSession> session) :
   m_session(session)
 {
-  if (m_session != 0) {
+  if (m_session) {
     m_mapIt = m_session->m_map.begin();
     m_fileIndex = 0;
     m_offset = 0;
@@ -254,14 +254,14 @@ int CSessionIterator::index(void) const
 
 bool CSessionIterator::atEnd(void) const
 {
-  return (m_session == 0 || m_mapIt == m_session->m_map.end() || m_fileIndex == (m_mapIt->second)->m_files.size());
+  return (!m_session || m_mapIt == m_session->m_map.end() || m_fileIndex == (m_mapIt->second)->m_files.size());
 }
 
 bool CSessionIterator::atBegin(void) const
 {
   // NOTE returns false if session is null
 
-  return (m_session != 0 && m_mapIt == m_session->m_map.begin() && m_fileIndex == 0);
+  return (m_session && m_mapIt == m_session->m_map.begin() && m_fileIndex == 0);
 }
 
 const QFileInfo& CSessionIterator::file(void) const

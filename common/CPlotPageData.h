@@ -11,9 +11,11 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 #include <QList>
 
+#include <memory>
+
 #include "CPlotDataSet.h"
 #include "CPlotImage.h"
-#include "RefCountPtr.h"
+
 
 #define PLOTPAGE_DATASET 0
 #define PLOTPAGE_IMAGE   1
@@ -29,8 +31,8 @@ class CPlotPageData
   const QString& title(void) const;
   const QString& tag(void) const;
   int type(void) const;
-  RefCountConstPtr<CPlotDataSet> dataSet(int index) const;
-  RefCountConstPtr<CPlotImage> dataImage(int index) const;
+  std::shared_ptr<const CPlotDataSet> dataSet(int index) const;
+  std::shared_ptr<const CPlotImage> dataImage(int index) const;
 
   void setTitle(const QString &title);
   void setTag(const QString &tag);
@@ -41,8 +43,8 @@ class CPlotPageData
   int m_pageNumber;
   int m_pageType;
   QString m_title, m_tag;
-  QList< RefCountConstPtr<CPlotDataSet> > m_dataSets;
-  QList< RefCountConstPtr<CPlotImage> > m_dataImages;
+  QList<std::shared_ptr<const CPlotDataSet> > m_dataSets;
+  QList<std::shared_ptr<const CPlotImage> > m_dataImages;
 };
 
 inline bool CPlotPageData::isEmpty(void) const { return (m_pageType==PLOTPAGE_DATASET)?m_dataSets.isEmpty():m_dataImages.isEmpty(); }

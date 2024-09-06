@@ -25,9 +25,9 @@ CWPlotArea::CWPlotArea(QWidget *parent) :
   setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 }
 
-void CWPlotArea::setPage(const RefCountConstPtr<CPlotPageData> &page)
+void CWPlotArea::setPage(std::shared_ptr<const CPlotPageData> page)
 {
-  if (page != 0) {
+  if (page) {
     m_plotPage = new CWPlotPage(m_properties, page);
     setWidget(m_plotPage); // takes care of deleting the old widget
     m_plotPage->layoutPlots(m_visibleSize);
@@ -55,7 +55,7 @@ void CWPlotArea::exportPage(void)
 
 QString CWPlotArea::pageTitle(void) const
 {
-  if (m_pageData != 0)
+  if (m_pageData)
     return m_pageData->title();
 
   return QString();
@@ -63,7 +63,7 @@ QString CWPlotArea::pageTitle(void) const
 
 QString CWPlotArea::pageTag(void) const
 {
-  if (m_pageData != 0)
+  if (m_pageData)
     return m_pageData->tag();
 
   return QString();

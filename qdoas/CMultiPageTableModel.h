@@ -8,12 +8,13 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #define _CMULTIPAGETABLEMODEL_H_GUARD
 
 #include <map>
+#include <memory>
 
 #include <QAbstractTableModel>
 #include <QList>
 
 #include "CTablePageData.h"
-#include "RefCountPtr.h"
+
 
 class CMultiPageTableModel : public QAbstractTableModel
 {
@@ -21,7 +22,7 @@ Q_OBJECT
  public:
   CMultiPageTableModel(QObject *parent = 0) : QAbstractTableModel(parent) {};
 
-  void addPage(const RefCountConstPtr<CTablePageData> &page);
+  void addPage(std::shared_ptr<const CTablePageData> page);
   void removeAllPages(void);
   void removePagesExcept(const QList<int> pageNumberList);
 
@@ -32,11 +33,11 @@ Q_OBJECT
   virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
  public slots:
-  void slotTablePages(const QList< RefCountConstPtr<CTablePageData> > &pageList);
+  void slotTablePages(const QList<std::shared_ptr<const CTablePageData> > &pageList);
 
  private:
-  std::map< int,RefCountConstPtr<CTablePageData> > m_pageMap;
-  RefCountConstPtr<CTablePageData> m_currentPage;
+  std::map< int,std::shared_ptr<const CTablePageData> > m_pageMap;
+  std::shared_ptr<const CTablePageData> m_currentPage;
 };
 
 #endif

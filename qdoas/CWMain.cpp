@@ -137,10 +137,10 @@ CWMain::CWMain(QWidget *parent) :
   m_controller = new CQdoasEngineController(this);
 
   // connections to the controller
-  connect(m_projTree, SIGNAL(signalStartSession(const RefCountPtr<CSession>&)),
-          m_controller, SLOT(slotStartSession(const RefCountPtr<CSession>&)));
-  connect(m_projTree, SIGNAL(signalViewCrossSections(const RefCountPtr<CViewCrossSectionData>&)),
-      m_controller, SLOT(slotViewCrossSections(const RefCountPtr<CViewCrossSectionData>&)));
+  connect(m_projTree, SIGNAL(signalStartSession(std::shared_ptr<CSession>)),
+          m_controller, SLOT(slotStartSession(std::shared_ptr<CSession>)));
+  connect(m_projTree, SIGNAL(signalViewCrossSections(std::shared_ptr<CViewCrossSectionData>)),
+          m_controller, SLOT(slotViewCrossSections(std::shared_ptr<CViewCrossSectionData>)));
 
   // Menu and toolbar actions
 
@@ -286,12 +286,12 @@ CWMain::CWMain(QWidget *parent) :
           this, SLOT(slotSetMessageFileLogging(bool)));
 
   // plot data transfer
-  connect(m_controller, SIGNAL(signalPlotPages(const QList< RefCountConstPtr<CPlotPageData> >&)),
-          m_activeContext, SLOT(slotPlotPages(const QList< RefCountConstPtr<CPlotPageData> >&)));
+  connect(m_controller, SIGNAL(signalPlotPages(const QList<std::shared_ptr<const CPlotPageData> >&)),
+          m_activeContext, SLOT(slotPlotPages(const QList<std::shared_ptr<const CPlotPageData> >&)));
 
   // table data transfer
-  connect(m_controller, SIGNAL(signalTablePages(const QList< RefCountConstPtr<CTablePageData> > &)),
-          m_tableRegion, SLOT(slotTablePages(const QList< RefCountConstPtr<CTablePageData> > &)));
+  connect(m_controller, SIGNAL(signalTablePages(const QList<std::shared_ptr<const CTablePageData> > &)),
+          m_tableRegion, SLOT(slotTablePages(const QList<std::shared_ptr<const CTablePageData> > &)));
 
 
   // error messages

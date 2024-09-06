@@ -4,11 +4,11 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 */
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include "CPlotPageData.h"
 
+using std::shared_ptr;
 
 CPlotPageData::CPlotPageData(int pageNumber,int pageType) :
   m_pageNumber(pageNumber),
@@ -43,18 +43,18 @@ int CPlotPageData::type(void) const
       return m_pageType;
 }
 
-RefCountConstPtr<CPlotDataSet> CPlotPageData::dataSet(int index) const
+shared_ptr<const CPlotDataSet> CPlotPageData::dataSet(int index) const
 {
   if (index < 0 || index > m_dataSets.size())
-    return RefCountConstPtr<CPlotDataSet>();
+    shared_ptr<const CPlotDataSet>();
 
   return m_dataSets.at(index);
 }
 
-RefCountConstPtr<CPlotImage> CPlotPageData::dataImage(int index) const
+shared_ptr<const CPlotImage> CPlotPageData::dataImage(int index) const
 {
   if (index < 0 || index > m_dataImages.size())
-    return RefCountConstPtr<CPlotImage>();
+    shared_ptr<const CPlotImage>();
 
   return m_dataImages.at(index);
 }
@@ -74,7 +74,7 @@ void CPlotPageData::addPlotDataSet(const CPlotDataSet *dataSet)
   // page takes ownership responsibility, which means it is safe
   // to wrap it in a reference counting pointer
 
-  m_dataSets.push_back(RefCountConstPtr<CPlotDataSet>(dataSet));
+  m_dataSets.push_back(shared_ptr<const CPlotDataSet>(dataSet));
 }
 
 void CPlotPageData::addPlotImage(const CPlotImage *image)
@@ -82,7 +82,7 @@ void CPlotPageData::addPlotImage(const CPlotImage *image)
   // page takes ownership responsibility, which means it is safe
   // to wrap it in a reference counting pointer
 
-  m_dataImages.push_back(RefCountConstPtr<CPlotImage>(image));
+  m_dataImages.push_back(shared_ptr<const CPlotImage>(image));
 }
 
 

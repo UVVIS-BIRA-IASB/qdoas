@@ -8,6 +8,8 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #ifndef _CWPLOTPAGE_H_GUARD
 #define _CWPLOTPAGE_H_GUARD
 
+#include <memory>
+
 #include <QFrame>
 #include <QList>
 #include <QSize>
@@ -23,7 +25,7 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #include "CPlotDataSet.h"
 #include "CPlotImage.h"
 #include "CPlotPageData.h"
-#include "RefCountPtr.h"
+
 
 // NOTE. The plotProperties references held by these classes allows them to
 // poke at the internals of the CWPlotRegion (the owner of the plotProperties
@@ -36,8 +38,8 @@ class CWPlot : public QwtPlot
 {
 Q_OBJECT
  public:
-  CWPlot(const RefCountConstPtr<CPlotDataSet> &dataSet, CPlotProperties &plotProperties, QWidget *parent = 0);
-  CWPlot(const RefCountConstPtr<CPlotImage> &dataImage, CPlotProperties &plotProperties, QWidget *parent = 0);
+  CWPlot(std::shared_ptr<const CPlotDataSet> dataSet, CPlotProperties &plotProperties, QWidget *parent = 0);
+  CWPlot(std::shared_ptr<const CPlotImage> dataImage, CPlotProperties &plotProperties, QWidget *parent = 0);
   virtual ~CWPlot() {};
 
   static bool getImageSaveNameAndFormat(QWidget *parent, QString &fileName, QString &saveFormat);
@@ -54,8 +56,8 @@ Q_OBJECT
   void slotToggleInteraction();
 
  private:
-  RefCountConstPtr<CPlotDataSet> m_dataSet;
-  RefCountConstPtr<CPlotImage> m_dataImage;
+  std::shared_ptr<const CPlotDataSet> m_dataSet;
+  std::shared_ptr<const CPlotImage> m_dataImage;
   CPlotProperties &m_plotProperties;
   QwtPlotZoomer *m_zoomer;
   int m_type;
@@ -71,7 +73,7 @@ Q_OBJECT
  public:
   CWPlotPage(CPlotProperties &plotProperties, QWidget *parent = 0);
   CWPlotPage(CPlotProperties &plotProperties,
-         const RefCountConstPtr<CPlotPageData> &page, QWidget *parent = 0);
+         std::shared_ptr<const CPlotPageData> page, QWidget *parent = 0);
   virtual ~CWPlotPage() {};
 
   void layoutPlots(const QSize &visibleSize);

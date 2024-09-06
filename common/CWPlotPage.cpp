@@ -92,7 +92,7 @@ bool CWPlot::getImageSaveNameAndFormat(QWidget *parent, QString &fileName, QStri
   return false;
 }
 
-CWPlot::CWPlot(const RefCountConstPtr<CPlotDataSet> &dataSet,
+CWPlot::CWPlot(std::shared_ptr<const CPlotDataSet> dataSet,
            CPlotProperties &plotProperties, QWidget *parent) :
   QwtPlot(parent),
   m_dataSet(dataSet),
@@ -197,7 +197,7 @@ CWPlot::CWPlot(const RefCountConstPtr<CPlotDataSet> &dataSet,
   replot();
 }
 
-CWPlot::CWPlot(const RefCountConstPtr<CPlotImage> &dataImage,
+CWPlot::CWPlot(std::shared_ptr<const CPlotImage> dataImage,
            CPlotProperties &plotProperties, QWidget *parent) :
   QwtPlot(parent),
   m_dataImage(dataImage),
@@ -490,12 +490,12 @@ CWPlotPage::CWPlotPage(CPlotProperties &plotProperties, QWidget *parent) :
 }
 
 CWPlotPage::CWPlotPage(CPlotProperties &plotProperties,
-               const RefCountConstPtr<CPlotPageData> &page, QWidget *parent) :
+               std::shared_ptr<const CPlotPageData> page, QWidget *parent) :
   QFrame(parent),
   m_plotProperties(plotProperties),
   m_pageType(page->type())
 {
-  if (page != 0) {
+  if (page) {
     int nplots=page->size();
 
     if (page->type()==PLOTPAGE_DATASET) {

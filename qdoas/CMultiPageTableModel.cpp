@@ -8,25 +8,27 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 #include "debugutil.h"
 
-void CMultiPageTableModel::addPage(const RefCountConstPtr<CTablePageData> &page)
+using std::shared_ptr;
+
+void CMultiPageTableModel::addPage(shared_ptr<const CTablePageData> page)
 {
-  if (page == 0) return;
+  if (!page) return;
 
   // must not already exist
-  std::map< int,RefCountConstPtr<CTablePageData> >::iterator it = m_pageMap.find(page->pageNumber());
+  std::map<int,shared_ptr<const CTablePageData> >::iterator it = m_pageMap.find(page->pageNumber());
   if (it == m_pageMap.end())
-    m_pageMap.insert(std::map< int,RefCountConstPtr<CTablePageData> >::value_type(page->pageNumber(), page));
+    m_pageMap.insert(std::map< int,shared_ptr<const CTablePageData> >::value_type(page->pageNumber(), page));
 }
 
 void CMultiPageTableModel::removeAllPages(void)
 {
-  if (m_currentPage != 0) {
+  if (m_currentPage) {
     // notify that the active page is going to disapear ...
     int lastRow = m_currentPage->rowCount() - 1;
     int lastCol = m_currentPage->columnCount() - 1;
     beginRemoveRows(QModelIndex(), 0, lastRow);
     m_pageMap.clear();
-    m_currentPage = RefCountConstPtr<CTablePageData>();
+    m_currentPage = shared_ptr<const CTablePageData>();
     endRemoveRows();
     beginRemoveColumns(QModelIndex(), 0, lastCol);
     endRemoveColumns();
@@ -38,8 +40,8 @@ void CMultiPageTableModel::removeAllPages(void)
 
 void CMultiPageTableModel::removePagesExcept(const QList<int> pageNumberList)
 {
-  QList< RefCountConstPtr<CTablePageData> > retained;
-  std::map< int,RefCountConstPtr<CTablePageData> >::iterator it;
+  QList<shared_ptr<const CTablePageData> > retained;
+  std::map< int,shared_ptr<const CTablePageData> >::iterator it;
 
   // create a list of the pages to be retained
   QList<int>::const_iterator pIt = pageNumberList.begin();
@@ -54,13 +56,13 @@ void CMultiPageTableModel::removePagesExcept(const QList<int> pageNumberList)
     ++pIt;
   }
 
-  if (m_currentPage != 0 && !pageNumberList.contains(m_currentPage->pageNumber())) {
+  if (m_currentPage && !pageNumberList.contains(m_currentPage->pageNumber())) {
     // notify that the active page is going to disapear ...
     int lastRow = m_currentPage->rowCount() - 1;
     int lastCol = m_currentPage->columnCount() - 1;
     beginRemoveRows(QModelIndex(), 0, lastRow);
     m_pageMap.clear();
-    m_currentPage = RefCountConstPtr<CTablePageData>();
+    m_currentPage = shared_ptr<const CTablePageData>();
     endRemoveRows();
     beginRemoveColumns(QModelIndex(), 0, lastCol);
     endRemoveColumns();
@@ -71,9 +73,9 @@ void CMultiPageTableModel::removePagesExcept(const QList<int> pageNumberList)
 
   // now put the retained pages back
   while (!retained.isEmpty()) {
-    RefCountConstPtr<CTablePageData> page(retained.takeFirst());
+   shared_ptr<const CTablePageData> page(retained.takeFirst());
 
-    m_pageMap.insert(std::map< int,RefCountConstPtr<CTablePageData> >::value_type(page->pageNumber(), page));
+    m_pageMap.insert(std::map< int,shared_ptr<const CTablePageData> >::value_type(page->pageNumber(), page));
   }
 }
 
@@ -81,18 +83,18 @@ void CMultiPageTableModel::setActivePage(int pageNumber)
 {
   int lastRow, lastCol;
 
-  if (m_currentPage != 0) {
+  if (m_currentPage) {
     // notify that the active page is going to disapear ...
     lastRow = m_currentPage->rowCount() - 1;
     lastCol = m_currentPage->columnCount() - 1;
     beginRemoveColumns(QModelIndex(), 0, lastCol);
     beginRemoveRows(QModelIndex(), 0, lastRow);
-    m_currentPage = RefCountConstPtr<CTablePageData>();
+    m_currentPage = shared_ptr<const CTablePageData>();
     endRemoveRows();
     endRemoveColumns();
   }
 
-  std::map< int,RefCountConstPtr<CTablePageData> >::iterator it = m_pageMap.find(pageNumber);
+  std::map< int,shared_ptr<const CTablePageData> >::iterator it = m_pageMap.find(pageNumber);
   if (it != m_pageMap.end()) {
     lastRow = (it->second)->rowCount() - 1;
     lastCol = (it->second)->columnCount() - 1;
@@ -106,7 +108,7 @@ void CMultiPageTableModel::setActivePage(int pageNumber)
 
 int CMultiPageTableModel::columnCount(const QModelIndex &parent) const
 {
-  if (!parent.isValid() && m_currentPage != 0)
+  if (!parent.isValid() && m_currentPage)
     return m_currentPage->columnCount();
 
   return 0;
@@ -114,7 +116,7 @@ int CMultiPageTableModel::columnCount(const QModelIndex &parent) const
 
 int CMultiPageTableModel::rowCount(const QModelIndex &parent) const
 {
-  if (!parent.isValid() && m_currentPage != 0)
+  if (!parent.isValid() && m_currentPage)
     return m_currentPage->rowCount();
 
   return 0;
@@ -122,7 +124,7 @@ int CMultiPageTableModel::rowCount(const QModelIndex &parent) const
 
 QVariant CMultiPageTableModel::data(const QModelIndex &index, int role) const
 {
-  if (!index.isValid() || m_currentPage == 0)
+  if (!index.isValid() || !m_currentPage)
     return QVariant();
 
   // respond to display and alignment roles
@@ -140,14 +142,14 @@ QVariant CMultiPageTableModel::data(const QModelIndex &index, int role) const
 }
 
 // TODO
-void CMultiPageTableModel::slotTablePages(const QList< RefCountConstPtr<CTablePageData> > &pageList)
+void CMultiPageTableModel::slotTablePages(const QList<shared_ptr<const CTablePageData> > &pageList)
 {
-  int activePage = (m_currentPage != 0) ? m_currentPage->pageNumber() : -1;
+  int activePage = (m_currentPage) ? m_currentPage->pageNumber() : -1;
 
   QList<int> retainedList;
 
   // build a list of the pages to be retained (empty pages)
-  QList< RefCountConstPtr<CTablePageData> >::const_iterator it = pageList.begin();
+  auto it = pageList.begin();
   while (it != pageList.end()) {
 
     if ((*it)->isEmpty()) {

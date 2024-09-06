@@ -45,7 +45,6 @@ add_library(common STATIC
   CWorkSpace.cpp
   CWorkSpace.h
   QdoasVersion.h
-  RefCountPtr.h
   debugutil.h
   visual_c_compat.h
 )

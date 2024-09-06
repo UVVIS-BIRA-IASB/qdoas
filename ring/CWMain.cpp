@@ -167,8 +167,8 @@ CWMain::CWMain(QWidget *parent) :
   resize(CPreferences::instance()->windowSize("RingTool", QSize(450,350)));
 
   // connections
-  connect(m_controller, SIGNAL(signalPlotPage(const RefCountConstPtr<CPlotPageData> &)),
-      this, SLOT(slotPlotPage(const RefCountConstPtr<CPlotPageData> &)));
+  connect(m_controller, SIGNAL(signalPlotPage(std::shared_ptr<const CPlotPageData>)),
+      this, SLOT(slotPlotPage(std::shared_ptr<const CPlotPageData>)));
   connect(m_controller, SIGNAL(signalErrorMessages(int, const QString &)),
       this, SLOT(slotErrorMessages(int, const QString &)));
 }
@@ -510,9 +510,9 @@ void CWMain::slotRunRing()
   delete resp;
 }
 
-void CWMain::slotPlotPage(const RefCountConstPtr<CPlotPageData> &page)
+void CWMain::slotPlotPage(std::shared_ptr<const CPlotPageData> page)
 {
-  if (page != 0) {
+  if (page) {
     // lazy creation of the plot tab ...
     if (!m_plotArea) {
       CPlotProperties prop;

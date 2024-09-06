@@ -43,7 +43,7 @@ void CRingEngineController::notifyPlotData(QList<SPlotData> &plotDataList, QList
 
     // put the page in a smart pointer for safe dispatch.
 
-    RefCountConstPtr<CPlotPageData> page(plotPage);
+    std::shared_ptr<const CPlotPageData> page(plotPage);
 
     emit signalPlotPage(page);
   }

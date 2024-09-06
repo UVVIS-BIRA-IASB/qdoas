@@ -7,6 +7,8 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #ifndef _CWACTIVECONTEXT_H_GUARD
 #define _CWACTIVECONTEXT_H_GUARD
 
+#include <memory>
+
 #include <QFrame>
 #include <QPushButton>
 #include <QLabel>
@@ -15,7 +17,7 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 #include "CPlotPageData.h"
 #include "CImagePageData.h"
-#include "RefCountPtr.h"
+
 
 class CWEditor;
 class CWPlotRegion;
@@ -45,7 +47,7 @@ Q_OBJECT
 
   void slotAcceptOk(bool canDoOk);
 
-  void slotPlotPages(const QList< RefCountConstPtr<CPlotPageData> > &pageList);
+  void slotPlotPages(const QList<std::shared_ptr<const CPlotPageData> > &pageList);
   void slotCurrentGraphTabChanged(int index);
   void slotCurrentActiveTabChanged(int index);
 

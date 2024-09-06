@@ -14,6 +14,8 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 #include "debugutil.h"
 
+using std::shared_ptr;
+
 CQdoasEngineController::CQdoasEngineController(QObject *parent) :
   QObject(parent),
   CEngineController(),
@@ -154,11 +156,11 @@ void CQdoasEngineController::notifyPlotData(QList<SPlotData> &plotDataList, QLis
 
   // shift the items in the pageMap to a QList for cheap and safe dispatch.
 
-  QList< RefCountConstPtr<CPlotPageData> > pageList;
+  QList<shared_ptr<const CPlotPageData> > pageList;
 
   mIt = pageMap.begin();
   while (mIt != pageMap.end()) {
-    pageList.push_back(RefCountConstPtr<CPlotPageData>(mIt->second));
+    pageList.push_back(shared_ptr<const CPlotPageData>(mIt->second));
     ++mIt;
   }
   pageMap.clear();
@@ -196,11 +198,11 @@ void CQdoasEngineController::notifyTableData(QList<SCell> &cellList)
   // built a map of pages and emptied cellList (argument).
   // shift them to a QList for cheap and safe dispatch.
 
-  QList< RefCountConstPtr<CTablePageData> > pageList;
+  QList<shared_ptr<const CTablePageData> > pageList;
 
   mIt = pageMap.begin();
   while (mIt != pageMap.end()) {
-    pageList.push_back(RefCountConstPtr<CTablePageData>(mIt->second));
+    pageList.push_back(shared_ptr<const CTablePageData>(mIt->second));
     ++mIt;
   }
   pageMap.clear();
@@ -509,7 +511,7 @@ void CQdoasEngineController::slotStep()
   }
 }
 
-void CQdoasEngineController::slotStartSession(const RefCountPtr<CSession> &session)
+void CQdoasEngineController::slotStartSession(shared_ptr<CSession> session)
 {
   // need a compound request
   CEngineRequestCompound *req = new CEngineRequestCompound;
@@ -589,7 +591,7 @@ void CQdoasEngineController::slotStopSession()
 
 }
 
-void CQdoasEngineController::slotViewCrossSections(const RefCountPtr<CViewCrossSectionData> &awData)
+void CQdoasEngineController::slotViewCrossSections(shared_ptr<CViewCrossSectionData> awData)
 {
   const mediate_analysis_window_t *d = awData->analysisWindow();
 

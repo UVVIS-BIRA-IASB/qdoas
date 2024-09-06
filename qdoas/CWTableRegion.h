@@ -21,7 +21,7 @@ Q_OBJECT
   void contextMenuEvent(QContextMenuEvent *e);
 
  public slots:
-  void slotTablePages(const QList< RefCountConstPtr<CTablePageData> > &pageList);
+  void slotTablePages(const QList<std::shared_ptr<const CTablePageData> > &pageList);
   void slotDisplayPage(int pageNumber);
   void slotSaveAs();
 

@@ -28,11 +28,13 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #include "CWAnalysisWindowPropertyEditor.h"
 #include "CWActiveContext.h"
 #include "CSession.h"
-#include "RefCountPtr.h"
+
 #include "CPreferences.h"
 #include "CWProjectExportEditor.h"
 
 #include "debugutil.h"
+
+using std::shared_ptr;
 
 // Somewhat arbitrary constants that need to be unique for all widgets coupled to the
 // CWSplitter widget.
@@ -411,7 +413,7 @@ void CWProjectTree::buildAndStartSession(CSession::eMode sessionType)
   // safely dispatch the session to attached slots by wrapping in a reference
   // counting pointer.
 
-  RefCountPtr<CSession> ptr(session);
+  shared_ptr<CSession> ptr(session);
 
   emit signalStartSession(ptr);
 
@@ -1232,7 +1234,7 @@ void CWProjectTree::slotViewCrossSections()
       const mediate_analysis_window_t *aw = CWorkSpace::instance()->findAnalysisWindow(projItem->text(0), item->text(0));
 
       if (aw != NULL) {
-        RefCountPtr<CViewCrossSectionData> ptr(new CViewCrossSectionData(aw));
+        shared_ptr<CViewCrossSectionData> ptr(new CViewCrossSectionData(aw));
         emit signalViewCrossSections(ptr);
       }
     }

@@ -4,9 +4,7 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 */
 
-
 #include "CImagePageData.h"
-
 
 CImagePageData::CImagePageData(int pageNumber) :
   m_pageNumber(pageNumber)
@@ -40,10 +38,10 @@ const QString& CImagePageData::tag(void) const
   return m_tag;
 }
 
-RefCountConstPtr<CPlotImage> CImagePageData::image(int index) const
+std::shared_ptr<const CPlotImage> CImagePageData::image(int index) const
 {
   if (index < 0 || index > m_images.size())
-    return RefCountConstPtr<CPlotImage>();
+    return std::shared_ptr<const CPlotImage>();
 
   return m_images.at(index);
 }
@@ -63,7 +61,7 @@ void CImagePageData::addPlotImage(const CPlotImage *image)
   // page takes ownership responsibility, which means it is safe
   // to wrap it in a reference counting pointer
 
-  m_images.push_back(RefCountConstPtr<CPlotImage>(image));
+  m_images.push_back(std::shared_ptr<const CPlotImage>(image));
 }
 
 

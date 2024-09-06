@@ -15,7 +15,8 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #include <QList>
 #include <QSize>
 
-#include "RefCountPtr.h"
+#include <memory>
+
 #include "CSession.h"
 #include "CViewCrossSectionData.h"
 #include "CProjectConfigItem.h"
@@ -124,8 +125,8 @@ Q_OBJECT
 
  signals:
   void signalWidthModeChanged(int newMode);
-  void signalStartSession(const RefCountPtr<CSession> &session);
-  void signalViewCrossSections(const RefCountPtr<CViewCrossSectionData> &awData);
+  void signalStartSession(std::shared_ptr<CSession> session);
+  void signalViewCrossSections(std::shared_ptr<CViewCrossSectionData> awData);
   void signalSpectraTreeChanged();
 
  private:

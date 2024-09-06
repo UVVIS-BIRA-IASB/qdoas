@@ -25,6 +25,7 @@ const QRgb cEditTitleTextColour        = 0xFFFFFFFF;
 const QRgb cGraphTitleBackgroundColour = 0xFFF59F43;
 const QRgb cGraphTitleTextColour       = 0xFF000000;
 
+using std::shared_ptr;
 
 CWActiveContext::CWActiveContext(QWidget *parent) :
   QFrame(parent),
@@ -422,7 +423,7 @@ void CWActiveContext::slotAcceptOk(bool canDoOk)
   m_okButton->setEnabled(canDoOk);
 }
 
-void CWActiveContext::slotPlotPages(const QList< RefCountConstPtr<CPlotPageData> > &pageList)
+void CWActiveContext::slotPlotPages(const QList<shared_ptr<const CPlotPageData> > &pageList)
 {
   int pageNumber;
 
@@ -442,7 +443,7 @@ void CWActiveContext::slotPlotPages(const QList< RefCountConstPtr<CPlotPageData>
   // and reset the tabs...
   index = 0;
   QList<int> retainedList;
-  QList< RefCountConstPtr<CPlotPageData> >::const_iterator it = pageList.begin();
+  QList<shared_ptr<const CPlotPageData> >::const_iterator it = pageList.begin();
 
   while (it !=  pageList.end()) {
     pageNumber = (*it)->pageNumber();

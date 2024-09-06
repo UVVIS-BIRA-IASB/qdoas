@@ -28,7 +28,7 @@ CWTableRegion::CWTableRegion(QWidget *parent) :
   verticalHeader()->hide();
 }
 
-void CWTableRegion::slotTablePages(const QList< RefCountConstPtr<CTablePageData> > &pageList)
+void CWTableRegion::slotTablePages(const QList<std::shared_ptr<const CTablePageData> > &pageList)
 {
   m_model->slotTablePages(pageList);
 }

@@ -13,8 +13,6 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 #include "CEngineController.h"
 
-#include "RefCountPtr.h"
-
 #include "mediate_project.h"
 
 

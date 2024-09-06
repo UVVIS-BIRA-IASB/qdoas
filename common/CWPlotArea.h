@@ -8,13 +8,15 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #ifndef _CWPLOTAREA_H_GUARD
 #define _CWPLOTAREA_H_GUARD
 
+#include <memory>
+
 #include <QScrollArea>
 #include <QString>
 #include <QSize>
 
 #include "CPlotProperties.h"
 #include "CPlotPageData.h"
-#include "RefCountPtr.h"
+
 
 class CWPlotPage;
 
@@ -23,7 +25,7 @@ class CWPlotArea : public QScrollArea
  public:
   CWPlotArea(QWidget *parent = 0);
 
-  void setPage(const RefCountConstPtr<CPlotPageData> &page);
+  void setPage(std::shared_ptr<const CPlotPageData> page);
 
   void printPage(void);
   void exportPage(void);
@@ -42,7 +44,7 @@ class CWPlotArea : public QScrollArea
  private:
   CPlotProperties m_properties;
   CWPlotPage *m_plotPage;
-  RefCountConstPtr<CPlotPageData> m_pageData;
+  std::shared_ptr<const CPlotPageData> m_pageData;
   QSize m_visibleSize;
 };
 
