@@ -175,29 +175,27 @@ void MATRIX_Free(MATRIX_OBJECT *pMatrix, const char *callingFunction)
 //               ERROR_ID_NO otherwise
 // -----------------------------------------------------------------------------
 
-RC MATRIX_Copy(MATRIX_OBJECT *pTarget,MATRIX_OBJECT *pSource, const char *callingFunction)
+RC MATRIX_Copy(MATRIX_OBJECT *pTarget, const MATRIX_OBJECT *pSource, const char *callingFunction)
  {
   // Declarations
-
   INDEX indexC;
   RC rc;
 
   // Initializations
-
-  MATRIX_Free(pTarget,"MATRIX_Copy");
+  MATRIX_Free(pTarget,__func__);
   rc=ERROR_ID_NO;
 
   // Use the dimensions of the source matrix to allocate the target matrix
 
   if ((pSource->nl==0) || (pSource->nc==0) || (pSource->matrix==NULL))
-   ERROR_SetLast("MATRIX_Copy",ERROR_TYPE_FATAL,ERROR_ID_ALLOCMATRIX,"pSource",
-                  pSource->basel,pSource->nl+pSource->basel-1,pSource->basec,pSource->nc+pSource->basec-1);
+   ERROR_SetLast(__func__,ERROR_TYPE_FATAL,ERROR_ID_ALLOCMATRIX,"pSource",
+                 pSource->basel,pSource->nl+pSource->basel-1,pSource->basec,pSource->nc+pSource->basec-1);
 
   else if ((rc=MATRIX_Allocate(pTarget,pSource->nl,pSource->nc,pSource->basel,pSource->basec,
            (pSource->deriv2!=NULL)?1:0,callingFunction))==ERROR_ID_NO)
 
    {
-       // Make a copy of the input matrix into the new allocated one
+    // Make a copy of the input matrix into the new allocated one
 
     for (indexC=pSource->basec;indexC<pSource->basec+pSource->nc;indexC++)
      memcpy(pTarget->matrix[indexC]+pSource->basel,pSource->matrix[indexC]+pSource->basel,sizeof(double)*pSource->nl);
