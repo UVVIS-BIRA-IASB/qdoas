@@ -1201,12 +1201,12 @@ static RC OMI_LoadReference(int spectralType, const char *refFile, struct omi_re
   if (rc)
     goto cleanup2;
 
-  int16 *temp_Mantissa= (int16 *)malloc(dims[0]*dims[1]*dims[2]*sizeof(*temp_Mantissa));
-  int16 *temp_PrecisionMantissa= (int16 *)malloc(dims[0]*dims[1]*dims[2]*sizeof(*temp_PrecisionMantissa));
-  int8_t *temp_Exponent= (int8 *)malloc(dims[0]*dims[1]*dims[2]*sizeof(*temp_Exponent));
-  unsigned short *temp_pixelq= (unsigned short *)malloc(dims[0]*dims[1]*dims[2]*sizeof(*temp_pixelq));
-  float *temp_wave= (float *)malloc(dims[0]*dims[1]*OMI_NUM_COEFFICIENTS*sizeof(*temp_wave));
-  int16_t *refcol= (int16 *)malloc(dims[0]*sizeof(*refcol));
+  int16 *temp_Mantissa= malloc(dims[0]*dims[1]*dims[2]*sizeof(*temp_Mantissa));
+  int16 *temp_PrecisionMantissa= malloc(dims[0]*dims[1]*dims[2]*sizeof(*temp_PrecisionMantissa));
+  int8_t *temp_Exponent= malloc(dims[0]*dims[1]*dims[2]*sizeof(*temp_Exponent));
+  unsigned short *temp_pixelq= malloc(dims[0]*dims[1]*dims[2]*sizeof(*temp_pixelq));
+  float *temp_wave= malloc(dims[0]*dims[1]*OMI_NUM_COEFFICIENTS*sizeof(*temp_wave));
+  int16_t *refcol= malloc(dims[0]*sizeof(*refcol));
   rc = coda_cursor_read_int16_array(&cursor,temp_Mantissa,coda_array_ordering_c);
   if (rc)
     goto cleanup1;
