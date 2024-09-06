@@ -40,13 +40,13 @@ const QString& CPlotPageData::tag(void) const
 
 int CPlotPageData::type(void) const
 {
-      return m_pageType;
+  return m_pageType;
 }
 
 shared_ptr<const CPlotDataSet> CPlotPageData::dataSet(int index) const
 {
   if (index < 0 || index > m_dataSets.size())
-    shared_ptr<const CPlotDataSet>();
+    return shared_ptr<const CPlotDataSet>();
 
   return m_dataSets.at(index);
 }
@@ -54,7 +54,7 @@ shared_ptr<const CPlotDataSet> CPlotPageData::dataSet(int index) const
 shared_ptr<const CPlotImage> CPlotPageData::dataImage(int index) const
 {
   if (index < 0 || index > m_dataImages.size())
-    shared_ptr<const CPlotImage>();
+    return shared_ptr<const CPlotImage>();
 
   return m_dataImages.at(index);
 }
