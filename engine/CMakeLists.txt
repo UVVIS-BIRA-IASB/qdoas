@@ -133,7 +133,3 @@ endif (HDF4_MFHDF)
 
 target_compile_features(engine PUBLIC cxx_std_17)
 set_property(TARGET engine PROPERTY C_STANDARD 99)
-
-if(APPLE)
-  add_compile_definitions(_LIBCPP_DISABLE_AVAILABILITY)
-endif()
