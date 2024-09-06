@@ -1,8 +1,7 @@
 #ifndef OMIV4_READ_H
 #define OMIV4_READ_H
 
-typedef struct mediate_analysis_window mediate_analysis_window_t;
-
+#include "mediate_analysis_window.h"
 #include "doas.h"
 
 void OMIV4_cleanup();
