@@ -13,8 +13,8 @@ CPlotProperties::CPlotProperties() :
   m_scales(3),
   m_bgColour(Qt::white),
   m_columns(1),
-  m_printPaperSize(QPrinter::A4),
-  m_printPaperOrientation(QPrinter::Portrait)
+  m_printPaperSize(QPageSize::A4),
+  m_printPaperOrientation(QPageLayout::Portrait)
 {
   // a pen for each of the 4 curves
   m_pens.push_back(m_defaultPen);

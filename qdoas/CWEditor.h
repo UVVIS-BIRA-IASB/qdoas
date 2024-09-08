@@ -9,13 +9,14 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 #include <QFrame>
 #include <QString>
+#include <QTextStream>
 
 class CWEditor : public QFrame
 {
 Q_OBJECT
  public:
   CWEditor(QWidget *parent = 0) : QFrame(parent), m_captionStr("No Title"), m_lastNotification(false) {
-    m_contextTag.sprintf("%p", this); // unique by default
+    QTextStream(&m_contextTag) << this;
   };
 
   const QString& editCaption(void) const { return m_captionStr; };

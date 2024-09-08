@@ -665,7 +665,7 @@ void CWMain::slotConvolutionTool()
   QString name = "convolution";
 
   qputenv("PATH", QCoreApplication::applicationDirPath().toUtf8());
-  if (!QProcess::startDetached(name)) {
+  if (!QProcess::startDetached(name, {})) {
     QString msg = "Failed to start convolution tool.\n(";
     msg += name;
     msg += " )";
@@ -678,7 +678,7 @@ void CWMain::slotRingTool()
   QString name = "ring";
 
   qputenv("PATH", QCoreApplication::applicationDirPath().toUtf8());
-  if (!QProcess::startDetached(name)) {
+  if (!QProcess::startDetached(name, {})) {
     QString msg = "Failed to start ring tool.\n(";
     msg += name;
     msg += " )";
@@ -691,7 +691,7 @@ void CWMain::slotUndersamplingTool()
   QString name = "usamp";
 
   qputenv("PATH", QCoreApplication::applicationDirPath().toUtf8());
-  if (!QProcess::startDetached(name)) {
+  if (!QProcess::startDetached(name, {})) {
     QString msg = "Failed to start undersampling tool.\n( ";
     msg += name;
     msg += " )";

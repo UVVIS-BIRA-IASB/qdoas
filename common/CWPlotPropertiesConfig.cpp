@@ -166,8 +166,8 @@ void CWPlotPropertiesConfig::loadFromPreferences(CPlotProperties &prop)
   prop.setBackgroundColour(pref->plotColour("Background", colour));
 
   prop.setColumns(pref->plotLayout("Columns", 1));
-  prop.setPrintPaperSize(QPrinter::PageSize(pref->plotLayout("PaperSize", 0)));
-  prop.setPrintPaperOrientation(QPrinter::Orientation(pref->plotLayout("PaperOrientation", 0)));
+  prop.setPrintPaperSize(static_cast<QPageSize::PageSizeId>(pref->plotLayout("PaperSize", 7)));
+  prop.setPrintPaperOrientation(QPageLayout::Orientation(pref->plotLayout("PaperOrientation", 0)));
 }
 
 
@@ -187,7 +187,7 @@ void CWPlotPropertiesConfig::saveToPreferences(const CPlotProperties &prop)
   pref->setPlotColour("Background", prop.backgroundColour());
 
   pref->setPlotLayout("Columns", prop.columns());
-  pref->setPlotLayout("PaperSize", prop.printPaperSize());
+  pref->setPlotLayout("PaperSize", static_cast<int>(prop.printPaperSize()));
   pref->setPlotLayout("PaperOrientation", prop.printPaperOrientation());
 
 }

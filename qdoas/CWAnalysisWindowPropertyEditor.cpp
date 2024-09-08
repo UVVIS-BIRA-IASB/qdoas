@@ -237,7 +237,7 @@ CWAnalysisWindowPropertyEditor::CWAnalysisWindowPropertyEditor(const QString &pr
   m_szaCenterEdit->setValidator(new CDoubleFixedFmtValidator(0.0, 180.0, 1, m_szaCenterEdit));
   m_szaCenterEdit->setAlignment(Qt::AlignRight);
   m_szaDeltaEdit = new QLineEdit(m_refTwoSzaFrame);
-  const int sza_width = m_szaCenterEdit->fontMetrics().width("0090.0");
+  const int sza_width = m_szaCenterEdit->fontMetrics().horizontalAdvance("0090.0");
   m_szaCenterEdit->setFixedWidth(sza_width);
   m_szaDeltaEdit->setFixedWidth(sza_width);
   m_szaDeltaEdit->setValidator(new CDoubleFixedFmtValidator(0.0, 180.0, 1, m_szaDeltaEdit));
@@ -260,7 +260,7 @@ CWAnalysisWindowPropertyEditor::CWAnalysisWindowPropertyEditor(const QString &pr
   m_refTwoLonMinEdit = new QLineEdit(m_satelliteFrame);
   m_refTwoLonMinEdit->setValidator(new CDoubleFixedFmtValidator(-180, 360.0, 1, m_refTwoLonMinEdit));
   m_refTwoLonMinEdit->setAlignment(Qt::AlignRight);
-  const int lon_width = m_refTwoLonMinEdit->fontMetrics().width("-00360.0");
+  const int lon_width = m_refTwoLonMinEdit->fontMetrics().horizontalAdvance("-00360.0");
   m_refTwoLonMinEdit->setFixedWidth(lon_width);
   satelliteLayout->addWidget(m_refTwoLonMinEdit);
   m_refTwoLonMaxEdit = new QLineEdit(m_satelliteFrame);
@@ -271,7 +271,7 @@ CWAnalysisWindowPropertyEditor::CWAnalysisWindowPropertyEditor(const QString &pr
   // latitude (min/max)
   satelliteLayout->addWidget(new QLabel("Lat.", m_satelliteFrame));
   m_refTwoLatMinEdit = new QLineEdit(m_satelliteFrame);
-  const int lat_width = m_refTwoLatMinEdit->fontMetrics().width("0090.0");
+  const int lat_width = m_refTwoLatMinEdit->fontMetrics().horizontalAdvance("0090.0");
   m_refTwoLatMinEdit->setFixedWidth(lat_width);
   m_refTwoLatMinEdit->setValidator(new CDoubleFixedFmtValidator(-90.0, 90.0, 1, m_refTwoLatMinEdit));
   m_refTwoLatMinEdit->setAlignment(Qt::AlignRight);
@@ -284,7 +284,7 @@ CWAnalysisWindowPropertyEditor::CWAnalysisWindowPropertyEditor(const QString &pr
   // cloud fraction (min/max)
   satelliteLayout->addWidget(new QLabel("Cloud fraction", m_satelliteFrame));
   m_cloudFractionMinEdit = new QLineEdit(m_satelliteFrame);
-  const int cloud_frac_width = m_cloudFractionMinEdit->fontMetrics().width("001.0");
+  const int cloud_frac_width = m_cloudFractionMinEdit->fontMetrics().horizontalAdvance("001.0");
   m_cloudFractionMinEdit->setFixedWidth(cloud_frac_width);
   m_cloudFractionMinEdit->setValidator(new CDoubleFixedFmtValidator(0.0, 1.0, 1, m_cloudFractionMinEdit));
   m_cloudFractionMinEdit->setAlignment(Qt::AlignRight);

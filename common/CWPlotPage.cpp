@@ -416,22 +416,25 @@ void CWPlot::slotPrint()
 {
   QPrinter printer(QPrinter::HighResolution);
 
-  printer.setPageSize(m_plotProperties.printPaperSize());
-  printer.setOrientation(QPrinter::Landscape); // single plot ALWAYS defaults to landscape
-  printer.setNumCopies(1);
-  printer.setPageMargins(1,1,1,1, QPrinter::Inch);
+  QPageSize pageSize(m_plotProperties.printPaperSize());
+  if (!pageSize.isValid())
+    pageSize = QPageSize(QPageSize::A4);
+  printer.setPageSize(pageSize);
+  printer.setPageOrientation(QPageLayout::Landscape); // single plot ALWAYS defaults to landscape
+  printer.setCopyCount(1);
+  printer.setPageMargins(QMarginsF(1,1,1,1), QPageLayout::Inch);
 
   QPrintDialog dialog(&printer, this);
 
   if (dialog.exec() == QDialog::Accepted) {
 
     // store printer preference
-    m_plotProperties.setPrintPaperSize(printer.pageSize());
+    m_plotProperties.setPrintPaperSize(printer.pageLayout().pageSize().id());
 
     QPainter p(&printer);
     p.setPen(QPen(QColor(Qt::black)));
 
-    QRect page = printer.pageRect();
+    QRect page = printer.pageLayout().paintRectPixels(printer.resolution());
 
     const int cPageBorder = 150;
 
@@ -457,8 +460,7 @@ void CWPlot::slotExportAsImage()
   fileName="";
   filter += "PNG Documents (*.png)";
 
-  fileName = QFileDialog::getSaveFileName(this, "Export File Name", fileName,
-                                          filter.join(";;"), NULL, 0);
+  fileName = QFileDialog::getSaveFileName(this, "Export File Name", fileName, filter.join(";;"));
 
   if (!fileName.isEmpty() ) {
     QwtPlotRenderer renderer;
@@ -596,22 +598,25 @@ void CWPlotPage::slotPrintAllPlots()
 
   renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, false);
 
-  printer.setPageSize(m_plotProperties.printPaperSize());
-  printer.setOrientation(m_plotProperties.printPaperOrientation());
-  printer.setNumCopies(1);
+  QPageSize pageSize(m_plotProperties.printPaperSize());
+  if (!pageSize.isValid())
+    pageSize = QPageSize(QPageSize::A4);
+  printer.setPageSize(pageSize);
+  printer.setPageOrientation(m_plotProperties.printPaperOrientation());
+  printer.setCopyCount(1);
 
   QPrintDialog dialog(&printer, this);
 
   if (dialog.exec() == QDialog::Accepted) {
 
     // store print preferences
-    m_plotProperties.setPrintPaperSize(printer.pageSize());
-    m_plotProperties.setPrintPaperOrientation(printer.orientation());
+    m_plotProperties.setPrintPaperSize(printer.pageLayout().pageSize().id());
+    m_plotProperties.setPrintPaperOrientation(printer.pageLayout().orientation());
 
     QPainter p(&printer);
     p.setPen(QPen(QColor(Qt::black)));
 
-    QRect page = printer.pageRect();
+    QRect page = printer.pageLayout().paintRectPixels(printer.resolution());
 
     // configure the plot rectangle
     const int cPageBorder = 150; // offset inside the drawable region of the page.

@@ -6,6 +6,9 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <QTextStream>
+
 #include "CPlotPageData.h"
 
 using std::shared_ptr;
@@ -15,7 +18,7 @@ CPlotPageData::CPlotPageData(int pageNumber,int pageType) :
   m_pageType(pageType)
 {
   // default tag
-  m_tag.sprintf("Tag-%d", pageNumber);
+  QTextStream(&m_tag) << "Tag-" << pageNumber;
 }
 
 int CPlotPageData::pageNumber(void) const

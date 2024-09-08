@@ -33,7 +33,7 @@ QWidget* CNavigationPanel::helperBuildRecordEdit(void)
 
   QFontMetrics fm(m_recordEdit->font());
 
-  m_recordEdit->setFixedWidth(fm.width("00000000000"));
+  m_recordEdit->setFixedWidth(fm.horizontalAdvance("00000000000"));
   m_recordEdit->setToolTip("Goto record");
 
   QFrame *frame = new QFrame;
@@ -52,7 +52,7 @@ QWidget* CNavigationPanel::helperBuildDelayEdit(void)
 
   QFontMetrics fm(m_delayEdit->font());
 
-  m_delayEdit->setFixedWidth(fm.width("0000000")); // XX.XXX seconds [0,60]
+  m_delayEdit->setFixedWidth(fm.horizontalAdvance("0000000")); // XX.XXX seconds [0,60]
   m_delayEdit->setToolTip("Play time delay (s)");
   m_delayEdit->setValidator(new CDoubleFixedFmtValidator(0.0, 60.0, 3, m_delayEdit));
   m_delayEdit->setText("0.000");

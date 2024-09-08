@@ -38,7 +38,7 @@ CWProjectTabSelection::CWProjectTabSelection(const mediate_project_selection_t *
   QGroupBox *szaGroup = new QGroupBox("SZA", this);
   QGridLayout *szaGroupLayout = new QGridLayout;
 
-  pixels = fm.width("00000000");
+  pixels = fm.horizontalAdvance("00000000");
   szaGroupLayout->addWidget(new QLabel("Min", this), 0, 0);
   m_szaMinEdit = new QLineEdit(this);
   m_szaMinEdit->setFixedWidth(pixels);
@@ -71,7 +71,7 @@ CWProjectTabSelection::CWProjectTabSelection(const mediate_project_selection_t *
   QGroupBox *recordGroup = new QGroupBox("Spectra No. Range", this);
   QGridLayout *recordGroupLayout = new QGridLayout;
 
-  pixels = fm.width("00000000");
+  pixels = fm.horizontalAdvance("00000000");
   recordGroupLayout->addWidget(new QLabel("Min", this), 0, 0);
   m_recordMinEdit = new QLineEdit(this);
   m_recordMinEdit->setFixedWidth(pixels);
@@ -144,7 +144,7 @@ CWProjectTabSelection::CWProjectTabSelection(const mediate_project_selection_t *
   m_refGroup = new QGroupBox("Elevation angle for reference selection (MAXDOAS)", this);
   QGridLayout *refGroupLayout = new QGridLayout;
 
-  pixels = fm.width("00000000");
+  pixels = fm.horizontalAdvance("00000000");
   refGroupLayout->addWidget(new QLabel("Elevation angle (deg)", this), 0, 0);
   m_refAngleEdit = new QLineEdit(this);
   m_refAngleEdit->setFixedWidth(pixels);
@@ -170,7 +170,7 @@ CWProjectTabSelection::CWProjectTabSelection(const mediate_project_selection_t *
   m_elevationGroup = new QGroupBox("Viewing Elevation angles (MAXDOAS)", this);
   QGridLayout *elevationGroupLayout = new QGridLayout;
 
-  pixels = fm.width("00000000");
+  pixels = fm.horizontalAdvance("00000000");
   elevationGroupLayout->addWidget(new QLabel("Min", this), 0, 0);
   m_elevationMinEdit = new QLineEdit(this);
   m_elevationMinEdit->setFixedWidth(pixels);
@@ -278,7 +278,7 @@ CWGeolocation::CWGeolocation(const struct geolocation *geo, QWidget *parent) :
 {
   // use font metrics to size the line edits
   QFontMetrics fm(font());
-  int pixels = fm.width("00000000"); // same for all lineedits
+  int pixels = fm.horizontalAdvance("00000000"); // same for all lineedits
 
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
 

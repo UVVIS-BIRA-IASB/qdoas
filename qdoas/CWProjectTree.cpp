@@ -584,7 +584,7 @@ QString CWProjectTree::editInsertDirectory(QTreeWidgetItem *parent, const QStrin
     if (!fileFilters.isEmpty()) {
       if (fileFilters.contains(';')) {
     // split on ';' - NOTE whitespace is significant
-    filters = fileFilters.split(';', QString::SkipEmptyParts);
+    filters = fileFilters.split(';', Qt::SkipEmptyParts);
       }
       else {
     // split on whitespace
@@ -639,7 +639,7 @@ QString CWProjectTree::editChangeDirectoryProperties(QTreeWidgetItem *item,
     if (!fileFilters.isEmpty()) {
       if (fileFilters.contains(';')) {
     // split on ';' - NOTE whitespace is significant
-    filters = fileFilters.split(';', QString::SkipEmptyParts);
+    filters = fileFilters.split(';', Qt::SkipEmptyParts);
       }
       else {
     // split on whitespace
