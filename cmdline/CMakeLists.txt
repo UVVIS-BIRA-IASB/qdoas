@@ -19,7 +19,7 @@ add_executable(doas_cl
 target_compile_features(doas_cl PUBLIC cxx_std_11)
 target_link_libraries(doas_cl
   common engine mediate 
-  Qt5::Core Qt5::Xml
+  Qt::Core Qt::Xml
   )
 target_include_directories(doas_cl PRIVATE ../qdoas ../convolution ../usamp ../ring)
 
