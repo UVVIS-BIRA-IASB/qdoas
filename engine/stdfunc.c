@@ -361,7 +361,7 @@ char *STD_StrRep(char *n,char oldchar,char newchar)
 //                   -1 : does not exist, error, or something like that
 // -----------------------------------------------------------------------------
 
-int STD_IsDir(char *filename)
+int STD_IsDir(const char *filename)
  {
   struct stat fileinfo;
   int rc;

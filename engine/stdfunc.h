@@ -20,7 +20,7 @@ char       *STD_Strupr(char *n);
 char       *STD_Strlwr(char *n);
 char       *STD_StrRep(char *n,char oldchar,char newchar);
 
-int         STD_IsDir(char *filename);
+int         STD_IsDir(const char *filename);
 
 #if defined(_cplusplus) || defined(__cplusplus)
 }
