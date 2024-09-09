@@ -49,11 +49,6 @@ class CConfigHandler : public QXmlDefaultHandler
   CConfigHandler();
   virtual ~CConfigHandler();
 
-  // error handling
-  virtual bool error(const QXmlParseException &exception);
-  virtual bool warning(const QXmlParseException &exception);
-  virtual bool fatalError(const QXmlParseException &exception);
-
   // content handling
   virtual bool characters(const QString &ch);
   virtual bool endDocument();

@@ -27,30 +27,6 @@ CConfigHandler::~CConfigHandler()
   }
 }
 
-bool CConfigHandler::error(const QXmlParseException &exception)
-{
-  QTextStream stream(&m_errorMessages);
-  stream << "Error on line " << exception.lineNumber() << " : " << exception.message() << "\n";
-
-  return true;
-}
-
-bool CConfigHandler::warning(const QXmlParseException &exception)
-{
-  QTextStream stream(&m_errorMessages);
-  stream << "Warning on line " << exception.lineNumber() << " : " << exception.message() << "\n";
-
-  return true;
-}
-
-bool CConfigHandler::fatalError(const QXmlParseException &exception)
-{
-  QTextStream stream(&m_errorMessages);
-  stream << "Fatal Error on line " << exception.lineNumber() << " : " << exception.message() << "\n";
-
-  return false;
-}
-
 QString CConfigHandler::messages(void) const
 {
   return m_errorMessages;
