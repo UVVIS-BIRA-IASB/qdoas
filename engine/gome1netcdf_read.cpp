@@ -290,7 +290,7 @@ namespace
 
   typedef struct _gome1netCDF_orbitFiles
   {
-    char fileName[MAX_STR_LEN+1];                                               //!< \details the name of the file with a part of the orbit
+    string fileName;                                                            //!< \details the name of the file with a part of the orbit
     NetCDFFile current_file;                                                    //!< \details Pointer to the current netCDF file
     GOME1NETCDF_REF *refInfo[4];                                                //!< \details the minimum information useful for automatic reference selection
     string root_name;                                                           //!< \details The name of the root (should be the basename of the file)
@@ -704,7 +704,7 @@ RC GOME1NETCDF_Set(ENGINE_CONTEXT *pEngineContext)
    {
     int indexFile = 0;
     for (;indexFile<gome1netCDF_orbitFilesN;indexFile++)
-      if (!strcasecmp(pEngineContext->fileInfo.fileName,gome1netCDF_orbitFiles[indexFile].fileName) )
+      if (gome1netCDF_orbitFiles[indexFile].fileName == pEngineContext->fileInfo.fileName)
         break;
 
     if (indexFile<gome1netCDF_orbitFilesN)
@@ -735,8 +735,8 @@ RC GOME1NETCDF_Set(ENGINE_CONTEXT *pEngineContext)
       struct dirent *fileInfo = NULL;
       while (hDir!=NULL && ((fileInfo=readdir(hDir))!=NULL) )
        {
-        sprintf(gome1netCDF_orbitFiles[gome1netCDF_orbitFilesN].fileName,"%s/%s",filePath,fileInfo->d_name);
-        if (!STD_IsDir(gome1netCDF_orbitFiles[gome1netCDF_orbitFilesN].fileName))
+        gome1netCDF_orbitFiles[gome1netCDF_orbitFilesN].fileName = string(filePath) + "/" + fileInfo->d_name;
+        if (!STD_IsDir(gome1netCDF_orbitFiles[gome1netCDF_orbitFilesN].fileName.c_str()))
           ++gome1netCDF_orbitFilesN;
        }
 
@@ -747,7 +747,7 @@ RC GOME1NETCDF_Set(ENGINE_CONTEXT *pEngineContext)
     if (!gome1netCDF_orbitFilesN)
      {
       gome1netCDF_orbitFilesN=1;
-      strcpy(gome1netCDF_orbitFiles[0].fileName,pEngineContext->fileInfo.fileName);
+      gome1netCDF_orbitFiles[0].fileName = pEngineContext->fileInfo.fileName;
      }
 
     // Load files
@@ -1011,7 +1011,7 @@ RC GOME1NETCDF_Set(ENGINE_CONTEXT *pEngineContext)
       if (iscan_bs!=NULL)
        free(iscan_bs);
 
-      if (!strcasecmp(pEngineContext->fileInfo.fileName,pOrbitFile->fileName))
+      if (pOrbitFile->fileName == pEngineContext->fileInfo.fileName)
        gome1netCDF_currentFileIndex=indexFile;
 
       gome1netCDF_totalRecordNumber+=pOrbitFile->specNumber;

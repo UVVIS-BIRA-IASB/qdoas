@@ -104,7 +104,7 @@ RC netcdf_save_convolution(void *engineContext)
   PRJCT_FILTER *pLFilter,*pHFilter;
   INDEX slitType;
   int id;
-  char new_filename[DOAS_MAX_PATH_LEN+1],error_message[DOAS_MAX_PATH_LEN+1];
+  char new_filename[DOAS_MAX_PATH_LEN+1];
   FILE *fp;
   
   strcpy(new_filename,pEngineContext->path);
@@ -113,8 +113,8 @@ RC netcdf_save_convolution(void *engineContext)
   if ((fp=fopen(new_filename,"rb"))!=NULL)
    {
     fclose(fp);
-    sprintf(error_message,"%s already exists",new_filename);
-    return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, error_message);
+    string error_message(string(new_filename) + " already exists.");
+    return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, error_message.c_str());
    }
   
   pLFilter=(PRJCT_FILTER *)&pEngineContext->lfilter;
@@ -344,7 +344,7 @@ RC netcdf_save_ring(void *engineContext)
   INDEX slitType;
   int id;
   
-  char new_filename[DOAS_MAX_PATH_LEN+1],error_message[DOAS_MAX_PATH_LEN+1];
+  char new_filename[DOAS_MAX_PATH_LEN+1];
   FILE *fp;
   
   strcpy(new_filename,pEngineContext->path);
@@ -353,8 +353,8 @@ RC netcdf_save_ring(void *engineContext)
   if ((fp=fopen(new_filename,"rb"))!=NULL)
    {
     fclose(fp);
-    sprintf(error_message,"%s already exists",new_filename);
-    return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, error_message);
+    string error_message(string(new_filename) + " already exists.");
+    return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, error_message.c_str());
    }
   
   try {

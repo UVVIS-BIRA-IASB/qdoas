@@ -779,15 +779,16 @@ RC netcdf_open_calib(const ENGINE_CONTEXT *pEngineContext, const char *filename,
   
   FILE *fp;
   
-  char new_filename[DOAS_MAX_PATH_LEN+1],error_message[DOAS_MAX_PATH_LEN+1];
+  char new_filename[DOAS_MAX_PATH_LEN+1];
   strcpy(new_filename,filename);
   FILES_BuildFileName(new_filename,filename,FILE_TYPE_NETCDF);
   
   if ((fp=fopen(new_filename,"rb"))!=NULL)
    {
     fclose(fp);
-    sprintf(error_message,"%s already exists",new_filename);
-    return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, error_message);
+    string error_message(string(new_filename) + " already exists");
+    //sprintf(error_message,"%s already exists",new_filename);
+    return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, error_message.c_str());
    }
   
   try {
