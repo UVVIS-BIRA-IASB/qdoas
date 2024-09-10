@@ -35,7 +35,7 @@ static NetCDFFile radiance_file;
 static size_t n_wve;       // number of wavelengths
 static size_t n_rows;      // number of rows, cross-track
 static size_t n_images;    // number of images, along-track
-static bool   wve_reordering_flag;   
+static bool   wve_reordering_flag;
 static int    loadReferenceFlag=0; // if ((THRD_id==THREAD_TYPE_ANALYSIS) && pEngineContext->analysisRef.refAuto)
                                    // N/A here because files of the current orbit are not pre-loaded
 
@@ -109,9 +109,11 @@ static void read_data_fields(NetCDFFile& orbit_file) //,bool *use_row,INDEX *use
     {"terrain_height", radiance_file_data.alt}
   };
 
-  const size_t start[] = {0, 0},start_t[]={0};
-  const size_t count[] = {n_images,n_rows},count_t[]={n_images};
-   
+  const size_t start[] = {0, 0};
+  const size_t count[] = {wve_reordering_flag ? n_images : n_rows, wve_reordering_flag ? n_rows: n_images};
+  const size_t start_t[]= {0};
+  const size_t count_t[] = {n_images};
+
   for (auto& f: ffields1) {
     if (orbit_file.hasVar(f.first)) {
        f.second.resize(n_images);
