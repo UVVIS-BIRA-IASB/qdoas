@@ -25,10 +25,13 @@ add_definitions(-DAPP_CONV)
 target_compile_features(convolution PUBLIC cxx_std_11)
 target_link_libraries(convolution
   common mediate engine
-  Qt::Widgets Qt::PrintSupport Qt::Xml
+  Qt::Widgets Qt::PrintSupport
   ${QWT_LIBRARY}
   )
 target_include_directories(convolution PRIVATE ${QWT_INCLUDE_DIR})
+
+target_link_libraries(convolution ${LIBXMLXX_LIBRARIES})
+target_include_directories(convolution PRIVATE ${LIBXMLXX_INCLUDE_DIRS})
 
 if(APPLE)
   install(TARGETS convolution DESTINATION qdoas.app/Contents/MacOS)

@@ -100,6 +100,12 @@ if(netCDF_FOUND EQUAL 0)
 endif()
 set(netCDF_INCLUDE_DIR  "${netCDF_INCLUDE_DIRS}")
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(LIBXMLXX IMPORTED_TARGET libxml++-4.0)
+if(NOT LIBXMLXX_FOUND)
+  pkg_check_modules(LIBXMLXX REQUIRED IMPORTED_TARGET libxml++-2.6)
+endif()
+
 
 add_definitions(-DQDOAS_VERSION="${QDOAS_VERSION}" -DQDOAS_DATE="${QDOAS_DATE}")
 

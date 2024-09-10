@@ -8,6 +8,8 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #ifndef _CCONVCONFIGHANDLER_H_GUARD
 #define _CCONVCONFIGHANDLER_H_GUARD
 
+#include <libxml++/libxml++.h>
+
 #include <QXmlDefaultHandler>
 #include <QString>
 
@@ -23,11 +25,11 @@ class CConvConfigHandler : public CConfigHandler
   CConvConfigHandler();
   virtual ~CConvConfigHandler();
 
-  virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                const QString &qName, const QXmlAttributes &atts);
-
   const mediate_convolution_t* properties(void) const;
 
+protected:
+  virtual void start_subhandler(const Glib::ustring& name,
+                                const std::map<Glib::ustring, QString>& attributes) override;
  private:
   mediate_convolution_t m_properties;
 };
@@ -41,7 +43,7 @@ class CConvGeneralSubHandler : public CConfigSubHandler
  public:
   CConvGeneralSubHandler(CConfigHandler *master, mediate_conv_general_t *d);
 
-  virtual bool start(const QXmlAttributes &atts);
+  virtual void start(const std::map<Glib::ustring, QString>& attributes) override;
 
  private:
   mediate_conv_general_t *m_d;
@@ -54,7 +56,8 @@ class CConvSlitSubHandler : public CConfigSubHandler
  public:
   CConvSlitSubHandler(CConfigHandler *master, mediate_slit_function_t *d);
 
-  virtual bool start(const QString &element, const QXmlAttributes &atts);
+  virtual void start(const Glib::ustring& name,
+                     const std::map<Glib::ustring, QString>& attributes) override;
 
  private:
   mediate_slit_function_t *m_d;
