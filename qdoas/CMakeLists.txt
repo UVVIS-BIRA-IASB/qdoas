@@ -109,6 +109,9 @@ target_link_libraries(qdoas
 )
 target_include_directories(qdoas PRIVATE ${QWT_INCLUDE_DIR})
 
+target_link_libraries(qdoas ${LIBXMLXX_LIBRARIES})
+target_include_directories(qdoas PRIVATE ${LIBXMLXX_INCLUDE_DIRS})
+
 set_target_properties(qdoas PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/resources/qdoas.plist)
 set_source_files_properties(../resources/qdoas.icns PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 

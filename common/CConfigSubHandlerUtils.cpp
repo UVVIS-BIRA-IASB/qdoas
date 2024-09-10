@@ -5,6 +5,8 @@
 
 #include "debugutil.h"
 
+using std::map;
+
 //------------------------------------------------------------------------
 // handler for <lowpass_filter> and <highpass_filter>
 
@@ -15,11 +17,11 @@ CFilteringSubHandler::CFilteringSubHandler(CConfigHandler *master,
 {
 }
 
-bool CFilteringSubHandler::start(const QXmlAttributes &atts)
+void CFilteringSubHandler::start(const map<Glib::ustring, QString>& atts)
 {
   // selected filter
 
-  QString str = atts.value("selected");
+  QString str = atts.at("selected");
 
   if (str == "none")
     m_filter->mode = PRJCT_FILTER_TYPE_NONE;
@@ -38,68 +40,64 @@ bool CFilteringSubHandler::start(const QXmlAttributes &atts)
   else if (str == "binomial")
     m_filter->mode = PRJCT_FILTER_TYPE_BINOMIAL;
   else
-    return postErrorMessage("Invalid filter method");
-
-  return true;
+    throw std::runtime_error("Invalid filter method");
 }
 
-bool CFilteringSubHandler::start(const QString &element, const QXmlAttributes &atts)
+void CFilteringSubHandler::start(const Glib::ustring& element, const map<Glib::ustring, QString>& atts)
 {
   // sub element of lowpass_filter or highpass_filter
 
   if (element == "kaiser") {
 
-    m_filter->kaiser.cutoffFrequency = atts.value("cutoff").toDouble();
-    m_filter->kaiser.tolerance = atts.value("tolerance").toDouble();
-    m_filter->kaiser.passband = atts.value("passband").toDouble();
-    m_filter->kaiser.iterations = atts.value("iterations").toInt();
-    m_filter->kaiser.usage.calibrationFlag = (atts.value("cal") == "true") ? 1 : 0;
-    m_filter->kaiser.usage.fittingFlag = (atts.value("fit") == "true") ? 1 : 0;
-    m_filter->kaiser.usage.divide = (atts.value("div") == "true") ? 1 : 0;
+    m_filter->kaiser.cutoffFrequency = atts.at("cutoff").toDouble();
+    m_filter->kaiser.tolerance = atts.at("tolerance").toDouble();
+    m_filter->kaiser.passband = atts.at("passband").toDouble();
+    m_filter->kaiser.iterations = atts.at("iterations").toInt();
+    m_filter->kaiser.usage.calibrationFlag = (atts.at("cal") == "true") ? 1 : 0;
+    m_filter->kaiser.usage.fittingFlag = (atts.at("fit") == "true") ? 1 : 0;
+    m_filter->kaiser.usage.divide = (atts.at("div") == "true") ? 1 : 0;
   }
   else if (element == "boxcar") {
 
-    m_filter->boxcar.width = atts.value("width").toInt();
-    m_filter->boxcar.iterations = atts.value("iterations").toInt();
-    m_filter->boxcar.usage.calibrationFlag = (atts.value("cal") == "true") ? 1 : 0;
-    m_filter->boxcar.usage.fittingFlag = (atts.value("fit") == "true") ? 1 : 0;
-    m_filter->boxcar.usage.divide = (atts.value("div") == "true") ? 1 : 0;
+    m_filter->boxcar.width = atts.at("width").toInt();
+    m_filter->boxcar.iterations = atts.at("iterations").toInt();
+    m_filter->boxcar.usage.calibrationFlag = (atts.at("cal") == "true") ? 1 : 0;
+    m_filter->boxcar.usage.fittingFlag = (atts.at("fit") == "true") ? 1 : 0;
+    m_filter->boxcar.usage.divide = (atts.at("div") == "true") ? 1 : 0;
   }
   else if (element == "gaussian") {
 
-    m_filter->gaussian.fwhm = atts.value("fwhm").toDouble();
-    m_filter->gaussian.iterations = atts.value("iterations").toInt();
-    m_filter->gaussian.usage.calibrationFlag = (atts.value("cal") == "true") ? 1 : 0;
-    m_filter->gaussian.usage.fittingFlag = (atts.value("fit") == "true") ? 1 : 0;
-    m_filter->gaussian.usage.divide = (atts.value("div") == "true") ? 1 : 0;
+    m_filter->gaussian.fwhm = atts.at("fwhm").toDouble();
+    m_filter->gaussian.iterations = atts.at("iterations").toInt();
+    m_filter->gaussian.usage.calibrationFlag = (atts.at("cal") == "true") ? 1 : 0;
+    m_filter->gaussian.usage.fittingFlag = (atts.at("fit") == "true") ? 1 : 0;
+    m_filter->gaussian.usage.divide = (atts.at("div") == "true") ? 1 : 0;
   }
   else if (element == "triangular") {
 
-    m_filter->triangular.width = atts.value("width").toInt();
-    m_filter->triangular.iterations = atts.value("iterations").toInt();
-    m_filter->triangular.usage.calibrationFlag = (atts.value("cal") == "true") ? 1 : 0;
-    m_filter->triangular.usage.fittingFlag = (atts.value("fit") == "true") ? 1 : 0;
-    m_filter->triangular.usage.divide = (atts.value("div") == "true") ? 1 : 0;
+    m_filter->triangular.width = atts.at("width").toInt();
+    m_filter->triangular.iterations = atts.at("iterations").toInt();
+    m_filter->triangular.usage.calibrationFlag = (atts.at("cal") == "true") ? 1 : 0;
+    m_filter->triangular.usage.fittingFlag = (atts.at("fit") == "true") ? 1 : 0;
+    m_filter->triangular.usage.divide = (atts.at("div") == "true") ? 1 : 0;
   }
   else if (element == "savitzky_golay") {
 
-    m_filter->savitzky.width = atts.value("width").toInt();
-    m_filter->savitzky.order = atts.value("order").toInt();
-    m_filter->savitzky.iterations = atts.value("iterations").toInt();
-    m_filter->savitzky.usage.calibrationFlag = (atts.value("cal") == "true") ? 1 : 0;
-    m_filter->savitzky.usage.fittingFlag = (atts.value("fit") == "true") ? 1 : 0;
-    m_filter->savitzky.usage.divide = (atts.value("div") == "true") ? 1 : 0;
+    m_filter->savitzky.width = atts.at("width").toInt();
+    m_filter->savitzky.order = atts.at("order").toInt();
+    m_filter->savitzky.iterations = atts.at("iterations").toInt();
+    m_filter->savitzky.usage.calibrationFlag = (atts.at("cal") == "true") ? 1 : 0;
+    m_filter->savitzky.usage.fittingFlag = (atts.at("fit") == "true") ? 1 : 0;
+    m_filter->savitzky.usage.divide = (atts.at("div") == "true") ? 1 : 0;
   }
   else if (element == "binomial") {
 
-    m_filter->binomial.width = atts.value("width").toInt();
-    m_filter->binomial.iterations = atts.value("iterations").toInt();
-    m_filter->binomial.usage.calibrationFlag = (atts.value("cal") == "true") ? 1 : 0;
-    m_filter->binomial.usage.fittingFlag = (atts.value("fit") == "true") ? 1 : 0;
-    m_filter->binomial.usage.divide = (atts.value("div") == "true") ? 1 : 0;
+    m_filter->binomial.width = atts.at("width").toInt();
+    m_filter->binomial.iterations = atts.at("iterations").toInt();
+    m_filter->binomial.usage.calibrationFlag = (atts.at("cal") == "true") ? 1 : 0;
+    m_filter->binomial.usage.fittingFlag = (atts.at("fit") == "true") ? 1 : 0;
+    m_filter->binomial.usage.divide = (atts.at("div") == "true") ? 1 : 0;
   }
-
-  return true;
 }
 
 //------------------------------------------------------------------------
@@ -112,9 +110,9 @@ CSlitFunctionSubHandler::CSlitFunctionSubHandler(CConfigHandler *master,
 {
 }
 
-bool CSlitFunctionSubHandler::start(const QXmlAttributes &atts)
+void CSlitFunctionSubHandler::start(const map<Glib::ustring, QString>& atts)
 {
-  QString str = atts.value("type");
+  QString str = atts.at("type");
 
   if (str == "none")
     m_function->type = SLIT_TYPE_NONE;
@@ -143,26 +141,25 @@ bool CSlitFunctionSubHandler::start(const QXmlAttributes &atts)
   else if (str == "errorfile")
     m_function->type = SLIT_TYPE_ERF;
   else
-    return postErrorMessage("Invalid slit type");
+    throw std::runtime_error("Invalid slit type");
 
-  return true;
 }
 
-bool CSlitFunctionSubHandler::start(const QString &element, const QXmlAttributes &atts)
+void CSlitFunctionSubHandler::start(const Glib::ustring& element, const map<Glib::ustring, QString>& atts)
 {
   if (element == "file") {
 
-    QString str = atts.value("file");
-    QString str2 = atts.value("file2");
+    QString str = atts.at("file");
+    QString str2 = atts.at("file2");
 
-    m_function->file.wveDptFlag=(atts.value("wveDptFlag") == "true") ? 1 : 0;
+    m_function->file.wveDptFlag=(atts.at("wveDptFlag") == "true") ? 1 : 0;
 
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_function->file.filename))
     strcpy(m_function->file.filename, str.toLatin1().data());
       else
-    return postErrorMessage("Slit Function Filename too long");
+    throw std::runtime_error("Slit Function Filename too long");
     }
 
     if (!str2.isEmpty())
@@ -171,17 +168,17 @@ bool CSlitFunctionSubHandler::start(const QString &element, const QXmlAttributes
       if (str2.length() < (int)sizeof(m_function->file.filename2))
           strcpy(m_function->file.filename2, str2.toLatin1().data());
       else
-          return postErrorMessage("Slit Function Filename too long");
+          throw std::runtime_error("Slit Function Filename too long");
         }
        else
         strcpy(m_function->file.filename2 ,"\0");
   }
   else if (element == "gaussian") {
 
-       QString str = atts.value("file");
+    QString str = atts.at("file");
 
-    m_function->gaussian.fwhm = atts.value("fwhm").toDouble();
-    m_function->gaussian.wveDptFlag=(atts.value("wveDptFlag") == "true") ? 1 : 0;
+    m_function->gaussian.fwhm = atts.at("fwhm").toDouble();
+    m_function->gaussian.wveDptFlag=(atts.at("wveDptFlag") == "true") ? 1 : 0;
 
    if (!str.isEmpty())
      {
@@ -189,46 +186,46 @@ bool CSlitFunctionSubHandler::start(const QString &element, const QXmlAttributes
       if (str.length() < (int)sizeof(m_function->gaussian.filename))
           strcpy(m_function->gaussian.filename, str.toLatin1().data());
       else
-          return postErrorMessage("Slit Function Filename too long");
+          throw std::runtime_error("Slit Function Filename too long");
         }
        else
         strcpy(m_function->gaussian.filename ,"\0");
   }
   else if (element == "lorentz") {
 
-    QString str = atts.value("file");
+    QString str = atts.at("file");
 
-    m_function->lorentz.width = atts.value("width").toDouble();
+    m_function->lorentz.width = atts.at("width").toDouble();
 
-    if (atts.value("order") != "") {
-      m_function->lorentz.order = atts.value("order").toInt();
+    if (atts.at("order") != "") {
+      m_function->lorentz.order = atts.at("order").toInt();
     } else { // in older versions, 2n-lorentz was specified by the value "2n"
-      m_function->lorentz.order = atts.value("degree").toInt() / 2;
+      m_function->lorentz.order = atts.at("degree").toInt() / 2;
     }
 
-    m_function->lorentz.wveDptFlag=(atts.value("wveDptFlag") == "true") ? 1 : 0;
+    m_function->lorentz.wveDptFlag=(atts.at("wveDptFlag") == "true") ? 1 : 0;
     if (!str.isEmpty())
      {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_function->lorentz.filename))
           strcpy(m_function->lorentz.filename, str.toLatin1().data());
       else
-          return postErrorMessage("Slit Function Filename too long");
+          throw std::runtime_error("Slit Function Filename too long");
         }
        else
         strcpy(m_function->lorentz.filename ,"\0");
   }
   else if (element == "voigt") {
 
-    QString str = atts.value("file");
-    QString str2 = atts.value("file2");
+    QString str = atts.at("file");
+    QString str2 = atts.at("file2");
 
-    m_function->voigt.fwhmL = atts.value("fwhmleft").toDouble();
-    m_function->voigt.fwhmR = atts.value("fwhmright").toDouble();
-    m_function->voigt.glRatioL = atts.value("glrleft").toDouble();
-    m_function->voigt.glRatioR = atts.value("glrright").toDouble();
+    m_function->voigt.fwhmL = atts.at("fwhmleft").toDouble();
+    m_function->voigt.fwhmR = atts.at("fwhmright").toDouble();
+    m_function->voigt.glRatioL = atts.at("glrleft").toDouble();
+    m_function->voigt.glRatioR = atts.at("glrright").toDouble();
 
-    m_function->voigt.wveDptFlag=(atts.value("wveDptFlag") == "true") ? 1 : 0;
+    m_function->voigt.wveDptFlag=(atts.at("wveDptFlag") == "true") ? 1 : 0;
 
     if (!str.isEmpty())
      {
@@ -236,7 +233,7 @@ bool CSlitFunctionSubHandler::start(const QString &element, const QXmlAttributes
       if (str.length() < (int)sizeof(m_function->voigt.filename))
           strcpy(m_function->voigt.filename, str.toLatin1().data());
       else
-          return postErrorMessage("Slit Function Filename too long");
+          throw std::runtime_error("Slit Function Filename too long");
         }
        else
         strcpy(m_function->voigt.filename ,"\0");
@@ -247,20 +244,20 @@ bool CSlitFunctionSubHandler::start(const QString &element, const QXmlAttributes
       if (str2.length() < (int)sizeof(m_function->voigt.filename2))
           strcpy(m_function->voigt.filename2, str2.toLatin1().data());
       else
-          return postErrorMessage("Slit Function Filename too long");
+          throw std::runtime_error("Slit Function Filename too long");
         }
        else
         strcpy(m_function->voigt.filename2 ,"\0");
   }
   else if (element == "error") {
 
-    QString str = atts.value("file");
-    QString str2 = atts.value("file2");
+    QString str = atts.at("file");
+    QString str2 = atts.at("file2");
 
-    m_function->error.fwhm = atts.value("fwhm").toDouble();
-    m_function->error.width = atts.value("width").toDouble();
+    m_function->error.fwhm = atts.at("fwhm").toDouble();
+    m_function->error.width = atts.at("width").toDouble();
 
-    m_function->error.wveDptFlag=(atts.value("wveDptFlag") == "true") ? 1 : 0;
+    m_function->error.wveDptFlag=(atts.at("wveDptFlag") == "true") ? 1 : 0;
 
     if (!str.isEmpty())
      {
@@ -268,7 +265,7 @@ bool CSlitFunctionSubHandler::start(const QString &element, const QXmlAttributes
       if (str.length() < (int)sizeof(m_function->error.filename))
           strcpy(m_function->error.filename, str.toLatin1().data());
       else
-          return postErrorMessage("Slit Function Filename too long");
+          throw std::runtime_error("Slit Function Filename too long");
         }
        else
         strcpy(m_function->error.filename ,"\0");
@@ -279,20 +276,20 @@ bool CSlitFunctionSubHandler::start(const QString &element, const QXmlAttributes
       if (str2.length() < (int)sizeof(m_function->error.filename2))
           strcpy(m_function->error.filename2, str2.toLatin1().data());
       else
-          return postErrorMessage("Slit Function Filename too long");
+          throw std::runtime_error("Slit Function Filename too long");
         }
        else
         strcpy(m_function->error.filename2,"\0");
   }
   else if (element == "agauss") {
 
-    QString str = atts.value("file");
-    QString str2 = atts.value("file2");
+    QString str = atts.at("file");
+    QString str2 = atts.at("file2");
 
-    m_function->agauss.fwhm = atts.value("fwhm").toDouble();
-    m_function->agauss.asym = atts.value("asym").toDouble();
+    m_function->agauss.fwhm = atts.at("fwhm").toDouble();
+    m_function->agauss.asym = atts.at("asym").toDouble();
 
-    m_function->agauss.wveDptFlag=(atts.value("wveDptFlag") == "true") ? 1 : 0;
+    m_function->agauss.wveDptFlag=(atts.at("wveDptFlag") == "true") ? 1 : 0;
 
     if (!str.isEmpty())
      {
@@ -300,7 +297,7 @@ bool CSlitFunctionSubHandler::start(const QString &element, const QXmlAttributes
       if (str.length() < (int)sizeof(m_function->agauss.filename))
           strcpy(m_function->agauss.filename, str.toLatin1().data());
       else
-          return postErrorMessage("Slit Function Filename too long");
+          throw std::runtime_error("Slit Function Filename too long");
         }
        else
         strcpy(m_function->agauss.filename ,"\0");
@@ -311,7 +308,7 @@ bool CSlitFunctionSubHandler::start(const QString &element, const QXmlAttributes
       if (str2.length() < (int)sizeof(m_function->agauss.filename2))
           strcpy(m_function->agauss.filename2, str2.toLatin1().data());
       else
-          return postErrorMessage("Slit Function Filename too long");
+          throw std::runtime_error("Slit Function Filename too long");
         }
        else
         strcpy(m_function->agauss.filename2 ,"\0");
@@ -319,15 +316,15 @@ bool CSlitFunctionSubHandler::start(const QString &element, const QXmlAttributes
 
   else if (element == "supergauss") {
 
-    QString str = atts.value("file");
-    QString str2 = atts.value("file2");
-    QString str3 = atts.value("file3");
+    QString str = atts.at("file");
+    QString str2 = atts.at("file2");
+    QString str3 = atts.at("file3");
 
-    m_function->supergauss.fwhm = atts.value("fwhm").toDouble();
-    m_function->supergauss.exponential = atts.value("expTerm").toDouble();
-    m_function->supergauss.asym = atts.value("asym").toDouble();
+    m_function->supergauss.fwhm = atts.at("fwhm").toDouble();
+    m_function->supergauss.exponential = atts.at("expTerm").toDouble();
+    m_function->supergauss.asym = atts.at("asym").toDouble();
 
-    m_function->supergauss.wveDptFlag=(atts.value("wveDptFlag") == "true") ? 1 : 0;
+    m_function->supergauss.wveDptFlag=(atts.at("wveDptFlag") == "true") ? 1 : 0;
 
     if (!str.isEmpty())
      {
@@ -335,7 +332,7 @@ bool CSlitFunctionSubHandler::start(const QString &element, const QXmlAttributes
       if (str.length() < (int)sizeof(m_function->supergauss.filename))
           strcpy(m_function->supergauss.filename, str.toLatin1().data());
       else
-          return postErrorMessage("Slit Function Filename (FWHM) too long");
+          throw std::runtime_error("Slit Function Filename (FWHM) too long");
         }
        else
         strcpy(m_function->supergauss.filename ,"\0");
@@ -346,7 +343,7 @@ bool CSlitFunctionSubHandler::start(const QString &element, const QXmlAttributes
       if (str2.length() < (int)sizeof(m_function->supergauss.filename2))
           strcpy(m_function->supergauss.filename2, str2.toLatin1().data());
       else
-          return postErrorMessage("Slit Function Filename (Exponential term) too long");
+          throw std::runtime_error("Slit Function Filename (Exponential term) too long");
         }
        else
         strcpy(m_function->supergauss.filename2 ,"\0");
@@ -357,24 +354,24 @@ bool CSlitFunctionSubHandler::start(const QString &element, const QXmlAttributes
       if (str3.length() < (int)sizeof(m_function->supergauss.filename3))
           strcpy(m_function->supergauss.filename3, str3.toLatin1().data());
       else
-          return postErrorMessage("Slit Function Filename (Asymmetry factor) too long");
+          throw std::runtime_error("Slit Function Filename (Asymmetry factor) too long");
         }
        else
         strcpy(m_function->supergauss.filename3 ,"\0");
   }
   else if (element == "boxcarapod") {
 
-    m_function->boxcarapod.resolution = atts.value("resolution").toDouble();
-    m_function->boxcarapod.phase = atts.value("phase").toDouble();
+    m_function->boxcarapod.resolution = atts.at("resolution").toDouble();
+    m_function->boxcarapod.phase = atts.at("phase").toDouble();
   }
   else if (element == "nbsapod") {
 
-    m_function->nbsapod.resolution = atts.value("resolution").toDouble();
-    m_function->nbsapod.phase = atts.value("phase").toDouble();
+    m_function->nbsapod.resolution = atts.at("resolution").toDouble();
+    m_function->nbsapod.phase = atts.at("phase").toDouble();
   }
   else if (element == "gaussianfile") {
 
-    QString str = atts.value("file");
+    QString str = atts.at("file");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_function->gaussian.filename))
@@ -383,12 +380,12 @@ bool CSlitFunctionSubHandler::start(const QString &element, const QXmlAttributes
            m_function->gaussian.wveDptFlag=1;
           }
       else
-    return postErrorMessage("Slit Function Filename too long");
+    throw std::runtime_error("Slit Function Filename too long");
     }
   }
   else if (element == "lorentzfile") {
 
-    QString str = atts.value("file");
+    QString str = atts.at("file");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_function->lorentz.filename))
@@ -398,18 +395,18 @@ bool CSlitFunctionSubHandler::start(const QString &element, const QXmlAttributes
           }
 
       else
-    return postErrorMessage("Slit Function Filename too long");
+    throw std::runtime_error("Slit Function Filename too long");
     }
 
-    if (atts.value("order") != "") {
-      m_function->lorentz.order = atts.value("order").toInt();
+    if (atts.at("order") != "") {
+      m_function->lorentz.order = atts.at("order").toInt();
     } else {
-      m_function->lorentz.order = atts.value("degree").toInt() / 2;
+      m_function->lorentz.order = atts.at("degree").toInt() / 2;
     }
   }
   else if (element == "errorfile") {
 
-    QString str = atts.value("file");
+    QString str = atts.at("file");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_function->error.filename))
@@ -418,21 +415,20 @@ bool CSlitFunctionSubHandler::start(const QString &element, const QXmlAttributes
            strcpy(m_function->error.filename, str.toLatin1().data());
           }
       else
-    return postErrorMessage("Slit Function Filename too long");
+    throw std::runtime_error("Slit Function Filename too long");
     }
 
-    QString str2 = atts.value("file2");
+    QString str2 = atts.at("file2");
     if (!str2.isEmpty()) {
       str2 = m_master->pathExpand(str2);
       if (str2.length() < (int)sizeof(m_function->error.filename2))
     strcpy(m_function->error.filename2, str2.toLatin1().data());
       else
-    return postErrorMessage("Slit Function Filename too long");
+    throw std::runtime_error("Slit Function Filename too long");
     }
    else
     strcpy(m_function->error.filename2, str.toLatin1().data());
   }
 
-  return true;
 }
 
