@@ -4,14 +4,16 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 */
 
+#include <map>
 
 #include "CConvConfigHandler.h"
+
 #include "CPathSubHandler.h"
 #include "CConfigSubHandlerUtils.h"
-
 #include "constants.h"
-
 #include "debugutil.h"
+
+using std::map;
 
 CConvConfigHandler::CConvConfigHandler() :
   CConfigHandler()
@@ -23,41 +25,28 @@ CConvConfigHandler::~CConvConfigHandler()
 {
 }
 
-bool CConvConfigHandler::startElement(const QString &namespaceURI, const QString &localName,
-                       const QString &qName, const QXmlAttributes &atts)
-{
-  bool result;
-
-  if (delegateStartElement(qName, atts, result)) {
-    // handled by sub handler ...
-    return result;
+void CConvConfigHandler::start_subhandler(const Glib::ustring& name,
+                                          const map<Glib::ustring, QString>& atts) {
+  if (name == "general") {
+    // new General handler
+    install_subhandler(new CConvGeneralSubHandler(this, &(m_properties.general)), atts);
   }
-  else {
-    // a sub handler is not active ...
-
-    if (qName == "general") {
-      // new General handler
-      return installSubHandler(new CConvGeneralSubHandler(this, &(m_properties.general)), atts);
-    }
-    else if (qName == "paths") {
-      // new Path handler
-      return installSubHandler(new CPathSubHandler(this), atts);
-    }
-    else if (qName == "lowpass_filter") {
-      return installSubHandler(new CFilteringSubHandler(this, &(m_properties.lowpass)), atts);
-    }
-    else if (qName == "highpass_filter") {
-      return installSubHandler(new CFilteringSubHandler(this, &(m_properties.highpass)), atts);
-    }
-    else if (qName == "con_slit") {
-      return installSubHandler(new CConvSlitSubHandler(this, &(m_properties.conslit)), atts);
-    }
-    else if (qName == "dec_slit") {
-      return installSubHandler(new CConvSlitSubHandler(this, &(m_properties.decslit)), atts);
-    }
+  else if (name == "paths") {
+    // new Path handler
+    install_subhandler(new CPathSubHandler(this), atts);
   }
-
-  return true;
+  else if (name == "lowpass_filter") {
+    install_subhandler(new CFilteringSubHandler(this, &(m_properties.lowpass)), atts);
+  }
+  else if (name == "highpass_filter") {
+    install_subhandler(new CFilteringSubHandler(this, &(m_properties.highpass)), atts);
+  }
+  else if (name == "con_slit") {
+    install_subhandler(new CConvSlitSubHandler(this, &(m_properties.conslit)), atts);
+  }
+  else if (name == "dec_slit") {
+    install_subhandler(new CConvSlitSubHandler(this, &(m_properties.decslit)), atts);
+  }
 }
 
 //------------------------------------------------------------------------
@@ -70,12 +59,9 @@ CConvGeneralSubHandler::CConvGeneralSubHandler(CConfigHandler *master, mediate_c
 {
 }
 
-bool CConvGeneralSubHandler::start(const QXmlAttributes &atts)
-{
-  QString str;
-
-  // convolution type
-  str = atts.value("convol");
+void CConvGeneralSubHandler::start(const map<Glib::ustring, QString> &atts) {
+   // convolution type
+  QString str = atts.at("convol");
   if (str == "std")
     m_d->convolutionType = CONVOLUTION_TYPE_STANDARD;
   else if (str == "iocorr")
@@ -84,7 +70,7 @@ bool CConvGeneralSubHandler::start(const QXmlAttributes &atts)
     m_d->convolutionType = CONVOLUTION_TYPE_NONE;
 
   // conversion type
-  str = atts.value("conver");
+  str = atts.at("conver");
   if (str == "air2vac")
     m_d->conversionType = CONVOLUTION_CONVERSION_AIR2VAC;
   else if (str == "vac2air")
@@ -93,57 +79,56 @@ bool CConvGeneralSubHandler::start(const QXmlAttributes &atts)
     m_d->conversionType = CONVOLUTION_CONVERSION_NONE;
 
   // output format
-  str = atts.value("output_format");
+  str = atts.at("output_format");
   if (str == "ascii")
     m_d->formatType = CONVOLUTION_FORMAT_ASCII;
   else if (str == "netcdf")
     m_d->formatType = CONVOLUTION_FORMAT_NETCDF;
   else
     m_d->formatType = CONVOLUTION_FORMAT_ASCII;
-  
-   // number of ground pixels
-  str = atts.value("pixels");
+
+  // number of ground pixels
+  str = atts.at("pixels");
   m_d->n_groundpixel=(!str.isEmpty())?str.toInt():1;
 
-  m_d->shift = atts.value("shift").toDouble();
-  m_d->conc = atts.value("conc").toDouble();
+  m_d->shift = atts.at("shift").toDouble();
+  m_d->conc = atts.at("conc").toDouble();
 
-  m_d->noheader = (atts.value("rmhdr") == "true") ? 1 : 0;
+  m_d->noheader = (atts.at("rmhdr") == "true") ? 1 : 0;
 
-  str = atts.value("input");
+  str = atts.at("input");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_d->inputFile))
       strcpy(m_d->inputFile, str.toLocal8Bit().data());
     else
-      return postErrorMessage("Input Filename too long");
+      throw std::runtime_error("Input Filename too long");
   }
-  str = atts.value("output");
+  str = atts.at("output");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_d->outputFile))
       strcpy(m_d->outputFile, str.toLocal8Bit().data());
     else
-      return postErrorMessage("Output Filename too long");
+      throw std::runtime_error("Output Filename too long");
   }
-  str = atts.value("calib");
+  str = atts.at("calib");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_d->calibrationFile))
       strcpy(m_d->calibrationFile, str.toLocal8Bit().data());
     else
-      return postErrorMessage("Calibration Filename too long");
+      throw std::runtime_error("Calibration Filename too long");
   }
-  str = atts.value("ref");
+  str = atts.at("ref");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_d->solarRefFile))
       strcpy(m_d->solarRefFile, str.toLocal8Bit().data());
     else
-      return postErrorMessage("Solar Reference Filename too long");
+      throw std::runtime_error("Solar Reference Filename too long");
   }
 
-  return true;
 }
 
 //------------------------------------------------------------------------
@@ -156,10 +141,9 @@ CConvSlitSubHandler::CConvSlitSubHandler(CConfigHandler *master, mediate_slit_fu
 {
 }
 
-bool CConvSlitSubHandler::start(const QString &element, const QXmlAttributes &atts)
+void CConvSlitSubHandler::start(const Glib::ustring& element, const map<Glib::ustring, QString>& atts)
 {
   if (element == "slit_func")
-    return m_master->installSubHandler(new CSlitFunctionSubHandler(m_master, m_d), atts);
+    return m_master->install_subhandler(new CSlitFunctionSubHandler(m_master, m_d), atts);
 
-  return true;
 }

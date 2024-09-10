@@ -5,14 +5,14 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 */
 
 
-#include <QTextStream>
+#include <iostream>
 
 #include "CConfigHandler.h"
 
-#include "debugutil.h"
+using std::map;
 
 CConfigHandler::CConfigHandler() :
-  QXmlDefaultHandler(),
+  xmlpp::SaxParser(),
   m_activeSubHandler(NULL),
   m_paths(10)
 {
@@ -27,66 +27,68 @@ CConfigHandler::~CConfigHandler()
   }
 }
 
-QString CConfigHandler::messages(void) const
+void CConfigHandler::on_start_element(const Glib::ustring& name,
+                                      const AttributeList& attributes)
 {
-  return m_errorMessages;
-}
-
-bool CConfigHandler::characters(const QString &ch)
-{
-  // collects all character data into a single string. This is
-  // passed to sub handlers IFF the trimmed result is not empty.
-
-  if (m_activeSubHandler) {
-
-    m_collatedStr += ch;
+  map<Glib::ustring, QString> atts;
+  for (const auto& att : attributes) {
+    atts[att.name] = QString::fromStdString(att.value);
   }
 
-  return true;
-}
-
-bool CConfigHandler::endDocument()
-{
-  return true;
-}
-
-bool CConfigHandler::endElement(const QString &namespaceURI, const QString &localName, const QString &qName)
-{
-  bool status = true;
+  element_stack.push_back(name);
 
   if (m_activeSubHandler) {
+    // prepare for collation of character data
+    collated_str.clear();
+    // delegate to sub handler
+    m_activeSubHandler->start(name, atts);
+  } else {
+    this->start_subhandler(name, atts);
+  }
+}
+
+void CConfigHandler::on_end_element(const Glib::ustring& name)
+{
+  if (m_activeSubHandler) {
+    bool status = true;
     // delegate to the sub handler
 
     // first any collected character data
-    QString tmp(m_collatedStr.trimmed());
+    QString tmp(QString::fromStdString(collated_str).trimmed());
     if (!tmp.isEmpty()) {
       status = m_activeSubHandler->character(tmp);
     }
 
     if (status) {
-      if (m_subHandlerStack.back().depth == m_elementStack.count()) {
-    status = m_activeSubHandler->end();
-    // done with this handler ... discard it
-    delete m_activeSubHandler;
-    m_subHandlerStack.pop_back();
-    // revert back to the previous handler
-    if (!m_subHandlerStack.isEmpty())
-      m_activeSubHandler = m_subHandlerStack.back().handler;
-    else
-      m_activeSubHandler = NULL;
-      }
-      else {
-    status = m_activeSubHandler->end(qName);
+      if (m_subHandlerStack.back().depth == element_stack.size()) {
+        status = m_activeSubHandler->end();
+        // done with this handler ... discard it
+        delete m_activeSubHandler;
+        m_subHandlerStack.pop_back();
+        // revert back to the previous handler
+        if (!m_subHandlerStack.isEmpty())
+          m_activeSubHandler = m_subHandlerStack.back().handler;
+        else
+          m_activeSubHandler = NULL;
+      } else {
+        m_activeSubHandler->end(name);
       }
     }
   }
-  else {
-    // no sub handler ...
+
+  element_stack.pop_back();
+}
+
+void CConfigHandler::on_characters(const Glib::ustring& text)
+{
+  if (m_activeSubHandler) {
+    collated_str += text;
   }
+}
 
-  m_elementStack.pop_back();
-
-  return status;
+QString CConfigHandler::messages(void) const
+{
+  return m_errorMessages;
 }
 
 QString CConfigHandler::errorString() const
@@ -99,29 +101,13 @@ bool CConfigHandler::ignorableWhitespace(const QString &ch)
   return true;
 }
 
-bool CConfigHandler::startDocument()
-{
-  return true;
-}
-
-bool CConfigHandler::startElement(const QString &namespaceURI, const QString &localName,
-                  const QString &qName, const QXmlAttributes &atts)
-{
-  bool result;
-
-  if (delegateStartElement(qName, atts, result))
-    return result;
-
-  return false;
-}
-
-bool CConfigHandler::installSubHandler(CConfigSubHandler *newHandler,
-                           const QXmlAttributes &atts)
-{
-  m_subHandlerStack.push_back(SSubHandlerItem(newHandler, m_elementStack.count()));
+void CConfigHandler::install_subhandler(CConfigSubHandler *newHandler,
+                                        const map<Glib::ustring, QString>& attributes) {
+  m_subHandlerStack.push_back(SSubHandlerItem(newHandler, element_stack.size()));
   m_activeSubHandler = newHandler;
 
-  return m_activeSubHandler->start(atts);
+  return m_activeSubHandler->start(attributes);
+
 }
 
 void CConfigHandler::setPath(int index, const QString &pathPrefix)
@@ -166,24 +152,6 @@ QString CConfigHandler::pathExpand(const QString &name)
   }
 
   return name;
-}
-
-bool CConfigHandler::delegateStartElement(const QString &qName, const QXmlAttributes &atts, bool &result)
-{
-  // always track the stack - also provides the depth
-  m_elementStack.push_back(qName);
-
-  if (m_activeSubHandler) {
-    // prepare for collation of character data
-    m_collatedStr.clear();
-
-    // delegate to the sub handler
-    result = m_activeSubHandler->start(qName, atts);
-
-    return true; // delegated
-  }
-
-  return false; // not delegated to a sub handler
 }
 
 //------------------------------------------------------------------------

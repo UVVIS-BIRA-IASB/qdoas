@@ -16,9 +16,9 @@ class CPathSubHandler : public CConfigSubHandler
  public:
   CPathSubHandler(CConfigHandler *master) : CConfigSubHandler(master), m_index(-1) {};
 
-  virtual bool start(const QString &element, const QXmlAttributes &atts);
+  virtual void start(const Glib::ustring& element, const std::map<Glib::ustring, QString>& atts) override;
   virtual bool character(const QString &ch);
-  virtual bool end(const QString &element);
+  virtual void end(const Glib::ustring& element);
 
  private:
   int m_index;

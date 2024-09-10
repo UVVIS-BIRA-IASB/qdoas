@@ -53,6 +53,9 @@ target_link_libraries(common config Qt5::Widgets Qt5::PrintSupport Qt5::Xml)
 target_include_directories(common PRIVATE ${QWT_INCLUDE_DIR})
 target_include_directories(common PUBLIC ../common ../engine ../mediator)
 
+target_link_libraries(common ${LIBXMLXX_LIBRARIES})
+target_include_directories(common PUBLIC ${LIBXMLXX_INCLUDE_DIRS})
+
 if(APPLE)
   add_definitions(-DQDOAS_HELP_PATH="../Resources/Help")
 else()
