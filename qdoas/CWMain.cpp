@@ -420,13 +420,13 @@ void CWMain::openFile(const QString &fileName) {
    {
     // parse the file
     QXmlSimpleReader xmlReader;
-    QXmlInputSource *source = new QXmlInputSource(&file);
+    QXmlInputSource source(&file);
 
-    CQdoasConfigHandler *handler = new CQdoasConfigHandler;
-    xmlReader.setContentHandler(handler);
-    xmlReader.setErrorHandler(handler);
+    CQdoasConfigHandler handler;
+    xmlReader.setContentHandler(&handler);
+    xmlReader.setErrorHandler(&handler);
 
-    bool ok = xmlReader.parse(source);
+    bool ok = xmlReader.parse(&source);
 
     if (ok) {
       setProjectFileName(fileName);
@@ -443,7 +443,7 @@ void CWMain::openFile(const QString &fileName) {
 
       // store the paths in the pathMgr for simplification when saving ...
       for (int i = 0; i<10; ++i) {
-        QString path = handler->getPath(i);
+        QString path = handler.getPath(i);
         if (path.isEmpty())
       pathMgr->removePath(i);
         else
@@ -451,7 +451,7 @@ void CWMain::openFile(const QString &fileName) {
       }
 
       // sites
-      const QList<const CSiteConfigItem*> &siteItems = handler->siteItems();
+      const QList<const CSiteConfigItem*> &siteItems = handler.siteItems();
       QList<const CSiteConfigItem*>::const_iterator siteIt = siteItems.begin();
       while (siteIt != siteItems.end()) {
 
@@ -461,7 +461,7 @@ void CWMain::openFile(const QString &fileName) {
       }
 
       // symbols
-      const QList<const CSymbolConfigItem*> &symbolItems = handler->symbolItems();
+      const QList<const CSymbolConfigItem*> &symbolItems = handler.symbolItems();
       QList<const CSymbolConfigItem*>::const_iterator symIt = symbolItems.begin();
       while (symIt != symbolItems.end()) {
 
@@ -470,7 +470,7 @@ void CWMain::openFile(const QString &fileName) {
       }
 
       // projects
-      errMsg += m_projTree->loadConfiguration(handler->projectItems());
+      errMsg += m_projTree->loadConfiguration(handler.projectItems());
 
       m_stateMonitor->slotValidate();
       m_saveAction->setEnabled(false);
@@ -479,9 +479,8 @@ void CWMain::openFile(const QString &fileName) {
       updateRecentFiles(fileName);
     }
     else {
-      errMsg = handler->messages();
+      errMsg = handler.messages();
     }
-    delete handler;
    }
 
   if (!errMsg.isNull())
