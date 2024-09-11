@@ -1,3 +1,11 @@
+3.6.10 2024-09-10
+~~~~~~~~~~~~~~~~~
+
+* Fixed a memory management bug that caused QDOAS to crash when 'File
+  name' was selected as one of the output fields.
+
+* Fixed a bug in GEMS L1C reading routines.
+
 3.6.9 2024-09-05
 ~~~~~~~~~~~~~~~~
 
