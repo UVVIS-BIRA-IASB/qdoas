@@ -17,7 +17,7 @@
 
 #include <dirent.h>
 
-class dir_iter : public std::iterator<std::input_iterator_tag, std::string> {
+class dir_iter {
 private:
   std::string path;
   std::shared_ptr<DIR> stream;
@@ -73,6 +73,9 @@ private:
   }
 
 public:
+  using iterator_category = std::input_iterator_tag;
+  using value_type = std::string;
+
   dir_iter(std::string path, size_t depth = 0) : path(path),
                                                  stream(opendir(path.c_str()), [](DIR *dir) { dir && closedir (dir); }),
                                                  current(""), maxdepth(depth) {
