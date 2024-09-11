@@ -48,12 +48,10 @@ static inline void get_name(struct output_field *this_field UNUSED, char **name,
 }
 
 static inline void get_filename(struct output_field *this_field UNUSED, char const **name, const ENGINE_CONTEXT *pEngineContext, int indexFenoColumn UNUSED, int index_calib UNUSED) {
-
- const char *ptr;
-
-  ptr=strrchr(pEngineContext->fileInfo.fileName,PATH_SEP);
-
-  *name = (ptr!=NULL) ? &ptr[1]:pEngineContext->fileInfo.fileName;
+  // Keep only the file basename:
+  const char *ptr = strrchr(pEngineContext->fileInfo.fileName, PATH_SEP);
+  ptr = (ptr!=NULL) ? &ptr[1] : pEngineContext->fileInfo.fileName;
+  *name = strdup(ptr);
 }
 
 static inline void get_date(struct output_field *this_field UNUSED, struct date *date, const ENGINE_CONTEXT *pEngineContext, int indexFenoColumn UNUSED, int index_calib UNUSED) {
