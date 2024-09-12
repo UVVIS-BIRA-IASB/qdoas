@@ -12,9 +12,6 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #include <QMenu>
 #include <QAction>
 #include <QPushButton>
-#include <QXmlInputSource>
-#include <QXmlSimpleReader>
-#include <QFile>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QCloseEvent>
@@ -282,19 +279,15 @@ void CWMain::slotOpenFile()
   prefs->setDirectoryNameGivenFile("RingConf", fileName);
 
   QString errMsg;
-  QFile *file = new QFile(fileName);
 
   // parse the file
-  QXmlSimpleReader xmlReader;
-  QXmlInputSource *source = new QXmlInputSource(file);
 
-  CRingConfigHandler *handler = new CRingConfigHandler;
-  xmlReader.setContentHandler(handler);
-  xmlReader.setErrorHandler(handler);
+  CRingConfigHandler handler;
+  handler.set_substitute_entities(true);
 
-  bool ok = xmlReader.parse(source);
+  try {
+    handler.parse_file(fileName.toStdString());
 
-  if (ok) {
     // start with a clear configuration
     CPathMgr *pathMgr = CPathMgr::instance();
 
@@ -302,7 +295,7 @@ void CWMain::slotOpenFile()
 
     // store the paths in the pathMgr for simplification when saving ...
     for (int i = 0; i<10; ++i) {
-      QString path = handler->getPath(i);
+      QString path = handler.getPath(i);
       if (path.isEmpty())
     pathMgr->removePath(i);
       else
@@ -310,7 +303,7 @@ void CWMain::slotOpenFile()
     }
 
     // copy the properties data ...
-    m_guiProperties = *(handler->properties());
+    m_guiProperties = *(handler.properties());
 
     // update the GUI
     m_generalTab->reset(&m_guiProperties);
@@ -320,12 +313,9 @@ void CWMain::slotOpenFile()
 
     setConfigFileName(fileName);
   }
-  else {
-    errMsg = handler->messages();
+  catch(std::runtime_error& e) {
+    errMsg = e.what();
   }
-  delete handler;
-  delete source;
-  delete file;
 
   if (!errMsg.isNull())
     QMessageBox::critical(this, "File Open", errMsg);
