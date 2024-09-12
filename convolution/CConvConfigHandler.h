@@ -10,7 +10,6 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 #include <libxml++/libxml++.h>
 
-#include <QXmlDefaultHandler>
 #include <QString>
 
 #include "CConfigHandler.h"
