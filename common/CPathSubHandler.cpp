@@ -30,12 +30,10 @@ void CPathSubHandler::start(const Glib::ustring& element, const map<Glib::ustrin
   m_path.clear();
 }
 
-bool CPathSubHandler::character(const QString &ch)
+void CPathSubHandler::character(const QString &ch)
 {
   // collect all path characters
   m_path += ch;
-
-  return true;
 }
 
 void CPathSubHandler::end(const Glib::ustring &element)
