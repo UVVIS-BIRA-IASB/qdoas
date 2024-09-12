@@ -8,9 +8,6 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #include <QVBoxLayout>
 #include <QMenu>
 #include <QAction>
-#include <QXmlInputSource>
-#include <QXmlSimpleReader>
-#include <QFile>
 #include <QDir>
 #include <QProcess>
 #include <QMessageBox>
@@ -419,16 +416,13 @@ void CWMain::openFile(const QString &fileName) {
   else
    {
     // parse the file
-    QXmlSimpleReader xmlReader;
-    QXmlInputSource source(&file);
 
     CQdoasConfigHandler handler;
-    xmlReader.setContentHandler(&handler);
-    xmlReader.setErrorHandler(&handler);
+    handler.set_substitute_entities(true);
 
-    bool ok = xmlReader.parse(&source);
+    try {
+      handler.parse_file(fileName.toStdString());
 
-    if (ok) {
       setProjectFileName(fileName);
 
       CPathMgr *pathMgr = CPathMgr::instance();
@@ -478,8 +472,8 @@ void CWMain::openFile(const QString &fileName) {
 
       updateRecentFiles(fileName);
     }
-    else {
-      errMsg = handler.messages();
+    catch (std::runtime_error &e) {
+      errMsg = e.what();
     }
    }
 

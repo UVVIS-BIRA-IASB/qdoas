@@ -14,6 +14,8 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 #include "debugutil.h"
 
+using std::map;
+
 CQdoasConfigHandler::~CQdoasConfigHandler()
 {
   while (!m_projectItemList.isEmpty()) {
@@ -29,37 +31,25 @@ CQdoasConfigHandler::~CQdoasConfigHandler()
   }
 }
 
-bool CQdoasConfigHandler::startElement(const QString &namespaceURI, const QString &localName,
-                       const QString &qName, const QXmlAttributes &atts)
-{
-  bool result;
+void CQdoasConfigHandler::start_subhandler(const Glib::ustring& name,
+                                           const map<Glib::ustring, QString>& atts) {
 
-  if (delegateStartElement(qName, atts, result)) {
-    // handled by sub handler ...
-    return result;
+  if (name == "project") {
+    // new Project handler
+    install_subhandler(new CProjectSubHandler(this), atts);
   }
-  else {
-    // a sub handler is not active ...
-
-    if (qName == "project") {
-      // new Project handler
-      return installSubHandler(new CProjectSubHandler(this), atts);
-    }
-    else if (qName == "paths") {
-      // new Path handler
-      return installSubHandler(new CPathSubHandler(this), atts);
-    }
-    else if (qName == "sites") {
-      // new Site handler
-      return installSubHandler(new CSiteSubHandler(this), atts);
-    }
-    else if (qName == "symbols") {
-      // new symbol handler
-      return installSubHandler(new CSymbolSubHandler(this), atts);
-    }
+  else if (name == "paths") {
+    // new Path handler
+    install_subhandler(new CPathSubHandler(this), atts);
   }
-
-  return true;
+  else if (name == "sites") {
+    // new Site handler
+    install_subhandler(new CSiteSubHandler(this), atts);
+  }
+  else if (name == "symbols") {
+    // new symbol handler
+    install_subhandler(new CSymbolSubHandler(this), atts);
+  }
 }
 
 void CQdoasConfigHandler::addProjectItem(CProjectConfigItem *item)
@@ -110,7 +100,7 @@ CSiteSubHandler::CSiteSubHandler(CQdoasConfigHandler *master) :
 {
 }
 
-bool CSiteSubHandler::start(const QString &element, const QXmlAttributes &atts)
+void CSiteSubHandler::start(const Glib::ustring& element, const map<Glib::ustring, QString> &atts)
 {
   if (element == "site") {
     QString str;
@@ -120,36 +110,35 @@ bool CSiteSubHandler::start(const QString &element, const QXmlAttributes &atts)
     // create a new config item for the site
     CSiteConfigItem *item = new CSiteConfigItem;
 
-    str = atts.value("name");
+    str = atts.at("name");
     if (str.isEmpty()) {
       delete item;
-      return postErrorMessage("Missing site name");
+      throw std::runtime_error("Missing site name");
     }
     else
       item->setSiteName(str);
 
-    str = atts.value("abbrev");
+    str = atts.at("abbrev");
     if (!str.isEmpty())
       item->setAbbreviation(str);
 
-    tmpDouble = atts.value("long").toDouble(&ok);
+    tmpDouble = atts.at("long").toDouble(&ok);
     if (ok)
       item->setLongitude(tmpDouble);
 
-    tmpDouble = atts.value("lat").toDouble(&ok);
+    tmpDouble = atts.at("lat").toDouble(&ok);
     if (ok)
       item->setLatitude(tmpDouble);
 
-    tmpDouble = atts.value("alt").toDouble(&ok);
+    tmpDouble = atts.at("alt").toDouble(&ok);
     if (ok)
       item->setAltitude(tmpDouble);
 
     master()->addSiteItem(item);
 
-    return true;
+    return;
   }
-
-  return false;
+  throw std::runtime_error("Incorrect element name " + element);
 }
 
 //------------------------------------------------------------------------
@@ -161,22 +150,22 @@ CSymbolSubHandler::CSymbolSubHandler(CQdoasConfigHandler *master) :
 {
 }
 
-bool CSymbolSubHandler::start(const QString &element, const QXmlAttributes &atts)
+void CSymbolSubHandler::start(const Glib::ustring &element, const map<Glib::ustring, QString> &atts)
 {
   if (element == "symbol") {
     QString name;
 
-    name = atts.value("name");
+    name = atts.at("name");
     if (name.isEmpty()) {
-      return postErrorMessage("Missing symbol name");
+      throw std::runtime_error("Missing symbol name");
     }
 
-    master()->addSymbol(name, atts.value("descr"));
+    master()->addSymbol(name, atts.at("descr"));
 
-    return true;
+    return;
   }
 
-  return false;
+  throw std::runtime_error("Incorrect element name " + element);
 }
 
 //------------------------------------------------------------------------
@@ -195,75 +184,71 @@ CProjectSubHandler::~CProjectSubHandler()
   delete m_project;
 }
 
-bool CProjectSubHandler::start(const QXmlAttributes &atts)
+void CProjectSubHandler::start(const map<Glib::ustring, QString> &atts)
 {
   // the project element - must have a name
 
-  m_project->setName(atts.value("name"));
-  m_project->setEnabled(atts.value("disable") != "true");
+  m_project->setName(atts.at("name"));
+  m_project->setEnabled(atts.at("disable") != "true");
 
-  return !m_project->name().isEmpty();
+  if (m_project->name().isEmpty()) {
+    throw std::runtime_error("Project with empty name.");
+  }
 }
 
-bool CProjectSubHandler::start(const QString &element, const QXmlAttributes &atts)
+void CProjectSubHandler::start(const Glib::ustring &element, const map<Glib::ustring, QString> &atts)
 {
   // a sub element of project ... create a specialized handler and delegate
   mediate_project_t *prop = m_project->properties();
 
   if (element == "display") {
-    return m_master->installSubHandler(new CProjectDisplaySubHandler(m_master, &(prop->display)), atts);
+    return m_master->install_subhandler(new CProjectDisplaySubHandler(m_master, &(prop->display)), atts);
   }
   else if (element == "selection") {
-    return m_master->installSubHandler(new CProjectSelectionSubHandler(m_master, &(prop->selection)), atts);
+    return m_master->install_subhandler(new CProjectSelectionSubHandler(m_master, &(prop->selection)), atts);
   }
   else if (element == "analysis") {
-    return m_master->installSubHandler(new CProjectAnalysisSubHandler(m_master, &(prop->analysis)), atts);
+    return m_master->install_subhandler(new CProjectAnalysisSubHandler(m_master, &(prop->analysis)), atts);
   }
   else if (element == "raw_spectra") {
-    return m_master->installSubHandler(new CProjectRawSpectraSubHandler(m_master, m_project->rootNode()), atts);
+    return m_master->install_subhandler(new CProjectRawSpectraSubHandler(m_master, m_project->rootNode()), atts);
   }
   else if (element == "lowpass_filter") {
-    return m_master->installSubHandler(new CFilteringSubHandler(m_master, &(prop->lowpass)), atts);
+    return m_master->install_subhandler(new CFilteringSubHandler(m_master, &(prop->lowpass)), atts);
   }
   else if (element == "highpass_filter") {
-    return m_master->installSubHandler(new CFilteringSubHandler(m_master, &(prop->highpass)), atts);
+    return m_master->install_subhandler(new CFilteringSubHandler(m_master, &(prop->highpass)), atts);
   }
   else if (element == "calibration") {
-    return m_master->installSubHandler(new CProjectCalibrationSubHandler(m_master, &(prop->calibration)), atts);
+    return m_master->install_subhandler(new CProjectCalibrationSubHandler(m_master, &(prop->calibration)), atts);
   }
   else if (element == "undersampling") {
-    return m_master->installSubHandler(new CProjectUndersamplingSubHandler(m_master, &(prop->undersampling)), atts);
+    return m_master->install_subhandler(new CProjectUndersamplingSubHandler(m_master, &(prop->undersampling)), atts);
   }
   else if (element == "instrumental") {
-    return m_master->installSubHandler(new CProjectInstrumentalSubHandler(m_master, &(prop->instrumental)), atts);
+    return m_master->install_subhandler(new CProjectInstrumentalSubHandler(m_master, &(prop->instrumental)), atts);
   }
   else if (element == "slit") {
-    return m_master->installSubHandler(new CProjectSlitSubHandler(m_master, &(prop->slit)), atts);
+    return m_master->install_subhandler(new CProjectSlitSubHandler(m_master, &(prop->slit)), atts);
   }
   else if (element == "output") {
-    return m_master->installSubHandler(new CProjectOutputSubHandler(m_master, &(prop->output)), atts);
+    return m_master->install_subhandler(new CProjectOutputSubHandler(m_master, &(prop->output)), atts);
   }
   else if (element == "export") {
-    return m_master->installSubHandler(new CProjectExportSubHandler(m_master, &(prop->export_spectra)), atts);
+    return m_master->install_subhandler(new CProjectExportSubHandler(m_master, &(prop->export_spectra)), atts);
   }
   else if (element == "analysis_window") {
     // allocate a new item in the project for this AW
     CAnalysisWindowConfigItem *awItem = m_project->issueNewAnalysisWindowItem();
     if (awItem)
-      return m_master->installSubHandler(new CAnalysisWindowSubHandler(m_master, awItem), atts);
-
-    return false; // fall through failure
+      return m_master->install_subhandler(new CAnalysisWindowSubHandler(m_master, awItem), atts);
   }
-
-  return true; // TODO - false unknown element ... or just ignore...
 }
 
-bool CProjectSubHandler::end()
+void CProjectSubHandler::end()
 {
   // end of project ... hand project data over to the master handler
 
   master()->addProjectItem(m_project);
   m_project = NULL; // releases ownership responsibility
-
-  return true;
 }

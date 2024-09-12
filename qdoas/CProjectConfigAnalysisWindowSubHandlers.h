@@ -19,8 +19,8 @@ class CAnalysisWindowSubHandler : public CConfigSubHandler
   CAnalysisWindowSubHandler(CConfigHandler *master,
                 CAnalysisWindowConfigItem *item);
 
-  virtual bool start(const QXmlAttributes &atts);
-  virtual bool start(const QString &element, const QXmlAttributes &atts);
+  virtual void start(const std::map<Glib::ustring, QString>& attributes) override;
+  virtual void start(const Glib::ustring& element, const std::map<Glib::ustring, QString>& attributes) override;
 
   static int mapToPolyType(const QString &str);
 
@@ -34,7 +34,7 @@ class CAnalysisWindowCrossSectionSubHandler : public CConfigSubHandler
   CAnalysisWindowCrossSectionSubHandler(CConfigHandler *master,
                     cross_section_list_t *d);
 
-  virtual bool start(const QXmlAttributes &atts);
+  virtual void start(const std::map<Glib::ustring, QString>& attributes) override;
 
  private:
   cross_section_list_t *m_d;
@@ -46,7 +46,7 @@ class CAnalysisWindowLinearSubHandler : public CConfigSubHandler
   CAnalysisWindowLinearSubHandler(CConfigHandler *master,
                   struct anlyswin_linear *d);
 
-  virtual bool start(const QXmlAttributes &atts);
+  virtual void start(const std::map<Glib::ustring, QString>& attributes) override;
 
  private:
   struct anlyswin_linear *m_d;
@@ -58,7 +58,7 @@ class CAnalysisWindowNonLinearSubHandler : public CConfigSubHandler
   CAnalysisWindowNonLinearSubHandler(CConfigHandler *master,
                      struct anlyswin_nonlinear *d);
 
-  virtual bool start(const QXmlAttributes &atts);
+  virtual void start(const std::map<Glib::ustring, QString>& attributes) override;
 
  private:
   struct anlyswin_nonlinear *m_d;
@@ -70,9 +70,9 @@ class CAnalysisWindowShiftStretchSubHandler : public CConfigSubHandler
   CAnalysisWindowShiftStretchSubHandler(CConfigHandler *master,
                     shift_stretch_list_t *d);
 
-  virtual bool start(const QXmlAttributes &atts);
-  virtual bool start(const QString &element, const QXmlAttributes &atts);
-  virtual bool end(void);
+  virtual void start(const std::map<Glib::ustring, QString>& attributes) override;
+  virtual void start(const Glib::ustring& element, const std::map<Glib::ustring, QString>& attributes) override;
+  virtual void end();
 
  private:
   shift_stretch_list_t *m_d;
@@ -84,7 +84,7 @@ class CAnalysisWindowGapSubHandler : public CConfigSubHandler
   CAnalysisWindowGapSubHandler(CConfigHandler *master,
                    gap_list_t *d);
 
-  virtual bool start(const QXmlAttributes &atts);
+  virtual void start(const std::map<Glib::ustring, QString>& attributes) override;
 
  private:
   gap_list_t *m_d;
@@ -96,7 +96,7 @@ class CAnalysisWindowOutputSubHandler : public CConfigSubHandler
   CAnalysisWindowOutputSubHandler(CConfigHandler *master,
                   output_list_t *d);
 
-  virtual bool start(const QXmlAttributes &atts);
+  virtual void start(const std::map<Glib::ustring, QString>& attributes) override;
 
  private:
   output_list_t *m_d;
@@ -108,7 +108,7 @@ class CAnalysisWindowSfpSubHandler : public CConfigSubHandler
   CAnalysisWindowSfpSubHandler(CConfigHandler *master,
                    struct calibration_sfp *d);
 
-  virtual bool start(const QXmlAttributes &atts);
+  virtual void start(const std::map<Glib::ustring, QString>& attributes) override;
 
  private:
   struct calibration_sfp *m_d;
