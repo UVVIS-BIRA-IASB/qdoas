@@ -12,35 +12,25 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 #include "debugutil.h"
 
+using std::map;
+
 CUsampConfigHandler::CUsampConfigHandler() :
   CConfigHandler()
 {
   initializeMediateUsamp(&m_properties);
 }
 
-bool CUsampConfigHandler::startElement(const QString &namespaceURI, const QString &localName,
-                       const QString &qName, const QXmlAttributes &atts)
+void CUsampConfigHandler::start_subhandler(const Glib::ustring& name,
+                                          const map<Glib::ustring, QString>& atts)
 {
-  bool result;
-
-  if (delegateStartElement(qName, atts, result)) {
-    // handled by sub handler ...
-    return result;
+  if (name == "general") {
+    // new General handler
+    install_subhandler(new CUsampGeneralSubHandler(this, &m_properties), atts);
   }
-  else {
-    // a sub handler is not active ...
-
-    if (qName == "general") {
-      // new General handler
-      return installSubHandler(new CUsampGeneralSubHandler(this, &m_properties), atts);
-    }
-    else if (qName == "paths") {
-      // new Path handler
-      return installSubHandler(new CPathSubHandler(this), atts);
-    }
+  else if (name == "paths") {
+    // new Path handler
+    install_subhandler(new CPathSubHandler(this), atts);
   }
-
-  return true;
 }
 
 //------------------------------------------------------------------------
@@ -53,11 +43,11 @@ CUsampGeneralSubHandler::CUsampGeneralSubHandler(CConfigHandler *master, mediate
 {
 }
 
-bool CUsampGeneralSubHandler::start(const QXmlAttributes &atts)
+void CUsampGeneralSubHandler::start(const map<Glib::ustring, QString> &atts)
 {
   QString str;
 
-  str = atts.value("type");
+  str = atts.at("type");
   if (str == "ODF") {
     m_d->methodType = OPTICAL_DENSITY_FIT;
   }
@@ -65,53 +55,49 @@ bool CUsampGeneralSubHandler::start(const QXmlAttributes &atts)
     m_d->methodType = INTENSITY_FIT;
   }
   else
-    return postErrorMessage("Invalid analysis method");
+    throw std::runtime_error("Invalid analysis method");
 
-  m_d->shift = atts.value("shift").toDouble();
+  m_d->shift = atts.at("shift").toDouble();
 
-  m_d->noheader = (atts.value("rmhdr") == "true") ? 1 : 0;
+  m_d->noheader = (atts.at("rmhdr") == "true") ? 1 : 0;
 
-  str = atts.value("outphase1");
+  str = atts.at("outphase1");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_d->outputPhaseOneFile))
       strcpy(m_d->outputPhaseOneFile, str.toLocal8Bit().data());
     else
-      return postErrorMessage("Output Phase 1 Filename too long");
+      throw std::runtime_error("Output Phase 1 Filename too long");
   }
-  str = atts.value("outphase2");
+  str = atts.at("outphase2");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_d->outputPhaseTwoFile))
       strcpy(m_d->outputPhaseTwoFile, str.toLocal8Bit().data());
     else
-      return postErrorMessage("Output Phase 2 Filename too long");
+      throw std::runtime_error("Output Phase 2 Filename too long");
   }
-  str = atts.value("calib");
+  str = atts.at("calib");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_d->calibrationFile))
       strcpy(m_d->calibrationFile, str.toLocal8Bit().data());
     else
-      return postErrorMessage("Calibration Filename too long");
+      throw std::runtime_error("Calibration Filename too long");
   }
-  str = atts.value("ref");
+  str = atts.at("ref");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_d->solarRefFile))
       strcpy(m_d->solarRefFile, str.toLocal8Bit().data());
     else
-      return postErrorMessage("Solar Reference Filename too long");
+      throw std::runtime_error("Solar Reference Filename too long");
   }
-
-  return true;
 }
 
-bool CUsampGeneralSubHandler::start(const QString &element, const QXmlAttributes &atts)
+void CUsampGeneralSubHandler::start(const Glib::ustring &element, const map<Glib::ustring, QString> &atts)
 {
   if (element == "slit_func")
-    return m_master->installSubHandler(new CSlitFunctionSubHandler(m_master, &(m_d->slit)), atts);
-
-  return true;
+    m_master->install_subhandler(new CSlitFunctionSubHandler(m_master, &(m_d->slit)), atts);
 }
 
