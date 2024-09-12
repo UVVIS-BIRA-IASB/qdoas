@@ -210,9 +210,6 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include <QXmlInputSource>
-#include <QXmlSimpleReader>
-#include <QXmlStreamReader>
 #include <QFile>
 #include <QString>
 #include <QList>
@@ -810,17 +807,12 @@ int batchProcess(commands_t *cmd)
 
 enum BatchTool requiredBatchTool(const QString &filename)
 {
-  QFile config_file(filename);
-  if (!config_file.open(QIODevice::ReadOnly)) {
-    return UnknownConfig; // Can't open the file
-  }
-
-  QXmlStreamReader reader(&config_file);
-  if (!reader.readNextStartElement()) {
+  xmlpp::TextReader reader(filename.toStdString());
+  if (!reader.read()) {
     return UnknownConfig; // XML parsing failed
   }
 
-  auto toolname = reader.name();
+  auto toolname = reader.get_name();
 
   if (toolname == "qdoas") {
     return Qdoas;
@@ -918,26 +910,17 @@ int readConfigQdoas(commands_t *cmd, QList<const CProjectConfigItem*> &projectIt
 
   int retCode = 0;
 
-  QFile *file = new QFile(cmd->configFile);
+  CQdoasConfigHandler handler;
+  handler.set_substitute_entities(true);
 
-  // parse the file
-  QXmlSimpleReader xmlReader;
-  QXmlInputSource *source = new QXmlInputSource(file);
-
-  CQdoasConfigHandler *handler = new CQdoasConfigHandler;
-
-  xmlReader.setContentHandler(handler);
-  xmlReader.setErrorHandler(handler);
-
-  bool ok = xmlReader.parse(source);   // the xml file is read at this line
-
-  if (ok) {
+  try {
+    handler.parse_file(cmd->configFile.toStdString());
 
     CWorkSpace *ws = CWorkSpace::instance();
     ws->setConfigFile(cmd->configFile);
 
     // sites
-    const QList<const CSiteConfigItem*> &siteItems = handler->siteItems();
+    const QList<const CSiteConfigItem*> &siteItems = handler.siteItems();
     QList<const CSiteConfigItem*>::const_iterator siteIt = siteItems.begin();
     while (siteIt != siteItems.end()) {
 
@@ -947,7 +930,7 @@ int readConfigQdoas(commands_t *cmd, QList<const CProjectConfigItem*> &projectIt
     }
 
     // symbols
-    const QList<const CSymbolConfigItem*> &symbolItems = handler->symbolItems();
+    const QList<const CSymbolConfigItem*> &symbolItems = handler.symbolItems();
     QList<const CSymbolConfigItem*>::const_iterator symIt = symbolItems.begin();
     while (symIt != symbolItems.end()) {
 
@@ -956,7 +939,7 @@ int readConfigQdoas(commands_t *cmd, QList<const CProjectConfigItem*> &projectIt
     }
 
     // projects - dont need to be in the workspace ... just keep the project items
-    QList<const CProjectConfigItem*> tmpItems = handler->takeProjectItems();
+    QList<const CProjectConfigItem*> tmpItems = handler.takeProjectItems();
 
     // is a specific project required ...
     if (!cmd->projectName.isEmpty()) {
@@ -992,14 +975,10 @@ int readConfigQdoas(commands_t *cmd, QList<const CProjectConfigItem*> &projectIt
       retCode = 1;
 
   }
-  else {
-    std::cerr << handler->messages().toStdString() << std::endl;
+  catch (std::runtime_error& e) {
+    std::cerr << "Failed to parse configuration file: " << e.what() << std::endl;
     retCode = 1;
   }
-
-  delete handler;
-  delete source;
-  delete file;
 
   return retCode;
 }
@@ -1293,26 +1272,21 @@ int batchProcessConvolution(commands_t *cmd)
 
   int retCode = 0;
 
-  QFile *file = new QFile(cmd->configFile);
-
   // parse the file
-  QXmlSimpleReader xmlReader;
-  QXmlInputSource *source = new QXmlInputSource(file);
 
-  CConvConfigHandler *handler = new CConvConfigHandler;
-  xmlReader.setContentHandler(handler);
-  xmlReader.setErrorHandler(handler);
+  CConvConfigHandler handler;
+  handler.set_substitute_entities(true);
 
-  bool ok = xmlReader.parse(source);
+  try {
+    handler.parse_file(cmd->configFile.toStdString());
 
-  if (ok) {
     void *engineContext = NULL;
 
     CEngineResponseVisual *resp = new CEngineResponseVisual;
     CBatchEngineController *controller = new CBatchEngineController;
 
     // copy the properties data ...
-    mediate_convolution_t properties = *(handler->properties()); // blot copy
+    mediate_convolution_t properties = *(handler.properties()); // blot copy
 
     if (xmlSwitch)
      CONVXML_Parse(cmd->xmlCommands,&properties);
@@ -1371,13 +1345,10 @@ int batchProcessConvolution(commands_t *cmd)
     delete resp;
     delete controller;
   }
-  else {
+  catch (std::runtime_error &e) {
+    std::cerr << "Failed to parse configuration: " << e.what() << std::endl;
     retCode = 1;
   }
-
-  delete handler;
-  delete source;
-  delete file;
 
   return retCode;
 }
@@ -1388,27 +1359,20 @@ int batchProcessRing(commands_t *cmd)
 
   int retCode = 0;
 
-  QFile *file = new QFile(cmd->configFile);
-
   // parse the file
-  QXmlSimpleReader xmlReader;
-  QXmlInputSource *source = new QXmlInputSource(file);
 
-  CRingConfigHandler *handler = new CRingConfigHandler;
-  xmlReader.setContentHandler(handler);
-  xmlReader.setErrorHandler(handler);
+  CRingConfigHandler handler;
+  handler.set_substitute_entities(true);
 
-  bool ok = xmlReader.parse(source);
-
-  if (ok)
-   {
+  try {
+    handler.parse_file(cmd->configFile.toStdString());
     void *engineContext = NULL;
 
     CEngineResponseVisual *resp = new CEngineResponseVisual;
     CBatchEngineController *controller = new CBatchEngineController;
 
     // copy the properties data ...
-    mediate_ring properties = *(handler->properties()); // blot copy
+    mediate_ring properties = *(handler.properties()); // blot copy
 
     if (xmlSwitch)
      RINGXML_Parse(cmd->xmlCommands,&properties);
@@ -1470,13 +1434,10 @@ int batchProcessRing(commands_t *cmd)
     delete resp;
     delete controller;
   }
-  else {
+  catch(std::runtime_error &e) {
+    std::cerr << "Failed to parse configuration: " << e.what() << std::endl;
     retCode = 1;
   }
-
-  delete handler;
-  delete source;
-  delete file;
 
   return retCode;
 }
@@ -1487,27 +1448,21 @@ int batchProcessUsamp(commands_t *cmd)
 
   int retCode = 0;
 
-  QFile *file = new QFile(cmd->configFile);
-
   // parse the file
-  QXmlSimpleReader xmlReader;
-  QXmlInputSource *source = new QXmlInputSource(file);
 
-  CUsampConfigHandler *handler = new CUsampConfigHandler;
-  xmlReader.setContentHandler(handler);
-  xmlReader.setErrorHandler(handler);
+  CUsampConfigHandler handler;
+  handler.set_substitute_entities(true);
 
-  bool ok = xmlReader.parse(source);
+  try {
+    handler.parse_file(cmd->configFile.toStdString());
 
-  if (ok)
-   {
     void *engineContext = NULL;
 
     CEngineResponseVisual *resp = new CEngineResponseVisual;
     CBatchEngineController *controller = new CBatchEngineController;
 
     // copy the properties data ...
-    mediate_usamp_t properties = *(handler->properties()); // blot copy
+    mediate_usamp_t properties = *(handler.properties()); // blot copy
 
     if (!cmd->outputDir.isEmpty() && cmd->outputDir.size() < FILENAME_BUFFER_LENGTH-1)
      {
@@ -1581,13 +1536,11 @@ int batchProcessUsamp(commands_t *cmd)
     delete resp;
     delete controller;
   }
-  else {
+  catch(std::runtime_error &e) {
+    std::cerr << "Failed to parse configuration: " << e.what() << std::endl;
     retCode = 1;
   }
 
-  delete handler;
-  delete source;
-  delete file;
 
   return retCode;
 }
