@@ -45,7 +45,6 @@ CWAnalysisWindowPropertyEditor::CWAnalysisWindowPropertyEditor(const QString &pr
   assert(d != NULL);
 
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
-  mainLayout->setMargin(10);
   mainLayout->setSpacing(5);
 
   QHBoxLayout *topLayout = new QHBoxLayout;
@@ -53,7 +52,6 @@ CWAnalysisWindowPropertyEditor::CWAnalysisWindowPropertyEditor(const QString &pr
   // calibration combo ... group
   QGroupBox *calibrationGroup = new QGroupBox("Wavelength Calibration", this);
   QVBoxLayout *calibrationLayout = new QVBoxLayout(calibrationGroup);
-  calibrationLayout->setMargin(3);
   calibrationLayout->setSpacing(0);
   m_calibrationCombo = new QComboBox(calibrationGroup);
   m_calibrationCombo->addItem("None", QVariant(ANLYS_KURUCZ_NONE));
@@ -68,7 +66,6 @@ CWAnalysisWindowPropertyEditor::CWAnalysisWindowPropertyEditor(const QString &pr
   // radio button - ref selection
   QGroupBox *refSelectGroup = new QGroupBox("Ref. Selection", this);
   QVBoxLayout *refSelectLayout = new QVBoxLayout(refSelectGroup);
-  refSelectLayout->setMargin(3);
   refSelectLayout->setSpacing(0);
   QRadioButton *autoButton = new QRadioButton("Automatic",  refSelectGroup);
   refSelectLayout->addWidget(autoButton);
@@ -80,7 +77,6 @@ CWAnalysisWindowPropertyEditor::CWAnalysisWindowPropertyEditor(const QString &pr
   // fitting interval
   QGroupBox *fitIntervalGroup = new QGroupBox("Fitting Interval", this);
   QGridLayout *fitIntervalLayout = new QGridLayout(fitIntervalGroup);
-  fitIntervalLayout->setMargin(3);
   fitIntervalLayout->setSpacing(0);
   fitIntervalLayout->addWidget(new QLabel("Min ", fitIntervalGroup), 0, 0);
   m_fitMinEdit = new QLineEdit(fitIntervalGroup);
@@ -98,7 +94,6 @@ CWAnalysisWindowPropertyEditor::CWAnalysisWindowPropertyEditor(const QString &pr
   // display
   QGroupBox *displayGroup = new QGroupBox("Display", this);
   QGridLayout *displayLayout = new QGridLayout(displayGroup);
-  displayLayout->setMargin(3);
   displayLayout->setSpacing(0);
   m_spectrumCheck = new QCheckBox("Spectrum and reference", displayGroup);
   displayLayout->addWidget(m_spectrumCheck, 0, 0);
@@ -119,7 +114,6 @@ CWAnalysisWindowPropertyEditor::CWAnalysisWindowPropertyEditor(const QString &pr
 
   QGroupBox *optionsGroup = new QGroupBox("Other options", this);
   QGridLayout *optionsLayout=new QGridLayout(optionsGroup);
-  optionsLayout->setMargin(3);
   optionsLayout->setSpacing(0);
   optionsLayout->addWidget(new QLabel("Ref. Resol FWHM (nm) ", optionsGroup), 0, 0);
   m_resolEdit = new QLineEdit(optionsGroup);
@@ -141,14 +135,12 @@ CWAnalysisWindowPropertyEditor::CWAnalysisWindowPropertyEditor(const QString &pr
   // files
   QGroupBox *filesGroup = new QGroupBox("Files", this);
   QVBoxLayout *filesLayout = new QVBoxLayout(filesGroup);
-  filesLayout->setMargin(3);
   filesLayout->setSpacing(0);
 
   // row 0 - Ref1
   m_refOneFrame = new QFrame(filesGroup);
   m_refOneFrame->setFrameStyle(QFrame::NoFrame);
   QHBoxLayout *refOneFrameLayout = new QHBoxLayout(m_refOneFrame);
-  refOneFrameLayout->setMargin(0);
   QLabel *labelOne = new QLabel(" Reference 1 ", m_refOneFrame);
   labelOne->setFixedWidth(85);
   m_refOneEdit = new QLineEdit(m_refOneFrame);
@@ -166,14 +158,12 @@ CWAnalysisWindowPropertyEditor::CWAnalysisWindowPropertyEditor(const QString &pr
   m_maxdoasFrame=new QFrame(filesGroup);
   m_maxdoasFrame->setFrameStyle(QFrame::NoFrame);
   QHBoxLayout *maxdoasLayout = new QHBoxLayout(m_maxdoasFrame);
-  maxdoasLayout->setMargin(0);
   QLabel *labelMaxdoas = new QLabel(" Reference 2 ", m_maxdoasFrame);
   labelMaxdoas->setFixedWidth(85);
 
   m_maxdoasSzaFrame=new QFrame(m_maxdoasFrame);
   m_maxdoasSzaFrame->setFrameStyle(QFrame::NoFrame);
   QHBoxLayout *maxdoasSzaLayout = new QHBoxLayout(m_maxdoasSzaFrame);
-  maxdoasSzaLayout->setMargin(0);
 
   m_maxdoasSzaCenterEdit = new QLineEdit(m_maxdoasSzaFrame);
   m_maxdoasSzaCenterEdit->setFixedWidth(cDoubleEditWidth);
@@ -191,7 +181,6 @@ CWAnalysisWindowPropertyEditor::CWAnalysisWindowPropertyEditor(const QString &pr
   m_maxdoasScanFrame=new QFrame(m_maxdoasFrame);
   m_maxdoasScanFrame->setFrameStyle(QFrame::NoFrame);
   QHBoxLayout *maxdoasScanLayout = new QHBoxLayout(m_maxdoasScanFrame);
-  maxdoasScanLayout->setMargin(0);
 
   m_scanCombo = new QComboBox(m_maxdoasScanFrame);
   m_scanCombo->addItem("Reference before", QVariant(ANLYS_MAXDOAS_REF_SCAN_BEFORE));
@@ -230,7 +219,6 @@ CWAnalysisWindowPropertyEditor::CWAnalysisWindowPropertyEditor(const QString &pr
   m_refTwoSzaFrame = new QFrame(filesGroup);
   m_refTwoSzaFrame->setFrameStyle(QFrame::NoFrame);
   QHBoxLayout *szaLayout = new QHBoxLayout(m_refTwoSzaFrame);
-  szaLayout->setMargin(0);
   QLabel *labelTwoSza = new QLabel(" Reference 2 ", m_refTwoSzaFrame);
   labelTwoSza->setFixedWidth(85);
   m_szaCenterEdit = new QLineEdit(m_refTwoSzaFrame);
@@ -253,7 +241,6 @@ CWAnalysisWindowPropertyEditor::CWAnalysisWindowPropertyEditor(const QString &pr
   m_satelliteFrame = new QFrame(m_refTwoSzaFrame);
   m_satelliteFrame->setFrameStyle(QFrame::NoFrame);
   QHBoxLayout *satelliteLayout = new QHBoxLayout(m_satelliteFrame);
-  satelliteLayout->setMargin(0);
 
   // longitude (min/max)
   satelliteLayout->addWidget(new QLabel("Lon.", m_satelliteFrame));
@@ -305,7 +292,6 @@ CWAnalysisWindowPropertyEditor::CWAnalysisWindowPropertyEditor(const QString &pr
   m_refTwoEditFrame = new QFrame(filesGroup);
   m_refTwoEditFrame->setFrameStyle(QFrame::NoFrame);
   QHBoxLayout *refTwoEditFrameLayout = new QHBoxLayout(m_refTwoEditFrame);
-  refTwoEditFrameLayout->setMargin(0);
   QLabel *labelTwoEdit = new QLabel(" Reference 2 ", m_refTwoEditFrame);
   labelTwoEdit->setFixedWidth(85);
   m_refTwoEdit = new QLineEdit(m_refTwoEditFrame);
@@ -318,7 +304,6 @@ CWAnalysisWindowPropertyEditor::CWAnalysisWindowPropertyEditor(const QString &pr
 
   // stack for ref 2 switching ...
   m_refTwoStack = new QStackedLayout;
-  m_refTwoStack->setMargin(0);
 
   if (((p->instrumental.format!=PRJCT_INSTR_FORMAT_ASCII) && is_maxdoas((_prjctInstrFormat)p->instrumental.format)) ||
       ((p->instrumental.format==PRJCT_INSTR_FORMAT_ASCII) && ((p->instrumental.ascii.flagElevationAngle) || (p->instrumental.ascii.format==PRJCT_INSTR_ASCII_FORMAT_COLUMN_EXTENDED))))
@@ -335,7 +320,6 @@ CWAnalysisWindowPropertyEditor::CWAnalysisWindowPropertyEditor(const QString &pr
   QFrame *residualFrame = new QFrame(filesGroup);
   residualFrame->setFrameStyle(QFrame::NoFrame);
   QHBoxLayout *residualFrameLayout = new QHBoxLayout(residualFrame);
-  residualFrameLayout->setMargin(0);
 
   if  (p->output.file_format==NETCDF)
   // (p->instrumental.format==PRJCT_INSTR_FORMAT_GEMS)

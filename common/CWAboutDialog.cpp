@@ -42,11 +42,10 @@ CWAboutDialog::CWAboutDialog(QWidget *parent) :
 
   mainLayout->addSpacing(20);
 
-  QString blurb("is copyright ");
-  blurb.append(Qt::Key_copyright);
-  blurb.append(" 2007\n\nBelgian Institute for Space Aeronomy (BIRA-IASB)\n"
-           "Avenue Circulaire 3,  1180 Uccle,  Belgium\n\nand\n\n"
-           "Science [&] Technology BV,\nDelft, Netherlands.");
+  QString blurb("is copyright © 2007\n"
+                "Belgian Institute for Space Aeronomy (BIRA-IASB)\n"
+                "Avenue Circulaire 3,  1180 Uccle,  Belgium\n\nand\n\n"
+                "Science [&] Technology BV,\nDelft, Netherlands.");
 
   QLabel *blurbLabel = new QLabel(blurb);
   blurbLabel->setAlignment(Qt::AlignCenter);

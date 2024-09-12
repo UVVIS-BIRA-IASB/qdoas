@@ -29,7 +29,6 @@ CWProjectDirectoryEditor::CWProjectDirectoryEditor(CWProjectTree *projectTree, Q
   }
 
   QGridLayout *mainLayout = new QGridLayout(this);
-  mainLayout->setMargin(50);
 
   // row 0 - directory name
   mainLayout->addWidget(new QLabel("Directory", this), 0, 1);

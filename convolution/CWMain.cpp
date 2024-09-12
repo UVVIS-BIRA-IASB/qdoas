@@ -21,7 +21,6 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #include <QApplication>
 #include <QLocale>
 #include <clocale>
-#include <QTextCodec>
 
 #include "CWMain.h"
 #include "CWAboutDialog.h"
@@ -56,7 +55,6 @@ CWMain::CWMain(QWidget *parent) :
   m_controller = new CConvEngineController(this);
 
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
-  mainLayout->setMargin(0);
   mainLayout->setSpacing(0);
 
   //------------------------------

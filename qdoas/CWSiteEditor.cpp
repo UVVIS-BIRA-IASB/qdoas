@@ -27,7 +27,6 @@ CWSiteEditor::CWSiteEditor(QTreeWidgetItem *editItem, QWidget *parent) :
   m_validBits(0x0)
 {
   QGridLayout *mainLayout = new QGridLayout(this);
-  mainLayout->setMargin(50);
 
   // first create and layout the widget
   // row 0 - Name
