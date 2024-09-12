@@ -1680,7 +1680,7 @@ void CWSfpParametersDoasTable::populate(const struct calibration_sfp *data)
     initialValues.push_back(QVariant(data->errStore));
 
     QString label("SFP");
-    label.append('1' + i);
+    label.append(QString::number(1 + i));
 
     addRow(cStandardRowHeight, label, initialValues);
     ++data;

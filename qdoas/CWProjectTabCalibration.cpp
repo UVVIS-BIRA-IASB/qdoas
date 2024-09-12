@@ -70,7 +70,6 @@ CWProjectTabCalibration::CWProjectTabCalibration(const mediate_project_calibrati
   m_fileWidget = new QFrame(this);
   m_fileWidget->setFrameStyle(QFrame::NoFrame);
   QHBoxLayout *fileLayout = new QHBoxLayout(m_fileWidget);
-  fileLayout->setMargin(0);
   fileLayout->addWidget(m_slfFileEdit);
   fileLayout->addWidget(fileBrowseBtn);
 
@@ -81,7 +80,6 @@ CWProjectTabCalibration::CWProjectTabCalibration(const mediate_project_calibrati
   m_orderWidget = new QFrame(this);
   m_orderWidget->setFrameStyle(QFrame::NoFrame);
   QHBoxLayout *orderLayout = new QHBoxLayout(m_orderWidget);
-  orderLayout->setMargin(0);
   orderLayout->setAlignment(Qt::AlignLeft);
   orderLayout->addWidget(new QLabel("Order", this));
   m_orderSpinBox = new QSpinBox(this);
@@ -103,13 +101,11 @@ CWProjectTabCalibration::CWProjectTabCalibration(const mediate_project_calibrati
 
   // middle
   QHBoxLayout *groupLayout = new QHBoxLayout;
-  groupLayout->setMargin(0);
   groupLayout->setSpacing(5);
 
   // display
   QGroupBox *displayGroup = new QGroupBox("Display", this);
   QGridLayout *displayLayout = new QGridLayout(displayGroup);
-  displayLayout->setMargin(3);
   displayLayout->setSpacing(0);
 
   m_spectraCheck = new QCheckBox("Spectra", displayGroup);
@@ -126,7 +122,6 @@ CWProjectTabCalibration::CWProjectTabCalibration(const mediate_project_calibrati
   // Polynomial Degree
   QGroupBox *polyGroup = new QGroupBox("Polynomial Degree", this);
   QGridLayout *polyLayout = new QGridLayout(polyGroup);
-  polyLayout->setMargin(3);
   polyLayout->setAlignment(Qt::AlignLeft);
 
   polyLayout->addWidget(new QLabel("Shift", polyGroup), 0, 0, Qt::AlignRight);
@@ -146,7 +141,6 @@ CWProjectTabCalibration::CWProjectTabCalibration(const mediate_project_calibrati
   // window limits
   QGroupBox *intervalGroup = new QGroupBox("Calib. Interval (nm)", this);
   QGridLayout *intervalLayout = new QGridLayout(intervalGroup);
-  intervalLayout->setMargin(5);
   intervalLayout->setAlignment(Qt::AlignLeft);
 
   intervalLayout->addWidget(new QLabel("Min", intervalGroup), 0, 0, Qt::AlignRight);
@@ -167,7 +161,6 @@ CWProjectTabCalibration::CWProjectTabCalibration(const mediate_project_calibrati
 
   QGroupBox *windowGroup = new QGroupBox("Calibration windows", this);
   QGridLayout *windowLayout = new QGridLayout(windowGroup);
-  windowLayout->setMargin(5);
   windowLayout->setAlignment(Qt::AlignLeft);
 
   windowLayout->addWidget(new QLabel("Subdivision", this), 0, 0);

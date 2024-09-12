@@ -21,7 +21,6 @@ CWProjectNameEditor::CWProjectNameEditor(CWProjectTree *projectTree, QTreeWidget
   m_projectTree(projectTree)
 {
   QGridLayout *mainLayout = new QGridLayout(this);
-  mainLayout->setMargin(50);
 
   if (item && item->parent() == NULL) {
     // renaming a project

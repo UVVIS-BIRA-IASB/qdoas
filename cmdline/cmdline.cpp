@@ -217,7 +217,6 @@
 #include <QFileInfo>
 #include <QLocale>
 #include <clocale>
-#include <QTextCodec>
 
 #ifdef _WIN32
 #include <Windows.h>
