@@ -22,10 +22,13 @@ add_definitions(-DAPP_USAMP)
 target_compile_features(usamp PUBLIC cxx_std_11)
 target_link_libraries(usamp
   common mediate engine
-  Qt::Widgets Qt::PrintSupport Qt::Xml
+  Qt::Widgets Qt::PrintSupport
   ${QWT_LIBRARY}
   )
 target_include_directories(usamp PRIVATE ${QWT_INCLUDE_DIR})
+
+target_link_libraries(usamp ${LIBXMLXX_LIBRARIES})
+target_include_directories(usamp PRIVATE ${LIBXMLXX_INCLUDE_DIRS})
 
 if(APPLE)
   install(TARGETS usamp DESTINATION qdoas.app/Contents/MacOS)

@@ -21,10 +21,11 @@ class CUsampConfigHandler : public CConfigHandler
  public:
   CUsampConfigHandler();
 
-  virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                const QString &qName, const QXmlAttributes &atts);
-
   const mediate_usamp_t* properties(void) const;
+
+protected:
+  virtual void start_subhandler(const Glib::ustring& name,
+                                const std::map<Glib::ustring, QString>& attributes) override;
 
  private:
   mediate_usamp_t m_properties;
@@ -39,8 +40,8 @@ class CUsampGeneralSubHandler : public CConfigSubHandler
  public:
   CUsampGeneralSubHandler(CConfigHandler *master, mediate_usamp_t *d);
 
-  virtual bool start(const QXmlAttributes &atts);
-  virtual bool start(const QString &element, const QXmlAttributes &atts);
+  virtual void start(const std::map<Glib::ustring, QString>& attributes) override;
+  virtual void start(const Glib::ustring& element, const std::map<Glib::ustring, QString>& attributes) override;
 
  private:
   mediate_usamp_t *m_d;
