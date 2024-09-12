@@ -53,6 +53,7 @@ QString CRingConfigWriter::write(const QString &fileName)
       (d->noheader ? sTrue : sFalse),(d->saveraman ? sTrue : sFalse));
   
   fprintf(fp," output_format=\"%s\"",(d->formatType==CONVOLUTION_FORMAT_NETCDF)?"netcdf":"ascii");
+  fprintf(fp, " pixels=\"%d\"",d->n_groundpixel);
 
   tmpStr = pathMgr->simplifyPath(QString(d->outputFile));
   fprintf(fp, " output=\"%s\"", tmpStr.toLocal8Bit().data());
