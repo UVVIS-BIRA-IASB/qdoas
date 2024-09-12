@@ -37,8 +37,6 @@ class CConfigSubHandler
 
  protected:
   CConfigHandler *m_master;
-
-  bool postErrorMessage(const QString &msg); // always returns false
 };
 
 struct SSubHandlerItem
@@ -57,7 +55,6 @@ class CConfigHandler : public xmlpp::SaxParser
 
   // content handling
   virtual QString errorString() const;
-  virtual bool ignorableWhitespace(const QString &ch);
   void install_subhandler(CConfigSubHandler *newHandler, const std::map<Glib::ustring, QString>& attributes);
 
   void setPath(int index, const QString &pathPrefix);

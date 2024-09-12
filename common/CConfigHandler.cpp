@@ -93,11 +93,6 @@ QString CConfigHandler::errorString() const
   return m_subErrorMessage;
 }
 
-bool CConfigHandler::ignorableWhitespace(const QString &ch)
-{
-  return true;
-}
-
 void CConfigHandler::install_subhandler(CConfigSubHandler *newHandler,
                                         const map<Glib::ustring, QString>& attributes) {
   m_subHandlerStack.push_back(SSubHandlerItem(newHandler, element_stack.size()));
@@ -149,12 +144,4 @@ QString CConfigHandler::pathExpand(const QString &name)
   }
 
   return name;
-}
-
-//------------------------------------------------------------------------
-
-bool CConfigSubHandler::postErrorMessage(const QString &msg)
-{
-  master()->setSubErrorMessage(msg);
-  return false;
 }
