@@ -27,7 +27,6 @@ CWProjectAnalysisWindowNameEditor::CWProjectAnalysisWindowNameEditor(CWProjectTr
   // newAnalysisWindow is false (rename).
 
   QGridLayout *mainLayout = new QGridLayout(this);
-  mainLayout->setMargin(50);
 
   if (newAnalysisWindow)
     mainLayout->addWidget(new QLabel("Enter a name for the new Analysis Window", this), 0, 1);

@@ -6,6 +6,7 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 
 #include <QCoreApplication>
+#include <QIODevice>
 #include <QTextStream>
 #include <QVariant>
 

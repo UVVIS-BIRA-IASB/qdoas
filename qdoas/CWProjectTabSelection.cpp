@@ -11,7 +11,7 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #include <QGroupBox>
 #include <QLabel>
 #include <QFontMetrics>
-#include <QRegExpValidator>
+#include <QRegularExpressionValidator>
 
 #include "CWProjectTabSelection.h"
 #include "CValidator.h"
@@ -32,7 +32,6 @@ CWProjectTabSelection::CWProjectTabSelection(const mediate_project_selection_t *
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
   QHBoxLayout *topLayout = new QHBoxLayout;
-  topLayout->setMargin(0);
 
    // SZA group
   QGroupBox *szaGroup = new QGroupBox("SZA", this);
@@ -95,12 +94,10 @@ CWProjectTabSelection::CWProjectTabSelection(const mediate_project_selection_t *
   mainLayout->addLayout(topLayout);
 
   QHBoxLayout *satelliteLayout = new QHBoxLayout;
-  satelliteLayout->setMargin(0);
 
   // Gelocation selection - also in a group box
   m_geolocationGroup = new QGroupBox("Geolocations", this);
   QVBoxLayout *geoGroupLayout = new QVBoxLayout;
-  geoGroupLayout->setMargin(0);
   m_geolocationEdit = new CWGeolocation(&(properties->geo));
   geoGroupLayout->addWidget(m_geolocationEdit);
 
@@ -137,7 +134,6 @@ CWProjectTabSelection::CWProjectTabSelection(const mediate_project_selection_t *
   mainLayout->addLayout(satelliteLayout);
 
   QHBoxLayout *maxdoasLayout = new QHBoxLayout;
-  maxdoasLayout->setMargin(0);
 
    // Reference group
 
@@ -296,7 +292,6 @@ CWGeolocation::CWGeolocation(const struct geolocation *geo, QWidget *parent) :
   // circle
   QFrame *circleFrame = new QFrame;
   QGridLayout *circleLayout = new QGridLayout;
-  circleLayout->setMargin(0);
 
   // row 0
   circleLayout->addWidget(new QLabel("Radius (km)", circleFrame), 0, 0);
@@ -326,7 +321,6 @@ CWGeolocation::CWGeolocation(const struct geolocation *geo, QWidget *parent) :
   // rectangle
   QFrame *rectangleFrame = new QFrame;
   QGridLayout *rectangleLayout = new QGridLayout;
-  rectangleLayout->setMargin(0);
 
   // row 0
   rectangleLayout->addWidget(new QLabel("Western Limit (long. degrees)", rectangleFrame), 0, 0);
@@ -361,7 +355,6 @@ CWGeolocation::CWGeolocation(const struct geolocation *geo, QWidget *parent) :
   // sites
   QFrame *sitesFrame = new QFrame;
   QGridLayout *sitesLayout = new QGridLayout;
-  sitesLayout->setMargin(0);
 
   sitesLayout->addWidget(new QLabel("Radius (km)", sitesFrame), 0, 0);
   m_sitesRadiusEdit = new QLineEdit(this);

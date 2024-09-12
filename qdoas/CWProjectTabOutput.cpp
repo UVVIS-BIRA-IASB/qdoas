@@ -52,8 +52,8 @@ CWProjectTabOutput::CWProjectTabOutput(const mediate_project_output_t *propertie
   QFrame *groupFrame = new QFrame(m_pathFrame);
   groupFrame->setFrameStyle(QFrame::NoFrame);
   m_groupNameEdit = new QLineEdit(groupFrame);
-  QRegExp validGroupName("[^/]{1,255}"); // Swath name may not contain "/" and can be 1 to 255 characters long.
-  m_groupNameEdit->setValidator(new QRegExpValidator(validGroupName, m_groupNameEdit));
+  QRegularExpression validGroupName("[^/]{1,255}"); // Swath name may not contain "/" and can be 1 to 255 characters long.
+  m_groupNameEdit->setValidator(new QRegularExpressionValidator(validGroupName, m_groupNameEdit));
 
   // Layout for output file/format widgets:
   QHBoxLayout *pathLayout = new QHBoxLayout();

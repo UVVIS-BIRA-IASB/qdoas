@@ -25,7 +25,6 @@ CWConvTabGeneral::CWConvTabGeneral(const mediate_conv_general_t *properties, QWi
   QFrame(parent)
 {
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
-  mainLayout->setMargin(25);
   mainLayout->setSpacing(15);
 
   QHBoxLayout *topLayout = new QHBoxLayout;

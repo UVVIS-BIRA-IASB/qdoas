@@ -29,12 +29,10 @@ CWProjectPropertyEditor::CWProjectPropertyEditor(const QString &projectName, QWi
   QGridLayout *mainLayout = new QGridLayout(this);
 
   //QVBoxLayout *mainLayout = new QVBoxLayout(this);
-  mainLayout->setMargin(10);
   mainLayout->setSpacing(5);
 
   // Instrument selection combos
   QHBoxLayout *instrLayout = new QHBoxLayout;
-  instrLayout->setMargin(0);
   instrLayout->setSpacing(15);
 
   m_instrTypeCombo = new QComboBox(this);

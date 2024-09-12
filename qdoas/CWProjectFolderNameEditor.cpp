@@ -22,7 +22,6 @@ CWProjectFolderNameEditor::CWProjectFolderNameEditor(CWProjectTree *projectTree,
   m_newFolder(newFolder)
 {
   QGridLayout *mainLayout = new QGridLayout(this);
-  mainLayout->setMargin(50);
 
   if (newFolder)
     mainLayout->addWidget(new QLabel("Enter a name for the new Folder", this), 0, 1);

@@ -11,7 +11,7 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #include <QGroupBox>
 #include <QLabel>
 #include <QFontMetrics>
-#include <QRegExpValidator>
+#include <QRegularExpressionValidator>
 
 #include "CWProjectTabDisplay.h"
 #include "CWOutputSelector.h"
@@ -25,7 +25,6 @@ CWProjectTabDisplay::CWProjectTabDisplay(const mediate_project_display_t *proper
   // Each of the GUI components maintains its bit of 'properties' state (until 'apply'ed).
 
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
-  mainLayout->setMargin(10);
   mainLayout->setSpacing(15);
 
   // plot (require data) group

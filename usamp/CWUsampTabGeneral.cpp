@@ -24,7 +24,6 @@ CWUsampTabGeneral::CWUsampTabGeneral(const mediate_usamp_t *properties, QWidget 
   QFrame(parent)
 {
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
-  mainLayout->setMargin(25);
   mainLayout->setSpacing(15);
 
   QGridLayout *fileLayout = new QGridLayout;

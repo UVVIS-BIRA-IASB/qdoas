@@ -28,7 +28,6 @@ CWPlotPropertiesEditor::CWPlotPropertiesEditor(CWPlotRegion *plotRegion, QWidget
 {
 
   QGridLayout *mainLayout = new QGridLayout(this);
-  mainLayout->setMargin(50);
 
   m_config = new CWPlotPropertiesConfig(m_plotRegion->properties(), this);
   mainLayout->addWidget(m_config, 0, 1);

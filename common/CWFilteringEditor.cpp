@@ -32,7 +32,6 @@ CWFilteringEditor::CWFilteringEditor(const mediate_filter_t *lowpass,
   // Low Pass Filter
   QGroupBox *lowGroup = new QGroupBox("Low Pass Filter", this);
   QVBoxLayout *lowLayout = new QVBoxLayout(lowGroup);
-  lowLayout->setMargin(0);
   lowLayout->addSpacing(5);
   m_lowCombo = new QComboBox;
   m_lowStack = new QStackedWidget;
@@ -84,7 +83,6 @@ CWFilteringEditor::CWFilteringEditor(const mediate_filter_t *lowpass,
   // High Pass Filter
   QGroupBox *highGroup = new QGroupBox("High Pass Filter", this);
   QVBoxLayout *highLayout = new QVBoxLayout(highGroup);
-  highLayout->setMargin(0);
   highLayout->addSpacing(5);
   m_highCombo = new QComboBox;
   m_highStack = new QStackedWidget;
@@ -227,7 +225,6 @@ CWFilterUsageEdit::CWFilterUsageEdit(const struct filter_usage *d, CWFilteringEd
   case CWFilteringEditor::CalFitCheck:
     {
       QHBoxLayout *layout = new QHBoxLayout(this);
-      layout->setMargin(0);
       layout->addStretch(1); // push right
       QCheckBox *calCheck = new QCheckBox("Calibration", this);
       layout->addWidget(calCheck);
@@ -243,7 +240,6 @@ CWFilterUsageEdit::CWFilterUsageEdit(const struct filter_usage *d, CWFilteringEd
   case CWFilteringEditor::SubDivSwitch:
     {
       QHBoxLayout *layout = new QHBoxLayout(this);
-      layout->setMargin(0);
       layout->addStretch(1); // push right
       m_subBtn = new QRadioButton("Subtract", this);
       layout->addWidget(m_subBtn);

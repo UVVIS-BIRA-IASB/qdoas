@@ -26,7 +26,6 @@ CWRingTabGeneral::CWRingTabGeneral(const mediate_ring_t *properties, QWidget *pa
   QFrame(parent)
 {
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
-  mainLayout->setMargin(25);
   mainLayout->setSpacing(15);
 
   QGridLayout *fileLayout = new QGridLayout;
@@ -87,7 +86,6 @@ CWRingTabGeneral::CWRingTabGeneral(const mediate_ring_t *properties, QWidget *pa
   mainLayout->addWidget(outputGroup);
 
   QGridLayout *tempLayout = new QGridLayout;
-  tempLayout->setMargin(0);
   tempLayout->addWidget(new QLabel("Temperature (K)", this),0,0);
   m_tempEdit = new QLineEdit(this);
   m_tempEdit->setFixedWidth(cStandardEditWidth);

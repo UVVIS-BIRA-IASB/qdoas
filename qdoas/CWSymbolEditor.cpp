@@ -8,7 +8,7 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #include <QGridLayout>
 #include <QLabel>
 #include <QMessageBox>
-#include <QRegExpValidator>
+#include <QRegularExpressionValidator>
 
 #include "CWSymbolEditor.h"
 #include "CWorkSpace.h"
@@ -24,7 +24,6 @@ CWSymbolEditor::CWSymbolEditor(const QString &symbolName, const QString &descrip
   bool modifying = !symbolName.isEmpty();
 
   QGridLayout *mainLayout = new QGridLayout(this);
-  mainLayout->setMargin(50);
 
   // row 0 - Name
   mainLayout->addWidget(new QLabel("Symbol Name", this), 0, 1);
@@ -32,7 +31,7 @@ CWSymbolEditor::CWSymbolEditor(const QString &symbolName, const QString &descrip
   m_symbolName->setMaxLength(SYMBOL_NAME_BUFFER_LENGTH - 1);
 
   // limit the possible input
-  m_symbolName->setValidator(new QRegExpValidator(QRegExp("[A-Za-z][A-Za-z0-9()\\-_]*"), m_symbolName));
+  m_symbolName->setValidator(new QRegularExpressionValidator(QRegularExpression("[A-Za-z][A-Za-z0-9()\\-_]*"), m_symbolName));
 
   if (modifying) {
     // can modify only the description - the enabled state of the symbolName edit is

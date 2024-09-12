@@ -51,7 +51,9 @@ QLineEdit *CWSlitFileBase::helperConstructFileEdit(QGridLayout *gridLayout, int 
   gridLayout->addWidget(browseButton, row, 2);
   // store a pointer to the fileEdit in browseButton's properties, so
   // we can find the fileEdit when the button is clicked
-  browseButton->setProperty("lineEdit", QVariant(QMetaType::QObjectStar,&fileEdit));
+  QVariant v_fileEdit;
+  v_fileEdit.setValue(fileEdit);
+  browseButton->setProperty("lineEdit", v_fileEdit);
   connect(browseButton, SIGNAL(clicked()), this, SLOT(slotBrowseFile()));
 
   return fileEdit;
@@ -166,7 +168,6 @@ CWSlitGaussianEdit::CWSlitGaussianEdit(const struct slit_gaussian *d, QWidget *p
   QFrame *fwhmFrame = new QFrame(this);
   fwhmFrame->setFrameStyle(QFrame::NoFrame);
   QHBoxLayout *fwhmFrameLayout = new QHBoxLayout(fwhmFrame);
-  fwhmFrameLayout->setMargin(0);
   QLabel *labelfwhm = new QLabel("FWHM (nm)", fwhmFrame);
   labelfwhm->setAlignment(Qt::AlignVCenter|Qt::AlignRight);
   labelfwhm->setMinimumSize(cSuggestedColumnZeroWidth, 0);
@@ -182,12 +183,10 @@ CWSlitGaussianEdit::CWSlitGaussianEdit(const struct slit_gaussian *d, QWidget *p
   QFrame *fileFrame = new QFrame(this);
   fileFrame->setFrameStyle(QFrame::NoFrame);
   QGridLayout *fileFrameLayout = new QGridLayout(fileFrame);
-  fileFrameLayout->setMargin(0);
 
   m_slitFileEdit = helperConstructFileEdit(fileFrameLayout, 0, "FWHM (nm)",d->filename, sizeof(d->filename)-1);
 
   m_toggleWavelengthStack = new QStackedLayout;
-  m_toggleWavelengthStack->setMargin(0);
   m_toggleWavelengthStack->addWidget(fwhmFrame);
   m_toggleWavelengthStack->addWidget(fileFrame);
 
@@ -234,7 +233,6 @@ CWSlitLorentzEdit::CWSlitLorentzEdit(const struct slit_lorentz *d, QWidget *pare
   QFrame *fwhmFrame = new QFrame(this);
   fwhmFrame->setFrameStyle(QFrame::NoFrame);
   QHBoxLayout *fwhmFrameLayout = new QHBoxLayout(fwhmFrame);
-  fwhmFrameLayout->setMargin(0);
 
   // width
 
@@ -253,12 +251,10 @@ CWSlitLorentzEdit::CWSlitLorentzEdit(const struct slit_lorentz *d, QWidget *pare
   QFrame *fileFrame = new QFrame(this);
   fileFrame->setFrameStyle(QFrame::NoFrame);
   QGridLayout *fileFrameLayout = new QGridLayout(fileFrame);
-  fileFrameLayout->setMargin(0);
 
   m_slitFileEdit = helperConstructFileEdit(fileFrameLayout, 0, "Width (nm)",d->filename, sizeof(d->filename));
 
   m_toggleWavelengthStack = new QStackedLayout;
-  m_toggleWavelengthStack->setMargin(0);
   m_toggleWavelengthStack->addWidget(fwhmFrame);
   m_toggleWavelengthStack->addWidget(fileFrame);
 
@@ -326,7 +322,6 @@ CWSlitVoigtEdit::CWSlitVoigtEdit(const struct slit_voigt *d, QWidget *parent) :
   QFrame *fwhmFrame = new QFrame(this);
   fwhmFrame->setFrameStyle(QFrame::NoFrame);
   QGridLayout *fwhmFrameLayout = new QGridLayout(fwhmFrame);
-  fwhmFrameLayout->setMargin(0);
 
   // left FWHM
   QLabel *labelFwhm = new QLabel("Gaussian FWHM (nm)", fwhmFrame);
@@ -353,13 +348,11 @@ CWSlitVoigtEdit::CWSlitVoigtEdit(const struct slit_voigt *d, QWidget *parent) :
   QFrame *fileFrame = new QFrame(this);
   fileFrame->setFrameStyle(QFrame::NoFrame);
   QGridLayout *fileFrameLayout = new QGridLayout(fileFrame);
-  fileFrameLayout->setMargin(0);
 
   m_fwhmFileEdit = helperConstructFileEdit(fileFrameLayout, 0, "Gaussian FWHM File",d->filename, sizeof(d->filename)-1);
   m_ratioFileEdit = helperConstructFileEdit(fileFrameLayout, 1, "Lorentz/Gaussian ratio",d->filename2, sizeof(d->filename2)-1);
 
   m_toggleWavelengthStack = new QStackedLayout;
-  m_toggleWavelengthStack->setMargin(0);
   m_toggleWavelengthStack->addWidget(fwhmFrame);
   m_toggleWavelengthStack->addWidget(fileFrame);
 
@@ -415,7 +408,6 @@ CWSlitErrorEdit::CWSlitErrorEdit(const struct slit_error *d, QWidget *parent) :
   QFrame *fwhmFrame = new QFrame(this);
   fwhmFrame->setFrameStyle(QFrame::NoFrame);
   QGridLayout *fwhmFrameLayout = new QGridLayout(fwhmFrame);
-  fwhmFrameLayout->setMargin(0);
 
   // fwhm
 
@@ -445,13 +437,11 @@ CWSlitErrorEdit::CWSlitErrorEdit(const struct slit_error *d, QWidget *parent) :
   QFrame *fileFrame = new QFrame(this);
   fileFrame->setFrameStyle(QFrame::NoFrame);
   QGridLayout *fileFrameLayout = new QGridLayout(fileFrame);
-  fileFrameLayout->setMargin(0);
 
   m_fwhmFileEdit = helperConstructFileEdit(fileFrameLayout, 0, "Gaussian FWHM File",d->filename, sizeof(d->filename)-1);
   m_ratioFileEdit = helperConstructFileEdit(fileFrameLayout, 1, "Boxcar width File",d->filename2, sizeof(d->filename2)-1);
 
   m_toggleWavelengthStack = new QStackedLayout;
-  m_toggleWavelengthStack->setMargin(0);
   m_toggleWavelengthStack->addWidget(fwhmFrame);
   m_toggleWavelengthStack->addWidget(fileFrame);
 
@@ -554,7 +544,6 @@ CWSlitAGaussEdit::CWSlitAGaussEdit(const struct slit_agauss *d, QWidget *parent)
   QFrame *fwhmFrame = new QFrame(this);
   fwhmFrame->setFrameStyle(QFrame::NoFrame);
   QGridLayout *fwhmFrameLayout = new QGridLayout(fwhmFrame);
-  fwhmFrameLayout->setMargin(0);
 
   // fwhm
 
@@ -584,13 +573,11 @@ CWSlitAGaussEdit::CWSlitAGaussEdit(const struct slit_agauss *d, QWidget *parent)
   QFrame *fileFrame = new QFrame(this);
   fileFrame->setFrameStyle(QFrame::NoFrame);
   QGridLayout *fileFrameLayout = new QGridLayout(fileFrame);
-  fileFrameLayout->setMargin(0);
 
   m_fwhmFileEdit = helperConstructFileEdit(fileFrameLayout, 0, "Gaussian FWHM File",d->filename, sizeof(d->filename)-1);
   m_asymFileEdit = helperConstructFileEdit(fileFrameLayout, 1, "Asymmetry factor File",d->filename2, sizeof(d->filename2)-1);
 
   m_toggleWavelengthStack = new QStackedLayout;
-  m_toggleWavelengthStack->setMargin(0);
   m_toggleWavelengthStack->addWidget(fwhmFrame);
   m_toggleWavelengthStack->addWidget(fileFrame);
 
@@ -643,7 +630,6 @@ CWSlitSuperGaussEdit::CWSlitSuperGaussEdit(const struct slit_supergauss *d, QWid
   QFrame *fwhmFrame = new QFrame(this);
   fwhmFrame->setFrameStyle(QFrame::NoFrame);
   QGridLayout *fwhmFrameLayout = new QGridLayout(fwhmFrame);
-  fwhmFrameLayout->setMargin(0);
 
   // fwhm
 
@@ -687,14 +673,12 @@ CWSlitSuperGaussEdit::CWSlitSuperGaussEdit(const struct slit_supergauss *d, QWid
   QFrame *fileFrame = new QFrame(this);
   fileFrame->setFrameStyle(QFrame::NoFrame);
   QGridLayout *fileFrameLayout = new QGridLayout(fileFrame);
-  fileFrameLayout->setMargin(0);
 
   m_fwhmFileEdit = helperConstructFileEdit(fileFrameLayout, 0, "Gaussian FWHM File",d->filename, sizeof(d->filename)-1);
   m_expFileEdit = helperConstructFileEdit(fileFrameLayout, 1, "Exponential term File",d->filename2, sizeof(d->filename2)-1);
   m_asymFileEdit = helperConstructFileEdit(fileFrameLayout, 2, "Asymmetry factor File",d->filename3, sizeof(d->filename3)-1);
 
   m_toggleWavelengthStack = new QStackedLayout;
-  m_toggleWavelengthStack->setMargin(0);
   m_toggleWavelengthStack->addWidget(fwhmFrame);
   m_toggleWavelengthStack->addWidget(fileFrame);
 

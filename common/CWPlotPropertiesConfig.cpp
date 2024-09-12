@@ -88,7 +88,6 @@ CWPlotPropertyScale::CWPlotPropertyScale(const CScaleControl &scaleControl, cons
   m_scale(scaleControl)
 {
   QGridLayout *mainLayout = new QGridLayout(this);
-  mainLayout->setMargin(0);
   mainLayout->setSpacing(3);
 
   m_fixedCheck = new QCheckBox(name, this);
@@ -198,7 +197,6 @@ CWPlotPropertiesConfig::CWPlotPropertiesConfig(const CPlotProperties &prop, QWid
   int row;
 
   QGridLayout *mainLayout = new QGridLayout(this);
-  mainLayout->setMargin(0);
 
   QGroupBox *colourGroup = new QGroupBox("Colour/Line Width", this);
 

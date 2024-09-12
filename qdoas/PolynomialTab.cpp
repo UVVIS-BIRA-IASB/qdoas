@@ -37,7 +37,6 @@ static QFrame *white_frame() {
 static void add_layout(QGridLayout *grid_layout, QLayout *layout, int row, int col) {
   QFrame *frame = white_frame();
   frame->setLayout(layout);
-  layout->setMargin(1);
   grid_layout->addWidget(frame, row, col);
 }
 
@@ -60,7 +59,6 @@ PolynomialTab::PolynomialTab(QWidget *parent) :
   orthobase_order = new QComboBox(this);
 
   QGridLayout *layout = new QGridLayout(this);
-  layout->setMargin(0);
   layout->setSpacing(0);
 
   layout->addWidget(header_label("Polynomial"), 1, 0);

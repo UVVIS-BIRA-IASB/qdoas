@@ -39,7 +39,6 @@ QWidget* CNavigationPanel::helperBuildRecordEdit(void)
   QFrame *frame = new QFrame;
   frame->setFrameStyle(QFrame::NoFrame);
   QHBoxLayout *layout = new QHBoxLayout(frame);
-  layout->setMargin(0);
   layout->setSpacing(0);
   layout->addWidget(m_recordEdit);
 
@@ -64,7 +63,6 @@ QWidget* CNavigationPanel::helperBuildDelayEdit(void)
   QFrame *frame = new QFrame;
   frame->setFrameStyle(QFrame::NoFrame);
   QHBoxLayout *layout = new QHBoxLayout(frame);
-  layout->setMargin(0);
   layout->setSpacing(0);
 
   layout->addSpacing(10);
