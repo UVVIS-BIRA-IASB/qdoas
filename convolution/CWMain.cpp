@@ -14,8 +14,6 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #include <QMenu>
 #include <QAction>
 #include <QPushButton>
-#include <QXmlInputSource>
-#include <QXmlSimpleReader>
 #include <QFile>
 #include <QMessageBox>
 #include <QFileDialog>

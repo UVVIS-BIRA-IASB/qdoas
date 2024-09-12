@@ -17,6 +17,7 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #include <QLocale>
 #include <clocale>
 #include <QTextCodec>
+#include <QTextStream>
 
 #include "CWMain.h"
 #include "CWProjectTree.h"

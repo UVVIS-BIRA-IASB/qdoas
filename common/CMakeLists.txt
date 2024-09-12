@@ -49,7 +49,7 @@ add_library(common STATIC
 )
 
 target_compile_features(common PUBLIC cxx_std_11)
-target_link_libraries(common config Qt5::Widgets Qt5::PrintSupport Qt5::Xml)
+target_link_libraries(common config Qt::Widgets Qt::PrintSupport)
 target_include_directories(common PRIVATE ${QWT_INCLUDE_DIR})
 target_include_directories(common PUBLIC ../common ../engine ../mediator)
 

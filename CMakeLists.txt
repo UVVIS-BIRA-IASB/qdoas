@@ -80,7 +80,7 @@ else()
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-find_package(Qt5 COMPONENTS Core Gui Widgets Xml PrintSupport REQUIRED)
+find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport REQUIRED)
 find_package(Qwt REQUIRED)
 
 find_package(Boost REQUIRED)
