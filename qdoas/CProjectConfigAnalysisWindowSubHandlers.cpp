@@ -11,6 +11,8 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 #include "constants.h"
 
+using std::map;
+
 CAnalysisWindowSubHandler::CAnalysisWindowSubHandler(CConfigHandler *master,
                              CAnalysisWindowConfigItem *item) :
   CConfigSubHandler(master),
@@ -18,16 +20,16 @@ CAnalysisWindowSubHandler::CAnalysisWindowSubHandler(CConfigHandler *master,
 {
 }
 
-bool CAnalysisWindowSubHandler::start(const QXmlAttributes &atts)
+void CAnalysisWindowSubHandler::start(const map<Glib::ustring, QString> &atts)
 {
   mediate_analysis_window_t *d = m_item->properties();
 
-  if (!m_item->setName(atts.value("name")))
-    return postErrorMessage("Analysis window name too long.");
+  if (!m_item->setName(atts.at("name")))
+    throw std::runtime_error("Analysis window name too long.");
 
-  m_item->setEnabled(atts.value("disable") != "true");
+  m_item->setEnabled(atts.at("disable") != "true");
 
-  QString str = atts.value("kurucz");
+  QString str = atts.at("kurucz");
   if (str == "ref")
     d->kuruczMode = ANLYS_KURUCZ_REF;
   else if (str == "spec")
@@ -37,79 +39,81 @@ bool CAnalysisWindowSubHandler::start(const QXmlAttributes &atts)
   else
     d->kuruczMode = ANLYS_KURUCZ_NONE;
 
-  d->refSpectrumSelection = (atts.value("refsel") == "auto") ? ANLYS_REF_SELECTION_MODE_AUTOMATIC :  ANLYS_REF_SELECTION_MODE_FILE;
+  d->refSpectrumSelection = (atts.at("refsel") == "auto") ? ANLYS_REF_SELECTION_MODE_AUTOMATIC :  ANLYS_REF_SELECTION_MODE_FILE;
 
-  d->fitMinWavelength = atts.value("min").toDouble();
-  d->fitMaxWavelength = atts.value("max").toDouble();
-  d->resolFwhm=(!atts.value("resol_fwhm").isEmpty())?atts.value("resol_fwhm").toDouble():0.5;
-  d->lambda0=(!atts.value("lambda0").isEmpty())?atts.value("lambda0").toDouble():0.5*(d->fitMinWavelength+d->fitMaxWavelength);
+  d->fitMinWavelength = atts.at("min").toDouble();
+  d->fitMaxWavelength = atts.at("max").toDouble();
+  d->resolFwhm=(!atts.at("resol_fwhm").isEmpty())?atts.at("resol_fwhm").toDouble():0.5;
+  d->lambda0=(!atts.at("lambda0").isEmpty())?atts.at("lambda0").toDouble():0.5*(d->fitMinWavelength+d->fitMaxWavelength);
 
   // MUST have a valid name
-  return !m_item->name().isEmpty();
+  if (m_item->name().isEmpty()) {
+    throw std::runtime_error("Analysis window must have valid name.");
+  };
 }
 
-bool CAnalysisWindowSubHandler::start(const QString &element, const QXmlAttributes &atts)
+void CAnalysisWindowSubHandler::start(const Glib::ustring &element, const map<Glib::ustring, QString> &atts)
 {
   mediate_analysis_window_t *d = m_item->properties();
 
   if (element == "display") {
-    d->requireSpectrum = (atts.value("spectrum") == "true") ? 1 : 0;
-    d->requirePolynomial = (atts.value("poly") == "true") ? 1 : 0;
-    d->requireFit = (atts.value("fits") == "true") ? 1 : 0;
-    d->requireResidual = (atts.value("residual") == "true") ? 1 : 0;
-    d->requirePredefined = (atts.value("predef") == "true") ? 1 : 0;
-    d->requireRefRatio = (atts.value("ratio") == "true") ? 1 : 0;
+    d->requireSpectrum = (atts.at("spectrum") == "true") ? 1 : 0;
+    d->requirePolynomial = (atts.at("poly") == "true") ? 1 : 0;
+    d->requireFit = (atts.at("fits") == "true") ? 1 : 0;
+    d->requireResidual = (atts.at("residual") == "true") ? 1 : 0;
+    d->requirePredefined = (atts.at("predef") == "true") ? 1 : 0;
+    d->requireRefRatio = (atts.at("ratio") == "true") ? 1 : 0;
 
   }
   else if (element == "files") {
     QString str;
 
-    str = atts.value("refone");
+    str = atts.at("refone");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(d->refOneFile))
     strcpy(d->refOneFile, str.toLocal8Bit().data());
       else
-    return postErrorMessage("Reference 1 Filename too long");
+    throw std::runtime_error("Reference 1 Filename too long");
     }
 
-    str = atts.value("reftwo");
+    str = atts.at("reftwo");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(d->refTwoFile))
     strcpy(d->refTwoFile, str.toLocal8Bit().data());
       else
-    return postErrorMessage("Reference 2 Filename too long");
+    throw std::runtime_error("Reference 2 Filename too long");
     }
 
-    str = atts.value("residual");
+    str = atts.at("residual");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(d->residualFile))
     strcpy(d->residualFile, str.toLocal8Bit().data());
       else
-    return postErrorMessage("Residual Filename too long");
+    throw std::runtime_error("Residual Filename too long");
     }
 
-    d->saveResidualsFlag = (atts.value("saveresiduals") == "true") ? 1 : 0;
+    d->saveResidualsFlag = (atts.at("saveresiduals") == "true") ? 1 : 0;
 
-    d->refMinLongitude = atts.value("minlon").toDouble();
-    d->refMaxLongitude = atts.value("maxlon").toDouble();
-    d->refMinLatitude = atts.value("minlat").toDouble();
-    d->refMaxLatitude = atts.value("maxlat").toDouble();
-    d->refNs = atts.value("refns").toInt();
+    d->refMinLongitude = atts.at("minlon").toDouble();
+    d->refMaxLongitude = atts.at("maxlon").toDouble();
+    d->refMinLatitude = atts.at("minlat").toDouble();
+    d->refMaxLatitude = atts.at("maxlat").toDouble();
+    d->refNs = atts.at("refns").toInt();
 
     if (d->refNs<=0)
      d->refNs=1;
     else if (d->refNs>50)
      d->refNs=50;
 
-    d->cloudFractionMin = atts.value("cloudfmin").toDouble();
-    d->cloudFractionMax = atts.value("cloudfmax").toDouble();
+    d->cloudFractionMin = atts.at("cloudfmin").toDouble();
+    d->cloudFractionMax = atts.at("cloudfmax").toDouble();
 
-    d->refMaxdoasSelection = (atts.value("maxdoasrefmode") == "scan") ? ANLYS_MAXDOAS_REF_SCAN :  ANLYS_MAXDOAS_REF_SZA;
+    d->refMaxdoasSelection = (atts.at("maxdoasrefmode") == "scan") ? ANLYS_MAXDOAS_REF_SCAN :  ANLYS_MAXDOAS_REF_SZA;
 
-    str = atts.value("scanmode");
+    str = atts.at("scanmode");
     if (str == "before")
      d->refSpectrumSelectionScanMode = ANLYS_MAXDOAS_REF_SCAN_BEFORE;
     else if (str == "average")
@@ -121,35 +125,33 @@ bool CAnalysisWindowSubHandler::start(const QString &element, const QXmlAttribut
 
     if (d->refMaxdoasSelection==ANLYS_MAXDOAS_REF_SCAN)
      {
-      d->refSzaCenter = atts.value("maxdoasszacenter").toDouble();
-      d->refSzaDelta = atts.value("maxdoasszadelta").toDouble();
+      d->refSzaCenter = atts.at("maxdoasszacenter").toDouble();
+      d->refSzaDelta = atts.at("maxdoasszadelta").toDouble();
      }
     else
      {
-      d->refSzaCenter = atts.value("szacenter").toDouble();
-      d->refSzaDelta = atts.value("szadelta").toDouble();
+      d->refSzaCenter = atts.at("szacenter").toDouble();
+      d->refSzaDelta = atts.at("szadelta").toDouble();
      }
   }
   else if (element == "cross_section") {
-    return m_master->installSubHandler(new CAnalysisWindowCrossSectionSubHandler(m_master, &(d->crossSectionList)), atts);
+    m_master->install_subhandler(new CAnalysisWindowCrossSectionSubHandler(m_master, &(d->crossSectionList)), atts);
   }
   else if (element == "linear") {
-    return m_master->installSubHandler(new CAnalysisWindowLinearSubHandler(m_master, &(d->linear)), atts);
+    m_master->install_subhandler(new CAnalysisWindowLinearSubHandler(m_master, &(d->linear)), atts);
   }
   else if (element == "nonlinear") {
-    return m_master->installSubHandler(new CAnalysisWindowNonLinearSubHandler(m_master, &(d->nonlinear)), atts);
+    m_master->install_subhandler(new CAnalysisWindowNonLinearSubHandler(m_master, &(d->nonlinear)), atts);
   }
   else if (element == "shift_stretch") {
-    return m_master->installSubHandler(new CAnalysisWindowShiftStretchSubHandler(m_master, &(d->shiftStretchList)), atts);
+    m_master->install_subhandler(new CAnalysisWindowShiftStretchSubHandler(m_master, &(d->shiftStretchList)), atts);
   }
   else if (element == "gap") {
-    return m_master->installSubHandler(new CAnalysisWindowGapSubHandler(m_master, &(d->gapList)), atts);
+    m_master->install_subhandler(new CAnalysisWindowGapSubHandler(m_master, &(d->gapList)), atts);
   }
   else if (element == "output") {
-    return m_master->installSubHandler(new CAnalysisWindowOutputSubHandler(m_master, &(d->outputList)), atts);
+    m_master->install_subhandler(new CAnalysisWindowOutputSubHandler(m_master, &(d->outputList)), atts);
   }
-
-  return true;
 }
 
 int CAnalysisWindowSubHandler::mapToPolyType(const QString &str)
@@ -176,47 +178,47 @@ CAnalysisWindowCrossSectionSubHandler::CAnalysisWindowCrossSectionSubHandler(CCo
 {
 }
 
-bool CAnalysisWindowCrossSectionSubHandler::start(const QXmlAttributes &atts)
+void CAnalysisWindowCrossSectionSubHandler::start(const map<Glib::ustring, QString> &atts)
 {
   if (m_d->nCrossSection < MAX_AW_CROSS_SECTION) {
 
     QString str;
     struct anlyswin_cross_section *d = &(m_d->crossSection[m_d->nCrossSection]);
 
-    str = atts.value("sym");
+    str = atts.at("sym");
     if (!str.isEmpty() && str.length() < (int)sizeof(d->symbol))
       strcpy(d->symbol, str.toLocal8Bit().data());
     else
-      return postErrorMessage("missing symbol (or name too long)");
+      throw std::runtime_error("missing symbol (or name too long)");
 
-    str = atts.value("ortho");
+    str = atts.at("ortho");
 
     if (str.isEmpty())
      strcpy(d->orthogonal,"");
     else if (str.length() < (int)sizeof(d->orthogonal))
       strcpy(d->orthogonal, str.toLocal8Bit().data());
     else
-       return postErrorMessage("ortho name too long");
+       throw std::runtime_error("ortho name too long");
 
-    str = atts.value("subtract");
+    str = atts.at("subtract");
 
     if (str.isEmpty())
      strcpy(d->subtract,"");
     else if (str.length() < (int)sizeof(d->subtract))
       strcpy(d->subtract, str.toLocal8Bit().data());
     else
-      return postErrorMessage("subtract name too long");
+      throw std::runtime_error("subtract name too long");
 
-    d->subtractFlag=(atts.value("subtract_flag") == "true") ? 1 : 0;
+    d->subtractFlag=(atts.at("subtract_flag") == "true") ? 1 : 0;
 
-    str = atts.value("cstype");
+    str = atts.at("cstype");
     if (str == "interp") d->crossType = ANLYS_CROSS_ACTION_INTERPOLATE;
     else if (str == "std") d->crossType = ANLYS_CROSS_ACTION_CONVOLUTE;
     else if (str == "io") d->crossType = ANLYS_CROSS_ACTION_CONVOLUTE_I0;
     else if (str == "ring") d->crossType = ANLYS_CROSS_ACTION_CONVOLUTE_RING;
     else d->crossType = ANLYS_CROSS_ACTION_NOTHING;
 
-    str = atts.value("amftype");
+    str = atts.at("amftype");
     if (str == "sza") d->amfType = ANLYS_AMF_TYPE_SZA;
     else if (str == "climate") d->amfType = ANLYS_AMF_TYPE_CLIMATOLOGY;
     else if ((str == "wave") ||
@@ -224,56 +226,56 @@ bool CAnalysisWindowCrossSectionSubHandler::start(const QXmlAttributes &atts)
      d->amfType = ANLYS_AMF_TYPE_WAVELENGTH;
     else d->amfType = ANLYS_AMF_TYPE_NONE;
 
-    str = atts.value("corrtype");
+    str = atts.at("corrtype");
     if (str == "slope") d->correctionType = ANLYS_CORRECTION_TYPE_SLOPE;
     else if (str == "pukite") d->correctionType = ANLYS_CORRECTION_TYPE_PUKITE;
     else if (str == "molecular_ring") d->correctionType = ANLYS_CORRECTION_TYPE_MOLECULAR_RING;
     else if (str == "molecular_ring_slope") d->correctionType = ANLYS_CORRECTION_TYPE_MOLECULAR_RING_SLOPE;
     else d->correctionType = ANLYS_CORRECTION_TYPE_NONE;
 
-    str = atts.value("molecular_xs");
+    str = atts.at("molecular_xs");
     strcpy(d->molecularRing,str.toLocal8Bit().data());
 
-    d->requireFit = (atts.value("fit") == "true") ? 1 : 0;
-    d->requireFilter = (atts.value("filter") == "true") ? 1 : 0;
-    d->constrainedCc = (atts.value("cstrncc") == "true") ? 1 : 0;
-    d->requireCcFit = (atts.value("ccfit") == "true") ? 1 : 0;
-    d->initialCc = atts.value("icc").toDouble();
-    d->deltaCc = atts.value("dcc").toDouble();
-    d->ccIo = atts.value("ccio").toDouble();
-    d->ccMin = atts.value("ccmin").toDouble();
-    d->ccMax = atts.value("ccmax").toDouble();
+    d->requireFit = (atts.at("fit") == "true") ? 1 : 0;
+    d->requireFilter = (atts.at("filter") == "true") ? 1 : 0;
+    d->constrainedCc = (atts.at("cstrncc") == "true") ? 1 : 0;
+    d->requireCcFit = (atts.at("ccfit") == "true") ? 1 : 0;
+    d->initialCc = atts.at("icc").toDouble();
+    d->deltaCc = atts.at("dcc").toDouble();
+    d->ccIo = atts.at("ccio").toDouble();
+    d->ccMin = atts.at("ccmin").toDouble();
+    d->ccMax = atts.at("ccmax").toDouble();
 
     if (fabs(d->deltaCc)<(double)EPSILON)
      d->deltaCc=(double)1.e-3;
 
-    str = atts.value("csfile");
+    str = atts.at("csfile");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(d->crossSectionFile))
     strcpy(d->crossSectionFile, str.toLocal8Bit().data());
       else
-    return postErrorMessage("Cross Section filename too long");
+    throw std::runtime_error("Cross Section filename too long");
     }
     else
-      return postErrorMessage("Missing cross section file");
+      throw std::runtime_error("Missing cross section file");
 
-    str = atts.value("amffile");
+    str = atts.at("amffile");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(d->amfFile))
     strcpy(d->amfFile, str.toLocal8Bit().data());
       else
-    return postErrorMessage("AMF filename too long");
+    throw std::runtime_error("AMF filename too long");
     }
 
     // All OK
     ++(m_d->nCrossSection);
 
-    return true;
+    return;
   }
 
-  return postErrorMessage("Too many cross sections in analysis window");
+  throw std::runtime_error("Too many cross sections in analysis window");
 }
 
 //------------------------------------------------------------
@@ -285,20 +287,19 @@ CAnalysisWindowLinearSubHandler::CAnalysisWindowLinearSubHandler(CConfigHandler 
 {
 }
 
-bool CAnalysisWindowLinearSubHandler::start(const QXmlAttributes &atts)
+void CAnalysisWindowLinearSubHandler::start(const map<Glib::ustring, QString> &atts)
 {
-  m_d->xPolyOrder = CAnalysisWindowSubHandler::mapToPolyType(atts.value("xpoly"));
-  m_d->xBaseOrder = CAnalysisWindowSubHandler::mapToPolyType(atts.value("xbase"));
-  m_d->xFlagFitStore = (atts.value("xfit") == "true") ? 1 : 0;
-  m_d->xFlagErrStore = (atts.value("xerr") == "true") ? 1 : 0;
+  m_d->xPolyOrder = CAnalysisWindowSubHandler::mapToPolyType(atts.at("xpoly"));
+  m_d->xBaseOrder = CAnalysisWindowSubHandler::mapToPolyType(atts.at("xbase"));
+  m_d->xFlagFitStore = (atts.at("xfit") == "true") ? 1 : 0;
+  m_d->xFlagErrStore = (atts.at("xerr") == "true") ? 1 : 0;
 
-  m_d->offsetPolyOrder = CAnalysisWindowSubHandler::mapToPolyType(atts.value("offpoly"));
-  m_d->offsetFlagFitStore = (atts.value("offfit") == "true") ? 1 : 0;
-  m_d->offsetFlagErrStore = (atts.value("offerr") == "true") ? 1 : 0;
+  m_d->offsetPolyOrder = CAnalysisWindowSubHandler::mapToPolyType(atts.at("offpoly"));
+  m_d->offsetFlagFitStore = (atts.at("offfit") == "true") ? 1 : 0;
+  m_d->offsetFlagErrStore = (atts.at("offerr") == "true") ? 1 : 0;
 
-  m_d->offsetI0 = (atts.value("offizero") == "true") ?  1 : 0;
+  m_d->offsetI0 = (atts.at("offizero") == "true") ?  1 : 0;
 
-  return true;
 }
 
 //------------------------------------------------------------
@@ -310,110 +311,109 @@ CAnalysisWindowNonLinearSubHandler::CAnalysisWindowNonLinearSubHandler(CConfigHa
 {
 }
 
-bool CAnalysisWindowNonLinearSubHandler::start(const QXmlAttributes &atts)
+void CAnalysisWindowNonLinearSubHandler::start(const map<Glib::ustring, QString> &atts)
 {
   QString str;
 
-  m_d->solFlagFit = (atts.value("solfit") == "true") ? 1 : 0;
-  m_d->solInitial = atts.value("solinit").toDouble();
-  m_d->solDelta = atts.value("soldelt").toDouble();
-  m_d->solFlagFitStore = (atts.value("solfstr") == "true") ? 1 : 0;
-  m_d->solFlagErrStore = (atts.value("solestr") == "true") ? 1 : 0;
+  m_d->solFlagFit = (atts.at("solfit") == "true") ? 1 : 0;
+  m_d->solInitial = atts.at("solinit").toDouble();
+  m_d->solDelta = atts.at("soldelt").toDouble();
+  m_d->solFlagFitStore = (atts.at("solfstr") == "true") ? 1 : 0;
+  m_d->solFlagErrStore = (atts.at("solestr") == "true") ? 1 : 0;
 
   if (fabs(m_d->solDelta)<(double)EPSILON)
    m_d->solDelta=(double)1.e-3;
 
-  m_d->off0FlagFit = (atts.value("o0fit") == "true") ? 1 : 0;
-  m_d->off0Initial = atts.value("o0init").toDouble();
-  m_d->off0Delta = atts.value("o0delt").toDouble();
-  m_d->off0FlagFitStore = (atts.value("o0fstr") == "true") ? 1 : 0;
-  m_d->off0FlagErrStore = (atts.value("o0estr") == "true") ? 1 : 0;
+  m_d->off0FlagFit = (atts.at("o0fit") == "true") ? 1 : 0;
+  m_d->off0Initial = atts.at("o0init").toDouble();
+  m_d->off0Delta = atts.at("o0delt").toDouble();
+  m_d->off0FlagFitStore = (atts.at("o0fstr") == "true") ? 1 : 0;
+  m_d->off0FlagErrStore = (atts.at("o0estr") == "true") ? 1 : 0;
 
   if (fabs(m_d->off0Delta)<(double)EPSILON)
    m_d->off0Delta=(double)1.e-3;
 
-  m_d->off1FlagFit = (atts.value("o1fit") == "true") ? 1 : 0;
-  m_d->off1Initial = atts.value("o1init").toDouble();
-  m_d->off1Delta = atts.value("o1delt").toDouble();
-  m_d->off1FlagFitStore = (atts.value("o1fstr") == "true") ? 1 : 0;
-  m_d->off1FlagErrStore = (atts.value("o1estr") == "true") ? 1 : 0;
+  m_d->off1FlagFit = (atts.at("o1fit") == "true") ? 1 : 0;
+  m_d->off1Initial = atts.at("o1init").toDouble();
+  m_d->off1Delta = atts.at("o1delt").toDouble();
+  m_d->off1FlagFitStore = (atts.at("o1fstr") == "true") ? 1 : 0;
+  m_d->off1FlagErrStore = (atts.at("o1estr") == "true") ? 1 : 0;
 
   if (fabs(m_d->off1Delta)<(double)EPSILON)
    m_d->off1Delta=(double)1.e-3;
 
-  m_d->off2FlagFit = (atts.value("o2fit") == "true") ? 1 : 0;
-  m_d->off2Initial = atts.value("o2init").toDouble();
-  m_d->off2Delta = atts.value("o2delt").toDouble();
-  m_d->off2FlagFitStore = (atts.value("o2fstr") == "true") ? 1 : 0;
-  m_d->off2FlagErrStore = (atts.value("o2estr") == "true") ? 1 : 0;
+  m_d->off2FlagFit = (atts.at("o2fit") == "true") ? 1 : 0;
+  m_d->off2Initial = atts.at("o2init").toDouble();
+  m_d->off2Delta = atts.at("o2delt").toDouble();
+  m_d->off2FlagFitStore = (atts.at("o2fstr") == "true") ? 1 : 0;
+  m_d->off2FlagErrStore = (atts.at("o2estr") == "true") ? 1 : 0;
 
   if (fabs(m_d->off2Delta)<(double)EPSILON)
    m_d->off2Delta=(double)1.e-3;
 
-  m_d->comFlagFit = (atts.value("comfit") == "true") ? 1 : 0;
-  m_d->comInitial = atts.value("cominit").toDouble();
-  m_d->comDelta = atts.value("comdelt").toDouble();
-  m_d->comFlagFitStore = (atts.value("comfstr") == "true") ? 1 : 0;
-  m_d->comFlagErrStore = (atts.value("comestr") == "true") ? 1 : 0;
+  m_d->comFlagFit = (atts.at("comfit") == "true") ? 1 : 0;
+  m_d->comInitial = atts.at("cominit").toDouble();
+  m_d->comDelta = atts.at("comdelt").toDouble();
+  m_d->comFlagFitStore = (atts.at("comfstr") == "true") ? 1 : 0;
+  m_d->comFlagErrStore = (atts.at("comestr") == "true") ? 1 : 0;
 
   if (fabs(m_d->comDelta)<(double)EPSILON)
    m_d->comDelta=(double)1.e-3;
 
-  m_d->usamp1FlagFit = (atts.value("u1fit") == "true") ? 1 : 0;
-  m_d->usamp1Initial = atts.value("u1init").toDouble();
-  m_d->usamp1Delta = atts.value("u1delt").toDouble();
-  m_d->usamp1FlagFitStore = (atts.value("u1str") == "true") ? 1 : 0;
-  m_d->usamp1FlagErrStore = (atts.value("u1estr") == "true") ? 1 : 0;
+  m_d->usamp1FlagFit = (atts.at("u1fit") == "true") ? 1 : 0;
+  m_d->usamp1Initial = atts.at("u1init").toDouble();
+  m_d->usamp1Delta = atts.at("u1delt").toDouble();
+  m_d->usamp1FlagFitStore = (atts.at("u1str") == "true") ? 1 : 0;
+  m_d->usamp1FlagErrStore = (atts.at("u1estr") == "true") ? 1 : 0;
 
   if (fabs(m_d->usamp1Delta)<(double)EPSILON)
    m_d->usamp1Delta=(double)1.e-3;
 
-  m_d->usamp2FlagFit = (atts.value("u2fit") == "true") ? 1 : 0;
-  m_d->usamp2Initial = atts.value("u2init").toDouble();
-  m_d->usamp2Delta = atts.value("u2delt").toDouble();
-  m_d->usamp2FlagFitStore = (atts.value("u2str") == "true") ? 1 : 0;
-  m_d->usamp2FlagErrStore = (atts.value("u2estr") == "true") ? 1 : 0;
+  m_d->usamp2FlagFit = (atts.at("u2fit") == "true") ? 1 : 0;
+  m_d->usamp2Initial = atts.at("u2init").toDouble();
+  m_d->usamp2Delta = atts.at("u2delt").toDouble();
+  m_d->usamp2FlagFitStore = (atts.at("u2str") == "true") ? 1 : 0;
+  m_d->usamp2FlagErrStore = (atts.at("u2estr") == "true") ? 1 : 0;
 
   if (fabs(m_d->usamp2Delta)<(double)EPSILON)
    m_d->usamp2Delta=(double)1.e-3;
 
-  m_d->resolFlagFit = (atts.value("resolfit") == "true") ? 1 : 0;
-  m_d->resolInitial = atts.value("resolinit").toDouble();
-  m_d->resolDelta = atts.value("resoldelt").toDouble();
-  m_d->resolFlagFitStore = (atts.value("resolstr") == "true") ? 1 : 0;
-  m_d->resolFlagErrStore = (atts.value("resolestr") == "true") ? 1 : 0;
+  m_d->resolFlagFit = (atts.at("resolfit") == "true") ? 1 : 0;
+  m_d->resolInitial = atts.at("resolinit").toDouble();
+  m_d->resolDelta = atts.at("resoldelt").toDouble();
+  m_d->resolFlagFitStore = (atts.at("resolstr") == "true") ? 1 : 0;
+  m_d->resolFlagErrStore = (atts.at("resolestr") == "true") ? 1 : 0;
 
   if (fabs(m_d->resolDelta)<(double)EPSILON)
    m_d->resolDelta=(double)1.e-3;
 
-  str = atts.value("comfile");
+  str = atts.at("comfile");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_d->comFile))
       strcpy(m_d->comFile, str.toLocal8Bit().data());
     else
-      return postErrorMessage("Com filename too long");
+      throw std::runtime_error("Com filename too long");
   }
 
-  str = atts.value("u1file");
+  str = atts.at("u1file");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_d->usamp1File))
       strcpy(m_d->usamp1File, str.toLocal8Bit().data());
     else
-      return postErrorMessage("Usamp1 filename too long");
+      throw std::runtime_error("Usamp1 filename too long");
   }
 
-  str = atts.value("u2file");
+  str = atts.at("u2file");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_d->usamp2File))
       strcpy(m_d->usamp2File, str.toLocal8Bit().data());
     else
-      return postErrorMessage("Usamp2 filename too long");
+      throw std::runtime_error("Usamp2 filename too long");
   }
 
-  return true;
 }
 
 //------------------------------------------------------------
@@ -425,46 +425,46 @@ CAnalysisWindowShiftStretchSubHandler::CAnalysisWindowShiftStretchSubHandler(CCo
 {
 }
 
-bool CAnalysisWindowShiftStretchSubHandler::start(const QXmlAttributes &atts)
+void CAnalysisWindowShiftStretchSubHandler::start(const map<Glib::ustring, QString> &atts)
 {
   if (m_d->nShiftStretch < MAX_AW_SHIFT_STRETCH) {
 
     QString str;
     struct anlyswin_shift_stretch *d = &(m_d->shiftStretch[m_d->nShiftStretch]);
 
-    str=atts.value("shfit");
+    str=atts.at("shfit");
 
     if ((str=="true") || (str=="nonlinear")) d->shFit=ANLYS_SHIFT_TYPE_NONLINEAR;
   //  else if (str=="linear") d->shFit=ANLYS_SHIFT_TYPE_LINEAR;
     else d->shFit=ANLYS_SHIFT_TYPE_NONE;
 
-    str = atts.value("stfit");
+    str = atts.at("stfit");
     if (str == "1st") d->stFit = ANLYS_STRETCH_TYPE_FIRST_ORDER;
     else if (str == "2nd") d->stFit = ANLYS_STRETCH_TYPE_SECOND_ORDER;
     else d->stFit = ANLYS_STRETCH_TYPE_NONE;
 
-    d->shStore = (atts.value("shstr") == "true") ? 1 : 0;
-    d->stStore = (atts.value("ststr") == "true") ? 1 : 0;
-    d->errStore = (atts.value("errstr") == "true") ? 1 : 0;
+    d->shStore = (atts.at("shstr") == "true") ? 1 : 0;
+    d->stStore = (atts.at("ststr") == "true") ? 1 : 0;
+    d->errStore = (atts.at("errstr") == "true") ? 1 : 0;
 
-    d->shInit = atts.value("shini").toDouble();
-    d->stInit = atts.value("stini").toDouble();
-    d->stInit2 = atts.value("stini2").toDouble();
+    d->shInit = atts.at("shini").toDouble();
+    d->stInit = atts.at("stini").toDouble();
+    d->stInit2 = atts.at("stini2").toDouble();
 
-    if (fabs((double)(d->shDelta = atts.value("shdel").toDouble()  ))<EPSILON) d->shDelta  =(double)1.e-3;
-    if (fabs((double)(d->stDelta = atts.value("stdel").toDouble()  ))<EPSILON) d->stDelta  =(double)1.e-3;
-    if (fabs((double)(d->stDelta2 = atts.value("stdel2").toDouble()))<EPSILON) d->stDelta2 =(double)1.e-3;
+    if (fabs((double)(d->shDelta = atts.at("shdel").toDouble()  ))<EPSILON) d->shDelta  =(double)1.e-3;
+    if (fabs((double)(d->stDelta = atts.at("stdel").toDouble()  ))<EPSILON) d->stDelta  =(double)1.e-3;
+    if (fabs((double)(d->stDelta2 = atts.at("stdel2").toDouble()))<EPSILON) d->stDelta2 =(double)1.e-3;
 
-    d->shMin = atts.value("shmin").toDouble();
-    d->shMax = atts.value("shmax").toDouble();
+    d->shMin = atts.at("shmin").toDouble();
+    d->shMax = atts.at("shmax").toDouble();
 
-    return true;
+    return;
   }
 
-  return postErrorMessage("Too many cross sections in analysis window");
+  throw std::runtime_error("Too many cross sections in analysis window");
 }
 
-bool CAnalysisWindowShiftStretchSubHandler::start(const QString &element, const QXmlAttributes &atts)
+void CAnalysisWindowShiftStretchSubHandler::start(const Glib::ustring &element, const map<Glib::ustring, QString> &atts)
 {
   if (element == "symbol" && m_d->nShiftStretch < MAX_AW_SHIFT_STRETCH) {
 
@@ -472,25 +472,21 @@ bool CAnalysisWindowShiftStretchSubHandler::start(const QString &element, const 
 
     if (d->nSymbol < MAX_AW_SHIFT_STRETCH) {
 
-      QString str = atts.value("name");
+      QString str = atts.at("name");
       if (!str.isEmpty() && str.length() < (int)SYMBOL_NAME_BUFFER_LENGTH) {
-    strcpy(&(d->symbol[d->nSymbol][0]), str.toLocal8Bit().data());
-    ++(d->nSymbol);
-
-    return true;
+        strcpy(&(d->symbol[d->nSymbol][0]), str.toLocal8Bit().data());
+        ++(d->nSymbol);
+        return;
       }
     }
   }
-
-  return false;
+  throw std::runtime_error("Failed parsing shift/stretch settings.");
 }
 
-bool CAnalysisWindowShiftStretchSubHandler::end(void)
+void CAnalysisWindowShiftStretchSubHandler::end()
 {
   if (m_d->nShiftStretch < MAX_AW_SHIFT_STRETCH)
     ++(m_d->nShiftStretch);
-
-  return true;
 }
 
 //------------------------------------------------------------
@@ -502,20 +498,20 @@ CAnalysisWindowGapSubHandler::CAnalysisWindowGapSubHandler(CConfigHandler *maste
 {
 }
 
-bool CAnalysisWindowGapSubHandler::start(const QXmlAttributes &atts)
+void CAnalysisWindowGapSubHandler::start(const map<Glib::ustring, QString> &atts)
 {
   if (m_d->nGap < MAX_AW_GAP) {
-    m_d->gap[m_d->nGap].minimum = atts.value("min").toDouble();
-    m_d->gap[m_d->nGap].maximum = atts.value("max").toDouble();
+    m_d->gap[m_d->nGap].minimum = atts.at("min").toDouble();
+    m_d->gap[m_d->nGap].maximum = atts.at("max").toDouble();
     if (m_d->gap[m_d->nGap].minimum < m_d->gap[m_d->nGap].maximum) {
       ++(m_d->nGap);
-      return true;
+      return;
     }
     else
-      return postErrorMessage("Invalid gap definition");
+      throw std::runtime_error("Invalid gap definition");
   }
 
-  return postErrorMessage("Too many gaps defined");
+  throw std::runtime_error("Too many gaps defined");
 }
 
 //------------------------------------------------------------
@@ -527,35 +523,35 @@ CAnalysisWindowOutputSubHandler::CAnalysisWindowOutputSubHandler(CConfigHandler 
 {
 }
 
-bool CAnalysisWindowOutputSubHandler::start(const QXmlAttributes &atts)
+void CAnalysisWindowOutputSubHandler::start(const map<Glib::ustring, QString> &atts)
 {
   if (m_d->nOutput < MAX_AW_CROSS_SECTION) {
 
     QString str;
     struct anlyswin_output *d = &(m_d->output[m_d->nOutput]);
 
-    str = atts.value("sym");
+    str = atts.at("sym");
     if (!str.isEmpty() && str.length() < (int)sizeof(d->symbol))
       strcpy(d->symbol, str.toLocal8Bit().data());
     else
-      return postErrorMessage("missing symbol (or name too long)");
+      throw std::runtime_error("missing symbol (or name too long)");
 
-    d->amf = (atts.value("amf") == "true") ? 1 : 0;
-    d->resCol = atts.value("rescol").toDouble();
-    d->slantCol = (atts.value("scol") == "true") ? 1 : 0;
-    d->slantErr = (atts.value("serr") == "true") ? 1 : 0;
-    d->slantFactor = atts.value("sfact").toDouble();
-    d->vertCol = (atts.value("vcol") == "true") ? 1 : 0;
-    d->vertErr = (atts.value("verr") == "true") ? 1 : 0;
-    d->vertFactor = atts.value("vfact").toDouble();
+    d->amf = (atts.at("amf") == "true") ? 1 : 0;
+    d->resCol = atts.at("rescol").toDouble();
+    d->slantCol = (atts.at("scol") == "true") ? 1 : 0;
+    d->slantErr = (atts.at("serr") == "true") ? 1 : 0;
+    d->slantFactor = atts.at("sfact").toDouble();
+    d->vertCol = (atts.at("vcol") == "true") ? 1 : 0;
+    d->vertErr = (atts.at("verr") == "true") ? 1 : 0;
+    d->vertFactor = atts.at("vfact").toDouble();
 
     // All OK
     ++(m_d->nOutput);
 
-    return true;
+    return;
   }
 
-  return postErrorMessage("Too many outputs in analysis window");
+  throw std::runtime_error("Too many outputs in analysis window");
 }
 
 //------------------------------------------------------------
@@ -567,24 +563,24 @@ CAnalysisWindowSfpSubHandler::CAnalysisWindowSfpSubHandler(CConfigHandler *maste
 {
 }
 
-bool CAnalysisWindowSfpSubHandler::start(const QXmlAttributes &atts)
+void CAnalysisWindowSfpSubHandler::start(const map<Glib::ustring, QString> &atts)
 {
-  int index = atts.value("index").toInt();
+  int index = atts.at("index").toInt();
 
   if (index > 0 && index <= 4) {
     struct calibration_sfp *p = (m_d + index - 1);
 
-    p->fitFlag = (atts.value("fit") == "true") ? 1 : 0;
-    p->initialValue = atts.value("init").toDouble();
-    p->deltaValue = atts.value("delta").toDouble();
-    p->fitStore = (atts.value("fstr") == "true") ? 1 : 0;
-    p->errStore = (atts.value("estr") == "true") ? 1 : 0;
+    p->fitFlag = (atts.at("fit") == "true") ? 1 : 0;
+    p->initialValue = atts.at("init").toDouble();
+    p->deltaValue = atts.at("delta").toDouble();
+    p->fitStore = (atts.at("fstr") == "true") ? 1 : 0;
+    p->errStore = (atts.at("estr") == "true") ? 1 : 0;
 
     if (fabs(p->deltaValue)<EPSILON)
      p->deltaValue=(double)1.e-3;
 
-    return true;
+    return;
   }
 
-  return postErrorMessage("Invalid SFP index");
+  throw std::runtime_error("Invalid SFP index");
 }
