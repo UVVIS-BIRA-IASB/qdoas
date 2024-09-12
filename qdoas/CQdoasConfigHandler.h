@@ -25,9 +25,6 @@ class CQdoasConfigHandler : public CConfigHandler
  public:
   virtual ~CQdoasConfigHandler();
 
-  virtual bool startElement(const QString &namespaceURI, const QString &localName,
-                const QString &qName, const QXmlAttributes &atts);
-
   void addProjectItem(CProjectConfigItem *item);             // takes ownership of item
   QList<const CProjectConfigItem*> projectItems(void) const; // items in returned list have the same lifetime as 'this'
   QList<const CProjectConfigItem*> takeProjectItems(void);   // takes ownership of items (removes them from 'this')
@@ -37,6 +34,10 @@ class CQdoasConfigHandler : public CConfigHandler
 
   void addSymbol(const QString &symbolName, const QString &symbolDescription);
   QList<const CSymbolConfigItem*> symbolItems(void) const; // items in returned list have the same lifetime as 'this'
+
+protected:
+  virtual void start_subhandler(const Glib::ustring& name,
+                                const std::map<Glib::ustring, QString>& attributes) override;
 
  private:
   QList<const CProjectConfigItem*> m_projectItemList;
@@ -63,7 +64,8 @@ class CSiteSubHandler : public CQdoasConfigSubHandler
  public:
   CSiteSubHandler(CQdoasConfigHandler *master);
 
-  virtual bool start(const QString &element, const QXmlAttributes &atts);
+  virtual void start(const Glib::ustring&name,
+                     const std::map<Glib::ustring, QString>& attributes) override;
 };
 
 //-------------------------------------------------------------------
@@ -73,7 +75,8 @@ class CSymbolSubHandler : public CQdoasConfigSubHandler
  public:
   CSymbolSubHandler(CQdoasConfigHandler *master);
 
-  virtual bool start(const QString &element, const QXmlAttributes &atts);
+  virtual void start(const Glib::ustring& name,
+                     const std::map<Glib::ustring, QString>& attributes) override;
 };
 
 //-------------------------------------------------------------------
@@ -84,9 +87,10 @@ class CProjectSubHandler : public CQdoasConfigSubHandler
   CProjectSubHandler(CQdoasConfigHandler *master);
   virtual ~CProjectSubHandler();
 
-  virtual bool start(const QXmlAttributes &atts);
-  virtual bool start(const QString &element, const QXmlAttributes &atts);
-  virtual bool end(void);
+  virtual void start(const Glib::ustring& element,
+                     const std::map<Glib::ustring, QString>& atts) override;
+  virtual void start(const std::map<Glib::ustring, QString>& atts) override;
+  virtual void end(void) override;
 
  private:
   CProjectConfigItem *m_project;
