@@ -29,9 +29,9 @@ class CConfigSubHandler
   virtual void start(const Glib::ustring& name, const AttributeList& atts) {};
   virtual void start(const std::map<Glib::ustring, QString>& atts) {};
   virtual void start(const Glib::ustring& element, const std::map<Glib::ustring, QString>& atts) {};
-  virtual bool character(const QString &ch) { return true; };
+  virtual void character(const QString &ch) {};
   virtual void end(const Glib::ustring &element) {};
-  virtual bool end() {return true; };
+  virtual void end() {};
 
   virtual CConfigHandler* master() { return m_master; };
 

@@ -50,29 +50,26 @@ void CConfigHandler::on_start_element(const Glib::ustring& name,
 void CConfigHandler::on_end_element(const Glib::ustring& name)
 {
   if (m_activeSubHandler) {
-    bool status = true;
     // delegate to the sub handler
 
     // first any collected character data
     QString tmp(QString::fromStdString(collated_str).trimmed());
     if (!tmp.isEmpty()) {
-      status = m_activeSubHandler->character(tmp);
+      m_activeSubHandler->character(tmp);
     }
 
-    if (status) {
-      if (m_subHandlerStack.back().depth == element_stack.size()) {
-        status = m_activeSubHandler->end();
-        // done with this handler ... discard it
-        delete m_activeSubHandler;
-        m_subHandlerStack.pop_back();
-        // revert back to the previous handler
-        if (!m_subHandlerStack.isEmpty())
-          m_activeSubHandler = m_subHandlerStack.back().handler;
-        else
-          m_activeSubHandler = NULL;
-      } else {
-        m_activeSubHandler->end(name);
-      }
+    if (m_subHandlerStack.back().depth == element_stack.size()) {
+      m_activeSubHandler->end();
+      // done with this handler ... discard it
+      delete m_activeSubHandler;
+      m_subHandlerStack.pop_back();
+      // revert back to the previous handler
+      if (!m_subHandlerStack.isEmpty())
+        m_activeSubHandler = m_subHandlerStack.back().handler;
+      else
+        m_activeSubHandler = NULL;
+    } else {
+      m_activeSubHandler->end(name);
     }
   }
 
