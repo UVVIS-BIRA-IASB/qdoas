@@ -70,15 +70,13 @@ CWRingTabGeneral::CWRingTabGeneral(const mediate_ring_t *properties, QWidget *pa
   QGridLayout *outputLayout = new QGridLayout(outputGroup);
 
   QLabel *labelFormat=new QLabel("Output format", this);
-  labelFormat->setFixedWidth(cSuggestedColumnZeroWidth);
   outputLayout->addWidget(labelFormat, 0, 0);
   m_formatCombo = new QComboBox(this);
   m_formatCombo->addItem("ASCII", QVariant(CONVOLUTION_FORMAT_ASCII));
   m_formatCombo->addItem("netCDF", QVariant(CONVOLUTION_FORMAT_NETCDF));
   outputLayout->addWidget(m_formatCombo, 0, 1);
   
-  QLabel *labelPixel=new QLabel("number of columns", this);
-  labelPixel->setFixedWidth(cSuggestedColumnZeroWidth);
+  QLabel *labelPixel=new QLabel("Number of columns", this);
   outputLayout->addWidget(labelPixel, 1, 0);
   m_pixelEdit = new QLineEdit(this);
   m_pixelEdit->setFixedWidth(cStandardEditWidth);
