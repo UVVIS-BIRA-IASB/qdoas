@@ -7,7 +7,6 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #ifndef _CUSAMPCONFIGHANDLER_H_GUARD
 #define _CUSAMPCONFIGHANDLER_H_GUARD
 
-#include <QXmlDefaultHandler>
 #include <QString>
 
 #include "CConfigHandler.h"

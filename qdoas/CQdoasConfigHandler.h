@@ -8,7 +8,6 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #ifndef _CQDOASCONFIGHANDLER_H_GUARD
 #define _CQDOASCONFIGHANDLER_H_GUARD
 
-#include <QXmlDefaultHandler>
 #include <QList>
 #include <QString>
 #include <QVector>
