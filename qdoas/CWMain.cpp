@@ -16,7 +16,6 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #include <QApplication>
 #include <QLocale>
 #include <clocale>
-#include <QTextCodec>
 #include <QTextStream>
 
 #include "CWMain.h"
@@ -63,7 +62,6 @@ CWMain::CWMain(QWidget *parent) :
   setProjectFileName(QString());
 
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
-  mainLayout->setMargin(0);
   mainLayout->setSpacing(0);
 
   //------------------------------

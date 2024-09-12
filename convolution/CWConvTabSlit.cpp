@@ -23,7 +23,6 @@ CWConvTabSlit::CWConvTabSlit(const mediate_slit_function_t *conv, const mediate_
   QFrame(parent)
 {
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
-  mainLayout->setMargin(25);
   mainLayout->setSpacing(15);
 
   m_convEdit = new CWSlitSelector(conv, "Convolution", false,this);

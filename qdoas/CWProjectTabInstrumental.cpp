@@ -1475,7 +1475,6 @@ CWInstrCcdEevEdit::CWInstrCcdEevEdit(const struct instrumental_ccdeev *d, QWidge
   QString tmpStr;
   int row = 0;
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
-  mainLayout->setMargin(0);
   QGridLayout *gridLayout = new QGridLayout;
 
   mainLayout->addWidget(m_strayLightConfig);
@@ -1937,7 +1936,6 @@ CWInstrOmiEdit::CWInstrOmiEdit(const struct instrumental_omi *d, QWidget *parent
 {
   int row = 0;
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
-  mainLayout->setMargin(5);
   mainLayout->setSpacing(5);
 
   QHBoxLayout *qualityFlagsLayout = new QHBoxLayout;
@@ -2062,7 +2060,6 @@ CWInstrOmiV4Edit::CWInstrOmiV4Edit(const struct instrumental_omi *d, QWidget *pa
   CWCalibInstrEdit(parent)
 {
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
-  mainLayout->setMargin(5);
   mainLayout->setSpacing(5);
 
   QHBoxLayout *qualityFlagsLayout = new QHBoxLayout;

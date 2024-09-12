@@ -10,7 +10,7 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #include <QShowEvent>
 #include <QContextMenuEvent>
 #include <QFileDialog>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QDir>
 #include <QTextStream>
 #include <QMessageBox>
@@ -588,7 +588,7 @@ QString CWProjectTree::editInsertDirectory(QTreeWidgetItem *parent, const QStrin
       }
       else {
     // split on whitespace
-    filters = fileFilters.split(QRegExp("\\s+"));
+    filters = fileFilters.split(QRegularExpression("\\s+"));
       }
     }
 
@@ -643,7 +643,7 @@ QString CWProjectTree::editChangeDirectoryProperties(QTreeWidgetItem *item,
       }
       else {
     // split on whitespace
-    filters = fileFilters.split(QRegExp("\\s+"));
+    filters = fileFilters.split(QRegularExpression("\\s+"));
       }
     }
 
