@@ -89,4 +89,14 @@ class CConfigHandler : public xmlpp::SaxParser
 
 inline void CConfigHandler::setSubErrorMessage(const QString &msg) { m_subErrorMessage = msg; }
 
+// Get value from a map of xml attributes, or an empty string.  Mimics the behaviour of QXmlAttributes::value().
+inline QString value(const std::map<Glib::ustring, QString>& attributes, const Glib::ustring& key) {
+  auto i_val = attributes.find(key);
+  if (i_val != attributes.end()) {
+    return i_val->second;
+  } else {
+    return "";
+  }
+};
+
 #endif

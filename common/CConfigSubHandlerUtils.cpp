@@ -21,7 +21,7 @@ void CFilteringSubHandler::start(const map<Glib::ustring, QString>& atts)
 {
   // selected filter
 
-  QString str = atts.at("selected");
+  QString str = value(atts, "selected");
 
   if (str == "none")
     m_filter->mode = PRJCT_FILTER_TYPE_NONE;
@@ -49,54 +49,54 @@ void CFilteringSubHandler::start(const Glib::ustring& element, const map<Glib::u
 
   if (element == "kaiser") {
 
-    m_filter->kaiser.cutoffFrequency = atts.at("cutoff").toDouble();
-    m_filter->kaiser.tolerance = atts.at("tolerance").toDouble();
-    m_filter->kaiser.passband = atts.at("passband").toDouble();
-    m_filter->kaiser.iterations = atts.at("iterations").toInt();
-    m_filter->kaiser.usage.calibrationFlag = (atts.at("cal") == "true") ? 1 : 0;
-    m_filter->kaiser.usage.fittingFlag = (atts.at("fit") == "true") ? 1 : 0;
-    m_filter->kaiser.usage.divide = (atts.at("div") == "true") ? 1 : 0;
+    m_filter->kaiser.cutoffFrequency = value(atts, "cutoff").toDouble();
+    m_filter->kaiser.tolerance = value(atts, "tolerance").toDouble();
+    m_filter->kaiser.passband = value(atts, "passband").toDouble();
+    m_filter->kaiser.iterations = value(atts, "iterations").toInt();
+    m_filter->kaiser.usage.calibrationFlag = (value(atts, "cal") == "true") ? 1 : 0;
+    m_filter->kaiser.usage.fittingFlag = (value(atts, "fit") == "true") ? 1 : 0;
+    m_filter->kaiser.usage.divide = (value(atts, "div") == "true") ? 1 : 0;
   }
   else if (element == "boxcar") {
 
-    m_filter->boxcar.width = atts.at("width").toInt();
-    m_filter->boxcar.iterations = atts.at("iterations").toInt();
-    m_filter->boxcar.usage.calibrationFlag = (atts.at("cal") == "true") ? 1 : 0;
-    m_filter->boxcar.usage.fittingFlag = (atts.at("fit") == "true") ? 1 : 0;
-    m_filter->boxcar.usage.divide = (atts.at("div") == "true") ? 1 : 0;
+    m_filter->boxcar.width = value(atts, "width").toInt();
+    m_filter->boxcar.iterations = value(atts, "iterations").toInt();
+    m_filter->boxcar.usage.calibrationFlag = (value(atts, "cal") == "true") ? 1 : 0;
+    m_filter->boxcar.usage.fittingFlag = (value(atts, "fit") == "true") ? 1 : 0;
+    m_filter->boxcar.usage.divide = (value(atts, "div") == "true") ? 1 : 0;
   }
   else if (element == "gaussian") {
 
-    m_filter->gaussian.fwhm = atts.at("fwhm").toDouble();
-    m_filter->gaussian.iterations = atts.at("iterations").toInt();
-    m_filter->gaussian.usage.calibrationFlag = (atts.at("cal") == "true") ? 1 : 0;
-    m_filter->gaussian.usage.fittingFlag = (atts.at("fit") == "true") ? 1 : 0;
-    m_filter->gaussian.usage.divide = (atts.at("div") == "true") ? 1 : 0;
+    m_filter->gaussian.fwhm = value(atts, "fwhm").toDouble();
+    m_filter->gaussian.iterations = value(atts, "iterations").toInt();
+    m_filter->gaussian.usage.calibrationFlag = (value(atts, "cal") == "true") ? 1 : 0;
+    m_filter->gaussian.usage.fittingFlag = (value(atts, "fit") == "true") ? 1 : 0;
+    m_filter->gaussian.usage.divide = (value(atts, "div") == "true") ? 1 : 0;
   }
   else if (element == "triangular") {
 
-    m_filter->triangular.width = atts.at("width").toInt();
-    m_filter->triangular.iterations = atts.at("iterations").toInt();
-    m_filter->triangular.usage.calibrationFlag = (atts.at("cal") == "true") ? 1 : 0;
-    m_filter->triangular.usage.fittingFlag = (atts.at("fit") == "true") ? 1 : 0;
-    m_filter->triangular.usage.divide = (atts.at("div") == "true") ? 1 : 0;
+    m_filter->triangular.width = value(atts, "width").toInt();
+    m_filter->triangular.iterations = value(atts, "iterations").toInt();
+    m_filter->triangular.usage.calibrationFlag = (value(atts, "cal") == "true") ? 1 : 0;
+    m_filter->triangular.usage.fittingFlag = (value(atts, "fit") == "true") ? 1 : 0;
+    m_filter->triangular.usage.divide = (value(atts, "div") == "true") ? 1 : 0;
   }
   else if (element == "savitzky_golay") {
 
-    m_filter->savitzky.width = atts.at("width").toInt();
-    m_filter->savitzky.order = atts.at("order").toInt();
-    m_filter->savitzky.iterations = atts.at("iterations").toInt();
-    m_filter->savitzky.usage.calibrationFlag = (atts.at("cal") == "true") ? 1 : 0;
-    m_filter->savitzky.usage.fittingFlag = (atts.at("fit") == "true") ? 1 : 0;
-    m_filter->savitzky.usage.divide = (atts.at("div") == "true") ? 1 : 0;
+    m_filter->savitzky.width = value(atts, "width").toInt();
+    m_filter->savitzky.order = value(atts, "order").toInt();
+    m_filter->savitzky.iterations = value(atts, "iterations").toInt();
+    m_filter->savitzky.usage.calibrationFlag = (value(atts, "cal") == "true") ? 1 : 0;
+    m_filter->savitzky.usage.fittingFlag = (value(atts, "fit") == "true") ? 1 : 0;
+    m_filter->savitzky.usage.divide = (value(atts, "div") == "true") ? 1 : 0;
   }
   else if (element == "binomial") {
 
-    m_filter->binomial.width = atts.at("width").toInt();
-    m_filter->binomial.iterations = atts.at("iterations").toInt();
-    m_filter->binomial.usage.calibrationFlag = (atts.at("cal") == "true") ? 1 : 0;
-    m_filter->binomial.usage.fittingFlag = (atts.at("fit") == "true") ? 1 : 0;
-    m_filter->binomial.usage.divide = (atts.at("div") == "true") ? 1 : 0;
+    m_filter->binomial.width = value(atts, "width").toInt();
+    m_filter->binomial.iterations = value(atts, "iterations").toInt();
+    m_filter->binomial.usage.calibrationFlag = (value(atts, "cal") == "true") ? 1 : 0;
+    m_filter->binomial.usage.fittingFlag = (value(atts, "fit") == "true") ? 1 : 0;
+    m_filter->binomial.usage.divide = (value(atts, "div") == "true") ? 1 : 0;
   }
 }
 
@@ -112,7 +112,7 @@ CSlitFunctionSubHandler::CSlitFunctionSubHandler(CConfigHandler *master,
 
 void CSlitFunctionSubHandler::start(const map<Glib::ustring, QString>& atts)
 {
-  QString str = atts.at("type");
+  QString str = value(atts, "type");
 
   if (str == "none")
     m_function->type = SLIT_TYPE_NONE;
@@ -149,10 +149,10 @@ void CSlitFunctionSubHandler::start(const Glib::ustring& element, const map<Glib
 {
   if (element == "file") {
 
-    QString str = atts.at("file");
-    QString str2 = atts.at("file2");
+    QString str = value(atts, "file");
+    QString str2 = value(atts, "file2");
 
-    m_function->file.wveDptFlag=(atts.at("wveDptFlag") == "true") ? 1 : 0;
+    m_function->file.wveDptFlag=(value(atts, "wveDptFlag") == "true") ? 1 : 0;
 
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
@@ -175,10 +175,10 @@ void CSlitFunctionSubHandler::start(const Glib::ustring& element, const map<Glib
   }
   else if (element == "gaussian") {
 
-    QString str = atts.at("file");
+    QString str = value(atts, "file");
 
-    m_function->gaussian.fwhm = atts.at("fwhm").toDouble();
-    m_function->gaussian.wveDptFlag=(atts.at("wveDptFlag") == "true") ? 1 : 0;
+    m_function->gaussian.fwhm = value(atts, "fwhm").toDouble();
+    m_function->gaussian.wveDptFlag=(value(atts, "wveDptFlag") == "true") ? 1 : 0;
 
    if (!str.isEmpty())
      {
@@ -193,17 +193,17 @@ void CSlitFunctionSubHandler::start(const Glib::ustring& element, const map<Glib
   }
   else if (element == "lorentz") {
 
-    QString str = atts.at("file");
+    QString str = value(atts, "file");
 
-    m_function->lorentz.width = atts.at("width").toDouble();
+    m_function->lorentz.width = value(atts, "width").toDouble();
 
-    if (atts.at("order") != "") {
-      m_function->lorentz.order = atts.at("order").toInt();
+    if (value(atts, "order") != "") {
+      m_function->lorentz.order = value(atts, "order").toInt();
     } else { // in older versions, 2n-lorentz was specified by the value "2n"
-      m_function->lorentz.order = atts.at("degree").toInt() / 2;
+      m_function->lorentz.order = value(atts, "degree").toInt() / 2;
     }
 
-    m_function->lorentz.wveDptFlag=(atts.at("wveDptFlag") == "true") ? 1 : 0;
+    m_function->lorentz.wveDptFlag=(value(atts, "wveDptFlag") == "true") ? 1 : 0;
     if (!str.isEmpty())
      {
       str = m_master->pathExpand(str);
@@ -217,15 +217,15 @@ void CSlitFunctionSubHandler::start(const Glib::ustring& element, const map<Glib
   }
   else if (element == "voigt") {
 
-    QString str = atts.at("file");
-    QString str2 = atts.at("file2");
+    QString str = value(atts, "file");
+    QString str2 = value(atts, "file2");
 
-    m_function->voigt.fwhmL = atts.at("fwhmleft").toDouble();
-    m_function->voigt.fwhmR = atts.at("fwhmright").toDouble();
-    m_function->voigt.glRatioL = atts.at("glrleft").toDouble();
-    m_function->voigt.glRatioR = atts.at("glrright").toDouble();
+    m_function->voigt.fwhmL = value(atts, "fwhmleft").toDouble();
+    m_function->voigt.fwhmR = value(atts, "fwhmright").toDouble();
+    m_function->voigt.glRatioL = value(atts, "glrleft").toDouble();
+    m_function->voigt.glRatioR = value(atts, "glrright").toDouble();
 
-    m_function->voigt.wveDptFlag=(atts.at("wveDptFlag") == "true") ? 1 : 0;
+    m_function->voigt.wveDptFlag=(value(atts, "wveDptFlag") == "true") ? 1 : 0;
 
     if (!str.isEmpty())
      {
@@ -251,13 +251,13 @@ void CSlitFunctionSubHandler::start(const Glib::ustring& element, const map<Glib
   }
   else if (element == "error") {
 
-    QString str = atts.at("file");
-    QString str2 = atts.at("file2");
+    QString str = value(atts, "file");
+    QString str2 = value(atts, "file2");
 
-    m_function->error.fwhm = atts.at("fwhm").toDouble();
-    m_function->error.width = atts.at("width").toDouble();
+    m_function->error.fwhm = value(atts, "fwhm").toDouble();
+    m_function->error.width = value(atts, "width").toDouble();
 
-    m_function->error.wveDptFlag=(atts.at("wveDptFlag") == "true") ? 1 : 0;
+    m_function->error.wveDptFlag=(value(atts, "wveDptFlag") == "true") ? 1 : 0;
 
     if (!str.isEmpty())
      {
@@ -283,13 +283,13 @@ void CSlitFunctionSubHandler::start(const Glib::ustring& element, const map<Glib
   }
   else if (element == "agauss") {
 
-    QString str = atts.at("file");
-    QString str2 = atts.at("file2");
+    QString str = value(atts, "file");
+    QString str2 = value(atts, "file2");
 
-    m_function->agauss.fwhm = atts.at("fwhm").toDouble();
-    m_function->agauss.asym = atts.at("asym").toDouble();
+    m_function->agauss.fwhm = value(atts, "fwhm").toDouble();
+    m_function->agauss.asym = value(atts, "asym").toDouble();
 
-    m_function->agauss.wveDptFlag=(atts.at("wveDptFlag") == "true") ? 1 : 0;
+    m_function->agauss.wveDptFlag=(value(atts, "wveDptFlag") == "true") ? 1 : 0;
 
     if (!str.isEmpty())
      {
@@ -316,15 +316,15 @@ void CSlitFunctionSubHandler::start(const Glib::ustring& element, const map<Glib
 
   else if (element == "supergauss") {
 
-    QString str = atts.at("file");
-    QString str2 = atts.at("file2");
-    QString str3 = atts.at("file3");
+    QString str = value(atts, "file");
+    QString str2 = value(atts, "file2");
+    QString str3 = value(atts, "file3");
 
-    m_function->supergauss.fwhm = atts.at("fwhm").toDouble();
-    m_function->supergauss.exponential = atts.at("expTerm").toDouble();
-    m_function->supergauss.asym = atts.at("asym").toDouble();
+    m_function->supergauss.fwhm = value(atts, "fwhm").toDouble();
+    m_function->supergauss.exponential = value(atts, "expTerm").toDouble();
+    m_function->supergauss.asym = value(atts, "asym").toDouble();
 
-    m_function->supergauss.wveDptFlag=(atts.at("wveDptFlag") == "true") ? 1 : 0;
+    m_function->supergauss.wveDptFlag=(value(atts, "wveDptFlag") == "true") ? 1 : 0;
 
     if (!str.isEmpty())
      {
@@ -361,17 +361,17 @@ void CSlitFunctionSubHandler::start(const Glib::ustring& element, const map<Glib
   }
   else if (element == "boxcarapod") {
 
-    m_function->boxcarapod.resolution = atts.at("resolution").toDouble();
-    m_function->boxcarapod.phase = atts.at("phase").toDouble();
+    m_function->boxcarapod.resolution = value(atts, "resolution").toDouble();
+    m_function->boxcarapod.phase = value(atts, "phase").toDouble();
   }
   else if (element == "nbsapod") {
 
-    m_function->nbsapod.resolution = atts.at("resolution").toDouble();
-    m_function->nbsapod.phase = atts.at("phase").toDouble();
+    m_function->nbsapod.resolution = value(atts, "resolution").toDouble();
+    m_function->nbsapod.phase = value(atts, "phase").toDouble();
   }
   else if (element == "gaussianfile") {
 
-    QString str = atts.at("file");
+    QString str = value(atts, "file");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_function->gaussian.filename))
@@ -385,7 +385,7 @@ void CSlitFunctionSubHandler::start(const Glib::ustring& element, const map<Glib
   }
   else if (element == "lorentzfile") {
 
-    QString str = atts.at("file");
+    QString str = value(atts, "file");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_function->lorentz.filename))
@@ -398,15 +398,15 @@ void CSlitFunctionSubHandler::start(const Glib::ustring& element, const map<Glib
     throw std::runtime_error("Slit Function Filename too long");
     }
 
-    if (atts.at("order") != "") {
-      m_function->lorentz.order = atts.at("order").toInt();
+    if (value(atts, "order") != "") {
+      m_function->lorentz.order = value(atts, "order").toInt();
     } else {
-      m_function->lorentz.order = atts.at("degree").toInt() / 2;
+      m_function->lorentz.order = value(atts, "degree").toInt() / 2;
     }
   }
   else if (element == "errorfile") {
 
-    QString str = atts.at("file");
+    QString str = value(atts, "file");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_function->error.filename))
@@ -418,7 +418,7 @@ void CSlitFunctionSubHandler::start(const Glib::ustring& element, const map<Glib
     throw std::runtime_error("Slit Function Filename too long");
     }
 
-    QString str2 = atts.at("file2");
+    QString str2 = value(atts, "file2");
     if (!str2.isEmpty()) {
       str2 = m_master->pathExpand(str2);
       if (str2.length() < (int)sizeof(m_function->error.filename2))

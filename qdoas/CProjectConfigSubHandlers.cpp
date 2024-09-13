@@ -1,4 +1,3 @@
-
 #include "CProjectConfigSubHandlers.h"
 #include "CProjectConfigAnalysisWindowSubHandlers.h"
 #include "CConfigSubHandlerUtils.h"
@@ -45,7 +44,7 @@ void CSelectorSubHandler::start(const Glib::ustring &element, const map<Glib::us
   if (d->nSelected >= PRJCT_RESULTS_MAX)
     throw std::runtime_error("Too many output fields");
 
-  QString str = atts.at("name");
+  QString str = value(atts, "name");
   if ( str == "filename" )
     d->selected[d->nSelected] = PRJCT_RESULTS_FILENAME;
   else if (str == "specno")
@@ -296,10 +295,10 @@ CProjectDisplaySubHandler::CProjectDisplaySubHandler(CConfigHandler *master, med
 
 void CProjectDisplaySubHandler::start(const map<Glib::ustring, QString> &atts)
 {
-  m_display->requireSpectra = (atts.at("spectra") == "true") ? 1 : 0;
-  m_display->requireData = (atts.at("data") == "true") ? 1 : 0;
-  m_display->requireCalib = (atts.at("calib") == "true") ? 1 : 0;
-  m_display->requireFits = (atts.at("fits") == "true") ? 1 : 0;
+  m_display->requireSpectra = (value(atts, "spectra") == "true") ? 1 : 0;
+  m_display->requireData = (value(atts, "data") == "true") ? 1 : 0;
+  m_display->requireCalib = (value(atts, "calib") == "true") ? 1 : 0;
+  m_display->requireFits = (value(atts, "fits") == "true") ? 1 : 0;
 
 }
 
@@ -317,57 +316,57 @@ void CProjectSelectionSubHandler::start(const Glib::ustring &element, const map<
   if (element == "sza") {
 
     // defaults from mediateInitializeProject() are ok if attributes are not present
-    m_selection->szaMinimum = atts.at("min").toDouble();
-    m_selection->szaMaximum = atts.at("max").toDouble();
-    m_selection->szaDelta = atts.at("delta").toDouble();
+    m_selection->szaMinimum = value(atts, "min").toDouble();
+    m_selection->szaMaximum = value(atts, "max").toDouble();
+    m_selection->szaDelta = value(atts, "delta").toDouble();
 
   }
   if (element == "elevation") {
 
     // defaults from mediateInitializeProject() are ok if attributes are not present
-    m_selection->elevationMinimum = atts.at("min").toDouble();
-    m_selection->elevationMaximum = atts.at("max").toDouble();
-    m_selection->elevationTolerance = atts.at("tol").toDouble();
+    m_selection->elevationMinimum = value(atts, "min").toDouble();
+    m_selection->elevationMaximum = value(atts, "max").toDouble();
+    m_selection->elevationTolerance = value(atts, "tol").toDouble();
 
   }
   if (element == "reference") {
 
     // defaults from mediateInitializeProject() are ok if attributes are not present
-    m_selection->refAngle = atts.at("angle").toDouble();
-    m_selection->refTolerance = atts.at("tol").toDouble();
+    m_selection->refAngle = value(atts, "angle").toDouble();
+    m_selection->refTolerance = value(atts, "tol").toDouble();
 
   }
   else if (element == "record") {
 
     // defaults from mediateInitializeProject() are ok if attributes are not present
-    m_selection->recordNumberMinimum = atts.at("min").toInt();
-    m_selection->recordNumberMaximum = atts.at("max").toInt();
+    m_selection->recordNumberMinimum = value(atts, "min").toInt();
+    m_selection->recordNumberMaximum = value(atts, "max").toInt();
   }
   else if (element == "cloud")
    {
-    m_selection->cloudFractionMinimum = atts.at("min").toDouble();
-    m_selection->cloudFractionMaximum = atts.at("max").toDouble();
+    m_selection->cloudFractionMinimum = value(atts, "min").toDouble();
+    m_selection->cloudFractionMaximum = value(atts, "max").toDouble();
    }
   else if (element == "circle") {
 
-    m_selection->geo.circle.radius = atts.at("radius").toDouble();
-    m_selection->geo.circle.centerLongitude = atts.at("long").toDouble();
-    m_selection->geo.circle.centerLatitude = atts.at("lat").toDouble();
+    m_selection->geo.circle.radius = value(atts, "radius").toDouble();
+    m_selection->geo.circle.centerLongitude = value(atts, "long").toDouble();
+    m_selection->geo.circle.centerLatitude = value(atts, "lat").toDouble();
   }
   else if (element == "rectangle") {
 
-    m_selection->geo.rectangle.easternLongitude = atts.at("east").toDouble();
-    m_selection->geo.rectangle.westernLongitude = atts.at("west").toDouble();
-    m_selection->geo.rectangle.northernLatitude = atts.at("north").toDouble();
-    m_selection->geo.rectangle.southernLatitude = atts.at("south").toDouble();
+    m_selection->geo.rectangle.easternLongitude = value(atts, "east").toDouble();
+    m_selection->geo.rectangle.westernLongitude = value(atts, "west").toDouble();
+    m_selection->geo.rectangle.northernLatitude = value(atts, "north").toDouble();
+    m_selection->geo.rectangle.southernLatitude = value(atts, "south").toDouble();
   }
   else if (element == "sites") {
 
-    m_selection->geo.sites.radius = atts.at("radius").toDouble();
+    m_selection->geo.sites.radius = value(atts, "radius").toDouble();
   }
   else if (element == "geolocation") {
 
-    QString selected = atts.at("selected");
+    QString selected = value(atts, "selected");
 
     if (selected == "circle")
       m_selection->geo.mode = PRJCT_SPECTRA_MODES_CIRCLE;
@@ -398,7 +397,7 @@ void CProjectAnalysisSubHandler::start(const map<Glib::ustring, QString> &atts)
 
   QString str;
 
-  str = atts.at("method");
+  str = value(atts, "method");
   if (str == "ODF")
     m_analysis->methodType = OPTICAL_DENSITY_FIT;
   else if (str == "ML+SVD")
@@ -406,7 +405,7 @@ void CProjectAnalysisSubHandler::start(const map<Glib::ustring, QString> &atts)
   else
     throw std::runtime_error("Invalid analysis method");
 
-  str = atts.at("fit");
+  str = value(atts, "fit");
   if (str == "none")
     m_analysis->fitType = PRJCT_ANLYS_FIT_WEIGHTING_NONE;
   else if (str == "instr")
@@ -414,7 +413,7 @@ void CProjectAnalysisSubHandler::start(const map<Glib::ustring, QString> &atts)
   else
     throw std::runtime_error("Invalid analysis fit");
 
-  str = atts.at("interpolation");
+  str = value(atts, "interpolation");
   if (str == "linear")
     m_analysis->interpolationType = PRJCT_ANLYS_INTERPOL_LINEAR;
   else if (str == "spline")
@@ -422,11 +421,11 @@ void CProjectAnalysisSubHandler::start(const map<Glib::ustring, QString> &atts)
   else
     throw std::runtime_error("Invalid analysis interpolation");
 
-  m_analysis->interpolationSecurityGap = atts.at("gap").toInt();
-  m_analysis->maxIterations=atts.at("max_iterations").toInt();
-  m_analysis->convergenceCriterion = atts.at("converge").toDouble();
-  if (atts.at("spike_tolerance") != "")
-    m_analysis->spike_tolerance = atts.at("spike_tolerance").toDouble();
+  m_analysis->interpolationSecurityGap = value(atts, "gap").toInt();
+  m_analysis->maxIterations=value(atts, "max_iterations").toInt();
+  m_analysis->convergenceCriterion = value(atts, "converge").toDouble();
+  if (value(atts, "spike_tolerance") != "")
+    m_analysis->spike_tolerance = value(atts, "spike_tolerance").toDouble();
 
 }
 
@@ -445,8 +444,8 @@ void CProjectRawSpectraSubHandler::start(const Glib::ustring &element, const map
 {
   // <directory>, <file> or <folder>
 
-  QString name = atts.at("name");
-  bool enabled = (atts.at("disabled") != "true");
+  QString name = value(atts, "name");
+  bool enabled = (value(atts, "disabled") != "true");
 
   // MUST have a name ...
   if (name.isEmpty())
@@ -461,8 +460,8 @@ void CProjectRawSpectraSubHandler::start(const Glib::ustring &element, const map
 
     // expand the name (the directory name)
     name = m_master->pathExpand(name);
-    m_node->addChild(new CProjectConfigDirectory(name, atts.at("filters"),
-                         (atts.at("recursive") == "true"), enabled));
+    m_node->addChild(new CProjectConfigDirectory(name, value(atts, "filters"),
+                         (value(atts, "recursive") == "true"), enabled));
   }
   else if (element == "folder") {
     // create an item for the folder now ...
@@ -490,7 +489,7 @@ void CProjectCalibrationSubHandler::start(const map<Glib::ustring, QString> &att
 {
   QString str;
 
-  str = atts.at("method");
+  str = value(atts, "method");
   if (str == "ODF")
     m_calibration->methodType = OPTICAL_DENSITY_FIT;
   else if (str == "ML+SVD")
@@ -498,7 +497,7 @@ void CProjectCalibrationSubHandler::start(const map<Glib::ustring, QString> &att
   else
     throw std::runtime_error("Invalid analysis method");
 
-  str = atts.at("ref");
+  str = value(atts, "ref");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_calibration->solarRefFile))
@@ -515,7 +514,7 @@ void CProjectCalibrationSubHandler::start(const Glib::ustring &element, const ma
   // sub element of calibration
 
   if (element == "line") {
-    str = atts.at("shape");
+    str = value(atts, "shape");
     if (str == "none")
       m_calibration->lineShape = PRJCT_CALIB_FWHM_TYPE_NONE;
     else if (str == "file")
@@ -535,13 +534,13 @@ void CProjectCalibrationSubHandler::start(const Glib::ustring &element, const ma
     else
       throw std::runtime_error("Invalid line shape" + str.toStdString());
 
-    if (atts.at("lorentzorder") != "") {
-      m_calibration->lorentzOrder = atts.at("lorentzorder").toInt();
+    if (value(atts, "lorentzorder") != "") {
+      m_calibration->lorentzOrder = value(atts, "lorentzorder").toInt();
     } else {
-      m_calibration->lorentzOrder = atts.at("lorentzdegree").toInt()/2;
+      m_calibration->lorentzOrder = value(atts, "lorentzdegree").toInt()/2;
     }
 
-    str = atts.at("slfFile");
+    str = value(atts, "slfFile");
     if (!str.isEmpty())
      {
       str = m_master->pathExpand(str);
@@ -553,24 +552,24 @@ void CProjectCalibrationSubHandler::start(const Glib::ustring &element, const ma
   }
   else if (element == "display") {
 
-    m_calibration->requireSpectra = (atts.at("spectra") == "true") ? 1 : 0;
-    m_calibration->requireFits = (atts.at("fits") == "true") ? 1 : 0;
-    m_calibration->requireResidual = (atts.at("residual") == "true") ? 1 : 0;
-    m_calibration->requireShiftSfp = (atts.at("shiftsfp") == "true") ? 1 : 0;
+    m_calibration->requireSpectra = (value(atts, "spectra") == "true") ? 1 : 0;
+    m_calibration->requireFits = (value(atts, "fits") == "true") ? 1 : 0;
+    m_calibration->requireResidual = (value(atts, "residual") == "true") ? 1 : 0;
+    m_calibration->requireShiftSfp = (value(atts, "shiftsfp") == "true") ? 1 : 0;
   }
   else if (element == "polynomial") {
 
-    m_calibration->shiftDegree = atts.at("shift").toInt();
-    m_calibration->sfpDegree = atts.at("sfp").toInt();
+    m_calibration->shiftDegree = value(atts, "shift").toInt();
+    m_calibration->sfpDegree = value(atts, "sfp").toInt();
   }
   else if (element == "window") {
 
-    m_calibration->wavelengthMin = atts.at("min").toDouble();
-    m_calibration->wavelengthMax = atts.at("max").toDouble();
-    m_calibration->windowSize = atts.at("size").toDouble();
-    m_calibration->subWindows = atts.at("intervals").toInt();
+    m_calibration->wavelengthMin = value(atts, "min").toDouble();
+    m_calibration->wavelengthMax = value(atts, "max").toDouble();
+    m_calibration->windowSize = value(atts, "size").toDouble();
+    m_calibration->subWindows = value(atts, "intervals").toInt();
 
-    const QByteArray& ascii=atts.at("custom_windows").toLocal8Bit();
+    const QByteArray& ascii=value(atts, "custom_windows").toLocal8Bit();
     const char *ptr = ascii.data();
     int i=0;
     double lambdaMin,lambdaMax;
@@ -591,7 +590,7 @@ void CProjectCalibrationSubHandler::start(const Glib::ustring &element, const ma
       i++;
     }
 
-    str = atts.at("division");
+    str = value(atts, "division");
     if (str == "sliding")
      m_calibration->divisionMode = PRJCT_CALIB_WINDOWS_SLIDING;
     else if (str == "custom")
@@ -602,9 +601,9 @@ void CProjectCalibrationSubHandler::start(const Glib::ustring &element, const ma
 
   }
   else if (element == "preshift") {
-    m_calibration->preshiftFlag = (atts.at("calculate") == "true") ? 1 : 0;
-    m_calibration->preshiftMin = atts.at("min").toDouble();
-    m_calibration->preshiftMax = atts.at("max").toDouble();
+    m_calibration->preshiftFlag = (value(atts, "calculate") == "true") ? 1 : 0;
+    m_calibration->preshiftMin = value(atts, "min").toDouble();
+    m_calibration->preshiftMax = value(atts, "max").toDouble();
   }
   else if (element == "cross_section") {
     return m_master->install_subhandler(new CAnalysisWindowCrossSectionSubHandler(m_master, &(m_calibration->crossSectionList)), atts);
@@ -641,7 +640,7 @@ void CProjectUndersamplingSubHandler::start(const map<Glib::ustring, QString> &a
 {
   QString str;
 
-  str = atts.at("method");
+  str = value(atts, "method");
   if (str == "file")
     m_undersampling->method = PRJCT_USAMP_FILE;
   else if (str == "fixed")
@@ -651,7 +650,7 @@ void CProjectUndersamplingSubHandler::start(const map<Glib::ustring, QString> &a
   else
     throw std::runtime_error("Invalid analysis method");
 
-  str = atts.at("ref");
+  str = value(atts, "ref");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_undersampling->solarRefFile))
@@ -660,7 +659,7 @@ void CProjectUndersamplingSubHandler::start(const map<Glib::ustring, QString> &a
       throw std::runtime_error("Solar Reference Filename too long");
   }
 
-  m_undersampling->shift = atts.at("shift").toDouble();
+  m_undersampling->shift = value(atts, "shift").toDouble();
 
 }
 
@@ -680,7 +679,7 @@ void CProjectInstrumentalSubHandler::start(const map<Glib::ustring, QString> &at
 
   QString str;
 
-  str = atts.at("format");
+  str = value(atts, "format");
   if (str == "ascii")
     m_instrumental->format = PRJCT_INSTR_FORMAT_ASCII;
 #ifdef PRJCT_INSTR_FORMAT_OLD
@@ -752,7 +751,7 @@ void CProjectInstrumentalSubHandler::start(const map<Glib::ustring, QString> &at
   else
     throw std::runtime_error("Invalid instrumental format");
 
-  str = atts.at("site");
+  str = value(atts, "site");
   if (!str.isEmpty()) {
     if (str.length() < (int)sizeof(m_instrumental->siteName))
       strcpy(m_instrumental->siteName, str.toLocal8Bit().data());
@@ -760,7 +759,7 @@ void CProjectInstrumentalSubHandler::start(const map<Glib::ustring, QString> &at
       throw std::runtime_error("Instrumental Site Name too long");
   }
 
-  str = atts.at("saa_convention");
+  str = value(atts, "saa_convention");
   m_instrumental->saaConvention=(!str.isEmpty() && (str=="0-north"))?PRJCT_INSTR_SAA_NORTH:PRJCT_INSTR_SAA_SOUTH;
 
 }
@@ -772,9 +771,9 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
   if (element == "ascii") { // ASCII
     QString str;
 
-    m_instrumental->ascii.detectorSize = atts.at("size").toInt();
+    m_instrumental->ascii.detectorSize = value(atts, "size").toInt();
 
-    str = atts.at("format");
+    str = value(atts, "format");
     if (str == "line")
       m_instrumental->ascii.format = PRJCT_INSTR_ASCII_FORMAT_LINE;
     else if (str == "column")
@@ -784,17 +783,17 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
     else
       throw std::runtime_error("Invalid ascii format");
 
-    m_instrumental->ascii.flagZenithAngle = (atts.at("zen") == "true") ? 1 : 0;
-    m_instrumental->ascii.flagAzimuthAngle = (atts.at("azi") == "true") ? 1 : 0;
-    m_instrumental->ascii.flagElevationAngle = (atts.at("ele") == "true") ? 1 : 0;
-    m_instrumental->ascii.flagDate = (atts.at("date") == "true") ? 1 : 0;
-    m_instrumental->ascii.flagTime = (atts.at("time") == "true") ? 1 : 0;
-    m_instrumental->ascii.flagWavelength = (atts.at("lambda") == "true") ? 1 : 0;
-    m_instrumental->ascii.straylight = (atts.at("straylight") == "true") ? 1 : 0;
-    m_instrumental->ascii.lambdaMin = atts.at("lambda_min").toDouble();
-    m_instrumental->ascii.lambdaMax = atts.at("lambda_max").toDouble();
+    m_instrumental->ascii.flagZenithAngle = (value(atts, "zen") == "true") ? 1 : 0;
+    m_instrumental->ascii.flagAzimuthAngle = (value(atts, "azi") == "true") ? 1 : 0;
+    m_instrumental->ascii.flagElevationAngle = (value(atts, "ele") == "true") ? 1 : 0;
+    m_instrumental->ascii.flagDate = (value(atts, "date") == "true") ? 1 : 0;
+    m_instrumental->ascii.flagTime = (value(atts, "time") == "true") ? 1 : 0;
+    m_instrumental->ascii.flagWavelength = (value(atts, "lambda") == "true") ? 1 : 0;
+    m_instrumental->ascii.straylight = (value(atts, "straylight") == "true") ? 1 : 0;
+    m_instrumental->ascii.lambdaMin = value(atts, "lambda_min").toDouble();
+    m_instrumental->ascii.lambdaMax = value(atts, "lambda_max").toDouble();
 
-    str = atts.at("calib");
+    str = value(atts, "calib");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->ascii.calibrationFile))
@@ -803,9 +802,9 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
     throw std::runtime_error(CALIBRATION_FILENAME_ERR);
     }
 
-    str = atts.at("transmission");
+    str = value(atts, "transmission");
     if (str.isEmpty())
-      str = atts.at("instr"); // check for old config files
+      str = value(atts, "instr"); // check for old config files
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->ascii.transmissionFunctionFile))
@@ -823,7 +822,7 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
   else if (element == "acton") { // ACTON
     QString str;
 
-    str = atts.at("type");
+    str = value(atts, "type");
     if (str == "old")
       m_instrumental->acton.niluType = PRJCT_INSTR_NILU_FORMAT_OLD;
     else if (str == "new")
@@ -831,7 +830,7 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
     else
       throw std::runtime_error("Invalid acton Type");
 
-    str = atts.at("calib");
+    str = value(atts, "calib");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->acton.calibrationFile))
@@ -840,9 +839,9 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
     throw std::runtime_error(CALIBRATION_FILENAME_ERR);
     }
 
-    str = atts.at("transmission");
+    str = value(atts, "transmission");
     if (str.isEmpty())
-      str = atts.at("instr"); // check for old config files
+      str = value(atts, "instr"); // check for old config files
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->acton.transmissionFunctionFile))
@@ -874,30 +873,30 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
 
   }
   else if (element == "saozefm") { // SAOZ EFM
-    m_instrumental->saozefm.straylight = (atts.at("straylight") == "true") ? 1 : 0;
-    m_instrumental->saozefm.lambdaMin = atts.at("lambda_min").toDouble();
-    m_instrumental->saozefm.lambdaMax = atts.at("lambda_max").toDouble();
+    m_instrumental->saozefm.straylight = (value(atts, "straylight") == "true") ? 1 : 0;
+    m_instrumental->saozefm.lambdaMin = value(atts, "lambda_min").toDouble();
+    m_instrumental->saozefm.lambdaMax = value(atts, "lambda_max").toDouble();
     return helperLoadMinimum(atts, &(m_instrumental->saozefm));
 
   }
   else if (element == "mfc") { // MFC
     QString str;
 
-    m_instrumental->mfc.detectorSize = atts.at("size").toInt();
-    m_instrumental->mfc.firstWavelength = atts.at("first").toInt();
+    m_instrumental->mfc.detectorSize = value(atts, "size").toInt();
+    m_instrumental->mfc.firstWavelength = value(atts, "first").toInt();
 
-    m_instrumental->mfc.revert = (atts.at("revert") == "true") ? 1 : 0;
-    m_instrumental->mfc.autoFileSelect = (atts.at("auto") == "true") ? 1 : 0;
-    m_instrumental->mfc.offsetMask = atts.at("omask").toUInt();
-    m_instrumental->mfc.instrFctnMask = atts.at("imask").toUInt();
-    m_instrumental->mfc.darkCurrentMask = atts.at("dmask").toUInt();
-    m_instrumental->mfc.spectraMask = atts.at("smask").toUInt();
+    m_instrumental->mfc.revert = (value(atts, "revert") == "true") ? 1 : 0;
+    m_instrumental->mfc.autoFileSelect = (value(atts, "auto") == "true") ? 1 : 0;
+    m_instrumental->mfc.offsetMask = value(atts, "omask").toUInt();
+    m_instrumental->mfc.instrFctnMask = value(atts, "imask").toUInt();
+    m_instrumental->mfc.darkCurrentMask = value(atts, "dmask").toUInt();
+    m_instrumental->mfc.spectraMask = value(atts, "smask").toUInt();
 
-    m_instrumental->mfc.straylight = (atts.at("straylight") == "true") ? 1 : 0;
-    m_instrumental->mfc.lambdaMin = atts.at("lambda_min").toDouble();
-    m_instrumental->mfc.lambdaMax = atts.at("lambda_max").toDouble();
+    m_instrumental->mfc.straylight = (value(atts, "straylight") == "true") ? 1 : 0;
+    m_instrumental->mfc.lambdaMin = value(atts, "lambda_min").toDouble();
+    m_instrumental->mfc.lambdaMax = value(atts, "lambda_max").toDouble();
 
-    str = atts.at("calib");
+    str = value(atts, "calib");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->mfc.calibrationFile))
@@ -906,9 +905,9 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
     throw std::runtime_error(CALIBRATION_FILENAME_ERR);
     }
 
-    str = atts.at("transmission");
+    str = value(atts, "transmission");
     if (str.isEmpty())
-      str = atts.at("instr"); // check for old config files
+      str = value(atts, "instr"); // check for old config files
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->mfc.transmissionFunctionFile))
@@ -916,7 +915,7 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
       else
     throw std::runtime_error(TRANSMISSION_FILENAME_ERR);
     }
-    str = atts.at("dark");
+    str = value(atts, "dark");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->mfc.darkCurrentFile))
@@ -925,7 +924,7 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
     throw std::runtime_error("Dark Current Filename too long");
     }
 
-    str = atts.at("offset");
+    str = value(atts, "offset");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->mfc.offsetFile))
@@ -938,13 +937,13 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
   else if (element == "mfcstd") { // MFC STD
     QString str;
 
-    m_instrumental->mfcstd.detectorSize = atts.at("size").toInt();
-    m_instrumental->mfcstd.revert = (atts.at("revert") == "true") ? 1 : 0;
-    m_instrumental->mfcstd.straylight = (atts.at("straylight") == "true") ? 1 : 0;
-    m_instrumental->mfcstd.lambdaMin = atts.at("lambda_min").toDouble();
-    m_instrumental->mfcstd.lambdaMax = atts.at("lambda_max").toDouble();
+    m_instrumental->mfcstd.detectorSize = value(atts, "size").toInt();
+    m_instrumental->mfcstd.revert = (value(atts, "revert") == "true") ? 1 : 0;
+    m_instrumental->mfcstd.straylight = (value(atts, "straylight") == "true") ? 1 : 0;
+    m_instrumental->mfcstd.lambdaMin = value(atts, "lambda_min").toDouble();
+    m_instrumental->mfcstd.lambdaMax = value(atts, "lambda_max").toDouble();
 
-    str = atts.at("date");
+    str = value(atts, "date");
     if (!str.isEmpty()) {
       if (str.length() < (int)sizeof(m_instrumental->mfcstd.dateFormat))
         strcpy(m_instrumental->mfcstd.dateFormat, str.toLocal8Bit().data());
@@ -952,7 +951,7 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
         throw std::runtime_error("Date format too long");
      }
 
-    str = atts.at("calib");
+    str = value(atts, "calib");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->mfcstd.calibrationFile))
@@ -961,9 +960,9 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
     throw std::runtime_error(CALIBRATION_FILENAME_ERR);
     }
 
-    str = atts.at("transmission");
+    str = value(atts, "transmission");
     if (str.isEmpty())
-      str = atts.at("instr"); // check for old config files
+      str = value(atts, "instr"); // check for old config files
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->mfcstd.transmissionFunctionFile))
@@ -971,7 +970,7 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
       else
     throw std::runtime_error(TRANSMISSION_FILENAME_ERR);
     }
-    str = atts.at("dark");
+    str = value(atts, "dark");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->mfcstd.darkCurrentFile))
@@ -980,7 +979,7 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
     throw std::runtime_error("Dark Current Filename too long");
     }
 
-    str = atts.at("offset");
+    str = value(atts, "offset");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->mfcstd.offsetFile))
@@ -992,12 +991,12 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
   else if (element == "mfcbira") { // MFC bira
     QString str;
 
-    m_instrumental->mfcbira.detectorSize = atts.at("size").toInt();
-    m_instrumental->mfcbira.straylight = (atts.at("straylight") == "true") ? 1 : 0;
-    m_instrumental->mfcbira.lambdaMin = atts.at("lambda_min").toDouble();
-    m_instrumental->mfcbira.lambdaMax = atts.at("lambda_max").toDouble();
+    m_instrumental->mfcbira.detectorSize = value(atts, "size").toInt();
+    m_instrumental->mfcbira.straylight = (value(atts, "straylight") == "true") ? 1 : 0;
+    m_instrumental->mfcbira.lambdaMin = value(atts, "lambda_min").toDouble();
+    m_instrumental->mfcbira.lambdaMax = value(atts, "lambda_max").toDouble();
 
-    str = atts.at("calib");
+    str = value(atts, "calib");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->mfcbira.calibrationFile))
@@ -1006,9 +1005,9 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
     throw std::runtime_error(CALIBRATION_FILENAME_ERR);
     }
 
-    str = atts.at("transmission");
+    str = value(atts, "transmission");
     if (str.isEmpty())
-      str = atts.at("instr"); // check for old config files
+      str = value(atts, "instr"); // check for old config files
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->mfcbira.transmissionFunctionFile))
@@ -1020,16 +1019,16 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
 
 #ifdef PRJCT_INSTR_FORMAT_OLD
   else if (element == "rasas") { // RASAS
-    m_instrumental->rasas.straylight = (atts.at("straylight") == "true") ? 1 : 0;
-    m_instrumental->rasas.lambdaMin = atts.at("lambda_min").toDouble();
-    m_instrumental->rasas.lambdaMax = atts.at("lambda_max").toDouble();
+    m_instrumental->rasas.straylight = (value(atts, "straylight") == "true") ? 1 : 0;
+    m_instrumental->rasas.lambdaMin = value(atts, "lambda_min").toDouble();
+    m_instrumental->rasas.lambdaMax = value(atts, "lambda_max").toDouble();
     return helperLoadMinimum(atts, &(m_instrumental->rasas));
 
   }
   else if (element == "pdasieasoe") { // PDASI EASOE
-    m_instrumental->pdasieasoe.straylight = (atts.at("straylight") == "true") ? 1 : 0;
-    m_instrumental->pdasieasoe.lambdaMin = atts.at("lambda_min").toDouble();
-    m_instrumental->pdasieasoe.lambdaMax = atts.at("lambda_max").toDouble();
+    m_instrumental->pdasieasoe.straylight = (value(atts, "straylight") == "true") ? 1 : 0;
+    m_instrumental->pdasieasoe.lambdaMin = value(atts, "lambda_min").toDouble();
+    m_instrumental->pdasieasoe.lambdaMax = value(atts, "lambda_max").toDouble();
     return helperLoadMinimum(atts, &(m_instrumental->pdasieasoe));
 
   }
@@ -1037,12 +1036,12 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
   else if (element == "ccdeev") { // CCD EEV
     QString str;
 
-    m_instrumental->ccdeev.detectorSize = atts.at("size").toInt();
-    m_instrumental->ccdeev.straylight = (atts.at("straylight") == "true") ? 1 : 0;
-    m_instrumental->ccdeev.lambdaMin = atts.at("lambda_min").toDouble();
-    m_instrumental->ccdeev.lambdaMax = atts.at("lambda_max").toDouble();
+    m_instrumental->ccdeev.detectorSize = value(atts, "size").toInt();
+    m_instrumental->ccdeev.straylight = (value(atts, "straylight") == "true") ? 1 : 0;
+    m_instrumental->ccdeev.lambdaMin = value(atts, "lambda_min").toDouble();
+    m_instrumental->ccdeev.lambdaMax = value(atts, "lambda_max").toDouble();
 
-    str = atts.at("calib");
+    str = value(atts, "calib");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->ccdeev.calibrationFile))
@@ -1051,9 +1050,9 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
     throw std::runtime_error(CALIBRATION_FILENAME_ERR);
     }
 
-    str = atts.at("transmission");
+    str = value(atts, "transmission");
     if (str.isEmpty())
-      str = atts.at("instr"); // check for old config files
+      str = value(atts, "instr"); // check for old config files
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->ccdeev.transmissionFunctionFile))
@@ -1062,7 +1061,7 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
     throw std::runtime_error(TRANSMISSION_FILENAME_ERR);
     }
 
-    str = atts.at("image");
+    str = value(atts, "image");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->ccdeev.imagePath))
@@ -1071,7 +1070,7 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
     throw std::runtime_error("Stray Light Correction Filename too long");
     }
 
-    str = atts.at("stray");
+    str = value(atts, "stray");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->ccdeev.straylightCorrectionFile))
@@ -1080,7 +1079,7 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
     throw std::runtime_error("Stray Light Correction Filename too long");
     }
 
-    str = atts.at("dnl");
+    str = value(atts, "dnl");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->ccdeev.detectorNonLinearityFile))
@@ -1089,7 +1088,7 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
     throw std::runtime_error("Detector Non-Linearity Filename too long");
     }
 
-    str = atts.at("type");
+    str = value(atts, "type");
 
     if (!str.isEmpty())
          {
@@ -1120,23 +1119,23 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
 
   }
   else if (element == "uoft") { // UOFT
-    m_instrumental->uoft.straylight = (atts.at("straylight") == "true") ? 1 : 0;
-    m_instrumental->uoft.lambdaMin = atts.at("lambda_min").toDouble();
-    m_instrumental->uoft.lambdaMax = atts.at("lambda_max").toDouble();
+    m_instrumental->uoft.straylight = (value(atts, "straylight") == "true") ? 1 : 0;
+    m_instrumental->uoft.lambdaMin = value(atts, "lambda_min").toDouble();
+    m_instrumental->uoft.lambdaMax = value(atts, "lambda_max").toDouble();
     return helperLoadMinimum(atts, &(m_instrumental->uoft));
 
   }
   else if (element == "noaa") { // NOAA
-    m_instrumental->noaa.straylight = (atts.at("straylight") == "true") ? 1 : 0;
-    m_instrumental->noaa.lambdaMin = atts.at("lambda_min").toDouble();
-    m_instrumental->noaa.lambdaMax = atts.at("lambda_max").toDouble();
+    m_instrumental->noaa.straylight = (value(atts, "straylight") == "true") ? 1 : 0;
+    m_instrumental->noaa.lambdaMin = value(atts, "lambda_min").toDouble();
+    m_instrumental->noaa.lambdaMax = value(atts, "lambda_max").toDouble();
     return helperLoadMinimum(atts, &(m_instrumental->noaa));
 
   }
   else if (element == "omi") { // OMI
     QString str;
 
-    str = atts.at("type");
+    str = value(atts, "type");
     if (str == "uv1")
       m_instrumental->omi.spectralType = PRJCT_INSTR_OMI_TYPE_UV1;
     else if (str == "uv2")
@@ -1146,11 +1145,11 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
     else
       throw std::runtime_error("Invalid omi Spectral Type");
 
-    m_instrumental->omi.minimumWavelength = atts.at("min").toDouble();
-    m_instrumental->omi.maximumWavelength = atts.at("max").toDouble();
-    m_instrumental->omi.flagAverage = (atts.at("ave") == "true") ? 1 : 0;
+    m_instrumental->omi.minimumWavelength = value(atts, "min").toDouble();
+    m_instrumental->omi.maximumWavelength = value(atts, "max").toDouble();
+    m_instrumental->omi.flagAverage = (value(atts, "ave") == "true") ? 1 : 0;
 
-    str = atts.at("trackSelection");
+    str = value(atts, "trackSelection");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->omi.trackSelection))
@@ -1159,18 +1158,18 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
     throw std::runtime_error("Track selection string too long");
     }
 
-    str = atts.at("xTrackMode");
+    str = value(atts, "xTrackMode");
     m_instrumental->omi.xtrack_mode = str_to_mode(str.toLocal8Bit().constData());
 
-    m_instrumental->omi.pixelQFRejectionFlag = (atts.at("pixelQF_rejectionFlag") == "true") ? 1 : 0;
+    m_instrumental->omi.pixelQFRejectionFlag = (value(atts, "pixelQF_rejectionFlag") == "true") ? 1 : 0;
 
-    str = atts.at("pixelQF_maxGaps");
-    m_instrumental->omi.pixelQFMaxGaps = (!str.isEmpty())?atts.at("pixelQF_maxGaps").toInt():5;
-    m_instrumental->omi.pixelQFMask = atts.at("pixelQF_mask").toInt();
+    str = value(atts, "pixelQF_maxGaps");
+    m_instrumental->omi.pixelQFMaxGaps = (!str.isEmpty())?value(atts, "pixelQF_maxGaps").toInt():5;
+    m_instrumental->omi.pixelQFMask = value(atts, "pixelQF_mask").toInt();
 
   }
   else if (element == "omiv4") {
-    QString str(atts.at("type"));
+    QString str(value(atts, "type"));
     if (str == "uv1")
       m_instrumental->omi.spectralType = PRJCT_INSTR_OMI_TYPE_UV1;
     else if (str == "uv2")
@@ -1181,7 +1180,7 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
       throw std::runtime_error("Invalid omi Spectral Type");
   }
   else if (element == "tropomi") {
-    QString str = atts.at("band");
+    QString str = value(atts, "band");
 #define EXPAND(BAND, LABEL)                      \
     if(str == LABEL || str == #BAND)                 \
       m_instrumental->tropomi.spectralBand = BAND;   \
@@ -1190,7 +1189,7 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
 #undef EXPAND
       throw std::runtime_error("No Tropomi spectral band configured.");
 
-    str = atts.at("reference_orbit_dir");
+    str = value(atts, "reference_orbit_dir");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < sizeof(m_instrumental->tropomi.reference_orbit_dir))
@@ -1199,7 +1198,7 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
     throw std::runtime_error("Tropomi reference orbit directory name too long");
     }
 
-    str = atts.at("trackSelection");
+    str = value(atts, "trackSelection");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->tropomi.trackSelection))
@@ -1209,7 +1208,7 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
     }
 
 
-    str = atts.at("calib");
+    str = value(atts, "calib");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < sizeof(m_instrumental->tropomi.calibrationFile))
@@ -1218,7 +1217,7 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
     throw std::runtime_error("Calibration Filename too long");
     }
 
-    str = atts.at("instr");
+    str = value(atts, "instr");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < sizeof(m_instrumental->tropomi.instrFunctionFile))
@@ -1228,7 +1227,7 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
     }
   }
   else if (element == "apex") {
-    QString str = atts.at("trackSelection");
+    QString str = value(atts, "trackSelection");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->apex.trackSelection))
@@ -1238,7 +1237,7 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
     }
 
 
-    str = atts.at("calib");
+    str = value(atts, "calib");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < sizeof(m_instrumental->tropomi.calibrationFile))
@@ -1247,7 +1246,7 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
     throw std::runtime_error("Calibration Filename too long");
     }
 
-    str = atts.at("instr");
+    str = value(atts, "instr");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < sizeof(m_instrumental->tropomi.instrFunctionFile))
@@ -1260,24 +1259,24 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
     helperLoadGome2(atts, &(m_instrumental->gome2));
   }
   else if (element == "mkzy") { // MKZY
-    m_instrumental->mkzy.straylight = (atts.at("straylight") == "true") ? 1 : 0;
-    m_instrumental->mkzy.lambdaMin = atts.at("lambda_min").toDouble();
-    m_instrumental->mkzy.lambdaMax = atts.at("lambda_max").toDouble();
+    m_instrumental->mkzy.straylight = (value(atts, "straylight") == "true") ? 1 : 0;
+    m_instrumental->mkzy.lambdaMin = value(atts, "lambda_min").toDouble();
+    m_instrumental->mkzy.lambdaMax = value(atts, "lambda_max").toDouble();
     return helperLoadMinimum(atts, &(m_instrumental->mkzy));
   }
   else if (element == "biraairborne") {  // BIRA AIRBORNE
     QString str;
 
-    m_instrumental->biraairborne.straylight = (atts.at("straylight") == "true") ? 1 : 0;
-    m_instrumental->biraairborne.lambdaMin = atts.at("lambda_min").toDouble();
-    m_instrumental->biraairborne.lambdaMax = atts.at("lambda_max").toDouble();
+    m_instrumental->biraairborne.straylight = (value(atts, "straylight") == "true") ? 1 : 0;
+    m_instrumental->biraairborne.lambdaMin = value(atts, "lambda_min").toDouble();
+    m_instrumental->biraairborne.lambdaMax = value(atts, "lambda_max").toDouble();
 
-    m_instrumental->biraairborne.detectorSize = atts.at("size").toInt();
+    m_instrumental->biraairborne.detectorSize = value(atts, "size").toInt();
 
     if (!m_instrumental->biraairborne.detectorSize)
      m_instrumental->biraairborne.detectorSize=2048;
 
-    str = atts.at("calib");
+    str = value(atts, "calib");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < sizeof(m_instrumental->biraairborne.calibrationFile))
@@ -1286,7 +1285,7 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
           throw std::runtime_error("Calibration Filename too long");
     }
 
-    str = atts.at("instr");
+    str = value(atts, "instr");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < sizeof(m_instrumental->biraairborne.transmissionFunctionFile))
@@ -1298,16 +1297,16 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
   else if (element == "biramobile") {  // BIRA MOBILE
     QString str;
 
-    m_instrumental->biramobile.straylight = (atts.at("straylight") == "true") ? 1 : 0;
-    m_instrumental->biramobile.lambdaMin = atts.at("lambda_min").toDouble();
-    m_instrumental->biramobile.lambdaMax = atts.at("lambda_max").toDouble();
+    m_instrumental->biramobile.straylight = (value(atts, "straylight") == "true") ? 1 : 0;
+    m_instrumental->biramobile.lambdaMin = value(atts, "lambda_min").toDouble();
+    m_instrumental->biramobile.lambdaMax = value(atts, "lambda_max").toDouble();
 
-    m_instrumental->biramobile.detectorSize = atts.at("size").toInt();
+    m_instrumental->biramobile.detectorSize = value(atts, "size").toInt();
 
     if (!m_instrumental->biramobile.detectorSize)
      m_instrumental->biramobile.detectorSize=2048;
 
-    str = atts.at("calib");
+    str = value(atts, "calib");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < sizeof(m_instrumental->biramobile.calibrationFile))
@@ -1316,7 +1315,7 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
           throw std::runtime_error("Calibration Filename too long");
     }
 
-    str = atts.at("instr");
+    str = value(atts, "instr");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < sizeof(m_instrumental->biramobile.transmissionFunctionFile))
@@ -1328,12 +1327,12 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
   else if (element == "oceanoptics") { // OCEAN OPTICS
     QString str;
 
-    m_instrumental->oceanoptics.detectorSize = atts.at("size").toInt();
-    m_instrumental->oceanoptics.straylight = (atts.at("straylight") == "true") ? 1 : 0;
-    m_instrumental->oceanoptics.lambdaMin = atts.at("lambda_min").toDouble();
-    m_instrumental->oceanoptics.lambdaMax = atts.at("lambda_max").toDouble();
+    m_instrumental->oceanoptics.detectorSize = value(atts, "size").toInt();
+    m_instrumental->oceanoptics.straylight = (value(atts, "straylight") == "true") ? 1 : 0;
+    m_instrumental->oceanoptics.lambdaMin = value(atts, "lambda_min").toDouble();
+    m_instrumental->oceanoptics.lambdaMax = value(atts, "lambda_max").toDouble();
 
-    str = atts.at("calib");
+    str = value(atts, "calib");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < sizeof(m_instrumental->oceanoptics.calibrationFile))
@@ -1342,7 +1341,7 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
     throw std::runtime_error("Calibration Filename too long");
     }
 
-    str = atts.at("instr");
+    str = value(atts, "instr");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < sizeof(m_instrumental->oceanoptics.transmissionFunctionFile))
@@ -1353,20 +1352,20 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
   }
     else if (element == "gems") {
      QString str;
-    str = atts.at("trackSelection");
+    str = value(atts, "trackSelection");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_instrumental->gems.trackSelection))
         strcpy(m_instrumental->gems.trackSelection, str.toLocal8Bit().data());
       else
         throw std::runtime_error("Track selection string too long");
-    str = atts.at("binning");
+    str = value(atts, "binning");
     m_instrumental->gems.binning=(!str.isEmpty())?str.toInt():4;
 
     }
 
 
-    str = atts.at("calib");
+    str = value(atts, "calib");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < sizeof(m_instrumental->gems.calibrationFile))
@@ -1375,7 +1374,7 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
         throw std::runtime_error("Calibration Filename too long");
     }
 
-    str = atts.at("instr");
+    str = value(atts, "instr");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < sizeof(m_instrumental->gems.transmissionFunctionFile))
@@ -1387,19 +1386,19 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
   else if (element == "frm4doas") { // FRM4DOAS netCDF
     QString str;
 
-    str = atts.at("average_rows");
+    str = value(atts, "average_rows");
 
     if (!str.isEmpty())
-     m_instrumental->frm4doas.averageRows = (atts.at("average_rows") == "true") ? 1 : 0;
+     m_instrumental->frm4doas.averageRows = (value(atts, "average_rows") == "true") ? 1 : 0;
     else
      m_instrumental->frm4doas.averageRows=1;
 
-    m_instrumental->frm4doas.detectorSize = atts.at("size").toInt();
-    m_instrumental->frm4doas.straylight = (atts.at("straylight") == "true") ? 1 : 0;
-    m_instrumental->frm4doas.lambdaMin = atts.at("lambda_min").toDouble();
-    m_instrumental->frm4doas.lambdaMax = atts.at("lambda_max").toDouble();
+    m_instrumental->frm4doas.detectorSize = value(atts, "size").toInt();
+    m_instrumental->frm4doas.straylight = (value(atts, "straylight") == "true") ? 1 : 0;
+    m_instrumental->frm4doas.lambdaMin = value(atts, "lambda_min").toDouble();
+    m_instrumental->frm4doas.lambdaMax = value(atts, "lambda_max").toDouble();
 
-    str = atts.at("type");
+    str = value(atts, "type");
 
     if (!str.isEmpty())
       {
@@ -1417,7 +1416,7 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
         throw std::runtime_error("Invalid ccdeev Type");
      }
 
-    str = atts.at("calib");
+    str = value(atts, "calib");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < sizeof(m_instrumental->frm4doas.calibrationFile))
@@ -1426,7 +1425,7 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
     throw std::runtime_error("Calibration Filename too long");
     }
 
-    str = atts.at("instr");
+    str = value(atts, "instr");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < sizeof(m_instrumental->frm4doas.transmissionFunctionFile))
@@ -1445,7 +1444,7 @@ void CProjectInstrumentalSubHandler::helperLoadLogger(const map<Glib::ustring, Q
   QString str;
 
   // spectral type
-  str = atts.at("type");
+  str = value(atts, "type");
   if (str == "all")
     d->spectralType = PRJCT_INSTR_IASB_TYPE_ALL;
   else if (str == "zenithal")
@@ -1455,9 +1454,9 @@ void CProjectInstrumentalSubHandler::helperLoadLogger(const map<Glib::ustring, Q
   else
     throw std::runtime_error("Invalid spectral Type");
 
-  d->flagAzimuthAngle = (atts.at("azi") == "true") ? 1 : 0;
+  d->flagAzimuthAngle = (value(atts, "azi") == "true") ? 1 : 0;
 
-  str = atts.at("calib");
+  str = value(atts, "calib");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(d->calibrationFile))
@@ -1466,9 +1465,9 @@ void CProjectInstrumentalSubHandler::helperLoadLogger(const map<Glib::ustring, Q
       throw std::runtime_error(CALIBRATION_FILENAME_ERR);
   }
 
-  str = atts.at("transmission");
+  str = value(atts, "transmission");
   if (str.isEmpty())
-    str = atts.at("instr"); // check for old config files
+    str = value(atts, "instr"); // check for old config files
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(d->transmissionFunctionFile))
@@ -1484,7 +1483,7 @@ void CProjectInstrumentalSubHandler::helperLoadSaoz(const map<Glib::ustring, QSt
   QString str;
 
   // spectral type
-  str = atts.at("type");
+  str = value(atts, "type");
   if (str == "zenithal")
     d->spectralType = PRJCT_INSTR_SAOZ_TYPE_ZENITHAL;
   else if (str == "pointed")
@@ -1492,7 +1491,7 @@ void CProjectInstrumentalSubHandler::helperLoadSaoz(const map<Glib::ustring, QSt
   else
     throw std::runtime_error("Invalid spectral Type");
 
-  str = atts.at("calib");
+  str = value(atts, "calib");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(d->calibrationFile))
@@ -1501,9 +1500,9 @@ void CProjectInstrumentalSubHandler::helperLoadSaoz(const map<Glib::ustring, QSt
       throw std::runtime_error(CALIBRATION_FILENAME_ERR);
   }
 
-  str = atts.at("transmission");
+  str = value(atts, "transmission");
   if (str.isEmpty())
-    str = atts.at("instr"); // check for old config files
+    str = value(atts, "instr"); // check for old config files
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(d->transmissionFunctionFile))
@@ -1518,7 +1517,7 @@ void CProjectInstrumentalSubHandler::helperLoadMinimum(const map<Glib::ustring, 
 {
   QString str;
 
-  str = atts.at("calib");
+  str = value(atts, "calib");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(d->calibrationFile))
@@ -1527,9 +1526,9 @@ void CProjectInstrumentalSubHandler::helperLoadMinimum(const map<Glib::ustring, 
       throw std::runtime_error(CALIBRATION_FILENAME_ERR);
   }
 
-  str = atts.at("transmission");
+  str = value(atts, "transmission");
   if (str.isEmpty())
-    str = atts.at("instr"); // check for old config files
+    str = value(atts, "instr"); // check for old config files
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(d->transmissionFunctionFile))
@@ -1544,7 +1543,7 @@ void CProjectInstrumentalSubHandler::helperLoadCcd(const map<Glib::ustring, QStr
 {
   QString str;
 
-  str = atts.at("calib");
+  str = value(atts, "calib");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(d->calibrationFile))
@@ -1553,9 +1552,9 @@ void CProjectInstrumentalSubHandler::helperLoadCcd(const map<Glib::ustring, QStr
       throw std::runtime_error(CALIBRATION_FILENAME_ERR);
   }
 
-  str = atts.at("transmission");
+  str = value(atts, "transmission");
   if (str.isEmpty())
-    str = atts.at("instr"); // check for old config files
+    str = value(atts, "instr"); // check for old config files
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(d->transmissionFunctionFile))
@@ -1564,7 +1563,7 @@ void CProjectInstrumentalSubHandler::helperLoadCcd(const map<Glib::ustring, QStr
       throw std::runtime_error(TRANSMISSION_FILENAME_ERR);
   }
 
-  str = atts.at("ipv");
+  str = value(atts, "ipv");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(d->interPixelVariabilityFile))
@@ -1573,7 +1572,7 @@ void CProjectInstrumentalSubHandler::helperLoadCcd(const map<Glib::ustring, QStr
       throw std::runtime_error("Inter Pixel Variability Filename too long");
   }
 
-  str = atts.at("dnl");
+  str = value(atts, "dnl");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(d->detectorNonLinearityFile))
@@ -1588,7 +1587,7 @@ void CProjectInstrumentalSubHandler::helperLoadGdp(const map<Glib::ustring, QStr
 {
   QString str;
 
-  str = atts.at("type");
+  str = value(atts, "type");
   if (str == "1a")
     d->bandType = PRJCT_INSTR_GDP_BAND_1A;
   else if (str == "1b")
@@ -1604,7 +1603,7 @@ void CProjectInstrumentalSubHandler::helperLoadGdp(const map<Glib::ustring, QStr
   else
     throw std::runtime_error("Invalid gdp band");
 
-  str = atts.at("pixel");
+  str = value(atts, "pixel");
   if (str == "all")
     d->pixelType = PRJCT_INSTR_GDP_PIXEL_ALL;
   else if (str == "east")
@@ -1618,7 +1617,7 @@ void CProjectInstrumentalSubHandler::helperLoadGdp(const map<Glib::ustring, QStr
   else
     throw std::runtime_error("Invalid gdp pixel type");
 
-  str = atts.at("calib");
+  str = value(atts, "calib");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(d->calibrationFile))
@@ -1627,9 +1626,9 @@ void CProjectInstrumentalSubHandler::helperLoadGdp(const map<Glib::ustring, QStr
       throw std::runtime_error(CALIBRATION_FILENAME_ERR);
   }
 
-  str = atts.at("transmission");
+  str = value(atts, "transmission");
   if (str.isEmpty())
-    str = atts.at("instr"); // check for old config files
+    str = value(atts, "instr"); // check for old config files
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(d->transmissionFunctionFile))
@@ -1644,7 +1643,7 @@ void CProjectInstrumentalSubHandler::helperLoadGome2(const map<Glib::ustring, QS
 {
   QString str;
 
-  str = atts.at("type");
+  str = value(atts, "type");
   if (str == "1a")
     d->bandType = PRJCT_INSTR_GDP_BAND_1A;
   else if (str == "1b")
@@ -1660,7 +1659,7 @@ void CProjectInstrumentalSubHandler::helperLoadGome2(const map<Glib::ustring, QS
   else
     throw std::runtime_error("Invalid gdp band");
 
-  str = atts.at("calib");
+  str = value(atts, "calib");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(d->calibrationFile))
@@ -1669,9 +1668,9 @@ void CProjectInstrumentalSubHandler::helperLoadGome2(const map<Glib::ustring, QS
       throw std::runtime_error(CALIBRATION_FILENAME_ERR);
   }
 
-  str = atts.at("transmission");
+  str = value(atts, "transmission");
   if (str.isEmpty())
-    str = atts.at("instr"); // check for old config files
+    str = value(atts, "instr"); // check for old config files
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(d->transmissionFunctionFile))
@@ -1686,7 +1685,7 @@ void CProjectInstrumentalSubHandler::helperLoadScia(const map<Glib::ustring, QSt
 {
   QString str;
 
-  str = atts.at("channel");
+  str = value(atts, "channel");
   if (str == "1")
     d->channel = PRJCT_INSTR_SCIA_CHANNEL_1;
   else if (str == "2")
@@ -1700,30 +1699,30 @@ void CProjectInstrumentalSubHandler::helperLoadScia(const map<Glib::ustring, QSt
 
   // clusters
   memset(d->clusters, 0, sizeof(d->clusters)); // zero
-  d->clusters[2]  = (atts.at("c2")  == "true") ? 1 : 0;
-  d->clusters[3]  = (atts.at("c3")  == "true") ? 1 : 0;
-  d->clusters[4]  = (atts.at("c4")  == "true") ? 1 : 0;
-  d->clusters[5]  = (atts.at("c5")  == "true") ? 1 : 0;
+  d->clusters[2]  = (value(atts, "c2")  == "true") ? 1 : 0;
+  d->clusters[3]  = (value(atts, "c3")  == "true") ? 1 : 0;
+  d->clusters[4]  = (value(atts, "c4")  == "true") ? 1 : 0;
+  d->clusters[5]  = (value(atts, "c5")  == "true") ? 1 : 0;
 
-  d->clusters[8]  = (atts.at("c8")  == "true") ? 1 : 0;
-  d->clusters[9]  = (atts.at("c9")  == "true") ? 1 : 0;
-  d->clusters[10] = (atts.at("c10") == "true") ? 1 : 0;
+  d->clusters[8]  = (value(atts, "c8")  == "true") ? 1 : 0;
+  d->clusters[9]  = (value(atts, "c9")  == "true") ? 1 : 0;
+  d->clusters[10] = (value(atts, "c10") == "true") ? 1 : 0;
 
-  d->clusters[13] = (atts.at("c13") == "true") ? 1 : 0;
-  d->clusters[14] = (atts.at("c14") == "true") ? 1 : 0;
-  d->clusters[15] = (atts.at("c15") == "true") ? 1 : 0;
-  d->clusters[16] = (atts.at("c16") == "true") ? 1 : 0;
-  d->clusters[17] = (atts.at("c17") == "true") ? 1 : 0;
-  d->clusters[18] = (atts.at("c18") == "true") ? 1 : 0;
+  d->clusters[13] = (value(atts, "c13") == "true") ? 1 : 0;
+  d->clusters[14] = (value(atts, "c14") == "true") ? 1 : 0;
+  d->clusters[15] = (value(atts, "c15") == "true") ? 1 : 0;
+  d->clusters[16] = (value(atts, "c16") == "true") ? 1 : 0;
+  d->clusters[17] = (value(atts, "c17") == "true") ? 1 : 0;
+  d->clusters[18] = (value(atts, "c18") == "true") ? 1 : 0;
 
-  d->clusters[22] = (atts.at("c22") == "true") ? 1 : 0;
-  d->clusters[23] = (atts.at("c23") == "true") ? 1 : 0;
-  d->clusters[24] = (atts.at("c24") == "true") ? 1 : 0;
-  d->clusters[25] = (atts.at("c25") == "true") ? 1 : 0;
-  d->clusters[26] = (atts.at("c26") == "true") ? 1 : 0;
-  d->clusters[27] = (atts.at("c27") == "true") ? 1 : 0;
+  d->clusters[22] = (value(atts, "c22") == "true") ? 1 : 0;
+  d->clusters[23] = (value(atts, "c23") == "true") ? 1 : 0;
+  d->clusters[24] = (value(atts, "c24") == "true") ? 1 : 0;
+  d->clusters[25] = (value(atts, "c25") == "true") ? 1 : 0;
+  d->clusters[26] = (value(atts, "c26") == "true") ? 1 : 0;
+  d->clusters[27] = (value(atts, "c27") == "true") ? 1 : 0;
 
-  str = atts.at("sunref");
+  str = value(atts, "sunref");
   if (!str.isEmpty()) {
     if (str.length() < (int)sizeof(d->sunReference))
       strcpy(d->sunReference, str.toLocal8Bit().data());
@@ -1731,7 +1730,7 @@ void CProjectInstrumentalSubHandler::helperLoadScia(const map<Glib::ustring, QSt
       throw std::runtime_error("Sun Reference too long");
   }
 
-  str = atts.at("calib");
+  str = value(atts, "calib");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(d->calibrationFile))
@@ -1740,9 +1739,9 @@ void CProjectInstrumentalSubHandler::helperLoadScia(const map<Glib::ustring, QSt
       throw std::runtime_error(CALIBRATION_FILENAME_ERR);
   }
 
-  str = atts.at("transmission");
+  str = value(atts, "transmission");
   if (str.isEmpty())
-    str = atts.at("instr"); // check for old config files
+    str = value(atts, "instr"); // check for old config files
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(d->transmissionFunctionFile))
@@ -1751,7 +1750,7 @@ void CProjectInstrumentalSubHandler::helperLoadScia(const map<Glib::ustring, QSt
       throw std::runtime_error(TRANSMISSION_FILENAME_ERR);
   }
 
-    str = atts.at("dnl");
+    str = value(atts, "dnl");
     if (!str.isEmpty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(d->detectorNonLinearityFile))
@@ -1776,7 +1775,7 @@ void CProjectSlitSubHandler::start(const map<Glib::ustring, QString> &atts)
 {
   QString str;
 
-  str = atts.at("ref");
+  str = value(atts, "ref");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_slit->solarRefFile))
@@ -1785,7 +1784,7 @@ void CProjectSlitSubHandler::start(const map<Glib::ustring, QString> &atts)
       throw std::runtime_error("Solar Reference Filename too long");
   }
 
-  m_slit->applyFwhmCorrection = (atts.at("fwhmcor") == "true") ? 1 : 0;
+  m_slit->applyFwhmCorrection = (value(atts, "fwhmcor") == "true") ? 1 : 0;
 
 }
 
@@ -1812,7 +1811,7 @@ void CProjectOutputSubHandler::start(const map<Glib::ustring, QString> &atts)
 {
   QString str;
 
-  str = atts.at("path");
+  str = value(atts, "path");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_output->path))
@@ -1821,22 +1820,22 @@ void CProjectOutputSubHandler::start(const map<Glib::ustring, QString> &atts)
       throw std::runtime_error("Output path too long");
   }
 
-  m_output->analysisFlag = (atts.at("anlys") == "true") ? 1 : 0;
-  m_output->calibrationFlag = (atts.at("calib") == "true") ? 1 : 0;
-  m_output->configurationFlag = (atts.at("conf") == "true") ? 1 : 0;
-  m_output->referenceFlag = (atts.at("ref") == "true");
-  // m_output->newcalibFlag = (atts.at("newcalib") == "true");
-  m_output->directoryFlag = (atts.at("dirs") == "true") ? 1 : 0;
-  m_output->filenameFlag = (atts.at("file") == "true") ? 1 : 0;
+  m_output->analysisFlag = (value(atts, "anlys") == "true") ? 1 : 0;
+  m_output->calibrationFlag = (value(atts, "calib") == "true") ? 1 : 0;
+  m_output->configurationFlag = (value(atts, "conf") == "true") ? 1 : 0;
+  m_output->referenceFlag = (value(atts, "ref") == "true");
+  // m_output->newcalibFlag = (value(atts, "newcalib") == "true");
+  m_output->directoryFlag = (value(atts, "dirs") == "true") ? 1 : 0;
+  m_output->filenameFlag = (value(atts, "file") == "true") ? 1 : 0;
 
-  str = atts.at("success");
+  str = value(atts, "success");
   if (str.isEmpty())
    m_output->successFlag=1;
   else
    m_output->successFlag = (str == "true") ? 1 : 0;
 
 
-  str = atts.at("flux");
+  str = value(atts, "flux");
   if (!str.isEmpty()) {
     if (str.length()+1 < (int)sizeof(m_output->flux))
       strcpy(m_output->flux, str.toLocal8Bit().data());
@@ -1844,13 +1843,13 @@ void CProjectOutputSubHandler::start(const map<Glib::ustring, QString> &atts)
       throw std::runtime_error("Output flux too long");
   }
 
-  str = atts.at("bandWidth");
+  str = value(atts, "bandWidth");
   if (str.isEmpty())
    m_output->bandWidth=1.;
   else
    m_output->bandWidth = str.toDouble();
 
-  str = atts.at("swathName");
+  str = value(atts, "swathName");
   if (!str.isEmpty()) {
     if ((size_t) str.length()+1 < sizeof(m_output->swath_name))
       strcpy(m_output->swath_name, str.toLocal8Bit().data());
@@ -1858,7 +1857,7 @@ void CProjectOutputSubHandler::start(const map<Glib::ustring, QString> &atts)
       throw std::runtime_error("Output file swath name too long.");
   }
 
-  str = atts.at("fileFormat");
+  str = value(atts, "fileFormat");
   if (!str.isEmpty()) {
     enum output_format format = output_get_format(str.toLocal8Bit().data());
     if ((format == ASCII)  || (format==NETCDF))
@@ -1883,7 +1882,7 @@ void CProjectExportSubHandler::start(const map<Glib::ustring, QString> &atts)
 {
   QString str;
 
-  str = atts.at("path");
+  str = value(atts, "path");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_export->path))
@@ -1892,7 +1891,7 @@ void CProjectExportSubHandler::start(const map<Glib::ustring, QString> &atts)
       throw std::runtime_error("Export path too long");
   }
 
-  m_export->titlesFlag = (atts.at("titles") == "true") ? 1 : 0;
-  m_export->directoryFlag = (atts.at("dir") == "true") ? 1 : 0;
+  m_export->titlesFlag = (value(atts, "titles") == "true") ? 1 : 0;
+  m_export->directoryFlag = (value(atts, "dir") == "true") ? 1 : 0;
 
 }

@@ -61,7 +61,7 @@ CConvGeneralSubHandler::CConvGeneralSubHandler(CConfigHandler *master, mediate_c
 
 void CConvGeneralSubHandler::start(const map<Glib::ustring, QString> &atts) {
    // convolution type
-  QString str = atts.at("convol");
+  QString str = value(atts, "convol");
   if (str == "std")
     m_d->convolutionType = CONVOLUTION_TYPE_STANDARD;
   else if (str == "iocorr")
@@ -70,7 +70,7 @@ void CConvGeneralSubHandler::start(const map<Glib::ustring, QString> &atts) {
     m_d->convolutionType = CONVOLUTION_TYPE_NONE;
 
   // conversion type
-  str = atts.at("conver");
+  str = value(atts, "conver");
   if (str == "air2vac")
     m_d->conversionType = CONVOLUTION_CONVERSION_AIR2VAC;
   else if (str == "vac2air")
@@ -79,7 +79,7 @@ void CConvGeneralSubHandler::start(const map<Glib::ustring, QString> &atts) {
     m_d->conversionType = CONVOLUTION_CONVERSION_NONE;
 
   // output format
-  str = atts.at("output_format");
+  str = value(atts, "output_format");
   if (str == "ascii")
     m_d->formatType = CONVOLUTION_FORMAT_ASCII;
   else if (str == "netcdf")
@@ -88,15 +88,15 @@ void CConvGeneralSubHandler::start(const map<Glib::ustring, QString> &atts) {
     m_d->formatType = CONVOLUTION_FORMAT_ASCII;
 
   // number of ground pixels
-  str = atts.at("pixels");
+  str = value(atts, "pixels");
   m_d->n_groundpixel=(!str.isEmpty())?str.toInt():1;
 
-  m_d->shift = atts.at("shift").toDouble();
-  m_d->conc = atts.at("conc").toDouble();
+  m_d->shift = value(atts, "shift").toDouble();
+  m_d->conc = value(atts, "conc").toDouble();
 
-  m_d->noheader = (atts.at("rmhdr") == "true") ? 1 : 0;
+  m_d->noheader = (value(atts, "rmhdr") == "true") ? 1 : 0;
 
-  str = atts.at("input");
+  str = value(atts, "input");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_d->inputFile))
@@ -104,7 +104,7 @@ void CConvGeneralSubHandler::start(const map<Glib::ustring, QString> &atts) {
     else
       throw std::runtime_error("Input Filename too long");
   }
-  str = atts.at("output");
+  str = value(atts, "output");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_d->outputFile))
@@ -112,7 +112,7 @@ void CConvGeneralSubHandler::start(const map<Glib::ustring, QString> &atts) {
     else
       throw std::runtime_error("Output Filename too long");
   }
-  str = atts.at("calib");
+  str = value(atts, "calib");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_d->calibrationFile))
@@ -120,7 +120,7 @@ void CConvGeneralSubHandler::start(const map<Glib::ustring, QString> &atts) {
     else
       throw std::runtime_error("Calibration Filename too long");
   }
-  str = atts.at("ref");
+  str = value(atts, "ref");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_d->solarRefFile))

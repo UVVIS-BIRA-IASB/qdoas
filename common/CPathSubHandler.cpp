@@ -16,7 +16,7 @@ void CPathSubHandler::start(const Glib::ustring& element, const map<Glib::ustrin
 
   if (element == "path") {
     bool ok;
-    m_index = atts.at("index").toInt(&ok);
+    m_index = value(atts, "index").toInt(&ok);
     if (!ok || m_index < 0 || m_index > 9) {
       m_index = -1;
       throw std::runtime_error("Invalid path index");
