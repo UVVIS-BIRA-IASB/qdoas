@@ -47,7 +47,7 @@ void CUsampGeneralSubHandler::start(const map<Glib::ustring, QString> &atts)
 {
   QString str;
 
-  str = atts.at("type");
+  str = value(atts, "type");
   if (str == "ODF") {
     m_d->methodType = OPTICAL_DENSITY_FIT;
   }
@@ -57,11 +57,11 @@ void CUsampGeneralSubHandler::start(const map<Glib::ustring, QString> &atts)
   else
     throw std::runtime_error("Invalid analysis method");
 
-  m_d->shift = atts.at("shift").toDouble();
+  m_d->shift = value(atts, "shift").toDouble();
 
-  m_d->noheader = (atts.at("rmhdr") == "true") ? 1 : 0;
+  m_d->noheader = (value(atts, "rmhdr") == "true") ? 1 : 0;
 
-  str = atts.at("outphase1");
+  str = value(atts, "outphase1");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_d->outputPhaseOneFile))
@@ -69,7 +69,7 @@ void CUsampGeneralSubHandler::start(const map<Glib::ustring, QString> &atts)
     else
       throw std::runtime_error("Output Phase 1 Filename too long");
   }
-  str = atts.at("outphase2");
+  str = value(atts, "outphase2");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_d->outputPhaseTwoFile))
@@ -77,7 +77,7 @@ void CUsampGeneralSubHandler::start(const map<Glib::ustring, QString> &atts)
     else
       throw std::runtime_error("Output Phase 2 Filename too long");
   }
-  str = atts.at("calib");
+  str = value(atts, "calib");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_d->calibrationFile))
@@ -85,7 +85,7 @@ void CUsampGeneralSubHandler::start(const map<Glib::ustring, QString> &atts)
     else
       throw std::runtime_error("Calibration Filename too long");
   }
-  str = atts.at("ref");
+  str = value(atts, "ref");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_d->solarRefFile))
