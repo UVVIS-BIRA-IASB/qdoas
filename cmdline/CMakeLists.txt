@@ -7,6 +7,20 @@ add_executable(doas_cl
   ../convolution/CConvConfigHandler.cpp
   ../ring/CRingConfigHandler.cpp
   ../usamp/CUsampConfigHandler.cpp
+  ../common/CConfigHandler.cpp
+  ../common/CConfigHandler.h
+  ../common/CConfigSubHandlerUtils.cpp
+  ../common/CConfigSubHandlerUtils.h
+  ../common/CPathSubHandler.cpp
+  ../common/CPathSubHandler.h
+  ../common/CEngineController.h
+  ../common/CEngineError.h
+  ../common/CEngineResponse.cpp
+  ../common/CEngineResponse.h
+  ../common/CWorkSpace.cpp
+  ../common/CWorkSpace.h
+  ../common/CPlotDataSet.cpp
+  ../common/CPlotDataSet.h
   CBatchEngineController.cpp
   CBatchEngineController.h
   cmdline.cpp
@@ -18,7 +32,7 @@ add_executable(doas_cl
 
 target_compile_features(doas_cl PUBLIC cxx_std_11)
 target_link_libraries(doas_cl
-  common engine mediate 
+  engine mediate
   Qt::Core
   ${LIBXMLXX_LIBRARIES})
 
