@@ -20,10 +20,10 @@ target_compile_features(doas_cl PUBLIC cxx_std_11)
 target_link_libraries(doas_cl
   common engine mediate 
   Qt::Core
-  )
-target_include_directories(doas_cl PRIVATE ../qdoas ../convolution ../usamp ../ring)
+  ${LIBXMLXX_LIBRARIES})
 
-target_link_libraries(doas_cl ${LIBXMLXX_LIBRARIES})
-target_include_directories(doas_cl PRIVATE ${LIBXMLXX_INCLUDE_DIRS})
+target_include_directories(doas_cl PRIVATE
+  ../qdoas ../convolution ../usamp ../ring
+  ${LIBXMLXX_INCLUDE_DIRS})
 
 install(TARGETS doas_cl DESTINATION ${BIN_PREFIX})

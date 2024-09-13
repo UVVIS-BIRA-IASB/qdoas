@@ -24,11 +24,11 @@ target_link_libraries(ring
   common mediate engine
   Qt::Widgets Qt::PrintSupport
   ${QWT_LIBRARY}
+  ${LIBXMLXX_LIBRARIES}
   )
-target_include_directories(ring PRIVATE ${QWT_INCLUDE_DIR})
-
-target_link_libraries(ring ${LIBXMLXX_LIBRARIES})
-target_include_directories(ring PRIVATE ${LIBXMLXX_INCLUDE_DIRS})
+target_include_directories(ring PRIVATE
+  ${QWT_INCLUDE_DIR}
+  ${LIBXMLXX_INCLUDE_DIRS})
 
 if(APPLE)
   install(TARGETS ring DESTINATION qdoas.app/Contents/MacOS)
