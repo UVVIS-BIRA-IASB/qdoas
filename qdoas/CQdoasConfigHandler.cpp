@@ -110,7 +110,7 @@ void CSiteSubHandler::start(const Glib::ustring& element, const map<Glib::ustrin
     // create a new config item for the site
     CSiteConfigItem *item = new CSiteConfigItem;
 
-    str = atts.at("name");
+    str = value(atts, "name");
     if (str.isEmpty()) {
       delete item;
       throw std::runtime_error("Missing site name");
@@ -118,19 +118,19 @@ void CSiteSubHandler::start(const Glib::ustring& element, const map<Glib::ustrin
     else
       item->setSiteName(str);
 
-    str = atts.at("abbrev");
+    str = value(atts, "abbrev");
     if (!str.isEmpty())
       item->setAbbreviation(str);
 
-    tmpDouble = atts.at("long").toDouble(&ok);
+    tmpDouble = value(atts, "long").toDouble(&ok);
     if (ok)
       item->setLongitude(tmpDouble);
 
-    tmpDouble = atts.at("lat").toDouble(&ok);
+    tmpDouble = value(atts, "lat").toDouble(&ok);
     if (ok)
       item->setLatitude(tmpDouble);
 
-    tmpDouble = atts.at("alt").toDouble(&ok);
+    tmpDouble = value(atts, "alt").toDouble(&ok);
     if (ok)
       item->setAltitude(tmpDouble);
 
@@ -155,12 +155,12 @@ void CSymbolSubHandler::start(const Glib::ustring &element, const map<Glib::ustr
   if (element == "symbol") {
     QString name;
 
-    name = atts.at("name");
+    name = value(atts, "name");
     if (name.isEmpty()) {
       throw std::runtime_error("Missing symbol name");
     }
 
-    master()->addSymbol(name, atts.at("descr"));
+    master()->addSymbol(name, value(atts, "descr"));
 
     return;
   }
@@ -188,8 +188,8 @@ void CProjectSubHandler::start(const map<Glib::ustring, QString> &atts)
 {
   // the project element - must have a name
 
-  m_project->setName(atts.at("name"));
-  m_project->setEnabled(atts.at("disable") != "true");
+  m_project->setName(value(atts, "name"));
+  m_project->setEnabled(value(atts, "disable") != "true");
 
   if (m_project->name().isEmpty()) {
     throw std::runtime_error("Project with empty name.");

@@ -48,18 +48,18 @@ void CRingGeneralSubHandler::start(const map<Glib::ustring, QString> &atts)
 {
   QString str;
 
-  m_d->temperature = atts.at("temp").toDouble();
+  m_d->temperature = value(atts, "temp").toDouble();
 
-  str = atts.at("normalize");
+  str = value(atts, "normalize");
   if (str.isEmpty())
     m_d->normalize=1;
   else
     m_d->normalize = (str == "true") ? 1 : 0;
-  m_d->noheader = (atts.at("rmhdr") == "true") ? 1 : 0;
-  m_d->saveraman = (atts.at("save_raman") == "true") ? 1 : 0;
+  m_d->noheader = (value(atts, "rmhdr") == "true") ? 1 : 0;
+  m_d->saveraman = (value(atts, "save_raman") == "true") ? 1 : 0;
 
   // output format
-  str = atts.at("output_format");
+  str = value(atts, "output_format");
   if (str == "ascii")
     m_d->formatType = CONVOLUTION_FORMAT_ASCII;
   else if (str == "netcdf")
@@ -68,10 +68,10 @@ void CRingGeneralSubHandler::start(const map<Glib::ustring, QString> &atts)
     m_d->formatType = CONVOLUTION_FORMAT_ASCII;
 
   // number of ground pixels
-  str = atts.at("pixels");
+  str = value(atts, "pixels");
   m_d->n_groundpixel=(!str.isEmpty())?str.toInt():1;
 
-  str = atts.at("output");
+  str = value(atts, "output");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_d->outputFile))
@@ -79,7 +79,7 @@ void CRingGeneralSubHandler::start(const map<Glib::ustring, QString> &atts)
     else
       throw std::runtime_error("Output Filename too long");
   }
-  str = atts.at("calib");
+  str = value(atts, "calib");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_d->calibrationFile))
@@ -87,7 +87,7 @@ void CRingGeneralSubHandler::start(const map<Glib::ustring, QString> &atts)
     else
       throw std::runtime_error("Calibration Filename too long");
   }
-  str = atts.at("ref");
+  str = value(atts, "ref");
   if (!str.isEmpty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_d->solarRefFile))
