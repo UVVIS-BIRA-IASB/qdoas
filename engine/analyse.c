@@ -806,7 +806,6 @@ RC AnalyseAddPukiteTerm(ENGINE_CONTEXT *pEngineContext, CROSS_REFERENCE *pCross,
   pTabFeno=&TabFeno[indexFenoColumn][NFeno];
   rc=ERROR_ID_NO;
   *pIndexPukite=ITEM_NONE;
-
   if (pukiteOrder==1)
    sprintf(symbolName,"Slope(%s)",pWrkCross->symbolName);
   else
@@ -827,9 +826,7 @@ RC AnalyseAddPukiteTerm(ENGINE_CONTEXT *pEngineContext, CROSS_REFERENCE *pCross,
 
       break;
   }
-
   // Add a new cross section
-
   if (rc==ERROR_ID_NO && (indexSymbol==NWorkSpace) && (NWorkSpace<MAX_SYMB)) {
 
     // Allocate a new symbol
@@ -842,7 +839,6 @@ RC AnalyseAddPukiteTerm(ENGINE_CONTEXT *pEngineContext, CROSS_REFERENCE *pCross,
     strcpy(pWrkSymbol->amfFileName,"");
 
     // Just copy original cross section (this cross section will be modified later)
-
     if (!(rc=MATRIX_Copy(&pWrkSymbol->xs,&pWrkCross->xs,(char *)__func__)))
      NWorkSpace++;
 
@@ -862,6 +858,9 @@ RC AnalyseAddPukiteTerm(ENGINE_CONTEXT *pEngineContext, CROSS_REFERENCE *pCross,
 
     else
      {
+      memcpy(pPukiteCross->vector, ANALYSE_zeros, sizeof(double) * n_wavel);
+      memcpy(pPukiteCross->Deriv2, ANALYSE_zeros, sizeof(double) * n_wavel);            
+      
       pPukiteCross->crossAction=pCross->crossAction;
       pPukiteCross->crossCorrection=ANLYS_CORRECTION_TYPE_NONE;
       pPukiteCross->amfType=ANLYS_AMF_TYPE_NONE;
@@ -877,7 +876,6 @@ RC AnalyseAddPukiteTerm(ENGINE_CONTEXT *pEngineContext, CROSS_REFERENCE *pCross,
                                   (pPukiteCross->crossAction==ANLYS_CROSS_ACTION_CONVOLUTE_RING))?1:0;
 
         pTabFeno->xsToConvoluteI0+=(pPukiteCross->crossAction==ANLYS_CROSS_ACTION_CONVOLUTE_I0)?1:0;
-
         pPukiteCross->IndSubtract=ITEM_NONE;
         pPukiteCross->display=pCross->display;                    // fit display
         pPukiteCross->InitConc=pCross->InitConc;                    // initial concentration
@@ -902,7 +900,6 @@ RC AnalyseAddPukiteTerm(ENGINE_CONTEXT *pEngineContext, CROSS_REFERENCE *pCross,
 
           if (pTabFeno->analysisMethod!=OPTICAL_DENSITY_FIT)     // In the intensity fitting method, FitConc is an index
            pPukiteCross->FitConc=pTabFeno->fit_properties.NF++;                   // in the non linear parameters vectors
-
           pTabFeno->fit_properties.nFit++;
          }
         else if (pTabFeno->analysisMethod!=OPTICAL_DENSITY_FIT)
@@ -927,12 +924,18 @@ RC AnalyseAddPukiteTerm(ENGINE_CONTEXT *pEngineContext, CROSS_REFERENCE *pCross,
 // MOLECULAR RING
 // ==============
 
-void Analyse_Molecular_Ring_Init(FENO *pFeno,double *lambda,int n_wavel)
+RC Analyse_Molecular_Ring_Init(FENO *pFeno,double *lambda,int n_wavel)
  {
   // Declarations
 
   CROSS_REFERENCE *pTabCross;
   INDEX indexTabCross;
+  
+  RC rc;
+
+  // Initializations
+
+  rc=ERROR_ID_NO;  
 
   for (indexTabCross=0;indexTabCross<pFeno->NTabCross;indexTabCross++)
    {
@@ -945,8 +948,19 @@ void Analyse_Molecular_Ring_Init(FENO *pFeno,double *lambda,int n_wavel)
      {
       memcpy(pTabCross->vectorBackup,pTabCross->vector,sizeof(double)*n_wavel);
       memcpy(pTabCross->Deriv2Backup,pTabCross->Deriv2,sizeof(double)*n_wavel);
+      
+      if (!(rc=SPLINE_Deriv2(lambda,pTabCross->vector,pTabCross->Deriv2,n_wavel,(char *)__func__)) &&
+           (pTabCross->crossCorrection==ANLYS_CORRECTION_TYPE_MOLECULAR_RING_SLOPE) && (pTabCross->indexPukite1!=ITEM_NONE))
+
+       rc=AnalyseSimplePukiteTerms(lambda,pTabCross->vector,
+                                   pFeno->TabCross[pTabCross->indexPukite1].vector,pFeno->TabCross[pTabCross->indexPukite1].Deriv2,
+                                   NULL,NULL,n_wavel,pFeno->lambda0);      
      }
    }
+   
+   // Return
+   
+   return rc;
  }
 
 RC Analyse_Molecular_Ring_Calculate(FENO *pFeno,double *lambda,int n_wavel,double ar)
@@ -1914,7 +1928,7 @@ RC ANALYSE_XsConvolution(FENO *pTabFeno,double *newlambda,
 
          for (int i=0;i<pTabFeno->NDET;i++)
           pTabCross->molecularCrossSection[i]=pTabCross->vector[i]-pTabCross->molecularCrossSection[i];
-
+        
 // Making the convolution on the whole vector gives similar results for interpolation only
 //
 //        if (!(rc=raman_convolution(&newlambda[indexlambdaMin],
@@ -2397,25 +2411,29 @@ RC ANALYSE_fit_shift_stretch(int indexFeno, int indexFenoColumn, const double *s
   Feno->fit_properties.linfit = NULL;
   Feno->Shift=Feno->Stretch=Feno->Stretch2=0.;
   NDET[indexFenoColumn]=Feno->NDET;
+  
+  //int molecularRingFlag=Feno->molecularCorrection;
+  
+  //Feno->molecularCorrection=0;
 
   CROSS_REFERENCE *pTabCross;
 
-  for (int indexTabCross=0;indexTabCross<Feno->NTabCross;indexTabCross++)
-   {
-    pTabCross=&Feno->TabCross[indexTabCross];
-
-    if ((pTabCross->crossCorrection==ANLYS_CORRECTION_TYPE_SLOPE) ||
-        (pTabCross->crossCorrection==ANLYS_CORRECTION_TYPE_PUKITE) ||
-        (pTabCross->crossCorrection==ANLYS_CORRECTION_TYPE_MOLECULAR_RING_SLOPE))
-     {
-      if (pTabCross->indexPukite1!=ITEM_NONE)
-       Feno->TabCross[pTabCross->indexPukite1].FitConc=0;
-      if (pTabCross->indexPukite2!=ITEM_NONE)
-       Feno->TabCross[pTabCross->indexPukite2].FitConc=0;
-
-      pTabCross->crossCorrection=ANLYS_CORRECTION_TYPE_NONE;   // Do not use Pukite or molecular ring for the alignment of reference spectra
-     }
-   }
+//   for (int indexTabCross=0;indexTabCross<Feno->NTabCross;indexTabCross++)
+//    {
+//     pTabCross=&Feno->TabCross[indexTabCross];
+// 
+//     if ((pTabCross->crossCorrection==ANLYS_CORRECTION_TYPE_SLOPE) ||
+//         (pTabCross->crossCorrection==ANLYS_CORRECTION_TYPE_PUKITE) ||
+//         (pTabCross->crossCorrection==ANLYS_CORRECTION_TYPE_MOLECULAR_RING_SLOPE))
+//      {
+//       if (pTabCross->indexPukite1!=ITEM_NONE)
+//        Feno->TabCross[pTabCross->indexPukite1].FitConc=0;
+//       if (pTabCross->indexPukite2!=ITEM_NONE)
+//        Feno->TabCross[pTabCross->indexPukite2].FitConc=0;
+//       
+//       pTabCross->crossCorrection=ANLYS_CORRECTION_TYPE_NONE;   // Do not use Pukite or molecular ring for the alignment of reference spectra
+//      }
+//    } 
 
   memcpy(Feno->Lambda,Feno->LambdaK,sizeof(*Feno->Lambda)*Feno->NDET); // CHECK: why this copy?
   LambdaSpec=Feno->Lambda; // now pointer LambdaSpec== pointer Feno->Lambda, and buffer content is Feno->LambdaK
@@ -2423,21 +2441,31 @@ RC ANALYSE_fit_shift_stretch(int indexFeno, int indexFenoColumn, const double *s
   Feno->Decomp=1;
   Feno->amfFlag=0;
   Feno->indexReference=ITEM_NONE;
-  RC rc=ANALYSE_SvdInit(Feno, &Feno->fit_properties, Feno->NDET,Feno->Lambda);
+  
+  RC rc;
+  
+  if (!(rc=ANALYSE_SvdInit(Feno, &Feno->fit_properties, Feno->NDET,Feno->Lambda)) && 
+     (!Feno->molecularCorrection || !(rc=Analyse_Molecular_Ring_Init(Feno,Feno->LambdaK,Feno->NDET))))  
+  
   // TODO: when we call curfitmethod here, absorber constraints between analysis windows will not work. is this ok?
-  if (!rc) rc=ANALYSE_CurFitMethod(indexFenoColumn,
-                                   spec1,                       // etalon reference spectrum
-                                   NULL,                        // error on raw spectrum
-                                   spec2,                       // reference spectrum
-                                   Feno->NDET,
-                                   NULL,
-                                   &Square,                     // returned stretch order 2
-                                   NULL,                        // number of iterations in Curfit
-                                   1.,
-                                   1.,
-                                   &Feno->fit_properties);
-
+       rc=ANALYSE_CurFitMethod(indexFenoColumn,
+                               spec1,                       // etalon reference spectrum
+                               NULL,                        // error on raw spectrum
+                               spec2,                       // reference spectrum
+                               Feno->NDET,
+                               NULL,
+                               &Square,                     // returned stretch order 2
+                               NULL,                        // number of iterations in Curfit
+                               1.,
+                               1.,
+                               &Feno->fit_properties);
+  
+  if (Feno->molecularCorrection)
+      Analyse_Molecular_Ring_End(Feno,Feno->NDET);    
+  
   LINEAR_free(Feno->fit_properties.linfit);
+  
+  //Feno->molecularCorrection=molecularRingFlag;
 
   if(rc>=THREAD_EVENT_STOP) {
     return ERROR_SetLast((char *)__func__,ERROR_TYPE_WARNING,ERROR_ID_REF_ALIGNMENT,Feno->windowName);
@@ -2811,7 +2839,7 @@ RC ANALYSE_Function(double *spectrum_orig, double *reference, const double *Sigm
    // ----------------
    // Build svd matrix
    // ----------------
-
+   
    if (Feno->Decomp) {
      for (int i=0;i<Feno->NTabCross;i++)
 
@@ -2954,6 +2982,7 @@ RC ANALYSE_Function(double *spectrum_orig, double *reference, const double *Sigm
       // ----------------------------------------------------
       // In optical density fitting mode, allocate linear fitting environment for cross sections:
       // ----------------------------------------------------
+      
       if (Feno->analysisMethod==OPTICAL_DENSITY_FIT) {
         // clean up old linear fit environment:
         LINEAR_free(fitprops->linfit);
@@ -2999,7 +3028,7 @@ RC ANALYSE_Function(double *spectrum_orig, double *reference, const double *Sigm
       if (Feno->analysisMethod==OPTICAL_DENSITY_FIT) {
         LINEAR_set_weight(fitprops->linfit, SigmaY);
         rc = LINEAR_decompose(fitprops->linfit,fitprops->SigmaSqr,fitprops->covar);
-
+        
         if (rc != ERROR_ID_NO)
           goto EndFunction;
       }
@@ -3988,7 +4017,9 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
               goto EndAnalysis;
              }
            } else if ((rc=ANALYSE_SvdInit(Feno,&Feno->fit_properties, n_wavel, Feno->LambdaK))!=ERROR_ID_NO)
+           {
             goto EndAnalysis;
+           }
 
           // Global variables initializations
 
@@ -4052,8 +4083,8 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
           int num_repeats_spikes = 0;
           int num_repeats_ring = 0;
 
-          if (Feno->molecularCorrection)
-           Analyse_Molecular_Ring_Init(Feno,Feno->LambdaK,n_wavel);
+          if (Feno->molecularCorrection && ((rc=Analyse_Molecular_Ring_Init(Feno,Feno->LambdaK,n_wavel))>THREAD_EVENT_STOP))
+            goto EndAnalysis;
 
           do {
             if ((num_repeats_ring && ((rc=Analyse_Molecular_Ring_Calculate(Feno,Feno->LambdaK,n_wavel,molecularRing_a))!=ERROR_ID_NO)) ||
@@ -4816,7 +4847,7 @@ RC ANALYSE_LoadCross(ENGINE_CONTEXT *pEngineContext, const ANALYSIS_CROSS *cross
 #if defined(__DEBUG_) && __DEBUG_ && defined(__DEBUG_DOAS_CONFIG_) && __DEBUG_DOAS_CONFIG_
   DEBUG_FunctionBegin((char *)__func__,DEBUG_FCTTYPE_CONFIG|DEBUG_FCTTYPE_MEM);
 #endif
-
+  
   // Initializations
   const int n_wavel = NDET[indexFenoColumn];
   pWrkSymbol=NULL;
@@ -4824,7 +4855,7 @@ RC ANALYSE_LoadCross(ENGINE_CONTEXT *pEngineContext, const ANALYSIS_CROSS *cross
   strcpy((char *)diffOrtho,(char *)"Differential XS");
   firstTabCross=pTabFeno->NTabCross;
   rc=ERROR_ID_NO;
-
+  
   for (indexTabCross=0;
        (indexTabCross<nCross) && (pTabFeno->NTabCross<MAX_FIT) && !rc;
        indexTabCross++) {
@@ -4987,7 +5018,7 @@ RC ANALYSE_LoadCross(ENGINE_CONTEXT *pEngineContext, const ANALYSIS_CROSS *cross
           pTabFeno->xsToConvoluteI0+=(pEngineCross->crossAction==ANLYS_CROSS_ACTION_CONVOLUTE_I0)?1:0;
           pTabFeno->xsPukite+=((pEngineCross->crossCorrection==ANLYS_CORRECTION_TYPE_SLOPE) || (pEngineCross->crossCorrection==ANLYS_CORRECTION_TYPE_PUKITE) || (pEngineCross->crossCorrection==ANLYS_CORRECTION_TYPE_MOLECULAR_RING_SLOPE))?1:0;
           pTabFeno->molecularCorrection+=((pEngineCross->crossCorrection==ANLYS_CORRECTION_TYPE_MOLECULAR_RING) || (pEngineCross->crossCorrection==ANLYS_CORRECTION_TYPE_MOLECULAR_RING_SLOPE))?1:0;
-
+          
           pOrthoDiffSymbol[pTabFeno->NTabCross]=(pCross->subtractFlag)?pCross->subtract:pCross->orthogonal;
           pRingSymbol[pTabFeno->NTabCross]=((pEngineCross->crossCorrection==ANLYS_CORRECTION_TYPE_MOLECULAR_RING) || (pEngineCross->crossCorrection==ANLYS_CORRECTION_TYPE_MOLECULAR_RING_SLOPE))?pCross->molecularRing:NULL;
 
@@ -5047,13 +5078,15 @@ RC ANALYSE_LoadCross(ENGINE_CONTEXT *pEngineContext, const ANALYSIS_CROSS *cross
          TabCross[pEngineCross->indexPukite1].isPukite=2;
         if ((pEngineCross->indexPukite2=AnalyseGetPukiteIndex(&TabCross[firstTabCross],endTabCross,(char *)pCross->symbol,2))!=ITEM_NONE)
          TabCross[pEngineCross->indexPukite2].isPukite=2;
-
+        
         // !!! Pukite, check the different cases and generate error messages for inconsistency
 
-           if (((pEngineCross->indexPukite1==ITEM_NONE) && AnalyseAddPukiteTerm(pEngineContext,pEngineCross,indexFenoColumn,1,&pEngineCross->indexPukite1)) ||
+        if (((pEngineCross->indexPukite1==ITEM_NONE) && AnalyseAddPukiteTerm(pEngineContext,pEngineCross,indexFenoColumn,1,&pEngineCross->indexPukite1)) ||
                ((pEngineCross->crossCorrection==ANLYS_CORRECTION_TYPE_PUKITE) && (pEngineCross->indexPukite2==ITEM_NONE) && AnalyseAddPukiteTerm(pEngineContext,pEngineCross,indexFenoColumn,2,&pEngineCross->indexPukite2)))
 
             rc=ERROR_SetLast((char *)__func__,ERROR_TYPE_WARNING,ERROR_ID_PUKITE,pTabFeno->windowName,WorkSpace[pEngineCross->Comp].symbolName);
+           
+          
 
         else
          {
