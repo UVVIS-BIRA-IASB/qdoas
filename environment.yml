@@ -4,7 +4,7 @@ channels:
 dependencies:
   - cmake
   - pkg-config
-  - boost
+  - libboost-headers
   - coda
   - eigen
   - hdf4
