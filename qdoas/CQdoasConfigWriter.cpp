@@ -970,15 +970,17 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
   tmpStr = pathMgr->simplifyPath(QString(d->tropomi.instrFunctionFile));
   fprintf(fp, " instr=\"%s\" />\n", tmpStr.toUtf8().constData());
 
-  fprintf(fp, "      <gems trackSelection=\"%s\" binning=\"%d\"",d->gems.trackSelection,d->gems.binning);
+  // apex
+  fprintf(fp, "      <apex trackSelection=\"%s\"",d->apex.trackSelection);
   tmpStr = pathMgr->simplifyPath(QString(d->apex.calibrationFile));
   fprintf(fp, " calib=\"%s\"", tmpStr.toUtf8().constData());
 
   tmpStr = pathMgr->simplifyPath(QString(d->apex.transmissionFunctionFile));
   fprintf(fp, " instr=\"%s\" />\n", tmpStr.toUtf8().constData());
 
-  // apex
-  fprintf(fp, "      <apex trackSelection=\"%s\"",d->apex.trackSelection);
+  // gems
+  fprintf(fp, "      <gems trackSelection=\"%s\" binning=\"%d\"",d->gems.trackSelection,d->gems.binning);
+
   tmpStr = pathMgr->simplifyPath(QString(d->gems.calibrationFile));
   fprintf(fp, " calib=\"%s\"", tmpStr.toUtf8().constData());
 
