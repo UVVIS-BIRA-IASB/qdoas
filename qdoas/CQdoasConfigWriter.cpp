@@ -434,6 +434,9 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
   case PRJCT_INSTR_FORMAT_GEMS:
     fprintf(fp, "\"gems\"");
     break;
+  case PRJCT_INSTR_FORMAT_TEMPO:
+    fprintf(fp, "\"tempo\"");
+    break;
   case PRJCT_INSTR_FORMAT_OCEAN_OPTICS:
     fprintf(fp, "\"oceanoptics\"");
     break;
@@ -989,6 +992,9 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
 
   tmpStr = pathMgr->simplifyPath(QString(d->gems.transmissionFunctionFile));
   fprintf(fp, " instr=\"%s\" />\n", tmpStr.toUtf8().constData());
+
+  // tempo
+  fprintf(fp, "      <tempo band=\"%s\"/>\n", d->tempo.band == PRJCT_INSTR_TEMPO_BAND_UV ? "uv" : "vis");
 
   // gome2
   fprintf(fp, "      <gome2 type=");

@@ -51,6 +51,7 @@ class CWInstrFrm4doasEdit;
 class CWInstrAvantesEdit;
 class CWInstrApexEdit;
 class CWInstrGemsEdit;
+class CWInstrTempoEdit;
 
 //--------------------------------------------------------------------------
 class CWProjectTabInstrumental : public QFrame
@@ -103,6 +104,7 @@ Q_OBJECT
   CWInstrTropomiEdit *m_tropomiEdit;
   CWInstrApexEdit *m_apexEdit;
   CWInstrGemsEdit *m_gemsEdit;
+  CWInstrTempoEdit *m_tempoEdit;
   CWInstrGome2Edit *m_gome2Edit;
   CWInstrMinimumEdit *m_mkzyEdit;
   CWInstrOceanOpticsEdit *m_oceanOpticsEdit;
@@ -555,6 +557,21 @@ class CWInstrGemsEdit : public CWCalibInstrEdit
 };
 
 //--------------------------------------------------------------------------
+
+class CWInstrTempoEdit : public QFrame
+{
+  Q_OBJECT
+ public:
+  CWInstrTempoEdit(const struct instrumental_tempo *d, QWidget *parent = 0);
+
+  void apply(struct instrumental_tempo *d) const;
+
+ private:
+  QComboBox *m_bandCombo;
+};
+
+//--------------------------------------------------------------------------
+
 
 #endif
 

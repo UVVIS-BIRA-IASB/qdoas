@@ -400,6 +400,10 @@ extern "C" {
     int  binning;
   };
 
+  struct instrumental_tempo {
+    int band;
+  };
+
   typedef struct mediate_project_instrumental
    {
     int format;
@@ -435,6 +439,7 @@ extern "C" {
     struct instrumental_oceanoptics oceanoptics;
     struct instrumental_frm4doas frm4doas;
     struct instrumental_gems gems;
+    struct instrumental_tempo tempo;
    }
   mediate_project_instrumental_t;
 

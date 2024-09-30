@@ -713,6 +713,8 @@ void CProjectInstrumentalSubHandler::start(const map<xmlstring, string> &atts)
     m_instrumental->format = PRJCT_INSTR_FORMAT_APEX;
   else if (str == "gems")
     m_instrumental->format = PRJCT_INSTR_FORMAT_GEMS;
+  else if (str == "tempo")
+    m_instrumental->format = PRJCT_INSTR_FORMAT_TEMPO;
   else if (str == "mfc")
     m_instrumental->format = PRJCT_INSTR_FORMAT_MFC;
   else if (str == "mfcstd")
@@ -1383,6 +1385,16 @@ void CProjectInstrumentalSubHandler::start(const xmlstring &element, const map<x
         strcpy(m_instrumental->gems.transmissionFunctionFile, str.c_str());
       else
         throw std::runtime_error("Instrument Function  Filename too long");
+    }
+  }
+  else if (element == "tempo") {
+    string str(value(atts, "band"));
+    if (str == "uv") {
+      m_instrumental->tempo.band = PRJCT_INSTR_TEMPO_BAND_UV;
+    } else if (str == "vis") {
+      m_instrumental->tempo.band = PRJCT_INSTR_TEMPO_BAND_VIS;
+    } else {
+      throw std::runtime_error("Invalid TEMPO band");
     }
   }
   else if (element == "frm4doas") { // FRM4DOAS netCDF

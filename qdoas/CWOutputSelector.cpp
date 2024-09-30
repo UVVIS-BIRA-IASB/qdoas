@@ -749,6 +749,13 @@ void getValidFieldFlags(int *validFlags, int instrument,int selectorOrigin)
      }
      break;
 
+   case PRJCT_INSTR_FORMAT_TEMPO :
+     {
+      validFlags[PRJCT_RESULTS_INDEX_ALONGTRACK]=1;
+      validFlags[PRJCT_RESULTS_INDEX_CROSSTRACK]=1;
+     }
+     break;
+
  // ----------------------------------------------------------------------------
 
    case PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF :

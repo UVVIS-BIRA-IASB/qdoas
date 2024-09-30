@@ -392,6 +392,7 @@ enum _prjctInstrFormat {
   PRJCT_INSTR_FORMAT_GOME1_NETCDF,                                              // 30 netCDF format for GOME1
   PRJCT_INSTR_FORMAT_GEMS,                                                      // 31 GEMS format (Geostationary Environment Monitoring Spectrometer onboard GEO-KOMPSAT-2B geostationary satellite)
   PRJCT_INSTR_FORMAT_OMIV4,                                                     // 32 OMI Collection 4 format (netCDF4)
+  PRJCT_INSTR_FORMAT_TEMPO,                                                     // 33 TEMPO
   PRJCT_INSTR_FORMAT_MAX
 };
 
@@ -503,6 +504,11 @@ enum _omiSpectralTypes {
   PRJCT_INSTR_OMI_TYPE_UV2,
   PRJCT_INSTR_OMI_TYPE_VIS,
   PRJCT_INSTR_OMI_TYPE_MAX
+};
+
+enum _tempoBands {
+  PRJCT_INSTR_TEMPO_BAND_UV,
+  PRJCT_INSTR_TEMPO_BAND_VIS
 };
 
 #define MAX_SWATHSIZE 2048 // maximum number of tracks per swath (for satellites)

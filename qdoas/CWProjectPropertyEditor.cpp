@@ -74,6 +74,7 @@ CWProjectPropertyEditor::CWProjectPropertyEditor(const QString &projectName, QWi
   // create and populate satellite
   m_satelliteFormatCombo = new QComboBox(this);
   m_satelliteFormatCombo->addItem("GEMS", QVariant(PRJCT_INSTR_FORMAT_GEMS));
+  m_satelliteFormatCombo->addItem("TEMPO", QVariant(PRJCT_INSTR_FORMAT_TEMPO));
   m_satelliteFormatCombo->addItem("Tropomi", QVariant(PRJCT_INSTR_FORMAT_TROPOMI));
   m_satelliteFormatCombo->addItem("OMPS", QVariant(PRJCT_INSTR_FORMAT_OMPS));
   m_satelliteFormatCombo->addItem("OMI", QVariant(PRJCT_INSTR_FORMAT_OMI));

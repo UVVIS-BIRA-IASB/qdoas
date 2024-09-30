@@ -246,6 +246,11 @@ CWProjectTabInstrumental::CWProjectTabInstrumental(const mediate_project_instrum
   index = m_formatStack->addWidget(m_gemsEdit);
   m_instrumentToStackIndexMap.insert(std::map<int,int>::value_type(PRJCT_INSTR_FORMAT_GEMS, index));
 
+  // TEMPO
+  m_tempoEdit = new CWInstrTempoEdit(&(instr->tempo));
+  index = m_formatStack->addWidget(m_tempoEdit);
+  m_instrumentToStackIndexMap.insert(std::map<int,int>::value_type(PRJCT_INSTR_FORMAT_TEMPO, index));
+  
   // ocean optics
   m_oceanOpticsEdit = new CWInstrOceanOpticsEdit(&(instr->oceanoptics));
   index = m_formatStack->addWidget(m_oceanOpticsEdit);
@@ -356,6 +361,7 @@ void CWProjectTabInstrumental::apply(mediate_project_instrumental_t *instr) cons
   m_oceanOpticsEdit->apply(&(instr->oceanoptics));
   m_frm4doasEdit->apply(&(instr->frm4doas));
   m_gemsEdit->apply(&(instr->gems));
+  m_tempoEdit->apply(&(instr->tempo));
 }
 
 void CWProjectTabInstrumental::slotInstrumentChanged(int instrument)
@@ -2383,6 +2389,45 @@ void CWInstrGemsEdit::apply(struct instrumental_gems *pInstrGems) const
   strcpy(pInstrGems->trackSelection, m_trackSelection->text().toLocal8Bit().data());
 
 //  pInstrGems->binning = m_binning->value();
+}
+
+//--------------------------------------------------------
+
+CWInstrTempoEdit::CWInstrTempoEdit(const struct instrumental_tempo *d, QWidget *parent) :
+  QFrame(parent)
+{
+  QVBoxLayout *mainLayout = new QVBoxLayout(this);
+  mainLayout->setMargin(5);
+  mainLayout->setSpacing(5);
+
+  QGridLayout *gridLayout = new QGridLayout;
+
+  int row = 0;
+
+  // spectral
+  gridLayout->addWidget(new QLabel("Spectral Band", this), row, 0);
+  m_bandCombo = new QComboBox(this);
+  m_bandCombo->addItem("UV", QVariant(PRJCT_INSTR_TEMPO_BAND_UV));
+  m_bandCombo->addItem("VIS", QVariant(PRJCT_INSTR_TEMPO_BAND_VIS));
+  gridLayout->addWidget(m_bandCombo, row, 1);
+  ++row;
+
+  mainLayout->addLayout(gridLayout);
+  mainLayout->addStretch(1);
+
+  // initial values
+
+  // spectral
+  int index = m_bandCombo->findData(QVariant(d->band));
+  if (index != -1)
+    m_bandCombo->setCurrentIndex(index);
+
+}
+
+void CWInstrTempoEdit::apply(struct instrumental_tempo *d) const
+{
+  // spectral
+  d->band = m_bandCombo->itemData(m_bandCombo->currentIndex()).toInt();
 }
 
 //--------------------------------------------------------
