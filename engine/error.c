@@ -80,7 +80,7 @@ ERROR_TABLE;
 
 ERROR_TABLE errorTable[]=
  {
-     // Standard errors
+  // Standard errors
 
   { ERROR_ID_NO                        , "no error"                                                                                                           },
   { ERROR_ID_BUG                       , "\"%s\" This is an error or limitation of QDOAS. Please contact the authors at qdoas@aeronomie.be"                   },
@@ -90,7 +90,8 @@ ERROR_TABLE errorTable[]=
   { ERROR_ID_BUFFER_FULL               , "the buffer of %s is full"                                                                                           },
   { ERROR_ID_COMMANDLINE               , "syntax error in command line"                                                                                       },
   { ERROR_ID_MEDIATE                   , "Error with field \"%s\" - %s"                                                                                       },
-  { ERROR_ID_SWATHSIZE                 , "This file contains %d detector rows, but this version of Qdoas can only handle %d" },
+  { ERROR_ID_SWATHSIZE                 , "This file contains %d detector rows, but this version of Qdoas can only handle %d"                                  },
+  { ERROR_ID_NOANALYSIS                , "No analysis window is enabled. Please configure and enable at least one analysis window to process spectra with"    },
 
   // File
 

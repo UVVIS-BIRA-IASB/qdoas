@@ -1676,8 +1676,8 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
    // Initializations
 
    #if defined(__DEBUG_) && __DEBUG_
-   DEBUG_Start(ENGINE_dbgFile,"mediateRequestSetAnalysisWindows",DEBUG_FCTTYPE_MEM,15,DEBUG_DVAR_YES,0);
-    #endif
+   DEBUG_Start(ENGINE_dbgFile, __func__, DEBUG_FCTTYPE_MEM, 15, DEBUG_DVAR_YES, 0);
+   #endif
 
    lambdaMin=1000;
    lambdaMax=0;
@@ -1705,6 +1705,11 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
 
    KURUCZ_indexLine=1;
    rc=ANALYSE_SetInit(pEngineContext);
+
+   if (numberOfWindows == 0) { // We need at least one active analysis window.
+     rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NOANALYSIS);
+     goto handle_errors;
+   }
 
    n_wavel_temp1 = 0;
    n_wavel_temp2 = 0;
@@ -2090,7 +2095,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
    }
 
    #if defined(__DEBUG_) && __DEBUG_
-   DEBUG_Stop("mediateRequestSetAnalysisWindows");
+   DEBUG_Stop(__func__);
    #endif
 
    return (rc!=ERROR_ID_NO)?-1:0;    // supposed that an error at the level of the load of projects stops the current session

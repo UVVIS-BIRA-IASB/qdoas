@@ -170,6 +170,7 @@ SHORT_DATE;
 #define ERROR_ID_COMMANDLINE                    105                             // syntax error in command line
 #define ERROR_ID_MEDIATE                        106
 #define ERROR_ID_SWATHSIZE                      107                             // swath size > MAX_SWATHSIZE
+#define ERROR_ID_NOANALYSIS                     108                             // "run analysis" started but on analysis window enabled/selected
 
 // Files
 
