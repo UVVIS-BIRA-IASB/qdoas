@@ -82,6 +82,7 @@
 #include "mfc-read.h"
 #include "spectrum_files.h"
 #include "gems_read.h"
+#include "tempo_read.h"
 #include "output_netcdf.h"
 
 #include "coda.h"
@@ -747,6 +748,10 @@ RC EngineSetFile(ENGINE_CONTEXT *pEngineContext,const char *fileName,void *respo
         rc=GEMS_LoadAnalysis(pEngineContext,responseHandle);
        break;
        // ---------------------------------------------------------------------------
+     case PRJCT_INSTR_FORMAT_TEMPO :
+       rc = TEMPO_set(pEngineContext);
+       break;
+       // ---------------------------------------------------------------------------
      case PRJCT_INSTR_FORMAT_MFC :
      case PRJCT_INSTR_FORMAT_MFC_STD :
        if (!(rc=SetMFC(pEngineContext,pFile->specFp)) && (THRD_id!=THREAD_TYPE_SPECTRA) && (THRD_id!=THREAD_TYPE_EXPORT) && (THRD_id!=THREAD_TYPE_NONE))
@@ -981,6 +986,10 @@ RC EngineReadFile(ENGINE_CONTEXT *pEngineContext,int indexRecord,int dateFlag,in
       // ---------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_GEMS :
       pRecord->rc=GEMS_Read(pEngineContext,indexRecord);
+      break;
+      // ---------------------------------------------------------------------------
+    case PRJCT_INSTR_FORMAT_TEMPO :
+      pRecord->rc=TEMPO_read(pEngineContext,indexRecord);
       break;
       // ---------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_MFC :
@@ -1307,6 +1316,7 @@ RC EngineEndCurrentSession(ENGINE_CONTEXT *pEngineContext)
      OMI_ReleaseBuffers();
      OMIV4_cleanup();
      tropomi_cleanup();
+     TEMPO_cleanup();
      FRM4DOAS_Cleanup();
      GOME1NETCDF_Cleanup();
      AIRBORNE_ReleaseBuffers();

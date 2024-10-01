@@ -82,6 +82,7 @@
 #include "gome1netcdf_read.h"
 #include "spectrum_files.h"
 #include "gems_read.h"
+#include "tempo_read.h"
 #include "visual_c_compat.h"
 
 AMF_SYMBOL *OUTPUT_AmfSpace;                                                 // list of cross sections with associated AMF file
@@ -2066,6 +2067,9 @@ static RC get_orbit_date(const ENGINE_CONTEXT *pEngineContext, int *orbit_year, 
     break;
   case PRJCT_INSTR_FORMAT_GEMS:
      GEMS_get_orbit_date(orbit_year,orbit_month,orbit_day);
+    break;
+  case PRJCT_INSTR_FORMAT_TEMPO:
+    TEMPO_get_orbit_date(orbit_year,orbit_month,orbit_day);
     break;
   default:
     // we should never get here:

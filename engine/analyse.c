@@ -149,6 +149,7 @@
 #include "gdp_bin_read.h"
 #include "raman.h"
 #include "gems_read.h"
+#include "tempo_read.h"
 #include "output_netcdf.h"
 #include "matrix_netcdf_read.h"
 #include "visual_c_compat.h"
@@ -2486,6 +2487,7 @@ RC ANALYSE_AlignReference(ENGINE_CONTEXT *pEngineContext,int refFlag,void *respo
          (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_APEX) ||
         ((pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF) && pEngineContext->project.instrumental.frm4doas.imagerFlag) ||
          (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_GEMS) ||
+         (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_TEMPO) ||
          (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_TROPOMI))
      &&
         !pFeno->useRefRow) continue;
@@ -3853,7 +3855,8 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
              (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_OMIV4) ||
              (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_APEX) ||
             ((pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF) && pEngineContext->project.instrumental.frm4doas.imagerFlag) || 
-             (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_GEMS))
+             (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_GEMS) ||
+             (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_TEMPO))
          &&
             !Feno->useRefRow) continue;
 
@@ -3965,6 +3968,7 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
               || pInstrumental->readOutFormat == PRJCT_INSTR_FORMAT_TROPOMI
               || pInstrumental->readOutFormat == PRJCT_INSTR_FORMAT_GOME1_NETCDF          // ??????????????????????????????
               || pInstrumental->readOutFormat == PRJCT_INSTR_FORMAT_GEMS
+              || pInstrumental->readOutFormat == PRJCT_INSTR_FORMAT_TEMPO
               || pInstrumental->readOutFormat == PRJCT_INSTR_FORMAT_GOME2 ) {
 
             double *spec_deriv2 = malloc(n_wavel * sizeof(*spec_deriv2));
@@ -6013,6 +6017,7 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
                        (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_APEX) &&
                       ((pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF) || !pEngineContext->project.instrumental.frm4doas.imagerFlag) && 
                        (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_GEMS) &&
+                       (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_TEMPO) &&
                        (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_TROPOMI))?1:pEngineContext->project.instrumental.use_row[indexFenoColumn];
 
   pTabFeno->gomeRefFlag=(!is_satellite(pEngineContext->project.instrumental.readOutFormat))?1:0;
@@ -6087,6 +6092,9 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
         break;
       case PRJCT_INSTR_FORMAT_GEMS:
         rc=GEMS_LoadReference(pTabFeno->ref1,indexFenoColumn,lambdaRefEtalon,SrefEtalon,&n_wavel_ref);
+        break;
+      case PRJCT_INSTR_FORMAT_TEMPO:
+        rc = TEMPO_get_irradiance_reference(pTabFeno->ref1, indexFenoColumn, lambdaRefEtalon, SrefEtalon, pTabFeno->SrefSigma);
         break;
       case PRJCT_INSTR_FORMAT_APEX:
         rc=apex_get_reference(pTabFeno->ref1,indexFenoColumn,lambdaRefEtalon,SrefEtalon,&n_wavel_ref);

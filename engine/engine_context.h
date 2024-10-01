@@ -167,6 +167,12 @@ typedef struct _prjctGemsFormat
  }
 PRJCT_GEMS;
 
+typedef struct _prjctTempoFormat
+ {
+  int band;
+ }
+PRJCT_TEMPO;
+
 typedef struct _prjctFrm4doasFormat
  {
   int imagerFlag;
@@ -198,6 +204,7 @@ typedef struct _prjctInstrumental
   PRJCT_OMI   omi;
   PRJCT_MFC   mfc;
   PRJCT_GEMS  gems;
+  PRJCT_TEMPO tempo;
   PRJCT_FRM4DOAS frm4doas;
   char       offsetFile[MAX_ITEM_TEXT_LEN];                                 // offset file
   struct instrumental_tropomi tropomi;

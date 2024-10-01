@@ -753,6 +753,8 @@ void getValidFieldFlags(int *validFlags, int instrument,int selectorOrigin)
      {
       validFlags[PRJCT_RESULTS_INDEX_ALONGTRACK]=1;
       validFlags[PRJCT_RESULTS_INDEX_CROSSTRACK]=1;
+      validFlags[PRJCT_RESULTS_LON_CORNERS]=1;
+      validFlags[PRJCT_RESULTS_LAT_CORNERS]=1;
      }
      break;
 

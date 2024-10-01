@@ -101,6 +101,8 @@ add_library(engine STATIC
   stdfunc.h
   svd.c
   svd.h
+  tempo_read.h
+  tempo_read.cpp
   tropomi.h
   tropomi_read.cpp
   tropomi_read.h

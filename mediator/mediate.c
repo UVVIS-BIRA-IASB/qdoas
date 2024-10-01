@@ -30,6 +30,7 @@
 #include "gome1netcdf_read.h"
 #include "apex_read.h"
 #include "gems_read.h"
+#include "tempo_read.h"
 #include "mfc-read.h"
 #include "frm4doas_read.h"
 
@@ -401,6 +402,7 @@ void mediateRequestPlotSpectra(ENGINE_CONTEXT *pEngineContext,void *responseHand
      case PRJCT_INSTR_FORMAT_GOME2:
      case PRJCT_INSTR_FORMAT_OMI:
      case PRJCT_INSTR_FORMAT_GEMS:
+     case PRJCT_INSTR_FORMAT_TEMPO:
        y_units = "photons / (nm s cm<sup>2</sup>)";
        break;
      case PRJCT_INSTR_FORMAT_OMIV4:
@@ -495,6 +497,7 @@ void mediateRequestPlotSpectra(ENGINE_CONTEXT *pEngineContext,void *responseHand
                 pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_OMIV4 ||
                 pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_TROPOMI ||
                 pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_GEMS ||
+                pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_TEMPO ||
                 pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF)
               || THRD_id==THREAD_TYPE_ANALYSIS) ) {
 
@@ -1278,6 +1281,17 @@ void setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const
 
       break;
       // ----------------------------------------------------------------------------
+    case PRJCT_INSTR_FORMAT_TEMPO:
+      pEngineInstrumental->tempo.band = pMediateInstrumental->tempo.band;
+      for (size_t i = 0; i != TEMPO_XTRACK; ++i) {
+        NDET[i] = TEMPO_SPECTRAL_CHANNEL;
+        pEngineInstrumental->use_row[i] = true;
+      }
+      for (size_t i = TEMPO_XTRACK; i != MAX_SWATHSIZE; ++i) {
+        pEngineInstrumental->use_row[i] = false;
+      }
+      break;
+      // ----------------------------------------------------------------------------
     }
  }
 
@@ -1745,7 +1759,9 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
        rc = GEMS_init_radref(analysisWindows[0].refTwoFile, &n_wavel_temp2);
      }
      break;
-     // TO SEE LATER WHAT IS NECESSARY FOR THIS FORMAT rc = gems_init(analysisWindows[0].refOneFile,pEngineContext);              // !!! GEMS : if fixed format, just initialize the ANALYSE_swathSize
+   case PRJCT_INSTR_FORMAT_TEMPO:
+     ANALYSE_swathSize = TEMPO_XTRACK;
+     rc = TEMPO_init_irradiances(analysisWindows, numberOfWindows, pEngineContext);
      break;
    case PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF:
      if (pEngineContext->project.instrumental.frm4doas.imagerFlag) {
