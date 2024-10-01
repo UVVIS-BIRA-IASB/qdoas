@@ -109,6 +109,24 @@ public:
     getVar(varID(name), start, count, out);
   }
 
+  // Read a complete netCDF variable and return data as a vector
+  template<typename T>
+  inline std::vector<T> getVar(const std::string& name) const {
+    using std::vector;
+    auto dim_ids = dimIDs(name);
+    size_t total_len = 1;
+    vector<size_t> start(dim_ids.size());
+    vector<size_t> count;
+    for (const auto id : dim_ids) {
+      auto len = dimLen(id);
+      total_len *= len;
+      count.push_back(len);
+    }
+    vector<T> result(total_len);
+    getVar<T>(name, start.data(), count.data(), result.data());
+    return result;
+  }
+
   // This function allocate the vector, initialize it to the default value and if the requested variable exists, retrieves the values
   template<typename T>
   inline int getVar(const std::string& name, const size_t start[], const size_t count[], int num_dims, T fill_value,std::vector<T>& out) const {

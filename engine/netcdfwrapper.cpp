@@ -322,7 +322,6 @@ int NetCDFFile::openNetCDF(const string &filename, NetCDFFile::Mode mode, size_t
   }
 
   if (rc != NC_NOERR) {
-    std::cout << __func__ << ": error, rc = " << rc << std::endl;
     throw std::runtime_error("Error opening netCDF file '" + filename + "'");
   }
   return groupid;

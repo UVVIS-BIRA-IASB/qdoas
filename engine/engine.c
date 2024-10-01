@@ -82,6 +82,7 @@
 #include "mfc-read.h"
 #include "spectrum_files.h"
 #include "gems_read.h"
+#include "s4_read.h"
 #include "output_netcdf.h"
 
 #include "coda.h"
