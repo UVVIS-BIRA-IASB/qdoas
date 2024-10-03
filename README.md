@@ -1,6 +1,6 @@
 # QDOAS
 
-QDOAS is a cross-platform application based on the long experience of BIRA-IASB (Royal Belgian Institute for Space Aeronomy) in the development and improvement of algorithms for the retrieval of trace gases from UV-Visible spectral measurements (satellite, ground-based, mobile or aircraft-based instruments) using the DOAS (Differential Optical Absorption Spectroscopy).  This software evolves along with the measurement techniques in DOAS. It has been extensively validated in different intercomparison campaigns. The friendly user interface, flexibility and the robustness of the algorithms largely contribute to QDOAS success in the world.
+QDOAS is a cross-platform application based on the long experience of BIRA-IASB (Royal Belgian Institute for Space Aeronomy) in the development and improvement of algorithms for the retrieval of trace gases from UV-Visible spectral measurements (satellite, ground-based, mobile or aircraft-based instruments) using the Differential Optical Absorption Spectroscopy (DOAS) method.  This software evolves along with the measurement techniques in DOAS. It has been extensively validated in different intercomparison campaigns. The friendly user interface, flexibility and the robustness of the algorithms largely contribute to QDOAS success in the world.
 
 QDOAS is now part of the [Atmospheric Toolbox](https://atmospherictoolbox.org).
 
@@ -77,7 +77,7 @@ The GUI is built on the Open-Source version of the Qt-5 toolkit. As a result, QD
 
 Building QDOAS from sources requires :
 
-* [CMake](https://cmake.org
+* [CMake](https://cmake.org)
 * C++ compiler (g++ version 4.8.1 or higher is recommended),
 * [Qt5](https://qt.io)
 * [Qwt](https://sourceforge.net/projects/qwt)
