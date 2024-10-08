@@ -954,28 +954,6 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
   tmpStr = pathMgr->simplifyPath(QString(d->omi.transmissionFunctionFile));
   fprintf(fp, " instr=\"%s\" />\n", tmpStr.toUtf8().constData());
 
-
-  // omiv4
-  fprintf(fp, "      <omiv4 type=");
-  switch (d->omiv4.spectralType) {
-  case PRJCT_INSTR_OMI_TYPE_UV1:
-    fprintf(fp, "\"uv1\"");
-    break;
-  case PRJCT_INSTR_OMI_TYPE_UV2:
-    fprintf(fp, "\"uv2\"");
-    break;
-  case PRJCT_INSTR_OMI_TYPE_VIS:
-    fprintf(fp, "\"vis\"");
-    break;
-  default:
-    fprintf(fp, "\"invalid\"");
-  }
-  tmpStr = pathMgr->simplifyPath(QString(d->omiv4.calibrationFile));
-  fprintf(fp, " calib=\"%s\"", tmpStr.toUtf8().constData());
-
-  tmpStr = pathMgr->simplifyPath(QString(d->omiv4.transmissionFunctionFile));
-  fprintf(fp, " instr=\"%s\" />\n", tmpStr.toUtf8().constData());
-
   // tropomi
   const char *tropomiSpectralBand;
   switch(d->tropomi.spectralBand) {

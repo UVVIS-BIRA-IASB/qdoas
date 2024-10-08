@@ -202,7 +202,7 @@ CWProjectTabInstrumental::CWProjectTabInstrumental(const mediate_project_instrum
   m_instrumentToStackIndexMap.insert(std::map<int,int>::value_type(PRJCT_INSTR_FORMAT_OMI, index));
 
   // omiv4
-  m_omiV4Edit = new CWInstrOmiV4Edit(&(instr->omiv4));
+  m_omiV4Edit = new CWInstrOmiV4Edit(&(instr->omi));
   index = m_formatStack->addWidget(m_omiV4Edit);
   m_instrumentToStackIndexMap[PRJCT_INSTR_FORMAT_OMIV4] = index;
 
@@ -345,7 +345,7 @@ void CWProjectTabInstrumental::apply(mediate_project_instrumental_t *instr) cons
   m_uoftEdit->apply(&(instr->uoft));
   m_noaaEdit->apply(&(instr->noaa));
   m_omiEdit->apply(&(instr->omi));
-  m_omiV4Edit->apply(&(instr->omiv4));
+  m_omiV4Edit->apply(&(instr->omi));
   m_ompsEdit->apply();
   m_tropomiEdit->apply(&(instr->tropomi));
   m_apexEdit->apply(&(instr->apex));
@@ -2067,12 +2067,29 @@ void CWInstrOmiEdit::apply(struct instrumental_omi *d) const
 
 //--------------------------------------------------------
 
-CWInstrOmiV4Edit::CWInstrOmiV4Edit(const struct instrumental_omiv4 *d, QWidget *parent) :
+CWInstrOmiV4Edit::CWInstrOmiV4Edit(const struct instrumental_omi *d, QWidget *parent) :
   CWCalibInstrEdit(parent)
 {
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
   mainLayout->setMargin(5);
   mainLayout->setSpacing(5);
+
+  QHBoxLayout *qualityFlagsLayout = new QHBoxLayout;
+  mainLayout->addLayout(qualityFlagsLayout);
+
+  // XTrack quality flags
+  QGroupBox *xtrackQFBox = new QGroupBox("Cross-track Quality Flags", this);
+  qualityFlagsLayout->addWidget(xtrackQFBox);
+  //m_xtrackQFBox->setCheckable(true);
+
+  QVBoxLayout *xtrackQFBoxLayout = new QVBoxLayout(xtrackQFBox);
+  xtrackQFBoxLayout->setAlignment(Qt::AlignCenter);
+  m_ignoreXTrackQF = new QRadioButton("Ignore quality flags");
+  xtrackQFBoxLayout->addWidget(m_ignoreXTrackQF);
+  m_nonstrictXTrackQF = new QRadioButton("Exclude uncorrected affected pixels");
+  xtrackQFBoxLayout->addWidget(m_nonstrictXTrackQF);
+  m_strictXTrackQF = new QRadioButton("Exclude all affected pixels");
+  xtrackQFBoxLayout->addWidget(m_strictXTrackQF);
 
   QGridLayout *gridLayout = new QGridLayout;
 
@@ -2102,12 +2119,33 @@ CWInstrOmiV4Edit::CWInstrOmiV4Edit(const struct instrumental_omiv4 *d, QWidget *
   if (index != -1)
     m_spectralTypeCombo->setCurrentIndex(index);
 
+  // xtrack quality flag
+  switch(d->xtrack_mode) {
+  case XTRACKQF_IGNORE:
+    m_ignoreXTrackQF->setChecked(true);
+    break;
+  case XTRACKQF_NONSTRICT:
+    m_nonstrictXTrackQF->setChecked(true);
+    break;
+  case XTRACKQF_STRICT:
+    m_strictXTrackQF->setChecked(true);
+    break;
+  }
 }
 
-void CWInstrOmiV4Edit::apply(struct instrumental_omiv4 *d) const
+void CWInstrOmiV4Edit::apply(struct instrumental_omi *d) const
 {
   // spectral
   d->spectralType = m_spectralTypeCombo->itemData(m_spectralTypeCombo->currentIndex()).toInt();
+
+  // XTrack Quality Flags:
+  if (m_ignoreXTrackQF->isChecked() ) {
+    d->xtrack_mode = XTRACKQF_IGNORE;
+  } else if (m_strictXTrackQF->isChecked() ) {
+    d->xtrack_mode = XTRACKQF_STRICT;
+  } else if (m_nonstrictXTrackQF->isChecked() ) {
+    d->xtrack_mode = XTRACKQF_NONSTRICT;
+  }
 
   // files
   strcpy(d->calibrationFile, m_fileOneEdit->text().toLocal8Bit().data());

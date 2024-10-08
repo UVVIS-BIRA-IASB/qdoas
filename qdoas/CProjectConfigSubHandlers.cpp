@@ -1194,34 +1194,16 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     }
 
   }
-  else if (element == "omiv4") {
+  else if (element == "omiv4") { // handle old OMI collection 4 configs...
     QString str(atts.value("type"));
     if (str == "uv1")
-      m_instrumental->omiv4.spectralType = PRJCT_INSTR_OMI_TYPE_UV1;
+      m_instrumental->omi.spectralType = PRJCT_INSTR_OMI_TYPE_UV1;
     else if (str == "uv2")
-      m_instrumental->omiv4.spectralType = PRJCT_INSTR_OMI_TYPE_UV2;
+      m_instrumental->omi.spectralType = PRJCT_INSTR_OMI_TYPE_UV2;
     else if (str == "vis")
-      m_instrumental->omiv4.spectralType = PRJCT_INSTR_OMI_TYPE_VIS;
+      m_instrumental->omi.spectralType = PRJCT_INSTR_OMI_TYPE_VIS;
     else
       return postErrorMessage("Invalid omi Spectral Type");
-
-    str = atts.value("calib");
-    if (!str.isEmpty()) {
-      str = m_master->pathExpand(str);
-      if (str.length() < (int)sizeof(m_instrumental->omiv4.calibrationFile))
-        strcpy(m_instrumental->omiv4.calibrationFile, str.toLocal8Bit().data());
-      else
-        return postErrorMessage(CALIBRATION_FILENAME_ERR);
-    }
-
-    str = atts.value("instr");
-    if (!str.isEmpty()) {
-      str = m_master->pathExpand(str);
-      if (str.length() < (int)sizeof(m_instrumental->omiv4.transmissionFunctionFile))
-        strcpy(m_instrumental->omiv4.transmissionFunctionFile, str.toLocal8Bit().data());
-      else
-        return postErrorMessage(TRANSMISSION_FILENAME_ERR);
-    }
   }
   else if (element == "tropomi") {
     QString str = atts.value("band");

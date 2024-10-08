@@ -433,12 +433,16 @@ class CWInstrOmiEdit : public CWCalibInstrEdit
 class CWInstrOmiV4Edit : public CWCalibInstrEdit
 {
  public:
-  CWInstrOmiV4Edit(const struct instrumental_omiv4 *d, QWidget *parent = 0);
+  CWInstrOmiV4Edit(const struct instrumental_omi *d, QWidget *parent = 0);
 
-  void apply(struct instrumental_omiv4 *d) const;
+  void apply(struct instrumental_omi *d) const;
 
  private:
   QComboBox *m_spectralTypeCombo;
+  //  QGroupBox *m_xtrackQFBox;
+  QRadioButton *m_ignoreXTrackQF;
+  QRadioButton *m_nonstrictXTrackQF;
+  QRadioButton *m_strictXTrackQF;
 };
 
 //--------------------------------------------------------------------------

@@ -343,13 +343,6 @@ extern "C" {
     char trackSelection[TRACK_SELECTION_LENGTH];
   };
 
-  struct instrumental_omiv4 {
-    int spectralType;
-    char calibrationFile[FILENAME_BUFFER_LENGTH];
-    char transmissionFunctionFile[FILENAME_BUFFER_LENGTH];
-    char trackSelection[TRACK_SELECTION_LENGTH];
-  };
-
   struct instrumental_apex {
     char calibrationFile[FILENAME_BUFFER_LENGTH];
     char transmissionFunctionFile[FILENAME_BUFFER_LENGTH];
@@ -433,7 +426,6 @@ extern "C" {
     struct instrumental_minimum uoft;
     struct instrumental_minimum noaa;
     struct instrumental_omi omi;
-    struct instrumental_omiv4 omiv4;
     struct instrumental_tropomi tropomi;
     struct instrumental_gome2 gome2;
     struct instrumental_minimum mkzy;

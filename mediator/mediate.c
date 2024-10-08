@@ -1226,12 +1226,8 @@ void setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const
         NDET[i]=0;
         pEngineInstrumental->use_row[i]=false;
       }
-
-      pEngineInstrumental->omi.spectralType=pMediateInstrumental->omiv4.spectralType;
-
-      strcpy(pEngineInstrumental->calibrationFile,pMediateInstrumental->omiv4.calibrationFile);     // calibration file
-      strcpy(pEngineInstrumental->instrFunction,pMediateInstrumental->omiv4.transmissionFunctionFile);     // instrumental function file
-
+      pEngineInstrumental->omi.spectralType=pMediateInstrumental->omi.spectralType;
+      pEngineInstrumental->omi.xtrack_mode=pMediateInstrumental->omi.xtrack_mode;
       break;
       // ----------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_TROPOMI:
@@ -2251,7 +2247,8 @@ int mediateRequestNextMatchingSpectrum(ENGINE_CONTEXT *pEngineContext,void *resp
 
        // reset the rc based on the severity of the failure - for non fatal errors keep searching
        rc = ERROR_DisplayMessage(responseHandle);
-     } else if ( (pProject->instrumental.readOutFormat==PRJCT_INSTR_FORMAT_OMI) &&
+     } else if ( (pProject->instrumental.readOutFormat==PRJCT_INSTR_FORMAT_OMI ||
+                  pProject->instrumental.readOutFormat==PRJCT_INSTR_FORMAT_OMIV4) &&
                  !omi_use_track(pRecord->xtrack_QF, pProject->instrumental.omi.xtrack_mode) ) {
        // skip this spectrum
      } else {
