@@ -1202,9 +1202,6 @@ void setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const
         pEngineInstrumental->use_row[i]=false;
       }
 
-      strcpy(pEngineInstrumental->calibrationFile,pMediateInstrumental->omi.calibrationFile);     // calibration file
-      strcpy(pEngineInstrumental->instrFunction,pMediateInstrumental->omi.transmissionFunctionFile);     // instrumental function file
-
       pEngineInstrumental->omi.spectralType=pMediateInstrumental->omi.spectralType;
       pEngineInstrumental->omi.averageFlag=pMediateInstrumental->omi.flagAverage;
       pEngineInstrumental->omi.pixelQFRejectionFlag=pMediateInstrumental->omi.pixelQFRejectionFlag;

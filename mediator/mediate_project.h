@@ -338,8 +338,6 @@ extern "C" {
     int  pixelQFMaxGaps;
     int  pixelQFMask;
     enum omi_xtrack_mode xtrack_mode;
-    char calibrationFile[FILENAME_BUFFER_LENGTH];
-    char transmissionFunctionFile[FILENAME_BUFFER_LENGTH];
     char trackSelection[TRACK_SELECTION_LENGTH];
   };
 

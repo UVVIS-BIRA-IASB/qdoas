@@ -1989,11 +1989,6 @@ CWInstrOmiEdit::CWInstrOmiEdit(const struct instrumental_omi *d, QWidget *parent
   gridLayout->addWidget(m_trackSelection, row, 1);
   ++row;
 
-  // files
-  helperConstructCalInsFileWidgets(gridLayout, row,
-                   d->calibrationFile, sizeof(d->calibrationFile),
-                   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
-
   mainLayout->addLayout(gridLayout);
   mainLayout->addStretch(1);
 
@@ -2059,10 +2054,6 @@ void CWInstrOmiEdit::apply(struct instrumental_omi *d) const
   } else {
     d->xtrack_mode = XTRACKQF_IGNORE;
   }
-
-  // files
-  strcpy(d->calibrationFile, m_fileOneEdit->text().toLocal8Bit().data());
-  strcpy(d->transmissionFunctionFile, m_fileTwoEdit->text().toLocal8Bit().data());
 }
 
 //--------------------------------------------------------
@@ -2104,11 +2095,6 @@ CWInstrOmiV4Edit::CWInstrOmiV4Edit(const struct instrumental_omi *d, QWidget *pa
   gridLayout->addWidget(m_spectralTypeCombo, row, 1);
   ++row;
 
-  // files
-  helperConstructCalInsFileWidgets(gridLayout, row,
-                   d->calibrationFile, sizeof(d->calibrationFile),
-                   d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
-
   mainLayout->addLayout(gridLayout);
   mainLayout->addStretch(1);
 
@@ -2147,9 +2133,6 @@ void CWInstrOmiV4Edit::apply(struct instrumental_omi *d) const
     d->xtrack_mode = XTRACKQF_NONSTRICT;
   }
 
-  // files
-  strcpy(d->calibrationFile, m_fileOneEdit->text().toLocal8Bit().data());
-  strcpy(d->transmissionFunctionFile, m_fileTwoEdit->text().toLocal8Bit().data());
 }
 
 //--------------------------------------------------------

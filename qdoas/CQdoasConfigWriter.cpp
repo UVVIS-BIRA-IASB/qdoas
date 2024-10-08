@@ -943,16 +943,10 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
     break;
   }
 
-  fprintf(fp, " min=\"%.1f\" max=\"%.1f\" ave=\"%s\" trackSelection=\"%s\" pixelQF_rejectionFlag=\"%s\" pixelQF_maxGaps=\"%d\" pixelQF_mask=\"%d\" xTrackMode=\"%s\"",
+  fprintf(fp, " min=\"%.1f\" max=\"%.1f\" ave=\"%s\" trackSelection=\"%s\" pixelQF_rejectionFlag=\"%s\" pixelQF_maxGaps=\"%d\" pixelQF_mask=\"%d\" xTrackMode=\"%s\" />\n",
       d->omi.minimumWavelength, d->omi.maximumWavelength, (d->omi.flagAverage ? sTrue : sFalse),d->omi.trackSelection,
       (d->omi.pixelQFRejectionFlag ? sTrue : sFalse),d->omi.pixelQFMaxGaps,d->omi.pixelQFMask,
           this_xtrack_mode);
-
-  tmpStr = pathMgr->simplifyPath(QString(d->omi.calibrationFile));
-  fprintf(fp, " calib=\"%s\"", tmpStr.toUtf8().constData());
-
-  tmpStr = pathMgr->simplifyPath(QString(d->omi.transmissionFunctionFile));
-  fprintf(fp, " instr=\"%s\" />\n", tmpStr.toUtf8().constData());
 
   // tropomi
   const char *tropomiSpectralBand;

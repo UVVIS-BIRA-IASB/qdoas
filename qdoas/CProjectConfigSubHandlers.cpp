@@ -1173,26 +1173,6 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
     m_instrumental->omi.pixelQFMaxGaps = (!str.isEmpty())?atts.value("pixelQF_maxGaps").toInt():5;
     m_instrumental->omi.pixelQFMask = atts.value("pixelQF_mask").toInt();
 
-    str = atts.value("calib");
-    if (!str.isEmpty()) {
-      str = m_master->pathExpand(str);
-      if (str.length() < (int)sizeof(m_instrumental->omi.calibrationFile))
-    strcpy(m_instrumental->omi.calibrationFile, str.toLocal8Bit().data());
-      else
-    return postErrorMessage(CALIBRATION_FILENAME_ERR);
-    }
-
-    str = atts.value("transmission");
-    if (str.isEmpty())
-      str = atts.value("instr"); // check for old config files
-    if (!str.isEmpty()) {
-      str = m_master->pathExpand(str);
-      if (str.length() < (int)sizeof(m_instrumental->omi.transmissionFunctionFile))
-    strcpy(m_instrumental->omi.transmissionFunctionFile, str.toLocal8Bit().data());
-      else
-    return postErrorMessage(TRANSMISSION_FILENAME_ERR);
-    }
-
   }
   else if (element == "omiv4") { // handle old OMI collection 4 configs...
     QString str(atts.value("type"));
