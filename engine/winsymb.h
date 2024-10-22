@@ -36,7 +36,7 @@ extern SYMBOL_CROSS *SYMB_itemCrossList;                                     // 
 extern int SYMB_itemCrossN;
 
 INDEX SYMB_GetListIndex(SYMBOL *symbolList,int symbolNumber,char *symbolName);
-RC SYMB_Add(char *symbolName,char *symbolDescription);
+RC SYMB_Add(const char *symbolName,const char *symbolDescription);
 
 RC    SYMB_Alloc(void);
 void  SYMB_Free(void);

@@ -220,7 +220,7 @@ RC KuruczConvolveSolarSpectrum(MATRIX_OBJECT *pSolar,double *newlambda,int n_wav
   KURUCZ *pKurucz;
 
 #if defined(__DEBUG_) && __DEBUG_
-  DEBUG_FunctionBegin((char *)__func__,DEBUG_FCTTYPE_APPL|DEBUG_FCTTYPE_MEM);
+  DEBUG_FunctionBegin(__func__,DEBUG_FCTTYPE_APPL|DEBUG_FCTTYPE_MEM);
 #endif
 
   // Initializations
@@ -306,7 +306,7 @@ RC KuruczConvolveSolarSpectrum(MATRIX_OBJECT *pSolar,double *newlambda,int n_wav
    MATRIX_Free(&slitMatrix[i],__func__);
 
 #if defined(__DEBUG_) && __DEBUG_
-  DEBUG_FunctionStop((char *)__func__,rc);
+  DEBUG_FunctionStop(__func__,rc);
 #endif
 
   // Return
@@ -344,7 +344,7 @@ RC KuruczCalculatePreshift(double *calibratedLambda,double *calibratedRef,double
      RC rc,rc2;
 
 #if defined(__DEBUG_) && __DEBUG_
-  DEBUG_FunctionBegin((char *)__func__,DEBUG_FCTTYPE_APPL|DEBUG_FCTTYPE_MEM);
+  DEBUG_FunctionBegin(__func__,DEBUG_FCTTYPE_APPL|DEBUG_FCTTYPE_MEM);
 #endif
 
      // Initialization
@@ -532,7 +532,7 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
   KURUCZ *pKurucz;
 
 #if defined(__DEBUG_) && __DEBUG_
-  DEBUG_FunctionBegin((char *)__func__,DEBUG_FCTTYPE_APPL|DEBUG_FCTTYPE_MEM);
+  DEBUG_FunctionBegin(__func__,DEBUG_FCTTYPE_APPL|DEBUG_FCTTYPE_MEM);
 #endif
 
   // Initializations
@@ -1178,7 +1178,7 @@ EndKuruczSpectrum:
   NDET[indexFenoColumn]=oldNDET;
 
 #if defined(__DEBUG_) && __DEBUG_
-  DEBUG_FunctionStop((char *)__func__,rc);
+  DEBUG_FunctionStop(__func__,rc);
 #endif
 
   return rc;
@@ -1212,7 +1212,7 @@ RC KURUCZ_ApplyCalibration(FENO *pTabFeno,double *newLambda,INDEX indexFenoColum
   rc=0;
 
 #if defined(__DEBUG_) && __DEBUG_
-  DEBUG_FunctionBegin((char *)__func__,DEBUG_FCTTYPE_APPL|DEBUG_FCTTYPE_MEM);
+  DEBUG_FunctionBegin(__func__,DEBUG_FCTTYPE_APPL|DEBUG_FCTTYPE_MEM);
 #endif
 
   // Rebuild gaps
@@ -1300,7 +1300,7 @@ RC KURUCZ_ApplyCalibration(FENO *pTabFeno,double *newLambda,INDEX indexFenoColum
    MATRIX_Free(&slitMatrix[i],__func__);
 
 #if defined(__DEBUG_) && __DEBUG_
-  DEBUG_FunctionStop((char *)__func__,rc);
+  DEBUG_FunctionStop(__func__,rc);
 #endif
 
   // Return
@@ -1349,7 +1349,7 @@ RC KURUCZ_Reference(double *instrFunction,INDEX refFlag,int saveFlag,int gomeFla
   RC               rc;                                                          // return code
 
 #if defined(__DEBUG_) && __DEBUG_
-  DEBUG_FunctionBegin((char *)__func__,DEBUG_FCTTYPE_APPL|DEBUG_FCTTYPE_MEM);
+  DEBUG_FunctionBegin(__func__,DEBUG_FCTTYPE_APPL|DEBUG_FCTTYPE_MEM);
 #endif
 
   // Initializations
@@ -1506,7 +1506,7 @@ RC KURUCZ_Reference(double *instrFunction,INDEX refFlag,int saveFlag,int gomeFla
    MEMORY_ReleaseDVector(__func__,"reference",reference,0);
 
 #if defined(__DEBUG_) && __DEBUG_
-  DEBUG_FunctionStop((char *)__func__,rc);
+  DEBUG_FunctionStop(__func__,rc);
 #endif
 
   return rc;
@@ -1541,7 +1541,7 @@ void KURUCZ_Init(int gomeFlag,INDEX indexFenoColumn) {
   FENO *pTabFeno;
 
 #if defined(__DEBUG_) && __DEBUG_
-  DEBUG_FunctionBegin((char *)__func__,DEBUG_FCTTYPE_APPL|DEBUG_FCTTYPE_MEM);
+  DEBUG_FunctionBegin(__func__,DEBUG_FCTTYPE_APPL|DEBUG_FCTTYPE_MEM);
 #endif
 
   // Initialization
@@ -1573,7 +1573,7 @@ void KURUCZ_Init(int gomeFlag,INDEX indexFenoColumn) {
   }
 
 #if defined(__DEBUG_) && __DEBUG_
-  DEBUG_FunctionStop((char *)__func__,0);
+  DEBUG_FunctionStop(__func__,0);
 #endif
 }
 
@@ -1613,7 +1613,7 @@ RC KURUCZ_Alloc(const PROJECT *pProject, const double *lambda,INDEX indexKurucz,
   RC rc;
 
 #if defined(__DEBUG_) && __DEBUG_
-  DEBUG_FunctionBegin((char *)__func__,DEBUG_FCTTYPE_MEM);
+  DEBUG_FunctionBegin(__func__,DEBUG_FCTTYPE_MEM);
 #endif
 
   // Initializations
@@ -1974,7 +1974,7 @@ RC KURUCZ_Alloc(const PROJECT *pProject, const double *lambda,INDEX indexKurucz,
   EndKuruczAlloc :
 
 #if defined(__DEBUG_) && __DEBUG_
-  DEBUG_FunctionStop((char *)__func__,rc);
+  DEBUG_FunctionStop(__func__,rc);
 #endif
 
   return rc;
@@ -1995,7 +1995,7 @@ void KURUCZ_Free(void)
   KURUCZ *pKurucz;
 
 #if defined(__DEBUG_) && __DEBUG_
-  DEBUG_FunctionBegin((char *)__func__,DEBUG_FCTTYPE_MEM);
+  DEBUG_FunctionBegin(__func__,DEBUG_FCTTYPE_MEM);
 #endif
 
   for (indexFenoColumn=0;indexFenoColumn<ANALYSE_swathSize;indexFenoColumn++)
@@ -2130,6 +2130,6 @@ void KURUCZ_Free(void)
    }
 
 #if defined(__DEBUG_) && __DEBUG_
-  DEBUG_FunctionStop((char *)__func__,0);
+  DEBUG_FunctionStop(__func__,0);
 #endif
  }

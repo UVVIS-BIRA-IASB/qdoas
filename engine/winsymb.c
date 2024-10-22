@@ -164,7 +164,7 @@ int SYMB_itemCrossN;                                                            
 //                 ERROR_ID_NO otherwise
 // -----------------------------------------------------------------------------
 
-RC SYMB_Add(char *symbolName,char *symbolDescription)
+RC SYMB_Add(const char *symbolName,const char *symbolDescription)
  {
      // Declaration
 

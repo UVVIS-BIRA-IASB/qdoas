@@ -299,7 +299,7 @@ SHORT_DATE;
 // them from the compilation as far as debug calls are included in a
 // #if defined(__DEBUG_) / #endif block.
 
-#define __DEBUG_                   0                                            // 1 to enable the debug mode, 0 to disable the debug mode
+#define __DEBUG_                   1                                            // 1 to enable the debug mode, 0 to disable the debug mode
 
 #define __DEBUG_DOAS_SVD_          0                                            // SVD decomposition
 #define __DEBUG_DOAS_SHIFT_        0                                            // interpolation of vectors
@@ -359,11 +359,11 @@ DEBUG_VARIABLE;
 // Prototypes
 
 void DEBUG_Print(const char *formatString,...);
-void DEBUG_PrintVar(char *message,...);
-RC   DEBUG_FunctionBegin(char *fctName,MASK fctType);
-RC   DEBUG_FunctionStop(char *fctName,RC rcFct);
-RC   DEBUG_Start(char *fileName,char *fctName,MASK fctMask,int nLevels,int varFlag,int resetFlag);
-RC   DEBUG_Stop(char *callingFct);
+void DEBUG_PrintVar(const char *message,...);
+RC   DEBUG_FunctionBegin(const char *fctName,MASK fctType);
+RC   DEBUG_FunctionStop(const char *fctName,RC rcFct);
+RC   DEBUG_Start(char *fileName,const char *fctName,MASK fctMask,int nLevels,int varFlag,int resetFlag);
+RC   DEBUG_Stop(const char *callingFct);
 
 // ===============
 // ERRORS HANDLING

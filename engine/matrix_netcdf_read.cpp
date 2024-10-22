@@ -144,7 +144,7 @@ RC MATRIX_netcdf_LoadXS(const char *fileName,MATRIX_OBJECT *pMatrix,
     
     if (((nl!=0) && (n_wavelength!=nl)) || ((nc!=0) && (n_rows+1!=nc)))
      rc=ERROR_SetLast(__func__,ERROR_TYPE_FATAL,ERROR_ID_FILE_BAD_LENGTH,fullPath);
-    else if ((dwve=(double *)MEMORY_AllocDVector((char *)__func__,"dwve",0,n_wavelength-1))==NULL)
+    else if ((dwve=(double *)MEMORY_AllocDVector(__func__,"dwve",0,n_wavelength-1))==NULL)
       rc=ERROR_ID_ALLOC;
     else
      {

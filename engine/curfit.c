@@ -359,7 +359,7 @@ char *CurfitError(char *string,INDEX indexError,double *p,double *deltap)
 
   // Return
 
-  return (char *)string;
+  return string;
  }
 
 // -----------------------------------------------------------------------------
@@ -455,7 +455,7 @@ static RC CurfitNumDeriv(double *specX, double *srefX, const double *sigmaY, int
    MEMORY_ReleaseDVector(__func__,"Pj",Pj,0);
 
 #if defined(__DEBUG_) && __DEBUG_
-  DEBUG_FunctionStop((char *)__func__,rc);
+  DEBUG_FunctionStop(__func__,rc);
 #endif
 
   return rc;

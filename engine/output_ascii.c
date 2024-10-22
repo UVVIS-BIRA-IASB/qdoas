@@ -20,7 +20,7 @@ static void OutputAscPrintTitles(FILE *fp);
 static int total_records=0;
 
 /*! \brief Open ascii file */
-RC ascii_open(const ENGINE_CONTEXT *pEngineContext, char *filename) {
+RC ascii_open(const ENGINE_CONTEXT *pEngineContext, const char *filename) {
 
  char *ptr;
 

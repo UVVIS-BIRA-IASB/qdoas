@@ -68,7 +68,7 @@ struct linear_system {
 struct linear_system*LINEAR_alloc(int m, int n, enum linear_fit_mode mode) {
  
 #if defined(__DEBUG_) && __DEBUG_
-  DEBUG_FunctionBegin((char *)__func__,DEBUG_FCTTYPE_APPL|DEBUG_FCTTYPE_MEM);
+  DEBUG_FunctionBegin(__func__,DEBUG_FCTTYPE_APPL|DEBUG_FCTTYPE_MEM);
 #endif
   
   struct linear_system *s = new linear_system();
@@ -99,7 +99,7 @@ struct linear_system*LINEAR_alloc(int m, int n, enum linear_fit_mode mode) {
   }
 
 #if defined(__DEBUG_) && __DEBUG_
-  DEBUG_FunctionStop((char *)__func__,0);
+  DEBUG_FunctionStop(__func__,0);
 #endif
   
   return s;
@@ -133,7 +133,7 @@ void LINEAR_free(struct linear_system *s) {
     return;
   
 #if defined(__DEBUG_) && __DEBUG_
-  DEBUG_FunctionBegin((char *)__func__,DEBUG_FCTTYPE_APPL|DEBUG_FCTTYPE_MEM);
+  DEBUG_FunctionBegin(__func__,DEBUG_FCTTYPE_APPL|DEBUG_FCTTYPE_MEM);
 #endif
 
   switch(s->mode) {
@@ -151,7 +151,7 @@ void LINEAR_free(struct linear_system *s) {
   delete s;
   
 #if defined(__DEBUG_) && __DEBUG_
-  DEBUG_FunctionStop((char *)__func__,0);
+  DEBUG_FunctionStop(__func__,0);
 #endif
 }
 
@@ -305,7 +305,7 @@ void LINEAR_pinv(const struct linear_system *s, double **pinv) {
 int LINEAR_fit_poly(int num_eqs, int poly_order, const double *a, const double *sigma, const double *b, double *x) {
 
 #if defined(__DEBUG_) && __DEBUG_
-  DEBUG_FunctionBegin((char *)__func__,DEBUG_FCTTYPE_APPL|DEBUG_FCTTYPE_MEM);
+  DEBUG_FunctionBegin(__func__,DEBUG_FCTTYPE_APPL|DEBUG_FCTTYPE_MEM);
 #endif
   
   const int num_unknowns=1+poly_order;
@@ -357,7 +357,7 @@ int LINEAR_fit_poly(int num_eqs, int poly_order, const double *a, const double *
   delete[] b_sigma;
 
 #if defined(__DEBUG_) && __DEBUG_
-  DEBUG_FunctionStop((char *)__func__,rc);
+  DEBUG_FunctionStop(__func__,rc);
 #endif
   
   return rc;

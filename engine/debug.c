@@ -141,7 +141,7 @@ void DEBUG_Print(const char *formatString,...)
 //               ...     : the list of variables to print out.
 // -----------------------------------------------------------------------------
 
-void DEBUG_PrintVar(char *message,...)
+void DEBUG_PrintVar(const char *message,...)
  {
   // Declarations
 
@@ -352,7 +352,7 @@ void DEBUG_PrintVar(char *message,...)
 //               ERROR_ID_NO if the function succeeds
 // -----------------------------------------------------------------------------
 
-RC DEBUG_FunctionBegin(char *fctName,MASK fctType)
+RC DEBUG_FunctionBegin(const char *fctName,MASK fctType)
  {
   // Declarations
 
@@ -461,7 +461,7 @@ RC DEBUG_FunctionBegin(char *fctName,MASK fctType)
 //               ERROR_ID_NO otherwise
 // -----------------------------------------------------------------------------
 
-RC DEBUG_FunctionStop(char *fctName,RC rcFct)
+RC DEBUG_FunctionStop(const char *fctName,RC rcFct)
  {
   // Declarations
 
@@ -533,7 +533,7 @@ rc=ERROR_SetLast("DEBUG_FunctionStop",ERROR_TYPE_DEBUG,ERROR_ID_DEBUG_FCTBLOCK,
 //               ERROR_ID_NO otherwise
 // -----------------------------------------------------------------------------
 
-RC DEBUG_Start(char *fileName,char *callingFct,MASK fctMask,int nLevels,int varFlag,int resetFlag)
+RC DEBUG_Start(char *fileName,const char *callingFct,MASK fctMask,int nLevels,int varFlag,int resetFlag)
  {
   // Declarations
 
@@ -640,7 +640,7 @@ RC DEBUG_Start(char *fileName,char *callingFct,MASK fctMask,int nLevels,int varF
 //               ERROR_ID_DEBUG_ otherwise
 // -----------------------------------------------------------------------------
 
-RC DEBUG_Stop(char *callingFct)
+RC DEBUG_Stop(const char *callingFct)
  {
   // Declaration
 

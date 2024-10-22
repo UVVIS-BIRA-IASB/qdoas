@@ -143,7 +143,7 @@ int apex_set(ENGINE_CONTEXT *pEngineContext) {
 //    release_data(radiance_file_data,(useSempas)?SEMPAS_FIELD_MAX:APEX_FIELD_MAX);
 
     if (!nc_inq_att(radiance_file.groupID(),NC_GLOBAL, "project_name",NULL,NULL) &&
-        !nc_get_att_text(radiance_file.groupID(), NC_GLOBAL,"project_name",(char *)projectAttribute) &&
+        !nc_get_att_text(radiance_file.groupID(), NC_GLOBAL,"project_name",projectAttribute) &&
         !strcmp(projectAttribute,"SEMPAS"))
 
      useSempas=1;

@@ -2193,11 +2193,11 @@ RC open_output_file(const ENGINE_CONTEXT *pEngineContext, const char *outputFile
 
   switch(selected_format) {
   case ASCII:
-    return ascii_open(pEngineContext, (char *)outputFileName);
+    return ascii_open(pEngineContext, outputFileName);
     break;
 
   case NETCDF:
-    return netcdf_open(pEngineContext, (char *)outputFileName,outputNbRecords);
+    return netcdf_open(pEngineContext, outputFileName,outputNbRecords);
     break;
   default:
     return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_FILE_BAD_FORMAT);

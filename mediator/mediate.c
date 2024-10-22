@@ -2116,7 +2116,7 @@ int mediateRequestSetSymbols(void *engineContext,
    // Add symbols in the list
 
    for (indexSymbol=0;(indexSymbol<numberOfSymbols) && !rc;indexSymbol++)
-    rc=SYMB_Add((char *)symbols[indexSymbol].name,(char *)symbols[indexSymbol].description);
+    rc=SYMB_Add(symbols[indexSymbol].name,symbols[indexSymbol].description);
 
    // Check for error
 
