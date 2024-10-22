@@ -299,7 +299,7 @@ SHORT_DATE;
 // them from the compilation as far as debug calls are included in a
 // #if defined(__DEBUG_) / #endif block.
 
-#define __DEBUG_                   1                                            // 1 to enable the debug mode, 0 to disable the debug mode
+#define __DEBUG_                   0                                            // 1 to enable the debug mode, 0 to disable the debug mode
 
 #define __DEBUG_DOAS_SVD_          0                                            // SVD decomposition
 #define __DEBUG_DOAS_SHIFT_        0                                            // interpolation of vectors
