@@ -1991,7 +1991,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
          ext = "";
        }
        if (!strcmp(ext, ".nc")) { // netCDF file
-         rc=MATRIX_netcdf_LoadXS(kurucz_file, &hr_solar_temp, 0, 0, lambdaMin, lambdaMax, 1, 0, NULL, __func__);
+         rc=MATRIX_netcdf_Load(kurucz_file, &hr_solar_temp, 0, 0, lambdaMin, lambdaMax, 1, 0, NULL, __func__);
        } else {
          rc=MATRIX_Load(kurucz_file, &hr_solar_temp, 0, 0, lambdaMin, lambdaMax, 1, 0, __func__);
        }
@@ -2635,7 +2635,7 @@ int mediateRequestViewCrossSections(void *engineContext, char *awName,double min
                       0,   // no derivatives
                       1,   // reverse vectors if needed
                       "mediateRequestViewCrossSections") && (xs.nl>1) && (xs.nc>1)) ||
-         (!strcmp(ext,"nc") && !MATRIX_netcdf_LoadXS(filenames[indexFile],&xs,0,0,
+         (!strcmp(ext,"nc") && !MATRIX_netcdf_Load(filenames[indexFile],&xs,0,0,
                       minWavelength,maxWavelength,
                       0,   // no derivatives
                       1,   // reverse vectors if needed

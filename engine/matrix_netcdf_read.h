@@ -13,7 +13,7 @@ extern "C" {
 // Prototypes
 // ----------
 
-RC   MATRIX_netcdf_LoadXS(const char *fileName,MATRIX_OBJECT *pMatrix,int nl,int nc,double xmin,double xmax,int allocateDeriv2,int reverseFlag,bool *use_row,const char *callingFunction);
+RC   MATRIX_netcdf_Load(const char *fileName,MATRIX_OBJECT *pMatrix,int nl,int nc,double xmin,double xmax,int allocateDeriv2,int reverseFlag,bool *use_row,const char *callingFunction);
 
 #if defined(_cplusplus) || defined(__cplusplus)
 }

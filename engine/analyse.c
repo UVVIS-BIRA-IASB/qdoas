@@ -4769,7 +4769,7 @@ RC ANALYSE_LoadSlit(const PRJCT_SLIT *pSlit,int kuruczFlag)
         ext = "";
       }
       if (!strcmp(ext, ".nc")) { // netCDF file
-        rc=MATRIX_netcdf_LoadXS(pSlit->kuruczFile, &ANALYSIS_slitK, 0, 0, 0., 0., 1, 0, NULL, __func__);
+        rc=MATRIX_netcdf_Load(pSlit->kuruczFile, &ANALYSIS_slitK, 0, 0, 0., 0., 1, 0, NULL, __func__);
       } else {
         rc=MATRIX_Load(pSlit->kuruczFile, &ANALYSIS_slitK, 0, 0, 0., 0., 1, 0, __func__);
       }
@@ -4920,9 +4920,10 @@ RC ANALYSE_LoadCross(ENGINE_CONTEXT *pEngineContext, const ANALYSIS_CROSS *cross
         ext="xs";
        
        if ((strcmp(ext,"nc") && ((rc=MATRIX_Load(pCross->crossSectionFile,&pWrkSymbol->xs,0,0,0.,0.,
-                                           (pCross->crossType!=ANLYS_CROSS_ACTION_NOTHING) ?1:0,1,__func__))!=0)) ||
-          (!strcmp(ext,"nc") && ((rc=MATRIX_netcdf_LoadXS(pCross->crossSectionFile,&pWrkSymbol->xs,0,0,0.,0.,
-                                           (pCross->crossType!=ANLYS_CROSS_ACTION_NOTHING) ?1:0,1,pEngineContext->project.instrumental.use_row,__func__))!=0)))                          
+                                                 (pCross->crossType!=ANLYS_CROSS_ACTION_NOTHING) ?1:0,1,__func__))!=0)) ||
+          (!strcmp(ext,"nc") && ((rc=MATRIX_netcdf_Load(pCross->crossSectionFile,&pWrkSymbol->xs,0,0,0.,0.,
+                                                        (pCross->crossType!=ANLYS_CROSS_ACTION_NOTHING) ? 1 : 0,
+                                                        1, pEngineContext->project.instrumental.use_row,__func__))!=0)))
         {
           return rc;
         }

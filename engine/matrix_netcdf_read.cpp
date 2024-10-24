@@ -4,13 +4,13 @@
 //! @{
 //!
 //! \file      matrix_netcdf_read.cpp
-//! \brief     
-//! \details   
-//! \details   
+//! \brief
+//! \details
+//! \details
 //! \authors   Caroline FAYT (qdoas@aeronomie.be)
 //! \date      12/08/2020 (creation date)
-//! \bug       
-//! \todo      
+//! \bug
+//! \todo
 //!
 //! @}
 //  ----------------------------------------------------------------------------
@@ -67,18 +67,17 @@ using std::min;
 using std::max;
 
 // -----------------------------------------------------------------------------
-// FUNCTION      MATRIX_netcdf_LoadXS
+// FUNCTION      MATRIX_netcdf_Load
 // -----------------------------------------------------------------------------
 //!
 //! \fn           RC MATRIX_netcdf_LoadXS(const char *fileName,MATRIX_OBJECT *pMatrix,int nl,int nc,double xmin,double xmax,int allocateDeriv2,int reverseFlag,bool *use_row,const char *callingFunction)
 //! \details      Load a cross section from a netCDF file
 //! \param   [in] fileName           the name of the file to load
-//! \param   [in] groupName          the name of the group to load
 //! \param   [in] pMatrix            pointer to the structure that will receive the data loaded from the input file
 //! \param   [in] nl                 the number of lines of the matrix to load (0 to retrieve the dimensions automatically from the file)
 //! \param   [in] nc                 the number of columns of the matrix to load (0 to retrieve the dimensions automatically from the file
 //! \param   [in] xmin               the lower limit of the range of wavelength values to load for the first column of the matrix
-//! \param   [in] xmax               the upper limit of the range of wavelength values to load for the first column of the matrix   
+//! \param   [in] xmax               the upper limit of the range of wavelength values to load for the first column of the matrix
 //! \param   [in] allocateDeriv2     1 to allocate buffers for the second derivatives
 //! \param   [in] reverseFlag        1 to reverse the matrix (flip up/down)
 //! \param   [in] use_row            vector of flags for rows to use (specific for satellites)
@@ -86,9 +85,9 @@ using std::max;
 //! \return  ERROR_ID_NO on success
 // -----------------------------------------------------------------------------
 
-RC MATRIX_netcdf_LoadXS(const char *fileName,MATRIX_OBJECT *pMatrix,
-                        int nl,int nc,double xmin,double xmax,
-                        int allocateDeriv2,int reverseFlag, bool *use_row,const char *callingFunction) 
+RC MATRIX_netcdf_Load(const char *fileName,MATRIX_OBJECT *pMatrix,
+                      int nl,int nc,double xmin,double xmax,
+                      int allocateDeriv2,int reverseFlag, bool *use_row,const char *callingFunction)
  {
   // Declarations
 
@@ -124,38 +123,36 @@ RC MATRIX_netcdf_LoadXS(const char *fileName,MATRIX_OBJECT *pMatrix,
   // Reset matrix
 
   MATRIX_Free(pMatrix, __func__);
-  
+
   // Try to open the file and load metadata
 
   try
    {
-    vector<float> wve;                                                          //!< \details vector for wavelengths 
-    vector<double> spe;                                                         //!< \details vector for xs at a specific row
     int n_wavelength;                                                           //!< \details number of wavelengths
     int n_rows;                                                                 //!< \details number of rows (for satellites)
     double *dwve = NULL;
-    size_t start[2],count[2];
-    
+
     NetCDFFile current_file(fullPath, NetCDFFile::Mode::read, 180 * 1024 * 1024);  // open file, use large cache to handle big cross sections.
-    NetCDFGroup root_group = current_file.getGroup("QDOAS_CROSS_SECTION_FILE");  // go to the root
-    
-    n_wavelength=root_group.dimLen("n_wavelength");      
-    n_rows=root_group.dimLen("dim_y");   
-    
+    bool have_qdoas_matrix = false;
+    // We can read files which have a "QDOAS_CROSS_SECTION_FILE" group, or files with a generic "qdoas_matrix" variable.
+    if (current_file.hasVar("qdoas_matrix")) {
+      have_qdoas_matrix = true;
+    }
+    NetCDFGroup root_group = have_qdoas_matrix ? current_file : current_file.getGroup("QDOAS_CROSS_SECTION_FILE");  // go to the root
+
+    n_wavelength=root_group.dimLen("n_wavelength");
+    n_rows=root_group.dimLen("dim_y");
+
     if (((nl!=0) && (n_wavelength!=nl)) || ((nc!=0) && (n_rows+1!=nc)))
      rc=ERROR_SetLast(__func__,ERROR_TYPE_FATAL,ERROR_ID_FILE_BAD_LENGTH,fullPath);
     else if ((dwve=(double *)MEMORY_AllocDVector(__func__,"dwve",0,n_wavelength-1))==NULL)
       rc=ERROR_ID_ALLOC;
     else
      {
-      start[0] = start[1]=0;   
-      count[0] = 1;                                                  
-      count[1] = n_wavelength;
-       
-      root_group.getVar("wavelength",start,count,2,(float)0.,wve); 
+      auto wve = root_group.getVar<double>("wavelength");
       for (i=0;i<n_wavelength;i++)
-       dwve[i]=(double)wve[i];
-      
+       dwve[i]=wve[i];
+
       if (fabs(xmax-xmin)<EPSILON)
        {
         imin=0;
@@ -166,28 +163,23 @@ RC MATRIX_netcdf_LoadXS(const char *fileName,MATRIX_OBJECT *pMatrix,
         imin=FNPixel((double *)dwve,xmin,n_wavelength,PIXEL_CLOSEST);
         imax=FNPixel((double *)dwve,xmax,n_wavelength,PIXEL_CLOSEST);
        }
-      
-      nl=(imax-imin+1); 
-      
-      start[1]=imin;
-      
+
+      nl=(imax-imin+1);
+
       if (!(rc=MATRIX_Allocate(pMatrix,nl,n_rows+1,0,0,allocateDeriv2,callingFunction)))
        {
         matrix=pMatrix->matrix;
         deriv2=pMatrix->deriv2;
-        
+
         memcpy(matrix[0],&dwve[imin],sizeof(double)*nl);
-        
-        for (j=1;j<=n_rows;j++)
 
-          if ((use_row==NULL) || use_row[j-1])
-           {
-            start[0] = j-1;                                            
-            root_group.getVar("cross_section",start,count,2,(double)0.,spe);   
-            memcpy(matrix[j],spe.data(),sizeof(double)*nl);
-           }
-
-         
+        for (size_t j=1; j <= n_rows; ++j) {
+          if ((use_row==NULL) || use_row[j-1]) {
+            const size_t start[] = {j-1, imin};
+            const size_t count[] = {1, nl};
+            root_group.getVar(have_qdoas_matrix ? "qdoas_matrix" : "cross_section", start, count, matrix[j]);
+          }
+        }
         // Flip up/down the matrix
 
         if (reverseFlag && (matrix[0][0]>matrix[0][1]))
@@ -199,7 +191,7 @@ RC MATRIX_netcdf_LoadXS(const char *fileName,MATRIX_OBJECT *pMatrix,
               matrix[j][i]=matrix[j][nl-1-i];
               matrix[j][nl-1-i]=tempValue;
              }
-           
+
         // Calculate second derivatives of the columns of the matrix for future interpolation
 
         if (allocateDeriv2)
@@ -212,11 +204,8 @@ RC MATRIX_netcdf_LoadXS(const char *fileName,MATRIX_OBJECT *pMatrix,
                              callingFunction);
        }
      }
-
-    current_file.close();
-    
     if (dwve!=NULL)
-     MEMORY_ReleaseDVector("MATRIX_netcdf_LoadXS ","dwve",dwve,0);
+     MEMORY_ReleaseDVector(__func__, "dwve", dwve, 0);
    }
   catch (std::runtime_error& e)
    {
@@ -227,7 +216,7 @@ RC MATRIX_netcdf_LoadXS(const char *fileName,MATRIX_OBJECT *pMatrix,
 
   if (rc)
    MATRIX_Free(pMatrix,__func__);
-  
+
   // Debugging
 
   #if defined(__DEBUG_) && __DEBUG_
@@ -245,4 +234,3 @@ RC MATRIX_netcdf_LoadXS(const char *fileName,MATRIX_OBJECT *pMatrix,
 
   return rc;
  }
-
