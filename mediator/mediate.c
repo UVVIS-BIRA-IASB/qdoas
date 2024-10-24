@@ -1986,7 +1986,15 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
      if ( !strlen(kurucz_file) ) {
        rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_MSGBOX_FIELDEMPTY, "Solar Ref. File");
      } else {
-       rc = MATRIX_Load(kurucz_file, &hr_solar_temp, 0, 0, lambdaMin, lambdaMax, 1, 0, __func__);
+       const char *ext = strrchr(kurucz_file, '.');
+       if (ext == NULL) {
+         ext = "";
+       }
+       if (!strcmp(ext, ".nc")) { // netCDF file
+         rc=MATRIX_netcdf_LoadXS(kurucz_file, &hr_solar_temp, 0, 0, lambdaMin, lambdaMax, 1, 0, NULL, __func__);
+       } else {
+         rc=MATRIX_Load(kurucz_file, &hr_solar_temp, 0, 0, lambdaMin, lambdaMax, 1, 0, __func__);
+       }
      }
 
      if (pKuruczOptions->fwhmType==SLIT_TYPE_FILE) {

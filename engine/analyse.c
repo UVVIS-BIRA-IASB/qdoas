@@ -4763,7 +4763,16 @@ RC ANALYSE_LoadSlit(const PRJCT_SLIT *pSlit,int kuruczFlag)
     if (!strlen(pSlit->kuruczFile))
       rc=ERROR_SetLast(__func__,ERROR_TYPE_FATAL,ERROR_ID_MSGBOX_FIELDEMPTY,"Slit solar ref. file");
     else {
-      rc=MATRIX_Load(pSlit->kuruczFile,&ANALYSIS_slitK,0,0,0.,0.,1,0,__func__);
+      // check filename extension:
+      const char *ext = strrchr(pSlit->kuruczFile, '.');
+      if (ext == NULL) {
+        ext = "";
+      }
+      if (!strcmp(ext, ".nc")) { // netCDF file
+        rc=MATRIX_netcdf_LoadXS(pSlit->kuruczFile, &ANALYSIS_slitK, 0, 0, 0., 0., 1, 0, NULL, __func__);
+      } else {
+        rc=MATRIX_Load(pSlit->kuruczFile, &ANALYSIS_slitK, 0, 0, 0., 0., 1, 0, __func__);
+      }
 
       int n_columns = (pSlitFunction->slitType==SLIT_TYPE_NONE) ? 1+ANALYSE_swathSize : 2;
 
