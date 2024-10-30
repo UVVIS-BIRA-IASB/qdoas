@@ -1,4 +1,5 @@
 
+
 //  ----------------------------------------------------------------------------
 //! \addtogroup general
 //! @{
@@ -175,8 +176,8 @@ RC MATRIX_netcdf_Load(const char *fileName,MATRIX_OBJECT *pMatrix,
 
         for (size_t j=1; j <= n_rows; ++j) {
           if ((use_row==NULL) || use_row[j-1]) {
-            const size_t start[] = {j-1, imin};
-            const size_t count[] = {1, nl};
+            const size_t start[] = {j-1, static_cast<size_t>(imin)};
+            const size_t count[] = {1, static_cast<size_t>(nl)};
             root_group.getVar(have_qdoas_matrix ? "qdoas_matrix" : "cross_section", start, count, matrix[j]);
           }
         }

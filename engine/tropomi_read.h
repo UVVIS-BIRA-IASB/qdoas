@@ -15,7 +15,7 @@
 #include "doas.h"
 #include "tropomi.h"
 
-typedef struct mediate_analysis_window mediate_analysis_window_t;
+#include "mediate_analysis_window.h"
 
 #ifdef __cplusplus
 extern "C" {
