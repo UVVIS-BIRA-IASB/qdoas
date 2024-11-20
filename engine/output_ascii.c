@@ -21,20 +21,29 @@ static int total_records=0;
 
 /*! \brief Open ascii file */
 RC ascii_open(const ENGINE_CONTEXT *pEngineContext, const char *filename) {
+  const char *ptr;
+  char *filename_dup = NULL;
 
- char *ptr;
+  if ((ptr=strrchr(filename,PATH_SEP))==NULL)             // avoid problem when dot is used in the directory path as "./<filename>
+    ptr=filename;
+  else
+    ptr++;
 
- if ((ptr=strrchr(filename,PATH_SEP))==NULL)             // avoid problem when dot is used in the directory path as "./<filename>
-  ptr=filename;
- else
-  ptr++;
-
-  if (strrchr(ptr,'.')==NULL)                            // ASCII format should accept any extension
-    strcat(ptr, output_file_extensions[ASCII]);
+  if (strrchr(ptr,'.')==NULL) {
+    // If no filename extension is provided, add '.ASC':
+    filename_dup = malloc(strlen(filename) + strlen(output_file_extensions[ASCII]) + 1);
+    strcpy(filename_dup, filename);
+    strcat(filename_dup, output_file_extensions[ASCII]);
+    filename = filename_dup;
+  }
 
   const PROJECT *pProject= &pEngineContext->project;
 
   output_file = fopen(filename, "a+t");
+  if (filename_dup != NULL) {
+    free(filename_dup);
+  }
+
   if (output_file == NULL) {
     return ERROR_ID_FILE_OPEN;
   }
