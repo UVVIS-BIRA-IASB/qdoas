@@ -862,10 +862,10 @@ static void OutputRegisterFields(const ENGINE_CONTEXT *pEngineContext, const int
        register_field( (struct output_field) { .basic_fieldname = "Latitude", .memory_type = OUTPUT_FLOAT, .resulttype = fieldtype, .format = "%#12.6f", .get_data = (func_void)get_latitude });
        break;
      case PRJCT_RESULTS_LON_CORNERS:
-       register_field( (struct output_field) { .basic_fieldname = "Pixel corner longitudes", .memory_type = OUTPUT_FLOAT, .resulttype= fieldtype, .format = "%#12.6f", .get_data = (func_void)&get_corner_longitudes, .data_cols = 4, .column_number_format="(%d)" });
+       register_field( (struct output_field) { .basic_fieldname = "longitude_bounds", .memory_type = OUTPUT_FLOAT, .resulttype= fieldtype, .format = "%#12.6f", .get_data = (func_void)&get_corner_longitudes, .data_cols = 4, .column_number_format="(%d)" });
        break;
      case PRJCT_RESULTS_LAT_CORNERS:
-       register_field( (struct output_field) { .basic_fieldname = "Pixel corner latitudes", .memory_type = OUTPUT_FLOAT, .resulttype= fieldtype, .format = "%#12.6f", .get_data = (func_void)&get_corner_latitudes, .data_cols = 4, .column_number_format="(%d)" });
+       register_field( (struct output_field) { .basic_fieldname = "latitude_bounds", .memory_type = OUTPUT_FLOAT, .resulttype= fieldtype, .format = "%#12.6f", .get_data = (func_void)&get_corner_latitudes, .data_cols = 4, .column_number_format="(%d)" });
        break;
      case PRJCT_RESULTS_ALTIT:
        register_field( (struct output_field) { .basic_fieldname = "Altitude", .memory_type = OUTPUT_FLOAT, .resulttype = fieldtype, .format = "%#12.6f", .get_data = (func_void)&get_altitude });

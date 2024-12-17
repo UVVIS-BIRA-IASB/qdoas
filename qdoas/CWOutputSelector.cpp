@@ -681,6 +681,8 @@ void getValidFieldFlags(int *validFlags, int instrument,int selectorOrigin)
 
       validFlags[PRJCT_RESULTS_SAT_LAT]=1;
       validFlags[PRJCT_RESULTS_SAT_LON]=1;
+      validFlags[PRJCT_RESULTS_LON_CORNERS]=1;
+      validFlags[PRJCT_RESULTS_LAT_CORNERS]=1;
      }
      break;
  // ----------------------------------------------------------------------------
