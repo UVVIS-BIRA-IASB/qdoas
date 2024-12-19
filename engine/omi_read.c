@@ -30,16 +30,17 @@
 //
 //  ----------------------------------------------------------------------------
 
+#include <assert.h>
 #include <dirent.h>
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 #include <time.h>
 
 #include <hdf.h>
-/* #include <HdfEosDef.h> */
 #include <mfhdf.h>
-#include <assert.h>
 #include <coda.h>
+
 #include "omi_read.h"
 
 #include "engine_context.h"
