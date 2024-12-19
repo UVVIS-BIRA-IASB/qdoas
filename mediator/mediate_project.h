@@ -459,14 +459,14 @@ extern "C" {
     int referenceFlag; // write components of automatic reference to output
     int configurationFlag;
     enum output_format file_format;
-   char swath_name[SWATH_NAME_LEN_MAX];  // for HDF-EOS5 output
+    char swath_name[SWATH_NAME_LEN_MAX];  // for netCDF output
     int directoryFlag;
     int filenameFlag;
     int successFlag;      // write only successful records (default)
     char flux[FLUX_BUFFER_LENGTH];
     double bandWidth;
     char colourIndex[COLOUR_INDEX_BUFFER_LENGTH]; // colour index is the ratio of two fluxes
-   char path[FILENAME_BUFFER_LENGTH];
+    char path[FILENAME_BUFFER_LENGTH];
     char newCalibPath[FILENAME_BUFFER_LENGTH];  // path for calibrated irradiances (satellites)
     /* result field flags. A list of PRJCT_RESULTS_ASCII_*** ... */
     data_select_list_t selection;

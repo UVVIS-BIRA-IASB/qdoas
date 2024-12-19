@@ -1310,7 +1310,7 @@ void setMediateProjectSlit(PRJCT_SLIT *pEngineSlit,const mediate_project_slit_t 
 // PURPOSE       Output (binary/ascii format) part of the project properties
 // -----------------------------------------------------------------------------
 
-void setMediateProjectOutput(PRJCT_RESULTS *pEngineOutput,const mediate_project_output_t *pMediateOutput)
+void setMediateProjectOutput(PRJCT_RESULTS *pEngineOutput, const char *project_name, const mediate_project_output_t *pMediateOutput)
  {
    // Declarations
 
@@ -1318,11 +1318,14 @@ void setMediateProjectOutput(PRJCT_RESULTS *pEngineOutput,const mediate_project_
    strcpy(pEngineOutput->newCalibPath,pMediateOutput->newCalibPath);            // path for calibrated irradiances (run calib for satellites)
    strcpy(pEngineOutput->fluxes,pMediateOutput->flux);                          // fluxes
 
-   // strcpy(pEngineOutput->cic,pMediateOutput->colourIndex);                      // color indexes    -> not used anymore
-
    pEngineOutput->bandWidth=pMediateOutput->bandWidth;
 
-   strcpy(pEngineOutput->swath_name,pMediateOutput->swath_name);
+   // use configured netCDF group name if provided, project name otherwise.
+   if (pMediateOutput->swath_name[0] != '\0') {
+     strcpy(pEngineOutput->swath_name, pMediateOutput->swath_name);
+   } else {
+     strcpy(pEngineOutput->swath_name, project_name);
+   }
 
    pEngineOutput->file_format=pMediateOutput->file_format;
 
@@ -1405,7 +1408,7 @@ int mediateRequestSetProject(void *engineContext,
    setMediateProjectInstrumental(&pEngineProject->instrumental,&project->instrumental);
    setMediateProjectUndersampling(&pEngineProject->usamp,&project->undersampling);
    setMediateProjectSlit(&pEngineProject->slit,&project->slit);
-   setMediateProjectOutput(&pEngineProject->asciiResults,&project->output);
+   setMediateProjectOutput(&pEngineProject->asciiResults, project->project_name, &project->output);
    setMediateProjectExport(&pEngineProject->exportSpectra,&project->export_spectra);
 
    if (is_maxdoas(pEngineProject->instrumental.readOutFormat))

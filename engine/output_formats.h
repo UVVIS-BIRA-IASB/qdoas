@@ -6,7 +6,6 @@
 #define OUTPUT_FORMATS_H
 
 #define SWATH_NAME_LEN_MAX 256 
-#define OUTPUT_HDF5_DEFAULT_GROUP "QDOAS Results"
 
 #if defined(_cplusplus) || defined(__cplusplus)
 extern "C" {

@@ -26,7 +26,7 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #include "debugutil.h"
 
 
-CWProjectTabOutput::CWProjectTabOutput(const mediate_project_output_t *properties, QWidget *parent) :
+CWProjectTabOutput::CWProjectTabOutput(const mediate_project_output_t *properties, const QString& project_name, QWidget *parent) :
   QFrame(parent)
 {
   // main layout: VBox
@@ -51,7 +51,7 @@ CWProjectTabOutput::CWProjectTabOutput(const mediate_project_output_t *propertie
 
   QFrame *groupFrame = new QFrame(m_pathFrame);
   groupFrame->setFrameStyle(QFrame::NoFrame);
-  m_groupNameEdit = new QLineEdit("QDOAS results", groupFrame);
+  m_groupNameEdit = new QLineEdit(groupFrame);
   QRegExp validGroupName("[^/]{1,255}"); // Swath name may not contain "/" and can be 1 to 255 characters long.
   m_groupNameEdit->setValidator(new QRegExpValidator(validGroupName, m_groupNameEdit));
 
@@ -69,7 +69,7 @@ CWProjectTabOutput::CWProjectTabOutput(const mediate_project_output_t *propertie
 
   QHBoxLayout *swathLayout = new QHBoxLayout(groupFrame);
   swathLayout->setContentsMargins(0, 0, 0, 0);
-  swathLayout->addWidget(new QLabel("HDF5 group name", groupFrame),0);
+  swathLayout->addWidget(new QLabel("netCDF group name", groupFrame),0);
   swathLayout->addWidget(m_groupNameEdit, 1);
 
   mainLayout->addWidget(m_pathFrame);
@@ -130,6 +130,7 @@ CWProjectTabOutput::CWProjectTabOutput(const mediate_project_output_t *propertie
   // initialize ...
   m_pathEdit->setText(QString(properties->path));
 
+  m_groupNameEdit->setPlaceholderText(project_name);
   m_groupNameEdit->setText(properties->swath_name);
 
   m_selectFileFormat->setCurrentIndex(properties->file_format);
@@ -183,7 +184,7 @@ void CWProjectTabOutput::apply(mediate_project_output_t *properties) const
 
   strcpy(properties->swath_name, m_groupNameEdit->hasAcceptableInput()
          ? m_groupNameEdit->text().toLocal8Bit().data()
-         : "QDOAS results");
+         : "");
 
   m_selector->apply(&(properties->selection));
 }

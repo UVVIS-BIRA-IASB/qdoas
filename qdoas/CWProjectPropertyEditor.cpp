@@ -134,7 +134,7 @@ CWProjectPropertyEditor::CWProjectPropertyEditor(const QString &projectName, QWi
   m_tabs->addTab(m_slitTab, "Slit");
 
   // Output Tab
-  m_outputTab = new CWProjectTabOutput(&(projectData->output));
+  m_outputTab = new CWProjectTabOutput(&(projectData->output), projectName);
   m_outputTab->slotInstrumentChanged(projectData->instrumental.format);
   m_tabs->addTab(m_outputTab, "Output");
 
