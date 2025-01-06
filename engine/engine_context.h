@@ -575,8 +575,8 @@ typedef struct _engineRecordInfo
 
   // quality flag
 
-  unsigned short  ground_pixel_QF;                                            // ground pixel quality flags
-  unsigned short  xtrack_QF;                                                  // xtrack quality flags
+  unsigned int ground_pixel_QF;                                            // ground pixel quality flags
+  unsigned short xtrack_QF;                                                // xtrack quality flags
  }
 RECORD_INFO;
 

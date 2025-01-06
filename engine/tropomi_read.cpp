@@ -127,6 +127,7 @@ static vector< vector<double> > nominal_wavelengths; // L1B radiance wavelength 
 static double fill_nominal_wavelengths; // fill value for L1B radiance wavelength calibration
 
 static geodata current_geodata;
+static vector<uint8_t> current_pixelquality; // ground_pixel_quality flags
 
 static size_t size_spectral; // number of wavelengths per spectrum
 static size_t size_scanline; // number of measurements (i.e. along track)
@@ -216,6 +217,7 @@ int tropomi_set(ENGINE_CONTEXT *pEngineContext) {
 
     const auto geo_group = current_file.getGroup(current_band + "_RADIANCE/STANDARD_MODE/GEODATA");
     current_geodata = read_geodata(geo_group, size_scanline, size_groundpixel);
+    current_pixelquality = obsGroup.getVar<uint8_t>("ground_pixel_quality");
 
   } catch(std::runtime_error& e) {
     rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, e.what());
@@ -368,6 +370,7 @@ int tropomi_read(ENGINE_CONTEXT *pEngineContext,int record) {
 
   pRecord->useErrors = 1;
   get_geodata(pRecord, current_geodata, record);
+  pRecord->ground_pixel_QF = current_pixelquality[record - 1];
 
   get_utc_date(reference_time, delta_time[indexScanline], &pRecord->present_datetime);
 
@@ -1065,6 +1068,7 @@ void tropomi_cleanup(void) {
   current_filename="";
 
   current_geodata = geodata();
+  current_pixelquality.clear();
   current_band = "";
 
   size_spectral = size_scanline = size_groundpixel = 0;

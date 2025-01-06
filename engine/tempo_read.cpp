@@ -40,11 +40,12 @@ namespace {
     vector<double> sigma;
   };
 
-  struct geodata {
+  struct auxdata {
     vector<float> sza, vza, saa,  vaa,
       lon, lat,
       lon_bounds, lat_bounds,
       sat_lon, sat_lat, sat_alt;
+    vector<unsigned int> pixel_quality;
   };
 
   class orbit_file {
@@ -145,7 +146,7 @@ namespace {
   public:
     rad_file(const string& filename, int band) : orbit_file(filename, band, "radiance"),
                                                  nominal_wavelength(read_nominal_wavelength()),
-                                                 orbit_geodata(read_geodata()) { };
+                                                 orbit_auxdata(read_auxdata()) { };
 
     inline virtual double get_lambda(size_t i_step, size_t i_xtrack, size_t i_spectral) final {
       auto nominal = reinterpret_cast<const float (*)[TEMPO_SPECTRAL_CHANNEL]>(nominal_wavelength.data());
@@ -154,17 +155,19 @@ namespace {
       return nominal[i_xtrack][i_spectral] + chebyshev_clenshaw_recurrence(params, nparams, x);
     };
 
-     void get_record_geodata(RECORD_INFO *pRecord, int record) {
-       pRecord->latitude= orbit_geodata.lat[record-1];
-       pRecord->longitude= orbit_geodata.lon[record-1];
-       pRecord->Zm= orbit_geodata.sza[record-1];
-       pRecord->Azimuth= orbit_geodata.saa[record-1];
-       pRecord->zenithViewAngle= orbit_geodata.vza[record-1];
-       pRecord->azimuthViewAngle= orbit_geodata.vaa[record-1];
+     void get_record_auxdata(RECORD_INFO *pRecord, int record) {
+       pRecord->latitude= orbit_auxdata.lat[record-1];
+       pRecord->longitude= orbit_auxdata.lon[record-1];
+       pRecord->Zm= orbit_auxdata.sza[record-1];
+       pRecord->Azimuth= orbit_auxdata.saa[record-1];
+       pRecord->zenithViewAngle= orbit_auxdata.vza[record-1];
+       pRecord->azimuthViewAngle= orbit_auxdata.vaa[record-1];
+
+       pRecord->ground_pixel_QF = orbit_auxdata.pixel_quality[record-1];
 
       // ugly casting because we store the (num_records * 4) corner arrays as a flat array:
-       auto lon_bounds = reinterpret_cast<const float(*)[4]>(orbit_geodata.lon_bounds.data());
-       auto lat_bounds = reinterpret_cast<const float(*)[4]>(orbit_geodata.lat_bounds.data());
+       auto lon_bounds = reinterpret_cast<const float(*)[4]>(orbit_auxdata.lon_bounds.data());
+       auto lat_bounds = reinterpret_cast<const float(*)[4]>(orbit_auxdata.lat_bounds.data());
        for (int i=0; i!=4; ++i) {
          pRecord->satellite.cornerlons[i] = lon_bounds[record-1][i];
          pRecord->satellite.cornerlats[i] = lat_bounds[record-1][i];
@@ -173,7 +176,7 @@ namespace {
 
   private:
     const std::array<float, TEMPO_XTRACK * TEMPO_SPECTRAL_CHANNEL> nominal_wavelength;
-    const geodata orbit_geodata;
+    const auxdata orbit_auxdata;
 
     std::array<float, TEMPO_XTRACK * TEMPO_SPECTRAL_CHANNEL> read_nominal_wavelength() {
       std::array<float, TEMPO_XTRACK * TEMPO_SPECTRAL_CHANNEL> result;
@@ -183,8 +186,8 @@ namespace {
       return result;
     };
 
-    geodata read_geodata() {
-      geodata result;
+    auxdata read_auxdata() {
+      auxdata result;
       result.sza = band_group.getVar<float>("solar_zenith_angle");
       result.vza = band_group.getVar<float>("viewing_zenith_angle");
       result.saa = band_group.getVar<float>("solar_azimuth_angle");
@@ -193,6 +196,8 @@ namespace {
       result.lon = band_group.getVar<float>("longitude");
       result.lon_bounds = band_group.getVar<float>("longitude_bounds");
       result.lat_bounds = band_group.getVar<float>("latitude_bounds");
+
+      result.pixel_quality = band_group.getVar<unsigned int>("ground_pixel_quality_flag");
       return result;
     };
   };
@@ -270,7 +275,7 @@ int TEMPO_read(ENGINE_CONTEXT *pEngineContext, int record) {
     rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, e.what());
   }
 
-  current_orbit->get_record_geodata(pRecord, record);
+  current_orbit->get_record_auxdata(pRecord, record);
 
   return rc;
 }

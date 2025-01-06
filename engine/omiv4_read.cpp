@@ -234,6 +234,8 @@ namespace {
       read_geodata();
       xtrack_quality.resize(size_scanline * size_groundpixel);
       obsGroup.getVar("xtrack_quality", start, count, xtrack_quality.data());
+      pixel_quality.resize(size_scanline * size_groundpixel);
+      obsGroup.getVar("ground_pixel_quality", start, count, pixel_quality.data());
     }
 
     void get_record_geodata(RECORD_INFO *pRecord, int record) {
@@ -322,6 +324,7 @@ namespace {
 
     const geodata& get_geodata() {return orbit_geodata;}
     const vector<uint16_t>& get_xtrack_quality() {return xtrack_quality;}
+    const vector<uint8_t>& get_pixel_quality() {return pixel_quality;}
 
   private:
     const string filename;
@@ -342,6 +345,7 @@ namespace {
     vector<int> delta_time; // number of milliseconds after reference_time
     geodata orbit_geodata;
     vector<uint16_t> xtrack_quality; // row anomaly impact
+    vector<uint8_t> pixel_quality; // ground pixel quality
     int wavelength_ref_col;
 
     int orbit_year, orbit_month, orbit_day;
@@ -621,6 +625,7 @@ int OMIV4_read(ENGINE_CONTEXT *pEngineContext,int record) {
 
   pRecord->useErrors = 1;
   pRecord->xtrack_QF = current_orbit->get_xtrack_quality()[record - 1];
+  pRecord->ground_pixel_QF = current_orbit->get_pixel_quality()[record - 1];
   current_orbit->get_record_geodata(pRecord, record);
   current_orbit->get_datetime(indexScanline, &pRecord->present_datetime);
 

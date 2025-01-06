@@ -1,3 +1,4 @@
+
 /*
 Qdoas is a cross-platform application for spectral analysis with the DOAS
 algorithm.  Copyright (C) 2007  S[&]T and BIRA
@@ -678,6 +679,7 @@ void getValidFieldFlags(int *validFlags, int instrument,int selectorOrigin)
       validFlags[PRJCT_RESULTS_INDEX_ALONGTRACK]=1;
       validFlags[PRJCT_RESULTS_INDEX_CROSSTRACK]=1;
       validFlags[PRJCT_RESULTS_XTRACK_QF]=1;
+      validFlags[PRJCT_RESULTS_GROUNDP_QF]=1;
 
       validFlags[PRJCT_RESULTS_SAT_LAT]=1;
       validFlags[PRJCT_RESULTS_SAT_LON]=1;
@@ -709,6 +711,7 @@ void getValidFieldFlags(int *validFlags, int instrument,int selectorOrigin)
        validFlags[PRJCT_RESULTS_LAT_CORNERS]=1;
        validFlags[PRJCT_RESULTS_SAT_LAT]=1;
        validFlags[PRJCT_RESULTS_SAT_LON]=1;
+       validFlags[PRJCT_RESULTS_GROUNDP_QF]=1;
      }
 
  // ----------------------------------------------------------------------------
@@ -755,6 +758,8 @@ void getValidFieldFlags(int *validFlags, int instrument,int selectorOrigin)
       validFlags[PRJCT_RESULTS_INDEX_CROSSTRACK]=1;
       validFlags[PRJCT_RESULTS_LON_CORNERS]=1;
       validFlags[PRJCT_RESULTS_LAT_CORNERS]=1;
+
+      validFlags[PRJCT_RESULTS_GROUNDP_QF]=1;
      }
      break;
 

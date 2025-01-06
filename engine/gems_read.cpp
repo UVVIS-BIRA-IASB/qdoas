@@ -396,7 +396,7 @@ int GEMS_Read(ENGINE_CONTEXT *pEngineContext, int record)
           pRecord->Azimuth = radiance_file_data.saa.size() ? radiance_file_data.saa[geoIndex2] : QDOAS_FILL_FLOAT;
           pRecord->zenithViewAngle = radiance_file_data.vza.size() ? radiance_file_data.vza[geoIndex2] : QDOAS_FILL_FLOAT;
           pRecord->azimuthViewAngle = radiance_file_data.vaa.size() ? radiance_file_data.vaa[geoIndex2] : QDOAS_FILL_FLOAT;
-          pRecord->ground_pixel_QF = radiance_file_data.gpqf.size() ? radiance_file_data.gpqf[geoIndex2] : QDOAS_FILL_USHORT;
+          pRecord->ground_pixel_QF = radiance_file_data.gpqf.size() ? radiance_file_data.gpqf[geoIndex2] : QDOAS_FILL_UINT;
           pRecord->xtrack_QF = radiance_file_data.xqf.size() ? radiance_file_data.xqf[geoIndex2] : QDOAS_FILL_USHORT;
           pRecord->Tint=radiance_file_data.exp_time.size() ? radiance_file_data.exp_time[i_alongtrack] : QDOAS_FILL_FLOAT;
 
