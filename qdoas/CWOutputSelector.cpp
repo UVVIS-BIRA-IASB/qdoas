@@ -168,6 +168,10 @@ CWOutputSelector::CWOutputSelector(const data_select_list_t *d, QWidget *parent)
   m_availableList->addItem(new CWOutputFieldItem(PRJCT_RESULTS_RC,                     "Return code"));
   m_availableList->addItem(new CWOutputFieldItem(PRJCT_RESULTS_RESIDUAL_SPECTRUM ,     "Residual spectrum"));
 
+  m_availableList->addItem(new CWOutputFieldItem(PRJCT_RESULTS_CLOUDMASK ,             "Cloud mask"));
+  m_availableList->addItem(new CWOutputFieldItem(PRJCT_RESULTS_RED ,                   "Red color image"));
+  m_availableList->addItem(new CWOutputFieldItem(PRJCT_RESULTS_GREEN ,                 "Green color image"));
+  m_availableList->addItem(new CWOutputFieldItem(PRJCT_RESULTS_BLUE ,                  "Blue color image"));
   // populate the selected list by key-reference to the available list ...
 
   int key;
@@ -760,6 +764,10 @@ void getValidFieldFlags(int *validFlags, int instrument,int selectorOrigin)
       validFlags[PRJCT_RESULTS_LAT_CORNERS]=1;
 
       validFlags[PRJCT_RESULTS_GROUNDP_QF]=1;
+      validFlags[PRJCT_RESULTS_CLOUDMASK]=1;
+      validFlags[PRJCT_RESULTS_RED]=1;
+      validFlags[PRJCT_RESULTS_GREEN]=1;
+      validFlags[PRJCT_RESULTS_BLUE]=1;
      }
      break;
 

@@ -44,7 +44,9 @@ namespace {
     vector<float> sza, vza, saa,  vaa,
       lon, lat,
       lon_bounds, lat_bounds,
-      sat_lon, sat_lat, sat_alt;
+      sat_lon, sat_lat, sat_alt,
+      red, green, blue;
+    vector<unsigned char> cloud_mask;
     vector<unsigned int> pixel_quality;
   };
 
@@ -165,7 +167,12 @@ namespace {
 
        pRecord->ground_pixel_QF = orbit_auxdata.pixel_quality[record-1];
 
-      // ugly casting because we store the (num_records * 4) corner arrays as a flat array:
+       pRecord->tempo.red = orbit_auxdata.red[record-1];
+       pRecord->tempo.green = orbit_auxdata.green[record-1];
+       pRecord->tempo.blue = orbit_auxdata.blue[record-1];
+       pRecord->tempo.cloud_mask = orbit_auxdata.cloud_mask[record-1];
+
+       // ugly casting because we store the (num_records * 4) corner arrays as a flat array:
        auto lon_bounds = reinterpret_cast<const float(*)[4]>(orbit_auxdata.lon_bounds.data());
        auto lat_bounds = reinterpret_cast<const float(*)[4]>(orbit_auxdata.lat_bounds.data());
        for (int i=0; i!=4; ++i) {
@@ -198,6 +205,12 @@ namespace {
       result.lat_bounds = band_group.getVar<float>("latitude_bounds");
 
       result.pixel_quality = band_group.getVar<unsigned int>("ground_pixel_quality_flag");
+
+      auto cloud_mask_group = ncfile.getGroup("cloud_mask_group");
+      result.red = cloud_mask_group.getVar<float>("red");
+      result.green = cloud_mask_group.getVar<float>("green");
+      result.blue = cloud_mask_group.getVar<float>("blue");
+      result.cloud_mask = cloud_mask_group.getVar<unsigned char>("cloud_mask");
       return result;
     };
   };

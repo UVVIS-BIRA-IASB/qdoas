@@ -662,6 +662,10 @@ enum _prjctResults
   PRJCT_RESULTS_ZENITH_AFTER,
   PRJCT_RESULTS_RC,
   PRJCT_RESULTS_RESIDUAL_SPECTRUM,
+  PRJCT_RESULTS_CLOUDMASK,
+  PRJCT_RESULTS_RED,
+  PRJCT_RESULTS_GREEN,
+  PRJCT_RESULTS_BLUE,
   PRJCT_RESULTS_MAX            // addition/deletion of new fields impact changes in ascii-qdoas (ascFieldsNames)
  };
 

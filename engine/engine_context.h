@@ -352,6 +352,11 @@ typedef struct _omi {
 }
 OMI_DATA;
 
+struct tempo_data {
+  float red, green, blue;
+  bool cloud_mask;
+};
+
 typedef struct _als
  {
   short       alsFlag;
@@ -537,6 +542,7 @@ typedef struct _engineRecordInfo
   SCIA_DATA scia;                                                               // SCIAMACHY format
   GOME2_DATA gome2;                                                             // GOME2 format
   OMI_DATA omi;
+  struct tempo_data tempo;
   ALS_DATA als;
   MKZY_DATA mkzy;
   MFC_DOASIS mfcDoasis;

@@ -1012,6 +1012,18 @@ static void OutputRegisterFields(const ENGINE_CONTEXT *pEngineContext, const int
      case PRJCT_RESULTS_OMI_CONFIGURATION_ID:
        register_field( (struct output_field) { .basic_fieldname = "OMI instrument configuration id", .memory_type = OUTPUT_USHORT, .resulttype = fieldtype, .format = "%#6d", .get_data = (func_void)&get_omi_configuration_id });
        break;
+     case PRJCT_RESULTS_CLOUDMASK:
+       register_field( (struct output_field) { .basic_fieldname = "Cloud mask", .memory_type = OUTPUT_USHORT, .resulttype = fieldtype, .format = "%#6d", .get_data = (func_void)&get_cloud_mask});
+       break;
+     case PRJCT_RESULTS_RED:
+       register_field( (struct output_field) { .basic_fieldname = "Red image", .memory_type = OUTPUT_FLOAT, .resulttype = fieldtype, .format = "%#9.3f", .get_data = (func_void)&get_red});
+       break;
+     case PRJCT_RESULTS_GREEN:
+       register_field( (struct output_field) { .basic_fieldname = "Green image", .memory_type = OUTPUT_FLOAT, .resulttype = fieldtype, .format = "%#9.3f", .get_data = (func_void)&get_green});
+       break;
+     case PRJCT_RESULTS_BLUE:
+       register_field( (struct output_field) { .basic_fieldname = "Blue image", .memory_type = OUTPUT_FLOAT, .resulttype = fieldtype, .format = "%#9.3f", .get_data = (func_void)&get_blue});
+       break;
      case PRJCT_RESULTS_UAV_SERVO_BYTE_SENT:
        register_field( (struct output_field) { .basic_fieldname = "UAV servo sent position byte", .memory_type = OUTPUT_USHORT, .resulttype = fieldtype, .format = "%#3d", .get_data = (func_void)&get_uav_servo_byte_sent });
        break;
@@ -1388,6 +1400,18 @@ static void OutputRegisterFieldsToExport(const ENGINE_CONTEXT *pEngineContext, c
        break;
      case PRJCT_RESULTS_OMI_CONFIGURATION_ID:  // !!! EXPORT FUNCTION !!!
        register_field( (struct output_field) { .basic_fieldname = "OMI instrument configuration id", .memory_type = OUTPUT_USHORT, .resulttype = fieldtype, .format = "%#6d", .get_data = (func_void)&get_omi_configuration_id });
+       break;
+     case PRJCT_RESULTS_CLOUDMASK:
+       register_field( (struct output_field) { .basic_fieldname = "Cloud mask", .memory_type = OUTPUT_USHORT, .resulttype = fieldtype, .format = "%#6d", .get_data = (func_void)&get_cloud_mask});
+       break;
+     case PRJCT_RESULTS_RED:
+       register_field( (struct output_field) { .basic_fieldname = "Red image", .memory_type = OUTPUT_FLOAT, .resulttype = fieldtype, .format = "%#9.3f", .get_data = (func_void)&get_red});
+       break;
+     case PRJCT_RESULTS_GREEN:
+       register_field( (struct output_field) { .basic_fieldname = "Green image", .memory_type = OUTPUT_FLOAT, .resulttype = fieldtype, .format = "%#9.3f", .get_data = (func_void)&get_green});
+       break;
+     case PRJCT_RESULTS_BLUE:
+       register_field( (struct output_field) { .basic_fieldname = "Blue image", .memory_type = OUTPUT_FLOAT, .resulttype = fieldtype, .format = "%#9.3f", .get_data = (func_void)&get_blue});
        break;
      case PRJCT_RESULTS_UAV_SERVO_BYTE_SENT:  // !!! EXPORT FUNCTION !!!
        register_field( (struct output_field) { .basic_fieldname = "UAV servo sent position byte", .memory_type = OUTPUT_USHORT, .resulttype = fieldtype, .format = "%#3d", .get_data = (func_void)&get_uav_servo_byte_sent });

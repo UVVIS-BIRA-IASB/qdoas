@@ -224,6 +224,14 @@ void CSelectorSubHandler::start(const xmlstring &element, const map<xmlstring, s
     d->selected[d->nSelected] = PRJCT_RESULTS_PIXELS_QF;
   else if (str == "omi_configuration_id")
     d->selected[d->nSelected] = PRJCT_RESULTS_OMI_CONFIGURATION_ID;
+  else if (str == "cloud_mask")
+    d->selected[d->nSelected] = PRJCT_RESULTS_CLOUDMASK;
+  else if (str == "red")
+    d->selected[d->nSelected] = PRJCT_RESULTS_RED;
+  else if (str == "green")
+    d->selected[d->nSelected] = PRJCT_RESULTS_GREEN;
+  else if (str == "blue")
+    d->selected[d->nSelected] = PRJCT_RESULTS_BLUE;
   else if (str == "spike_pixels")
     d->selected[d->nSelected] = PRJCT_RESULTS_SPIKES;
   else if (str == "servo_byte_sent")

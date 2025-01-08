@@ -1686,6 +1686,10 @@ void CQdoasConfigWriter::writeDataSelectList(FILE *fp, const data_select_list_t 
     case PRJCT_RESULTS_XTRACK_QF : config_string = "xtrack_qf"; break;
     case PRJCT_RESULTS_PIXELS_QF : config_string = "pixels_qf"; break;
     case PRJCT_RESULTS_OMI_CONFIGURATION_ID : config_string = "omi_configuration_id"; break;
+    case PRJCT_RESULTS_CLOUDMASK: config_string = "cloud_mask"; break;
+    case PRJCT_RESULTS_RED: config_string = "red"; break;
+    case PRJCT_RESULTS_GREEN: config_string = "green"; break;
+    case PRJCT_RESULTS_BLUE: config_string = "blue"; break;
     case PRJCT_RESULTS_SPIKES: config_string = "spike_pixels"; break;
     case PRJCT_RESULTS_UAV_SERVO_BYTE_SENT : config_string = "servo_byte_sent"; break;
     case PRJCT_RESULTS_UAV_SERVO_BYTE_RECEIVED : config_string = "servo_byte_received"; break;

@@ -435,6 +435,22 @@ static inline void get_omi_configuration_id(struct output_field *this_field UNUS
   *configuration_id = pEngineContext->recordInfo.omi.instrumentConfigurationId;
 }
 
+static inline void get_cloud_mask(struct output_field *this_field UNUSED, unsigned short *cloud_mask, const ENGINE_CONTEXT *pEngineContext, int indexFenoColumn UNUSED, int index_calib UNUSED) {
+  *cloud_mask = pEngineContext->recordInfo.tempo.cloud_mask;
+}
+
+static inline void get_red(struct output_field *this_field UNUSED, float *red, const ENGINE_CONTEXT *pEngineContext, int indexFenoColumn UNUSED, int index_calib UNUSED) {
+  *red = pEngineContext->recordInfo.tempo.red;
+}
+
+static inline void get_blue(struct output_field *this_field UNUSED, float *blue, const ENGINE_CONTEXT *pEngineContext, int indexFenoColumn UNUSED, int index_calib UNUSED) {
+  *blue = pEngineContext->recordInfo.tempo.blue;
+}
+
+static inline void get_green(struct output_field *this_field UNUSED, float *green, const ENGINE_CONTEXT *pEngineContext, int indexFenoColumn UNUSED, int index_calib UNUSED) {
+  *green = pEngineContext->recordInfo.tempo.green;
+}
+
 static inline void get_uav_servo_byte_sent(struct output_field *this_field UNUSED, unsigned short *servo_sent_position, const ENGINE_CONTEXT *pEngineContext, int indexFenoColumn UNUSED, int index_calib UNUSED) {
   *servo_sent_position = pEngineContext->recordInfo.uavBira.servoSentPosition;
 }
