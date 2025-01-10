@@ -35,6 +35,24 @@ static vector<vector<double>> loadRadAsRef(const NetCDFFile& reffile, const char
   const size_t count[] = {size_pixel};
   reffile.getVar("use_row", start, count, use_row.data());
 
+  // issue a warning if we have "use_pixel == 0" for one or more rows:
+  std::ostringstream missing_rows;
+  missing_rows << reffile.getFile() << ": missing reference for row(-s) ";
+  bool have_missing = false;
+  for (size_t i = 0; i<size_pixel; ++i) {
+    if (use_row[i] == 0) {
+      if (have_missing) {  // add separator if more than one row is missing
+        missing_rows << ", ";
+      }
+      missing_rows << i;
+      have_missing = true;
+    }
+  }
+  missing_rows << ".";
+  if (have_missing) {
+    ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_NETCDF, missing_rows.str().c_str());
+  }
+
   vector<vector<double>> result(size_pixel);
   for(size_t i=0; i<size_pixel; ++i) {
     if (use_row[i] == 0) {

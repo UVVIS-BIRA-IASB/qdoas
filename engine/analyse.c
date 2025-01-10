@@ -6165,14 +6165,18 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
                (pTabFeno->LambdaRadAsRef2=(double *)MEMORY_AllocDVector(__func__,"LambdaRadAsRef2",0,pTabFeno->n_wavel_ref2))==NULL ||
                (pTabFeno->Deriv2RadAsRef2=(double *)MEMORY_AllocDVector(__func__,"Deriv2RadAsRef2",0,pTabFeno->n_wavel_ref2))==NULL)
                rc=ERROR_ID_ALLOC;
-           else if (!(rc=radiance_ref_load(pTabFeno->ref2,indexFenoColumn,pTabFeno->LambdaRadAsRef2,pTabFeno->SrefRadAsRef2,pTabFeno->n_wavel_ref2,&temp_use_row)) &&
-                    !(rc=SPLINE_Deriv2(pTabFeno->LambdaRadAsRef2,pTabFeno->SrefRadAsRef2,pTabFeno->Deriv2RadAsRef2,pTabFeno->n_wavel_ref2,__func__))){
+           else {
+             rc=radiance_ref_load(pTabFeno->ref2,indexFenoColumn,pTabFeno->LambdaRadAsRef2,pTabFeno->SrefRadAsRef2,pTabFeno->n_wavel_ref2,&temp_use_row);
+             if (rc) break;
+             if (!temp_use_row) {
+               pTabFeno->useRefRow = false;
+               break;
+             }
              memcpy(pTabFeno->LambdaRef,lambdaRefEtalon,sizeof(double)*n_wavel_ref);
+             rc=SPLINE_Deriv2(pTabFeno->LambdaRadAsRef2,pTabFeno->SrefRadAsRef2,pTabFeno->Deriv2RadAsRef2,pTabFeno->n_wavel_ref2,__func__);
+             if(rc) break;
              rc=SPLINE_Vector(pTabFeno->LambdaRadAsRef2,pTabFeno->SrefRadAsRef2,pTabFeno->Deriv2RadAsRef2,pTabFeno->n_wavel_ref2,
                               pTabFeno->LambdaRef,pTabFeno->Sref,n_wavel_ref,SPLINE_CUBIC);
-             if (temp_use_row == 0) {
-               pTabFeno->useRefRow = false;
-             }
            }
            break;
         case PRJCT_INSTR_FORMAT_APEX:
