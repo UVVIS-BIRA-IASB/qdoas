@@ -33,28 +33,28 @@ void CBatchEngineController::notifyEndOfRecords(void)
 void CBatchEngineController::notifyErrorMessages(int highestErrorLevel, const QList<CEngineError> &errorMessages)
 {
   QList<CEngineError>::const_iterator it = errorMessages.begin();
-  while (it != errorMessages.end())
-   {
-    switch (it->errorLevel())
-     {
-      case InformationEngineError:
-        std::cout << "INFO:  ";
-        break;
-      case WarningEngineError:
-        if (verboseMode)
-         std::cout << "WARN:  ";
-        break;
-      case FatalEngineError:
-        std::cout << "ERROR: ";
-        break;
-      default:
-        std::cout << "???:   ";
-     }
+  while (it != errorMessages.end()) {
+    if (it->errorLevel() == InformationEngineError && !verboseMode) {
+      continue;
+    }
 
-    if ((it->errorLevel()!=WarningEngineError) || verboseMode)
-     std::cout << it->message().toStdString() << std::endl;
+    switch (it->errorLevel()) {
+    case InformationEngineError:
+      std::cout << "INFO:  ";
+      break;
+    case WarningEngineError:
+      std::cout << "WARN:  ";
+      break;
+    case FatalEngineError:
+      std::cout << "ERROR: ";
+      break;
+    default:
+      std::cout << "???:   ";
+    }
+
+    std::cout << it->message().toStdString() << std::endl;
     ++it;
-   }
+  }
 
   // abort if an error occurred
   if (highestErrorLevel == FatalEngineError)
