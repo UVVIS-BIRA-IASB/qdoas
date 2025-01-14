@@ -227,6 +227,8 @@
 #include <sys/ioctl.h>
 #include <termios.h>
 
+using std::vector;
+
 // kbhit function doesn't exist in Linux libraries (implementation found on the web)
 
 bool kbhit()
@@ -512,7 +514,7 @@ void showHelp();
 int  batchProcess(commands_t *cmd);
 
 int batchProcessQdoas(commands_t *cmd);
-int readConfigQdoas(commands_t *cmd, QList<const CProjectConfigItem*> &projectItems);
+int readConfigQdoas(commands_t *cmd, vector<CProjectConfigItem> &projectItems);
 int analyseProjectQdoasPrepare(void **engineContext, const CProjectConfigItem *projItem, const QString &outputDir,const QString &calibDir,
                    CBatchEngineController *controller);
 
@@ -530,7 +532,7 @@ int verboseMode=0;
 class QdoasBatch {
 
 public:
-  QdoasBatch(const CProjectConfigItem *projItem, const QString &outputDir, const QString &calibDir, int& rc) :
+  QdoasBatch(const CProjectConfigItem& projItem, const QString &outputDir, const QString &calibDir, int& rc) :
     projItem(projItem), outputDir(outputDir), calibDir(calibDir), have_enginecontext(false), rc(rc), files_processed(0) {
   };
 
@@ -551,7 +553,7 @@ public:
 
   int analyse_project() {
     // recursive walk of the files in the config
-    return analyse_treeNode(projItem->rootNode());
+    return analyse_treeNode(projItem.rootNode());
   }
 
   int analyse_file(const QString &filename);
@@ -562,7 +564,7 @@ public:
 
 private:
   CBatchEngineController controller;
-  std::unique_ptr<const CProjectConfigItem> projItem;
+  const CProjectConfigItem& projItem;
   const QString &outputDir;
   const QString &calibDir;
   void *engineContext;
@@ -863,7 +865,7 @@ int batchProcessQdoas(commands_t *cmd)
 {
   TRACE("batchProcessQdoas");
 
-  QList<const CProjectConfigItem*> projectItems;
+  vector<CProjectConfigItem> projectItems;
   int retCode = readConfigQdoas(cmd, projectItems);
 
   if (retCode)
@@ -874,13 +876,13 @@ int batchProcessQdoas(commands_t *cmd)
   TRACE("Num Projects = " <<  projectItems.size());
 
   int rc_batch = 0;
-  while (!projectItems.isEmpty() && retCode == 0) {
-    QdoasBatch batch(projectItems.takeFirst(), cmd->outputDir, cmd->calibDir, rc_batch);
+  for (const auto& config_item : projectItems) {
+    QdoasBatch batch(config_item, cmd->outputDir, cmd->calibDir, rc_batch);
     if (triggerSwitch) {
       retCode = batch.analyse_project(cmd->triggerDir);
     } else if (!cmd->filenames.isEmpty()) {
       // if files were specified on the command-line, then ignore the files in the project.
-      if (projectItems.size() == 0) { // projectitem was the only project
+      if (projectItems.size() == 1) { // projectitem was the only project
         retCode = batch.analyse_project(cmd->filenames);
       } else { // multiple projects ~> ambiguous which project the input files belong to
         std::cerr << "ERROR: Configuration contains multiple projects. Use option -a to specify which project to analyse the files with." << std::endl;
@@ -889,6 +891,9 @@ int batchProcessQdoas(commands_t *cmd)
     } else {
       retCode = batch.analyse_project();
     }
+    if (retCode) {
+      break;
+    }
   }
 
   // Check for error from QdoasBatch destructor
@@ -896,14 +901,10 @@ int batchProcessQdoas(commands_t *cmd)
     retCode = -1;
   }
 
-  // cleanup: free remaining projectItems in case we ran into an error in the previous loop
-  while (!projectItems.isEmpty())
-    delete projectItems.takeFirst();
-
   return retCode;
 }
 
-int readConfigQdoas(commands_t *cmd, QList<const CProjectConfigItem*> &projectItems)
+int readConfigQdoas(commands_t *cmd, vector<CProjectConfigItem>& projectItems)
 {
   // read the configuration file
 
@@ -919,60 +920,39 @@ int readConfigQdoas(commands_t *cmd, QList<const CProjectConfigItem*> &projectIt
     ws->setConfigFile(cmd->configFile);
 
     // sites
-    const QList<const CSiteConfigItem*> &siteItems = handler.siteItems();
-    QList<const CSiteConfigItem*>::const_iterator siteIt = siteItems.begin();
-    while (siteIt != siteItems.end()) {
-
-      ws->createSite((*siteIt)->siteName(), (*siteIt)->abbreviation(),
-             (*siteIt)->longitude(), (*siteIt)->latitude(), (*siteIt)->altitude());
-      ++siteIt;
+    for (const auto& site : handler.siteItems()) {
+      ws->createSite(site.siteName(), site.abbreviation(),
+                     site.longitude(), site.latitude(), site.altitude());
     }
 
     // symbols
-    const QList<const CSymbolConfigItem*> &symbolItems = handler.symbolItems();
-    QList<const CSymbolConfigItem*>::const_iterator symIt = symbolItems.begin();
-    while (symIt != symbolItems.end()) {
-
-      ws->createSymbol((*symIt)->symbolName(), (*symIt)->symbolDescription());
-      ++symIt;
+    for (const auto& symbol : handler.symbolItems()) {
+      ws->createSymbol(symbol.symbolName(), symbol.symbolDescription());
     }
-
-    // projects - dont need to be in the workspace ... just keep the project items
-    QList<const CProjectConfigItem*> tmpItems = handler.takeProjectItems();
 
     // is a specific project required ...
     if (!cmd->projectName.isEmpty()) {
       // select only the matching project and discard the rest ...
-      while (!tmpItems.isEmpty()) {
-    const CProjectConfigItem *p = tmpItems.takeFirst();
-
-    if (p->name().toUpper() == cmd->projectName.toUpper())
-
-      {
-            if (xmlSwitch)
-              QDOASXML_Parse(cmd->xmlCommands,p);
-
-            projectItems.push_back(p);
+      for (auto &p : handler.projectItems()) {
+        if (p.name().toUpper() == cmd->projectName.toUpper()) {
+          if (xmlSwitch) {
+            QDOASXML_Parse(cmd->xmlCommands,&p);
+          }
+          projectItems.push_back(std::move(p));
+        }
       }
-
-    else
-      delete p;
-      }
-    }
-    else if(xmlSwitch) {
+    } else if(xmlSwitch) {
       std::cerr << "-xml switch can only be used when processing a single project.  Use switch -a <projectname>" << std::endl;
       retCode = 1;
     } else {
-
-      while (!tmpItems.isEmpty()) {
-    projectItems.push_back(tmpItems.takeFirst());
+      for (auto& p : handler.projectItems()) {
+        projectItems.push_back(p);
       }
     }
 
     // are there any projects in the result list (projectItems).
-    if (projectItems.isEmpty())
+    if (projectItems.empty())
       retCode = 1;
-
   }
   catch (std::runtime_error& e) {
     std::cerr << "Failed to parse configuration file: " << e.what() << std::endl;
@@ -1158,7 +1138,7 @@ int QdoasBatch::analyse_file(const QString &filename) {
   int retCode = 0;
   // If this is the first file we process, we still have to run analyseProjectQdoasPrepare()
   if (!have_enginecontext) {
-    retCode = analyseProjectQdoasPrepare(&engineContext, projItem.get(), outputDir, calibDir, &controller);
+    retCode = analyseProjectQdoasPrepare(&engineContext, &projItem, outputDir, calibDir, &controller);
 
     if (retCode) {
       return retCode;

@@ -8,40 +8,35 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #ifndef _CQDOASCONFIGHANDLER_H_GUARD
 #define _CQDOASCONFIGHANDLER_H_GUARD
 
-#include <QList>
 #include <QString>
-#include <QVector>
 
 #include "CConfigHandler.h"
+#include "CProjectConfigItem.h"
 
-class CProjectConfigItem;
-class CSiteConfigItem;
-class CSymbolConfigItem;
+
 class CQdoasConfigHandler;
 
 class CQdoasConfigHandler : public CConfigHandler
 {
  public:
-  virtual ~CQdoasConfigHandler();
 
-  void addProjectItem(CProjectConfigItem *item);             // takes ownership of item
-  QList<const CProjectConfigItem*> projectItems(void) const; // items in returned list have the same lifetime as 'this'
-  QList<const CProjectConfigItem*> takeProjectItems(void);   // takes ownership of items (removes them from 'this')
+  void addProjectItem(CProjectConfigItem item);             // takes ownership of item
+  const std::vector<CProjectConfigItem>& projectItems() const; // items in returned list have the same lifetime as 'this'
 
-  void addSiteItem(CSiteConfigItem *item);             // takes ownership of item
-  QList<const CSiteConfigItem*> siteItems(void) const; // items in returned list have the same lifetime as 'this'
+  void addSiteItem(CSiteConfigItem item);             // takes ownership of item
+  const std::vector<CSiteConfigItem>& siteItems() const; // items in returned list have the same lifetime as 'this'
 
   void addSymbol(const QString &symbolName, const QString &symbolDescription);
-  QList<const CSymbolConfigItem*> symbolItems(void) const; // items in returned list have the same lifetime as 'this'
+  const std::vector<CSymbolConfigItem>& symbolItems() const; // items in returned list have the same lifetime as 'this'
 
 protected:
   virtual void start_subhandler(const Glib::ustring& name,
                                 const std::map<Glib::ustring, QString>& attributes) override;
 
  private:
-  QList<const CProjectConfigItem*> m_projectItemList;
-  QList<const CSiteConfigItem*> m_siteItemList;
-  QList<const CSymbolConfigItem*> m_symbolList;
+  std::vector<CProjectConfigItem> m_projectItemList;
+  std::vector<CSiteConfigItem> m_siteItemList;
+  std::vector<CSymbolConfigItem> m_symbolList;
 };
 
 //-------------------------------------------------------------------
@@ -84,7 +79,6 @@ class CProjectSubHandler : public CQdoasConfigSubHandler
 {
  public:
   CProjectSubHandler(CQdoasConfigHandler *master);
-  virtual ~CProjectSubHandler();
 
   virtual void start(const Glib::ustring& element,
                      const std::map<Glib::ustring, QString>& atts) override;
@@ -92,7 +86,7 @@ class CProjectSubHandler : public CQdoasConfigSubHandler
   virtual void end(void) override;
 
  private:
-  CProjectConfigItem *m_project;
+  CProjectConfigItem m_project;
 };
 
 #endif

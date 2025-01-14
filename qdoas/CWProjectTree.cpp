@@ -35,6 +35,7 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #include "debugutil.h"
 
 using std::shared_ptr;
+using std::vector;
 
 // Somewhat arbitrary constants that need to be unique for all widgets coupled to the
 // CWSplitter widget.
@@ -709,7 +710,7 @@ void CWProjectTree::removeAllContent(void)
   emit signalSpectraTreeChanged();
 }
 
-QString CWProjectTree::loadConfiguration(const QList<const CProjectConfigItem*> &itemList)
+QString CWProjectTree::loadConfiguration(const vector<CProjectConfigItem>& itemList)
 {
   // walk the list and create ...
   QString errStrPartial,errStrTotal=QString();
@@ -726,10 +727,8 @@ QString CWProjectTree::loadConfiguration(const QList<const CProjectConfigItem*> 
 
   // use the edit* interface to get reasonable error messages.
 
-  QList<const CProjectConfigItem*>::const_iterator it = itemList.begin();
-  while (it != itemList.end()) {
-
-    QString projName = (*it)->name();
+  for (const auto& config_item : itemList) {
+    QString projName = config_item.name();
 
     // create the project item
     projItem = NULL;
@@ -741,12 +740,12 @@ QString CWProjectTree::loadConfiguration(const QList<const CProjectConfigItem*> 
     assert(projItem && projItem->childCount() == 2); // sanity check
 
     // enable (or disable) the project
-    projItem->setEnabled((*it)->isEnabled());
+    projItem->setEnabled(config_item.isEnabled());
 
     // locate the properties in the workspace then copy
     projProp = CWorkSpace::instance()->findProject(projName);
     assert(projProp != NULL);
-    *projProp = *((*it)->properties()); // blot copy
+    *projProp = *(config_item.properties()); // blot copy
 
     // update useCount for count the symbols used in the calibration
     for (int i=0; i < projProp->calibration.crossSectionList.nCrossSection; ++i)
@@ -757,7 +756,7 @@ QString CWProjectTree::loadConfiguration(const QList<const CProjectConfigItem*> 
     item = projItem->child(0); // raw spectra node for the project
 
     // recursive construction of the project tree from the config tree ...
-    const CProjectConfigTreeNode *firstChild = (*it)->rootNode()->firstChild();
+    const CProjectConfigTreeNode *firstChild = config_item.rootNode()->firstChild();
     // top-down construction of the tree ...
     errStrPartial = CWProjectTree::buildRawSpectraTree(item, firstChild);
 
@@ -768,7 +767,7 @@ QString CWProjectTree::loadConfiguration(const QList<const CProjectConfigItem*> 
     item = projItem->child(1); // the analysis window branch node
 
     QString precedingWindowName;
-    const QList<const CAnalysisWindowConfigItem*> &awList = (*it)->analysisWindowItems();
+    const QList<const CAnalysisWindowConfigItem*> &awList = config_item.analysisWindowItems();
     QList<const CAnalysisWindowConfigItem*>::const_iterator awIt = awList.begin();
     while (awIt != awList.end()) {
       QString awName = (*awIt)->name();
@@ -792,8 +791,6 @@ QString CWProjectTree::loadConfiguration(const QList<const CProjectConfigItem*> 
       precedingWindowName = awName;
       ++awIt;
     }
-
-    ++it;
   }
 
   return errStrTotal;
