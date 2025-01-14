@@ -6,7 +6,9 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 #include "CProjectConfigTreeNode.h"
 
-CProjectConfigTreeNode::CProjectConfigTreeNode(const QString &name, bool enabled) :
+using std::string;
+
+CProjectConfigTreeNode::CProjectConfigTreeNode(const string &name, bool enabled) :
   m_firstChild(NULL),
   m_nextSibling(NULL),
   m_name(name),
@@ -27,9 +29,9 @@ void CProjectConfigTreeNode::addChild(CProjectConfigTreeNode *child)
   m_firstChild = child;
 }
 
-QString CProjectConfigTreeNode::filter(void) const
+string CProjectConfigTreeNode::filter(void) const
 {
-  return QString();
+  return "";
 }
 
 bool CProjectConfigTreeNode::recursive(void) const
@@ -38,7 +40,7 @@ bool CProjectConfigTreeNode::recursive(void) const
 }
 
 
-CProjectConfigFile::CProjectConfigFile(const QString &name, bool enabled) :
+CProjectConfigFile::CProjectConfigFile(const string &name, bool enabled) :
   CProjectConfigTreeNode(name, enabled)
 {
 }
@@ -49,7 +51,7 @@ CProjectConfigTreeNode::Type CProjectConfigFile::type(void) const
 }
 
 
-CProjectConfigFolder::CProjectConfigFolder(const QString &name, bool enabled) :
+CProjectConfigFolder::CProjectConfigFolder(const string &name, bool enabled) :
   CProjectConfigTreeNode(name, enabled)
 {
 }
@@ -60,7 +62,7 @@ CProjectConfigTreeNode::Type CProjectConfigFolder::type(void) const
 }
 
 
-CProjectConfigDirectory::CProjectConfigDirectory(const QString &name, const QString &filter, bool recurse, bool enabled) :
+CProjectConfigDirectory::CProjectConfigDirectory(const string &name, const string &filter, bool recurse, bool enabled) :
   CProjectConfigTreeNode(name, enabled),
   m_filter(filter),
   m_recurse(recurse)
@@ -72,7 +74,7 @@ CProjectConfigTreeNode::Type CProjectConfigDirectory::type(void) const
   return CProjectConfigTreeNode::eDirectory;
 }
 
-QString CProjectConfigDirectory::filter(void) const
+string CProjectConfigDirectory::filter(void) const
 {
   return m_filter;
 }

@@ -4,9 +4,6 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 */
 
-#include <QFile>
-#include <QTextStream>
-
 #include <iostream>
 
 #include "CEngineResponse.h"
@@ -14,9 +11,11 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 #include "debugutil.h"
 
+using std::string;
+
 //------------------------------------------------------------
 
-void CEngineResponse::addErrorMessage(const QString &tag, const QString &msg, int errorLevel)
+void CEngineResponse::addErrorMessage(const string &tag, const string &msg, int errorLevel)
 {
   m_errorMessages.push_back(CEngineError(tag, msg, errorLevel));
 
@@ -47,20 +46,16 @@ void CEngineResponseMessage::process(CEngineController *engineController)
 
 CEngineResponseVisual::~CEngineResponseVisual()
 {
-  while (!m_plotDataList.isEmpty()) {
-    delete m_plotDataList.front().data;
-    m_plotDataList.pop_front();
+  for (auto plot_data : m_plotDataList) {
+    delete plot_data.data;
   }
 
-  while (!m_plotImageList.isEmpty()) {
-    m_plotImageList.pop_front();
-  }
 }
 
 void CEngineResponseVisual::process(CEngineController *engineController)
 {
   if (!hasFatalError()
-      && !(m_cellList.isEmpty() && m_plotDataList.isEmpty() && m_plotImageList.isEmpty() ) ) {
+      && !(m_cellList.empty() && m_plotDataList.empty() && m_plotImageList.empty() ) ) {
     engineController->notifyTableData(m_cellList);
     engineController->notifyPlotData(m_plotDataList, m_titleList, m_plotImageList);
   }
@@ -78,7 +73,7 @@ void CEngineResponseVisual::addImage(int pageNumber, const CPlotImage *plotImage
   m_plotImageList.push_back(SPlotImage(pageNumber, plotImage));
 }
 
-void CEngineResponseVisual::addPageTitleAndTag(int pageNumber, const QString &title, const QString &tag)
+void CEngineResponseVisual::addPageTitleAndTag(int pageNumber, const string &title, const string &tag)
 {
   m_titleList.push_back(STitleTag(pageNumber, title, tag));
 }
@@ -93,7 +88,7 @@ void CEngineResponseVisual::addCell(int pageNumber, int row, int col, const QVar
 void CEngineResponseBeginAccessFile::process(CEngineController *engineController)
 {
   if (!hasFatalError() &&
-      !(m_cellList.isEmpty() && m_plotDataList.isEmpty() && m_plotImageList.isEmpty()) ) {
+      !(m_cellList.empty() && m_plotDataList.empty() && m_plotImageList.empty()) ) {
     engineController->notifyTableData(m_cellList);
     engineController->notifyPlotData(m_plotDataList, m_titleList, m_plotImageList);
   }

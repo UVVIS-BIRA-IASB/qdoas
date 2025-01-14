@@ -107,7 +107,7 @@ CWPlot::CWPlot(std::shared_ptr<const CPlotDataSet> dataSet,
   QFont tmpFont = tmpTitle.font();
   tmpFont.setPointSize(tmpFont.pointSize());
   tmpTitle.setFont(tmpFont);
-  tmpTitle.setText(m_dataSet->plotTitle());
+  tmpTitle.setText(QString::fromStdString(m_dataSet->plotTitle()));
   setTitle(tmpTitle);
 
   QString str=tmpTitle.text();
@@ -117,7 +117,7 @@ CWPlot::CWPlot(std::shared_ptr<const CPlotDataSet> dataSet,
   //setTitle(m_dataSet->plotTitle());
   //setAxisTitle(QwtPlot::xBottom, m_dataSet->xAxisLabel());
 
-  setAxisTitle(QwtPlot::yLeft, m_dataSet->yAxisLabel());
+  setAxisTitle(QwtPlot::yLeft, QString::fromStdString(m_dataSet->yAxisLabel()));
 
     // curves ...
 
@@ -205,7 +205,7 @@ CWPlot::CWPlot(std::shared_ptr<const CPlotImage> dataImage,
   m_zoomer(NULL),
   m_type(PLOTPAGE_IMAGE)
  {
-  QString filename=m_dataImage->GetFile();
+  QString filename(QString::fromStdString(m_dataImage->GetFile()));
   QwtText tmpTitle=title();
   const QByteArray fname=filename.toLocal8Bit();
   const char *ptr=strrchr(fname.constData(),'/')+1;
@@ -376,10 +376,10 @@ void CWPlot::slotSaveAs() {
 
         nCurves = m_dataSet->count();
         fprintf(fp,";\n");
-        fprintf(fp, "; Plot %s (%d %s)\n;\n", m_dataSet->plotTitle().toLocal8Bit().constData(),nCurves,(nCurves>1)?"curves":"curve");
+        fprintf(fp, "; Plot %s (%d %s)\n;\n", m_dataSet->plotTitle().c_str(),nCurves,(nCurves>1)?"curves":"curve");
         for (i=0,maxPoints=0;i<nCurves;i++) {
           n=m_dataSet->rawData(i).size();
-          fprintf(fp,";      Curve %d : %s (%d data points)\n",i+1,m_dataSet->rawData(i).curveName().toLocal8Bit().constData(),n);
+          fprintf(fp,";      Curve %d : %s (%d data points)\n",i+1,m_dataSet->rawData(i).curveName().c_str(),n);
           if (n>maxPoints)
             maxPoints=n;
         }

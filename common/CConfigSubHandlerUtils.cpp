@@ -6,6 +6,7 @@
 #include "debugutil.h"
 
 using std::map;
+using std::string;
 
 //------------------------------------------------------------------------
 // handler for <lowpass_filter> and <highpass_filter>
@@ -17,11 +18,11 @@ CFilteringSubHandler::CFilteringSubHandler(CConfigHandler *master,
 {
 }
 
-void CFilteringSubHandler::start(const map<Glib::ustring, QString>& atts)
+void CFilteringSubHandler::start(const map<Glib::ustring, string>& atts)
 {
   // selected filter
 
-  QString str = value(atts, "selected");
+  string str = value(atts, "selected");
 
   if (str == "none")
     m_filter->mode = PRJCT_FILTER_TYPE_NONE;
@@ -43,57 +44,56 @@ void CFilteringSubHandler::start(const map<Glib::ustring, QString>& atts)
     throw std::runtime_error("Invalid filter method");
 }
 
-void CFilteringSubHandler::start(const Glib::ustring& element, const map<Glib::ustring, QString>& atts)
+void CFilteringSubHandler::start(const Glib::ustring& element, const map<Glib::ustring, string>& atts)
 {
   // sub element of lowpass_filter or highpass_filter
 
   if (element == "kaiser") {
-
-    m_filter->kaiser.cutoffFrequency = value(atts, "cutoff").toDouble();
-    m_filter->kaiser.tolerance = value(atts, "tolerance").toDouble();
-    m_filter->kaiser.passband = value(atts, "passband").toDouble();
-    m_filter->kaiser.iterations = value(atts, "iterations").toInt();
+    m_filter->kaiser.cutoffFrequency = stod(value(atts, "cutoff"));
+    m_filter->kaiser.tolerance = stod(value(atts, "tolerance"));
+    m_filter->kaiser.passband = stod(value(atts, "passband"));
+    m_filter->kaiser.iterations = stoi(value(atts, "iterations"));
     m_filter->kaiser.usage.calibrationFlag = (value(atts, "cal") == "true") ? 1 : 0;
     m_filter->kaiser.usage.fittingFlag = (value(atts, "fit") == "true") ? 1 : 0;
     m_filter->kaiser.usage.divide = (value(atts, "div") == "true") ? 1 : 0;
   }
   else if (element == "boxcar") {
 
-    m_filter->boxcar.width = value(atts, "width").toInt();
-    m_filter->boxcar.iterations = value(atts, "iterations").toInt();
+    m_filter->boxcar.width = stoi(value(atts, "width"));
+    m_filter->boxcar.iterations = stoi(value(atts, "iterations"));
     m_filter->boxcar.usage.calibrationFlag = (value(atts, "cal") == "true") ? 1 : 0;
     m_filter->boxcar.usage.fittingFlag = (value(atts, "fit") == "true") ? 1 : 0;
     m_filter->boxcar.usage.divide = (value(atts, "div") == "true") ? 1 : 0;
   }
   else if (element == "gaussian") {
 
-    m_filter->gaussian.fwhm = value(atts, "fwhm").toDouble();
-    m_filter->gaussian.iterations = value(atts, "iterations").toInt();
+    m_filter->gaussian.fwhm = stod(value(atts, "fwhm"));
+    m_filter->gaussian.iterations = stoi(value(atts, "iterations"));
     m_filter->gaussian.usage.calibrationFlag = (value(atts, "cal") == "true") ? 1 : 0;
     m_filter->gaussian.usage.fittingFlag = (value(atts, "fit") == "true") ? 1 : 0;
     m_filter->gaussian.usage.divide = (value(atts, "div") == "true") ? 1 : 0;
   }
   else if (element == "triangular") {
 
-    m_filter->triangular.width = value(atts, "width").toInt();
-    m_filter->triangular.iterations = value(atts, "iterations").toInt();
+    m_filter->triangular.width = stoi(value(atts, "width"));
+    m_filter->triangular.iterations = stoi(value(atts, "iterations"));
     m_filter->triangular.usage.calibrationFlag = (value(atts, "cal") == "true") ? 1 : 0;
     m_filter->triangular.usage.fittingFlag = (value(atts, "fit") == "true") ? 1 : 0;
     m_filter->triangular.usage.divide = (value(atts, "div") == "true") ? 1 : 0;
   }
   else if (element == "savitzky_golay") {
 
-    m_filter->savitzky.width = value(atts, "width").toInt();
-    m_filter->savitzky.order = value(atts, "order").toInt();
-    m_filter->savitzky.iterations = value(atts, "iterations").toInt();
+    m_filter->savitzky.width = stoi(value(atts, "width"));
+    m_filter->savitzky.order = stoi(value(atts, "order"));
+    m_filter->savitzky.iterations = stoi(value(atts, "iterations"));
     m_filter->savitzky.usage.calibrationFlag = (value(atts, "cal") == "true") ? 1 : 0;
     m_filter->savitzky.usage.fittingFlag = (value(atts, "fit") == "true") ? 1 : 0;
     m_filter->savitzky.usage.divide = (value(atts, "div") == "true") ? 1 : 0;
   }
   else if (element == "binomial") {
 
-    m_filter->binomial.width = value(atts, "width").toInt();
-    m_filter->binomial.iterations = value(atts, "iterations").toInt();
+    m_filter->binomial.width = stoi(value(atts, "width"));
+    m_filter->binomial.iterations = stoi(value(atts, "iterations"));
     m_filter->binomial.usage.calibrationFlag = (value(atts, "cal") == "true") ? 1 : 0;
     m_filter->binomial.usage.fittingFlag = (value(atts, "fit") == "true") ? 1 : 0;
     m_filter->binomial.usage.divide = (value(atts, "div") == "true") ? 1 : 0;
@@ -110,9 +110,9 @@ CSlitFunctionSubHandler::CSlitFunctionSubHandler(CConfigHandler *master,
 {
 }
 
-void CSlitFunctionSubHandler::start(const map<Glib::ustring, QString>& atts)
+void CSlitFunctionSubHandler::start(const map<Glib::ustring, string>& atts)
 {
-  QString str = value(atts, "type");
+  string str = value(atts, "type");
 
   if (str == "none")
     m_function->type = SLIT_TYPE_NONE;
@@ -145,28 +145,28 @@ void CSlitFunctionSubHandler::start(const map<Glib::ustring, QString>& atts)
 
 }
 
-void CSlitFunctionSubHandler::start(const Glib::ustring& element, const map<Glib::ustring, QString>& atts)
+void CSlitFunctionSubHandler::start(const Glib::ustring& element, const map<Glib::ustring, string>& atts)
 {
   if (element == "file") {
 
-    QString str = value(atts, "file");
-    QString str2 = value(atts, "file2");
+    string str = value(atts, "file");
+    string str2 = value(atts, "file2");
 
     m_function->file.wveDptFlag=(value(atts, "wveDptFlag") == "true") ? 1 : 0;
 
-    if (!str.isEmpty()) {
+    if (!str.empty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_function->file.filename))
-    strcpy(m_function->file.filename, str.toLatin1().data());
+    strcpy(m_function->file.filename, str.c_str());
       else
     throw std::runtime_error("Slit Function Filename too long");
     }
 
-    if (!str2.isEmpty())
+    if (!str2.empty())
      {
       str2 = m_master->pathExpand(str2);
       if (str2.length() < (int)sizeof(m_function->file.filename2))
-          strcpy(m_function->file.filename2, str2.toLatin1().data());
+          strcpy(m_function->file.filename2, str2.c_str());
       else
           throw std::runtime_error("Slit Function Filename too long");
         }
@@ -175,16 +175,16 @@ void CSlitFunctionSubHandler::start(const Glib::ustring& element, const map<Glib
   }
   else if (element == "gaussian") {
 
-    QString str = value(atts, "file");
+    string str = value(atts, "file");
 
-    m_function->gaussian.fwhm = value(atts, "fwhm").toDouble();
+    m_function->gaussian.fwhm = stod(value(atts, "fwhm"));
     m_function->gaussian.wveDptFlag=(value(atts, "wveDptFlag") == "true") ? 1 : 0;
 
-   if (!str.isEmpty())
+   if (!str.empty())
      {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_function->gaussian.filename))
-          strcpy(m_function->gaussian.filename, str.toLatin1().data());
+          strcpy(m_function->gaussian.filename, str.c_str());
       else
           throw std::runtime_error("Slit Function Filename too long");
         }
@@ -193,22 +193,22 @@ void CSlitFunctionSubHandler::start(const Glib::ustring& element, const map<Glib
   }
   else if (element == "lorentz") {
 
-    QString str = value(atts, "file");
+    string str = value(atts, "file");
 
-    m_function->lorentz.width = value(atts, "width").toDouble();
+    m_function->lorentz.width = stod(value(atts, "width"));
 
     if (value(atts, "order") != "") {
-      m_function->lorentz.order = value(atts, "order").toInt();
+      m_function->lorentz.order = stoi(value(atts, "order"));
     } else { // in older versions, 2n-lorentz was specified by the value "2n"
-      m_function->lorentz.order = value(atts, "degree").toInt() / 2;
+      m_function->lorentz.order = stoi(value(atts, "degree"));
     }
 
     m_function->lorentz.wveDptFlag=(value(atts, "wveDptFlag") == "true") ? 1 : 0;
-    if (!str.isEmpty())
+    if (!str.empty())
      {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_function->lorentz.filename))
-          strcpy(m_function->lorentz.filename, str.toLatin1().data());
+          strcpy(m_function->lorentz.filename, str.c_str());
       else
           throw std::runtime_error("Slit Function Filename too long");
         }
@@ -217,32 +217,32 @@ void CSlitFunctionSubHandler::start(const Glib::ustring& element, const map<Glib
   }
   else if (element == "voigt") {
 
-    QString str = value(atts, "file");
-    QString str2 = value(atts, "file2");
+    string str = value(atts, "file");
+    string str2 = value(atts, "file2");
 
-    m_function->voigt.fwhmL = value(atts, "fwhmleft").toDouble();
-    m_function->voigt.fwhmR = value(atts, "fwhmright").toDouble();
-    m_function->voigt.glRatioL = value(atts, "glrleft").toDouble();
-    m_function->voigt.glRatioR = value(atts, "glrright").toDouble();
+    m_function->voigt.fwhmL = stod(value(atts, "fwhmleft"));
+    m_function->voigt.fwhmR = stod(value(atts, "fwhmright"));
+    m_function->voigt.glRatioL = stod(value(atts, "glrleft"));
+    m_function->voigt.glRatioR = stod(value(atts, "glrright"));
 
     m_function->voigt.wveDptFlag=(value(atts, "wveDptFlag") == "true") ? 1 : 0;
 
-    if (!str.isEmpty())
+    if (!str.empty())
      {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_function->voigt.filename))
-          strcpy(m_function->voigt.filename, str.toLatin1().data());
+          strcpy(m_function->voigt.filename, str.c_str());
       else
           throw std::runtime_error("Slit Function Filename too long");
         }
        else
         strcpy(m_function->voigt.filename ,"\0");
 
-    if (!str2.isEmpty())
+    if (!str2.empty())
      {
       str2 = m_master->pathExpand(str2);
       if (str2.length() < (int)sizeof(m_function->voigt.filename2))
-          strcpy(m_function->voigt.filename2, str2.toLatin1().data());
+          strcpy(m_function->voigt.filename2, str2.c_str());
       else
           throw std::runtime_error("Slit Function Filename too long");
         }
@@ -251,30 +251,30 @@ void CSlitFunctionSubHandler::start(const Glib::ustring& element, const map<Glib
   }
   else if (element == "error") {
 
-    QString str = value(atts, "file");
-    QString str2 = value(atts, "file2");
+    string str = value(atts, "file");
+    string str2 = value(atts, "file2");
 
-    m_function->error.fwhm = value(atts, "fwhm").toDouble();
-    m_function->error.width = value(atts, "width").toDouble();
+    m_function->error.fwhm = stod(value(atts, "fwhm"));
+    m_function->error.width = stod(value(atts, "width"));
 
     m_function->error.wveDptFlag=(value(atts, "wveDptFlag") == "true") ? 1 : 0;
 
-    if (!str.isEmpty())
+    if (!str.empty())
      {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_function->error.filename))
-          strcpy(m_function->error.filename, str.toLatin1().data());
+          strcpy(m_function->error.filename, str.c_str());
       else
           throw std::runtime_error("Slit Function Filename too long");
         }
        else
         strcpy(m_function->error.filename ,"\0");
 
-    if (!str2.isEmpty())
+    if (!str2.empty())
      {
       str2 = m_master->pathExpand(str2);
       if (str2.length() < (int)sizeof(m_function->error.filename2))
-          strcpy(m_function->error.filename2, str2.toLatin1().data());
+          strcpy(m_function->error.filename2, str2.c_str());
       else
           throw std::runtime_error("Slit Function Filename too long");
         }
@@ -283,30 +283,30 @@ void CSlitFunctionSubHandler::start(const Glib::ustring& element, const map<Glib
   }
   else if (element == "agauss") {
 
-    QString str = value(atts, "file");
-    QString str2 = value(atts, "file2");
+    string str = value(atts, "file");
+    string str2 = value(atts, "file2");
 
-    m_function->agauss.fwhm = value(atts, "fwhm").toDouble();
-    m_function->agauss.asym = value(atts, "asym").toDouble();
+    m_function->agauss.fwhm = stod(value(atts, "fwhm"));
+    m_function->agauss.asym = stod(value(atts, "asym"));
 
     m_function->agauss.wveDptFlag=(value(atts, "wveDptFlag") == "true") ? 1 : 0;
 
-    if (!str.isEmpty())
+    if (!str.empty())
      {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_function->agauss.filename))
-          strcpy(m_function->agauss.filename, str.toLatin1().data());
+          strcpy(m_function->agauss.filename, str.c_str());
       else
           throw std::runtime_error("Slit Function Filename too long");
         }
        else
         strcpy(m_function->agauss.filename ,"\0");
 
-    if (!str2.isEmpty())
+    if (!str2.empty())
      {
       str2 = m_master->pathExpand(str2);
       if (str2.length() < (int)sizeof(m_function->agauss.filename2))
-          strcpy(m_function->agauss.filename2, str2.toLatin1().data());
+          strcpy(m_function->agauss.filename2, str2.c_str());
       else
           throw std::runtime_error("Slit Function Filename too long");
         }
@@ -316,43 +316,43 @@ void CSlitFunctionSubHandler::start(const Glib::ustring& element, const map<Glib
 
   else if (element == "supergauss") {
 
-    QString str = value(atts, "file");
-    QString str2 = value(atts, "file2");
-    QString str3 = value(atts, "file3");
+    string str = value(atts, "file");
+    string str2 = value(atts, "file2");
+    string str3 = value(atts, "file3");
 
-    m_function->supergauss.fwhm = value(atts, "fwhm").toDouble();
-    m_function->supergauss.exponential = value(atts, "expTerm").toDouble();
-    m_function->supergauss.asym = value(atts, "asym").toDouble();
+    m_function->supergauss.fwhm = stod(value(atts, "fwhm"));
+    m_function->supergauss.exponential = stod(value(atts, "expTerm"));
+    m_function->supergauss.asym = stod(value(atts, "asym"));
 
     m_function->supergauss.wveDptFlag=(value(atts, "wveDptFlag") == "true") ? 1 : 0;
 
-    if (!str.isEmpty())
+    if (!str.empty())
      {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_function->supergauss.filename))
-          strcpy(m_function->supergauss.filename, str.toLatin1().data());
+          strcpy(m_function->supergauss.filename, str.c_str());
       else
           throw std::runtime_error("Slit Function Filename (FWHM) too long");
         }
        else
         strcpy(m_function->supergauss.filename ,"\0");
 
-    if (!str2.isEmpty())
+    if (!str2.empty())
      {
       str2 = m_master->pathExpand(str2);
       if (str2.length() < (int)sizeof(m_function->supergauss.filename2))
-          strcpy(m_function->supergauss.filename2, str2.toLatin1().data());
+          strcpy(m_function->supergauss.filename2, str2.c_str());
       else
           throw std::runtime_error("Slit Function Filename (Exponential term) too long");
         }
        else
         strcpy(m_function->supergauss.filename2 ,"\0");
 
-    if (!str3.isEmpty())
+    if (!str3.empty())
      {
       str3 = m_master->pathExpand(str3);
       if (str3.length() < (int)sizeof(m_function->supergauss.filename3))
-          strcpy(m_function->supergauss.filename3, str3.toLatin1().data());
+          strcpy(m_function->supergauss.filename3, str3.c_str());
       else
           throw std::runtime_error("Slit Function Filename (Asymmetry factor) too long");
         }
@@ -361,22 +361,22 @@ void CSlitFunctionSubHandler::start(const Glib::ustring& element, const map<Glib
   }
   else if (element == "boxcarapod") {
 
-    m_function->boxcarapod.resolution = value(atts, "resolution").toDouble();
-    m_function->boxcarapod.phase = value(atts, "phase").toDouble();
+    m_function->boxcarapod.resolution = stod(value(atts, "resolution"));
+    m_function->boxcarapod.phase = stod(value(atts, "phase"));
   }
   else if (element == "nbsapod") {
 
-    m_function->nbsapod.resolution = value(atts, "resolution").toDouble();
-    m_function->nbsapod.phase = value(atts, "phase").toDouble();
+    m_function->nbsapod.resolution = stod(value(atts, "resolution"));
+    m_function->nbsapod.phase = stod(value(atts, "phase"));
   }
   else if (element == "gaussianfile") {
 
-    QString str = value(atts, "file");
-    if (!str.isEmpty()) {
+    string str = value(atts, "file");
+    if (!str.empty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_function->gaussian.filename))
        {
-           strcpy(m_function->gaussian.filename, str.toLatin1().data());
+           strcpy(m_function->gaussian.filename, str.c_str());
            m_function->gaussian.wveDptFlag=1;
           }
       else
@@ -385,12 +385,12 @@ void CSlitFunctionSubHandler::start(const Glib::ustring& element, const map<Glib
   }
   else if (element == "lorentzfile") {
 
-    QString str = value(atts, "file");
-    if (!str.isEmpty()) {
+    string str = value(atts, "file");
+    if (!str.empty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_function->lorentz.filename))
        {
-           strcpy(m_function->lorentz.filename, str.toLatin1().data());
+           strcpy(m_function->lorentz.filename, str.c_str());
            m_function->lorentz.wveDptFlag=1;
           }
 
@@ -399,35 +399,35 @@ void CSlitFunctionSubHandler::start(const Glib::ustring& element, const map<Glib
     }
 
     if (value(atts, "order") != "") {
-      m_function->lorentz.order = value(atts, "order").toInt();
+      m_function->lorentz.order = stoi(value(atts, "order"));
     } else {
-      m_function->lorentz.order = value(atts, "degree").toInt() / 2;
+      m_function->lorentz.order = stoi(value(atts, "degree"));
     }
   }
   else if (element == "errorfile") {
 
-    QString str = value(atts, "file");
-    if (!str.isEmpty()) {
+    string str = value(atts, "file");
+    if (!str.empty()) {
       str = m_master->pathExpand(str);
       if (str.length() < (int)sizeof(m_function->error.filename))
        {
            m_function->error.wveDptFlag=1;
-           strcpy(m_function->error.filename, str.toLatin1().data());
+           strcpy(m_function->error.filename, str.c_str());
           }
       else
     throw std::runtime_error("Slit Function Filename too long");
     }
 
-    QString str2 = value(atts, "file2");
-    if (!str2.isEmpty()) {
+    string str2 = value(atts, "file2");
+    if (!str2.empty()) {
       str2 = m_master->pathExpand(str2);
       if (str2.length() < (int)sizeof(m_function->error.filename2))
-    strcpy(m_function->error.filename2, str2.toLatin1().data());
+    strcpy(m_function->error.filename2, str2.c_str());
       else
     throw std::runtime_error("Slit Function Filename too long");
     }
    else
-    strcpy(m_function->error.filename2, str.toLatin1().data());
+    strcpy(m_function->error.filename2, str.c_str());
   }
 
 }

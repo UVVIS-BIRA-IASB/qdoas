@@ -21,7 +21,7 @@ class CSelectorSubHandler : public CConfigSubHandler
  public:
   CSelectorSubHandler(CConfigHandler *master, data_select_list_t *selectList);
 
-  virtual void start(const Glib::ustring& element, const std::map<Glib::ustring, QString> &atts);
+  virtual void start(const Glib::ustring& element, const std::map<Glib::ustring, std::string> &atts);
 
  private:
   data_select_list_t *m_selectList;
@@ -34,7 +34,7 @@ class CProjectDisplaySubHandler : public CSelectorSubHandler
  public:
   CProjectDisplaySubHandler(CConfigHandler *master, mediate_project_display_t *display);
 
-  virtual void start(const std::map<Glib::ustring, QString> &atts);
+  virtual void start(const std::map<Glib::ustring, std::string> &atts);
 
  private:
   mediate_project_display_t *m_display;
@@ -47,7 +47,7 @@ class CProjectSelectionSubHandler : public CConfigSubHandler
  public:
   CProjectSelectionSubHandler(CConfigHandler *master, mediate_project_selection_t *selection);
 
-  virtual void start(const Glib::ustring& element, const std::map<Glib::ustring, QString> &atts);
+  virtual void start(const Glib::ustring& element, const std::map<Glib::ustring, std::string> &atts);
 
  private:
   mediate_project_selection_t *m_selection;
@@ -61,7 +61,7 @@ class CProjectAnalysisSubHandler : public CConfigSubHandler
   CProjectAnalysisSubHandler(CConfigHandler *master,
                 mediate_project_analysis_t *analysis);
 
-  virtual void start(const std::map<Glib::ustring, QString> &atts);
+  virtual void start(const std::map<Glib::ustring, std::string> &atts);
 
  private:
   mediate_project_analysis_t *m_analysis;
@@ -75,7 +75,7 @@ class CProjectRawSpectraSubHandler : public CConfigSubHandler
   CProjectRawSpectraSubHandler(CConfigHandler *master,
                   CProjectConfigTreeNode *node);
 
-  virtual void start(const Glib::ustring& element, const std::map<Glib::ustring, QString> &atts);
+  virtual void start(const Glib::ustring& element, const std::map<Glib::ustring, std::string> &atts);
 
  private:
   CProjectConfigTreeNode *m_node;
@@ -89,8 +89,8 @@ class CProjectCalibrationSubHandler : public CConfigSubHandler
   CProjectCalibrationSubHandler(CConfigHandler *master,
                mediate_project_calibration_t *calibration);
 
-  virtual void start(const std::map<Glib::ustring, QString> &atts);
-  virtual void start(const Glib::ustring& element, const std::map<Glib::ustring, QString> &atts);
+  virtual void start(const std::map<Glib::ustring, std::string> &atts);
+  virtual void start(const Glib::ustring& element, const std::map<Glib::ustring, std::string> &atts);
 
  private:
   mediate_project_calibration_t *m_calibration;
@@ -104,7 +104,7 @@ class CProjectUndersamplingSubHandler : public CConfigSubHandler
   CProjectUndersamplingSubHandler(CConfigHandler *master,
                mediate_project_undersampling_t *undersampling);
 
-  virtual void start(const std::map<Glib::ustring, QString> &atts);
+  virtual void start(const std::map<Glib::ustring, std::string> &atts);
 
  private:
   mediate_project_undersampling_t *m_undersampling;
@@ -118,17 +118,17 @@ class CProjectInstrumentalSubHandler : public CConfigSubHandler
   CProjectInstrumentalSubHandler(CConfigHandler *master,
                mediate_project_instrumental_t *instrumental);
 
-  virtual void start(const std::map<Glib::ustring, QString> &atts);
-  virtual void start(const Glib::ustring& element, const std::map<Glib::ustring, QString> &atts);
+  virtual void start(const std::map<Glib::ustring, std::string> &atts);
+  virtual void start(const Glib::ustring& element, const std::map<Glib::ustring, std::string> &atts);
 
  protected:
-  void helperLoadLogger(const std::map<Glib::ustring, QString> &atts, struct instrumental_logger *d);
-  void helperLoadSaoz(const std::map<Glib::ustring, QString> &atts, struct instrumental_saoz *d);
-  void helperLoadMinimum(const std::map<Glib::ustring, QString> &atts, struct instrumental_minimum *d);
-  void helperLoadCcd(const std::map<Glib::ustring, QString> &atts, struct instrumental_ccd *d);
-  void helperLoadGdp(const std::map<Glib::ustring, QString> &atts, struct instrumental_gdp *d);
-  void helperLoadGome2(const std::map<Glib::ustring, QString> &atts, struct instrumental_gome2 *d);
-  void helperLoadScia(const std::map<Glib::ustring, QString> &atts, struct instrumental_scia *d);
+  void helperLoadLogger(const std::map<Glib::ustring, std::string> &atts, struct instrumental_logger *d);
+  void helperLoadSaoz(const std::map<Glib::ustring, std::string> &atts, struct instrumental_saoz *d);
+  void helperLoadMinimum(const std::map<Glib::ustring, std::string> &atts, struct instrumental_minimum *d);
+  void helperLoadCcd(const std::map<Glib::ustring, std::string> &atts, struct instrumental_ccd *d);
+  void helperLoadGdp(const std::map<Glib::ustring, std::string> &atts, struct instrumental_gdp *d);
+  void helperLoadGome2(const std::map<Glib::ustring, std::string> &atts, struct instrumental_gome2 *d);
+  void helperLoadScia(const std::map<Glib::ustring, std::string> &atts, struct instrumental_scia *d);
 
 
  private:
@@ -143,8 +143,8 @@ class CProjectSlitSubHandler : public CConfigSubHandler
   CProjectSlitSubHandler(CConfigHandler *master,
              mediate_project_slit_t *slit);
 
-  virtual void start(const std::map<Glib::ustring, QString> &atts);
-  virtual void start(const Glib::ustring& element, const std::map<Glib::ustring, QString> &atts);
+  virtual void start(const std::map<Glib::ustring, std::string> &atts);
+  virtual void start(const Glib::ustring& element, const std::map<Glib::ustring, std::string> &atts);
 
  private:
   mediate_project_slit_t *m_slit;
@@ -158,7 +158,7 @@ class CProjectOutputSubHandler : public CSelectorSubHandler
   CProjectOutputSubHandler(CConfigHandler *master,
                mediate_project_output_t *output);
 
-  virtual void start(const std::map<Glib::ustring, QString> &atts);
+  virtual void start(const std::map<Glib::ustring, std::string> &atts);
 
  private:
   mediate_project_output_t *m_output;
@@ -172,7 +172,7 @@ class CProjectExportSubHandler : public CSelectorSubHandler
   CProjectExportSubHandler(CConfigHandler *master,
                mediate_project_export_t *exportSpectra);
 
-  virtual void start(const std::map<Glib::ustring, QString> &atts);
+  virtual void start(const std::map<Glib::ustring, std::string> &atts);
 
  private:
   mediate_project_export_t *m_export;

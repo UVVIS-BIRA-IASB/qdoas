@@ -4,9 +4,10 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 */
 
+#include <cstdarg>
 #include <cstdlib>
 #include <cmath>
-#include <stdio.h>
+#include <cstdio>
 
 #include "mediate_response.h"
 
@@ -200,5 +201,5 @@ void mediateResponseErrorMessage(const char *function,
                  void *responseHandle)
 {
   CEngineResponse *resp = static_cast<CEngineResponse*>(responseHandle);
-  resp->addErrorMessage(QString(function), QString(messageString), errorType);
+  resp->addErrorMessage(function, messageString, errorType);
 }

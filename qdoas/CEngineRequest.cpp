@@ -179,7 +179,7 @@ bool CEngineRequestBeginBrowseFile::process(CEngineThread *engineThread)
   CEngineResponseBeginAccessFile *resp = new CEngineResponseBeginAccessFile(m_fileName);
 
   int rc = mediateRequestBeginBrowseSpectra(engineThread->engineContext(),
-                        m_fileName.toLocal8Bit().constData(), resp);
+                        m_fileName.c_str(), resp);
 
   resp->setNumberOfRecords(rc); // -1 if an error occurred
 
@@ -241,7 +241,7 @@ bool CEngineRequestBeginExportFile::process(CEngineThread *engineThread)
   CEngineResponseBeginAccessFile *resp = new CEngineResponseBeginAccessFile(m_fileName);
 
   int rc = mediateRequestBeginExportSpectra(engineThread->engineContext(),
-                        m_fileName.toLocal8Bit().constData(), resp);
+                                            m_fileName.c_str(), resp);
 
   resp->setNumberOfRecords(rc); // -1 if an error occurred
 
@@ -303,8 +303,8 @@ bool CEngineRequestBeginAnalyseFile::process(CEngineThread *engineThread)
   CEngineResponseBeginAccessFile *resp = new CEngineResponseBeginAccessFile(m_fileName);
 
   int rc = mediateRequestBeginAnalyseSpectra(engineThread->engineContext(),
-                                             CWorkSpace::instance()->getConfigFile().toLocal8Bit().constData(),
-                         m_fileName.toLocal8Bit().constData(), resp);
+                                             CWorkSpace::instance()->getConfigFile().c_str(),
+                                             m_fileName.c_str(), resp);
 
   resp->setNumberOfRecords(rc); // -1 if an error occurred
 
@@ -366,7 +366,7 @@ bool CEngineRequestBeginCalibrateFile::process(CEngineThread *engineThread)
   CEngineResponseBeginAccessFile *resp = new CEngineResponseBeginAccessFile(m_fileName);
 
   int rc = mediateRequestBeginCalibrateSpectra(engineThread->engineContext(),
-                        m_fileName.toLocal8Bit().constData(), resp);
+                        m_fileName.c_str(), resp);
 
   resp->setNumberOfRecords(rc); // -1 if an error occurred
 

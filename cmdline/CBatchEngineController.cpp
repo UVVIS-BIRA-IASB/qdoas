@@ -20,7 +20,7 @@ CBatchEngineController::CBatchEngineController() :
 {
 }
 
-void CBatchEngineController::notifyReadyToNavigateRecords(const QString &filename, int numberOfRecords)
+void CBatchEngineController::notifyReadyToNavigateRecords(const std::string &filename, int numberOfRecords)
 {
   m_active = (numberOfRecords > 0);
 }
@@ -30,9 +30,9 @@ void CBatchEngineController::notifyEndOfRecords(void)
   m_active = false;
 }
 
-void CBatchEngineController::notifyErrorMessages(int highestErrorLevel, const QList<CEngineError> &errorMessages)
+void CBatchEngineController::notifyErrorMessages(int highestErrorLevel, const std::vector<CEngineError> &errorMessages)
 {
-  QList<CEngineError>::const_iterator it = errorMessages.begin();
+  auto it = errorMessages.begin();
   while (it != errorMessages.end())
    {
     switch (it->errorLevel())
@@ -52,7 +52,7 @@ void CBatchEngineController::notifyErrorMessages(int highestErrorLevel, const QL
      }
 
     if ((it->errorLevel()!=WarningEngineError) || verboseMode)
-     std::cout << it->message().toStdString() << std::endl;
+     std::cout << it->message() << std::endl;
     ++it;
    }
 

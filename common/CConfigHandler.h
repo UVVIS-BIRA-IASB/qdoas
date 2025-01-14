@@ -10,11 +10,8 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 #include <libxml++/libxml++.h>
 
-#include <iostream>
-
-#include <QList>
-#include <QString>
-#include <QVector>
+#include <string>
+#include <vector>
 
 class CConfigHandler;
 
@@ -27,9 +24,9 @@ class CConfigSubHandler
   virtual ~CConfigSubHandler() {};
 
   virtual void start(const Glib::ustring& name, const AttributeList& atts) {};
-  virtual void start(const std::map<Glib::ustring, QString>& atts) {};
-  virtual void start(const Glib::ustring& element, const std::map<Glib::ustring, QString>& atts) {};
-  virtual void character(const QString &ch) {};
+  virtual void start(const std::map<Glib::ustring, std::string>& atts) {};
+  virtual void start(const Glib::ustring& element, const std::map<Glib::ustring, std::string>& atts) {};
+  virtual void character(const std::string &ch) {};
   virtual void end(const Glib::ustring &element) {};
   virtual void end() {};
 
@@ -54,18 +51,18 @@ class CConfigHandler : public xmlpp::SaxParser
   virtual ~CConfigHandler();
 
   // content handling
-  virtual QString errorString() const;
-  void install_subhandler(CConfigSubHandler *newHandler, const std::map<Glib::ustring, QString>& attributes);
+  virtual std::string errorString() const;
+  void install_subhandler(CConfigSubHandler *newHandler, const std::map<Glib::ustring, std::string>& attributes);
 
-  void setPath(int index, const QString &pathPrefix);
-  QString getPath(int index) const;
-  QString pathExpand(const QString &name);
+  void setPath(int index, const std::string &pathPrefix);
+  std::string getPath(int index) const;
+  std::string pathExpand(const std::string &name);
 
-  QString messages(void) const; // messages collected during parsing
+  std::string messages(void) const; // messages collected during parsing
 
  protected:
   virtual void start_subhandler(const Glib::ustring& name,
-                                const std::map<Glib::ustring, QString>& attributes) = 0;
+                                const std::map<Glib::ustring, std::string>& attributes) = 0;
 
   //overrides:
   void on_start_element(const Glib::ustring& name,
@@ -76,21 +73,21 @@ class CConfigHandler : public xmlpp::SaxParser
  private:
   friend class CConfigSubHandler;
 
-  void setSubErrorMessage(const QString &msg);
+  void setSubErrorMessage(const std::string &msg);
 
   std::vector<Glib::ustring> element_stack;
   CConfigSubHandler *m_activeSubHandler;
-  QList<SSubHandlerItem> m_subHandlerStack;
-  QVector<QString> m_paths;
-  QString m_subErrorMessage;
-  QString m_errorMessages;
+  std::vector<SSubHandlerItem> m_subHandlerStack;
+  std::vector<std::string> m_paths;
+  std::string m_subErrorMessage;
+  std::string m_errorMessages;
   Glib::ustring collated_str;
 };
 
-inline void CConfigHandler::setSubErrorMessage(const QString &msg) { m_subErrorMessage = msg; }
+inline void CConfigHandler::setSubErrorMessage(const std::string &msg) { m_subErrorMessage = msg; }
 
 // Get value from a map of xml attributes, or an empty string.  Mimics the behaviour of QXmlAttributes::value().
-inline QString value(const std::map<Glib::ustring, QString>& attributes, const Glib::ustring& key) {
+inline std::string value(const std::map<Glib::ustring, std::string>& attributes, const Glib::ustring& key) {
   auto i_val = attributes.find(key);
   if (i_val != attributes.end()) {
     return i_val->second;

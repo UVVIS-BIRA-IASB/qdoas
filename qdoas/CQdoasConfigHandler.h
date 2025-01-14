@@ -8,8 +8,6 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #ifndef _CQDOASCONFIGHANDLER_H_GUARD
 #define _CQDOASCONFIGHANDLER_H_GUARD
 
-#include <QString>
-
 #include "CConfigHandler.h"
 #include "CProjectConfigItem.h"
 
@@ -26,12 +24,12 @@ class CQdoasConfigHandler : public CConfigHandler
   void addSiteItem(CSiteConfigItem item);             // takes ownership of item
   const std::vector<CSiteConfigItem>& siteItems() const; // items in returned list have the same lifetime as 'this'
 
-  void addSymbol(const QString &symbolName, const QString &symbolDescription);
+  void addSymbol(const std::string &symbolName, const std::string &symbolDescription);
   const std::vector<CSymbolConfigItem>& symbolItems() const; // items in returned list have the same lifetime as 'this'
 
 protected:
   virtual void start_subhandler(const Glib::ustring& name,
-                                const std::map<Glib::ustring, QString>& attributes) override;
+                                const std::map<Glib::ustring, std::string>& attributes) override;
 
  private:
   std::vector<CProjectConfigItem> m_projectItemList;
@@ -59,7 +57,7 @@ class CSiteSubHandler : public CQdoasConfigSubHandler
   CSiteSubHandler(CQdoasConfigHandler *master);
 
   virtual void start(const Glib::ustring&name,
-                     const std::map<Glib::ustring, QString>& attributes) override;
+                     const std::map<Glib::ustring, std::string>& attributes) override;
 };
 
 //-------------------------------------------------------------------
@@ -70,7 +68,7 @@ class CSymbolSubHandler : public CQdoasConfigSubHandler
   CSymbolSubHandler(CQdoasConfigHandler *master);
 
   virtual void start(const Glib::ustring& name,
-                     const std::map<Glib::ustring, QString>& attributes) override;
+                     const std::map<Glib::ustring, std::string>& attributes) override;
 };
 
 //-------------------------------------------------------------------
@@ -81,8 +79,8 @@ class CProjectSubHandler : public CQdoasConfigSubHandler
   CProjectSubHandler(CQdoasConfigHandler *master);
 
   virtual void start(const Glib::ustring& element,
-                     const std::map<Glib::ustring, QString>& atts) override;
-  virtual void start(const std::map<Glib::ustring, QString>& atts) override;
+                     const std::map<Glib::ustring, std::string>& atts) override;
+  virtual void start(const std::map<Glib::ustring, std::string>& atts) override;
   virtual void end(void) override;
 
  private:

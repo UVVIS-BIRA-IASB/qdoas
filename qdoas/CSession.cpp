@@ -81,14 +81,14 @@ void CSession::addFile(const QFileInfo &file, const QString &projectName)
 
   if (it == m_map.end()) {
     // dont have this project yet ... grab it from the workspace
-    mediate_project_t *proj = CWorkSpace::instance()->findProject(projectName);
+    mediate_project_t *proj = CWorkSpace::instance()->findProject(projectName.toStdString());
     if (proj) {
       CSessionItem *item = new CSessionItem(proj);
       item->addFile(file);
 
       if (m_mode == CSession::Analyse || m_mode == CSession::Calibrate) {
     int nWindows;
-    mediate_analysis_window_t *d = CWorkSpace::instance()->analysisWindowList(projectName, nWindows);
+    mediate_analysis_window_t *d = CWorkSpace::instance()->analysisWindowList(projectName.toStdString(), nWindows);
     if (d != NULL) {
       item->giveAnalysisWindowList(d, nWindows);
     }

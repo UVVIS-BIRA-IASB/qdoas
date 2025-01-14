@@ -81,7 +81,7 @@ bool CWSymbolEditor::actionOk(void)
   if (m_symbolName->isEnabled()) {
     // new symbol
     // must have a non-empty symbol name
-    bool ok = CWorkSpace::instance()->createSymbol(m_symbolName->text(), m_description->text());
+    bool ok = CWorkSpace::instance()->createSymbol(m_symbolName->text().toStdString(), m_description->text().toStdString());
 
     if (!ok) {
       notifyAcceptActionOk(false);
@@ -93,7 +93,7 @@ bool CWSymbolEditor::actionOk(void)
   }
 
   // modify
-  return CWorkSpace::instance()->modifySymbol(m_symbolName->text(), m_description->text());
+  return CWorkSpace::instance()->modifySymbol(m_symbolName->text().toStdString(), m_description->text().toStdString());
 }
 
 void CWSymbolEditor::actionHelp(void)

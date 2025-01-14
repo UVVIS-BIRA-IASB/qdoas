@@ -426,16 +426,16 @@ void CWProjectTree::buildAndStartSession(CSession::eMode sessionType)
 
 QString CWProjectTree::editInsertNewProject(const QString &projectName, CProjectItem **itemCreated)
 {
-  if (CWorkSpace::instance()->createProject(projectName)) {
+  if (CWorkSpace::instance()->createProject(projectName.toStdString())) {
     // created the project
     CProjectItem *item = new CProjectItem(projectName);
     addTopLevelItem(item);
     item->setExpanded(true);
 
     if (itemCreated != NULL) *itemCreated = item;
-  }
-  else
+  } else {
     return QString("A project with that name already exists.");
+  }
 
   // success falls through
   return QString();
@@ -445,12 +445,12 @@ QString CWProjectTree::editRenameProject(QTreeWidgetItem *item, const QString &p
 {
   if (item && item->type() == cProjectItemType) {
 
-    if (CWorkSpace::instance()->renameProject(item->text(0), projectName)) {
+    if (CWorkSpace::instance()->renameProject(item->text(0).toStdString(), projectName.toStdString())) {
       item->setText(0, projectName);
     }
     else {
       // explain why it failed ...
-      if (CWorkSpace::instance()->findProject(item->text(0)))
+      if (CWorkSpace::instance()->findProject(item->text(0).toStdString()))
     return QString("A project with that name already exists.");
       else
     return QString("The project no longer exists.");
@@ -531,7 +531,7 @@ QString CWProjectTree::editInsertNewAnalysisWindow(QTreeWidgetItem *parent, cons
     ++index;
       }
     }
-    if (CWorkSpace::instance()->createAnalysisWindow(projItem->text(0), windowName, preceedingWindowName)) {
+    if (CWorkSpace::instance()->createAnalysisWindow(projItem->text(0).toStdString(), windowName.toStdString(), preceedingWindowName.toStdString())) {
 
       CAnalysisWindowItem *tmp = new CAnalysisWindowItem(parent, preceeding, windowName);
 
@@ -556,12 +556,12 @@ QString CWProjectTree::editRenameAnalysisWindow(QTreeWidgetItem *item, const QSt
       // corrupt system
       return QString("The project tree is corrupt.");
     }
-    if (CWorkSpace::instance()->renameAnalysisWindow(projItem->text(0), item->text(0), newWindowName)) {
+    if (CWorkSpace::instance()->renameAnalysisWindow(projItem->text(0).toStdString(), item->text(0).toStdString(), newWindowName.toStdString())) {
       item->setText(0, newWindowName);
     }
     else {
       // see why it failed
-      if (CWorkSpace::instance()->findAnalysisWindow(projItem->text(0), item->text(0)))
+      if (CWorkSpace::instance()->findAnalysisWindow(projItem->text(0).toStdString(), item->text(0).toStdString()))
     return QString("The project already has an analysis window with that name.");
       else
     return QString("The project or analysis window no longer exists.");
@@ -728,7 +728,7 @@ QString CWProjectTree::loadConfiguration(const vector<CProjectConfigItem>& itemL
   // use the edit* interface to get reasonable error messages.
 
   for (const auto& config_item : itemList) {
-    QString projName = config_item.name();
+    QString projName(QString::fromStdString(config_item.name()));
 
     // create the project item
     projItem = NULL;
@@ -743,7 +743,7 @@ QString CWProjectTree::loadConfiguration(const vector<CProjectConfigItem>& itemL
     projItem->setEnabled(config_item.isEnabled());
 
     // locate the properties in the workspace then copy
-    projProp = CWorkSpace::instance()->findProject(projName);
+    projProp = CWorkSpace::instance()->findProject(projName.toStdString());
     assert(projProp != NULL);
     *projProp = *(config_item.properties()); // blot copy
 
@@ -751,7 +751,7 @@ QString CWProjectTree::loadConfiguration(const vector<CProjectConfigItem>& itemL
     for (int i=0; i < projProp->calibration.crossSectionList.nCrossSection; ++i)
       ws->incrementUseCount(projProp->calibration.crossSectionList.crossSection[i].symbol);
 
-    ws->modifiedProjectProperties(projName); // notification to any observers
+    ws->modifiedProjectProperties(projName.toStdString()); // notification to any observers
 
     item = projItem->child(0); // raw spectra node for the project
 
@@ -767,10 +767,10 @@ QString CWProjectTree::loadConfiguration(const vector<CProjectConfigItem>& itemL
     item = projItem->child(1); // the analysis window branch node
 
     QString precedingWindowName;
-    const QList<const CAnalysisWindowConfigItem*> &awList = config_item.analysisWindowItems();
-    QList<const CAnalysisWindowConfigItem*>::const_iterator awIt = awList.begin();
+    auto awList = config_item.analysisWindowItems();
+    auto awIt = awList.begin();
     while (awIt != awList.end()) {
-      QString awName = (*awIt)->name();
+      QString awName(QString::fromStdString((*awIt)->name()));
 
       // create the item with the edit iterface
       errStrPartial = editInsertNewAnalysisWindow(item, awName, precedingWindowName, &awItem);
@@ -778,7 +778,7 @@ QString CWProjectTree::loadConfiguration(const vector<CProjectConfigItem>& itemL
        collateErrorMessage(errStrTotal,errStrPartial);
 
       // locate the properties in the workspace and copy
-      awProp = CWorkSpace::instance()->findAnalysisWindow(projName, awName);
+      awProp = CWorkSpace::instance()->findAnalysisWindow(projName.toStdString(), awName.toStdString());
       assert(awProp != NULL);
       *awProp = *((*awIt)->properties()); // blot copy
       // update useCount for the symbols used in the molecules
@@ -807,26 +807,27 @@ QString CWProjectTree::buildRawSpectraTree(QTreeWidgetItem *parent, const CProje
     switch (childConfigItem->type()) {
     case CProjectConfigTreeNode::eFile:
       {
-    QFileInfo fileInfo(childConfigItem->name());
-    // make sure it exists ...
-    if (fileInfo.exists()) {
-      CSpectraFileItem *fileItem = new CSpectraFileItem(parent, fileInfo);
-      fileItem->setEnabled(childConfigItem->isEnabled());
-      // should not have children ...
-    }
-    else {
-      QString msg("File ");
-      msg += fileInfo.filePath();
-      msg += " does not exist.";
-      collateErrorMessage(errStr, msg);
-    }
+        QFileInfo fileInfo(QString::fromStdString(childConfigItem->name()));
+        // make sure it exists ...
+        if (fileInfo.exists()) {
+          CSpectraFileItem *fileItem = new CSpectraFileItem(parent, fileInfo);
+          fileItem->setEnabled(childConfigItem->isEnabled());
+          // should not have children ...
+        }
+        else {
+          QString msg("File ");
+          msg += fileInfo.filePath();
+          msg += " does not exist.";
+          collateErrorMessage(errStr, msg);
+        }
       }
       break;
     case CProjectConfigTreeNode::eFolder:
       {
     CSpectraFolderItem *folderItem = NULL;
 
-    collateErrorMessage(errStr, editInsertNewFolder(parent, childConfigItem->name(), &folderItem));
+    collateErrorMessage(errStr, editInsertNewFolder(parent,
+                                                    QString::fromStdString(childConfigItem->name()), &folderItem));
 
     if (folderItem != NULL) {
       folderItem->setEnabled(childConfigItem->isEnabled());
@@ -843,7 +844,9 @@ QString CWProjectTree::buildRawSpectraTree(QTreeWidgetItem *parent, const CProje
       {
     CSpectraDirectoryItem *dirItem = NULL;
 
-    collateErrorMessage(errStr, editInsertDirectory(parent, childConfigItem->name(), childConfigItem->filter(),
+    collateErrorMessage(errStr, editInsertDirectory(parent,
+                                                    QString::fromStdString(childConfigItem->name()),
+                                                    QString::fromStdString(childConfigItem->filter()),
                             childConfigItem->recursive(), &dirItem));
     if (dirItem != NULL)
       dirItem->setEnabled(childConfigItem->isEnabled());
@@ -1055,7 +1058,7 @@ void CWProjectTree::slotInsertFile()
     return;
 
       // access to the project data
-      const mediate_project_t *projData = CWorkSpace::instance()->findProject(projItem->text(0));
+      const mediate_project_t *projData = CWorkSpace::instance()->findProject(projItem->text(0).toStdString());
       if (projData == NULL)
     return;
 
@@ -1207,7 +1210,7 @@ void CWProjectTree::slotExportSpectra()
      mediate_project_t *projProp;
 
     // locate the properties in the workspace then copy
-    projProp = CWorkSpace::instance()->findProject(projItem->text(0));
+    projProp = CWorkSpace::instance()->findProject(projItem->text(0).toStdString());
     assert(projProp != NULL);
 
     CWEditor *exportEditor = new  CWProjectExportEditor(this,parent,projItem->text(0),&projProp->export_spectra,projProp->instrumental.format);
@@ -1228,7 +1231,7 @@ void CWProjectTree::slotViewCrossSections()
 
     QTreeWidgetItem *projItem = CWProjectTree::projectItem(item);
     if (projItem != NULL) {
-      const mediate_analysis_window_t *aw = CWorkSpace::instance()->findAnalysisWindow(projItem->text(0), item->text(0));
+      const mediate_analysis_window_t *aw = CWorkSpace::instance()->findAnalysisWindow(projItem->text(0).toStdString(), item->text(0).toStdString());
 
       if (aw != NULL) {
         shared_ptr<CViewCrossSectionData> ptr(new CViewCrossSectionData(aw));
@@ -1318,7 +1321,7 @@ void CWProjectTree::slotCutSelection()
 
       while ((*it)->childCount()) {
     QTreeWidgetItem *awItem = (*it)->child(0);
-    awProp = ws->findAnalysisWindow(projectName, awItem->text(0));
+    awProp = ws->findAnalysisWindow(projectName.toStdString(), awItem->text(0).toStdString());
     assert(awProp);
     // make a deep copy of the data to hand over to the clipboard
     mediate_analysis_window_t *awData = new mediate_analysis_window_t;
@@ -1332,7 +1335,7 @@ void CWProjectTree::slotCutSelection()
 
       QTreeWidgetItem *projItem = CWProjectTree::projectItem(*it);
       assert(projItem);
-      mediate_analysis_window_t *awProp = ws->findAnalysisWindow(projItem->text(0), (*it)->text(0));
+      mediate_analysis_window_t *awProp = ws->findAnalysisWindow(projItem->text(0).toStdString(), (*it)->text(0).toStdString());
       assert(awProp);
       // make a deep copy of the data to hand over to the clipboard
       mediate_analysis_window_t *awData = new mediate_analysis_window_t;
@@ -1344,13 +1347,13 @@ void CWProjectTree::slotCutSelection()
     else if ((*it)->parent() == NULL) {
       // a project item ... Collect all the bits and pieces for the project
       QString projectName = (*it)->text(0);
-      mediate_project_t *projProp = ws->findProject(projectName);
+      mediate_project_t *projProp = ws->findProject(projectName.toStdString());
       assert(projProp);
       // make a deep copy of the data to hand over to the clipboard
       mediate_project_t *projData = new mediate_project_t;
       *projData = *projProp;
       // get a deep copy of the analysis windows for this project
-      QList<mediate_analysis_window_t*> awList = ws->analysisWindowList(projectName);
+      auto awList = ws->analysisWindowList(projectName.toStdString());
       // steal the raw spectra items from the tree
       QTreeWidgetItem *rawSpectraItem = (*it)->child(0);
       assert(rawSpectraItem);
@@ -1366,7 +1369,7 @@ void CWProjectTree::slotCutSelection()
       QTreeWidgetItem *p = (*it)->parent();
       // cant remove the children of directory items .. just ignore them
       if (p->type() !=  cSpectraDirectoryItemType) {
-    m_clipboard->insertRawSpectraItem(p->takeChild(p->indexOfChild(*it)));
+        m_clipboard->insertRawSpectraItem(p->takeChild(p->indexOfChild(*it)));
       }
     }
 
@@ -1409,20 +1412,20 @@ void CWProjectTree::slotCopySelection()
       mediate_analysis_window_t *awProp;
 
       while ((*it)->childCount()) {
-    QTreeWidgetItem *awItem = (*it)->child(0);
-    awProp = ws->findAnalysisWindow(projectName, awItem->text(0));
-    assert(awProp);
-    // make a deep copy of the data to hand over to the clipboard
-    mediate_analysis_window_t *awData = new mediate_analysis_window_t;
-    *awData = *awProp; // blot copy
-    m_clipboard->insertAnalysisWindow(awData); // hand over the copy
+        QTreeWidgetItem *awItem = (*it)->child(0);
+        awProp = ws->findAnalysisWindow(projectName.toStdString(), awItem->text(0).toStdString());
+        assert(awProp);
+        // make a deep copy of the data to hand over to the clipboard
+        mediate_analysis_window_t *awData = new mediate_analysis_window_t;
+        *awData = *awProp; // blot copy
+        m_clipboard->insertAnalysisWindow(awData); // hand over the copy
       }
     }
     else if (type == cAnalysisWindowItemType) {
 
       QTreeWidgetItem *projItem = CWProjectTree::projectItem(*it);
       assert(projItem);
-      mediate_analysis_window_t *awProp = ws->findAnalysisWindow(projItem->text(0), (*it)->text(0));
+      mediate_analysis_window_t *awProp = ws->findAnalysisWindow(projItem->text(0).toStdString(), (*it)->text(0).toStdString());
       assert(awProp);
       // make a deep copy of the data to hand over to the clipboard
       mediate_analysis_window_t *awData = new mediate_analysis_window_t;
@@ -1432,13 +1435,13 @@ void CWProjectTree::slotCopySelection()
     else if ((*it)->parent() == NULL) {
       // a project item ... Collect all the bits and pieces for the project
       QString projectName = (*it)->text(0);
-      mediate_project_t *projProp = ws->findProject(projectName);
+      mediate_project_t *projProp = ws->findProject(projectName.toStdString());
       assert(projProp);
       // make a deep copy of the data to hand over to the clipboard
       mediate_project_t *projData = new mediate_project_t;
       *projData = *projProp;
       // get a deep copy of the analysis windows for this project
-      QList<mediate_analysis_window_t*> awList = ws->analysisWindowList(projectName);
+      auto awList = ws->analysisWindowList(projectName.toStdString());
       // steal the raw spectra items from the tree
       QTreeWidgetItem *rawSpectraItem = (*it)->child(0);
       assert(rawSpectraItem);
@@ -1517,13 +1520,13 @@ void CWProjectTree::slotPasteProjects()
   int projIndex = 0;
   while (projIndex < nProjects) {
     QString projName = m_clipboard->projectGroupItemName(projIndex);
-    const mediate_project_t *existingProj = ws->findProject(projName);
+    const mediate_project_t *existingProj = ws->findProject(projName.toStdString());
     while (existingProj != NULL) {
       projName += ".Copy";
-      existingProj = ws->findProject(projName);
+      existingProj = ws->findProject(projName.toStdString());
     }
     // safe to create a new project in the workspace
-    mediate_project_t *projData = ws->createProject(projName);
+    mediate_project_t *projData = ws->createProject(projName.toStdString());
     if (projData) {
       // copy the property data from the clipboard
       *projData = *(m_clipboard->projectGroupItemProperties(projIndex)); // blot copy
@@ -1547,7 +1550,7 @@ void CWProjectTree::slotPasteProjects()
     const mediate_analysis_window_t *awDataHandle = m_clipboard->projectGroupItemAnalysisWindowProperties(projIndex, awIndex);
     QString awName(awDataHandle->name);
 
-    mediate_analysis_window_t *awData = ws->createAnalysisWindow(projName, awName, preceedingWindowName);
+    mediate_analysis_window_t *awData = ws->createAnalysisWindow(projName.toStdString(), awName.toStdString(), preceedingWindowName.toStdString());
     // could assert that awData != NULL because this creation MUST work
     if (awData) {
       // copy the properties data
@@ -1602,10 +1605,10 @@ void CWProjectTree::slotPasteAnalysisWindows()
     QString awName(awDataHandle->name);
 
     // must be uniquely named ... because window names are size limited ... only make one ".Copy" attempt...
-    mediate_analysis_window_t *awData = ws->createAnalysisWindow(projName, awName, preceedingWindowName);
+    mediate_analysis_window_t *awData = ws->createAnalysisWindow(projName.toStdString(), awName.toStdString(), preceedingWindowName.toStdString());
     if (awData == NULL) {
       awName += ".Copy";
-      awData = ws->createAnalysisWindow(projName, awName, preceedingWindowName);
+      awData = ws->createAnalysisWindow(projName.toStdString(), awName.toStdString(), preceedingWindowName.toStdString());
     }
     // Is it OK to proceed ... silently skip this window if not OK ...
     if (awData) {
@@ -1805,7 +1808,7 @@ void CProjectItem::destroyItem(QTreeWidget *tree, QTreeWidgetItem *projItem)
 
   // there should be a corresponding project in the workspace ... this implicitly
   // destroys the analysis associated windows
-  CWorkSpace::instance()->destroyProject(projItem->text(0));
+  CWorkSpace::instance()->destroyProject(projItem->text(0).toStdString());
 
   delete tree->takeTopLevelItem(tree->indexOfTopLevelItem(projItem));
 }
@@ -2149,7 +2152,7 @@ void CAnalysisWindowItem::destroyItem(QTreeWidgetItem *awItem)
 
   assert(projItem && projItem != awItem);
 
-  CWorkSpace::instance()->destroyAnalysisWindow(projItem->text(0), awItem->text(0));
+  CWorkSpace::instance()->destroyAnalysisWindow(projItem->text(0).toStdString(), awItem->text(0).toStdString());
   // remove the item from the tree and delete it.
   QTreeWidgetItem *p = awItem->parent();
   delete p->takeChild(p->indexOfChild(awItem));
@@ -2162,7 +2165,7 @@ void CAnalysisWindowItem::setEnabled(bool enable)
   assert(projItem);
 
   // this is NOT state that is saved to the configuration file ...
-  if (CWorkSpace::instance()->setAnalysisWindowEnabled(projItem->text(0), text(0), enable))
+  if (CWorkSpace::instance()->setAnalysisWindowEnabled(projItem->text(0).toStdString(), text(0).toStdString(), enable))
     m_enabled = enable;
 }
 

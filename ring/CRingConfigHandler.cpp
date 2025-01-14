@@ -14,6 +14,7 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #include "debugutil.h"
 
 using std::map;
+using std::string;
 
 CRingConfigHandler::CRingConfigHandler() :
   CConfigHandler()
@@ -22,7 +23,7 @@ CRingConfigHandler::CRingConfigHandler() :
 }
 
 void CRingConfigHandler::start_subhandler(const Glib::ustring& name,
-                                          const map<Glib::ustring, QString>& atts)
+                                          const map<Glib::ustring, string>& atts)
 {
   if (name == "general") {
     // new General handler
@@ -44,14 +45,14 @@ CRingGeneralSubHandler::CRingGeneralSubHandler(CConfigHandler *master, mediate_r
 {
 }
 
-void CRingGeneralSubHandler::start(const map<Glib::ustring, QString> &atts)
+void CRingGeneralSubHandler::start(const map<Glib::ustring, string> &atts)
 {
-  QString str;
+  string str;
 
-  m_d->temperature = value(atts, "temp").toDouble();
+  m_d->temperature = stod(value(atts, "temp"));
 
   str = value(atts, "normalize");
-  if (str.isEmpty())
+  if (str.empty())
     m_d->normalize=1;
   else
     m_d->normalize = (str == "true") ? 1 : 0;
@@ -69,35 +70,35 @@ void CRingGeneralSubHandler::start(const map<Glib::ustring, QString> &atts)
 
   // number of ground pixels
   str = value(atts, "pixels");
-  m_d->n_groundpixel=(!str.isEmpty())?str.toInt():1;
+  m_d->n_groundpixel=(!str.empty())?stoi(str):1;
 
   str = value(atts, "output");
-  if (!str.isEmpty()) {
+  if (!str.empty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_d->outputFile))
-      strcpy(m_d->outputFile, str.toLocal8Bit().data());
+      strcpy(m_d->outputFile, str.c_str());
     else
       throw std::runtime_error("Output Filename too long");
   }
   str = value(atts, "calib");
-  if (!str.isEmpty()) {
+  if (!str.empty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_d->calibrationFile))
-      strcpy(m_d->calibrationFile, str.toLocal8Bit().data());
+      strcpy(m_d->calibrationFile, str.c_str());
     else
       throw std::runtime_error("Calibration Filename too long");
   }
   str = value(atts, "ref");
-  if (!str.isEmpty()) {
+  if (!str.empty()) {
     str = m_master->pathExpand(str);
     if (str.length() < (int)sizeof(m_d->solarRefFile))
-      strcpy(m_d->solarRefFile, str.toLocal8Bit().data());
+      strcpy(m_d->solarRefFile, str.c_str());
     else
       throw std::runtime_error("Solar Reference Filename too long");
   }
 }
 
-void CRingGeneralSubHandler::start(const Glib::ustring &element, const map<Glib::ustring, QString> &atts)
+void CRingGeneralSubHandler::start(const Glib::ustring &element, const map<Glib::ustring, string> &atts)
 {
   if (element == "slit_func")
     m_master->install_subhandler(new CSlitFunctionSubHandler(m_master, &(m_d->slit)), atts);

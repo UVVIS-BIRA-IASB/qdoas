@@ -67,8 +67,8 @@ void CProjectTreeClipboard::endInsertItems(void)
 // a complete project ... takes ownershift responsibility of data referenced
 // by pointer (ie. properties, AWs, tree items)
 void CProjectTreeClipboard::insertProject(const QString &projectName, mediate_project_t *properties,
-                      QList<mediate_analysis_window_t*> &analysisWindows,
-                      QList<QTreeWidgetItem*> &rawSpectraItems)
+                                          std::vector<mediate_analysis_window_t*> &analysisWindows,
+                                          QList<QTreeWidgetItem*> &rawSpectraItems)
 {
   // first consider the mark ... clear the group on first touch
   if (m_markedProjectGroup) {
@@ -76,7 +76,13 @@ void CProjectTreeClipboard::insertProject(const QString &projectName, mediate_pr
     m_markedProjectGroup = false;
   }
 
-  m_projectGroup.push_back(new CProjClipBucket(projectName, properties, analysisWindows, rawSpectraItems));
+  // Need to convert
+  QList<mediate_analysis_window_t*> analysisWindowsList;
+  for (auto aw : analysisWindows) {
+    analysisWindowsList.push_back(aw);
+  }
+
+  m_projectGroup.push_back(new CProjClipBucket(projectName, properties, analysisWindowsList, rawSpectraItems));
 }
 
 // a single analysis window ... takes ownership of the analysisWindow

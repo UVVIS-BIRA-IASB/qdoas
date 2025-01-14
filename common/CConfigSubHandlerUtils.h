@@ -19,8 +19,8 @@ class CFilteringSubHandler : public CConfigSubHandler
   CFilteringSubHandler(CConfigHandler *master,
                mediate_filter_t *filter);
 
-  virtual void start(const std::map<Glib::ustring, QString>& atts) override;
-  virtual void start(const Glib::ustring& element, const std::map<Glib::ustring, QString>& atts) override;
+  virtual void start(const std::map<Glib::ustring, std::string>& atts) override;
+  virtual void start(const Glib::ustring& element, const std::map<Glib::ustring, std::string>& atts) override;
 
  private:
   mediate_filter_t *m_filter;
@@ -34,8 +34,8 @@ class CSlitFunctionSubHandler : public CConfigSubHandler
   CSlitFunctionSubHandler(CConfigHandler *master,
               mediate_slit_function_t *function);
 
-  virtual void start(const std::map<Glib::ustring, QString>& atts) override;
-  virtual void start(const Glib::ustring& element, const std::map<Glib::ustring, QString>& atts) override;
+  virtual void start(const std::map<Glib::ustring, std::string>& atts) override;
+  virtual void start(const Glib::ustring& element, const std::map<Glib::ustring, std::string>& atts) override;
 
  private:
   mediate_slit_function_t *m_function;

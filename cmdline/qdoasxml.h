@@ -1,21 +1,12 @@
 #ifndef QDOASXML_H
 #define QDOASXML_H
 
-#include <cstdio>
-#include <cstring>
-
-#include <iostream>
 #include <string>
+#include <vector>
 
-#include <QString>
-#include <QList>
-#include <QStringList>
-
-#include "CProjectConfigItem.h"
-#include "CEngineResponse.h"
-#include "constants.h"
 #include "comdefs.h"
+#include "CProjectConfigItem.h"
 
-RC QDOASXML_Parse(QList<QString> &xmlCommands,const CProjectConfigItem *p);
+RC QDOASXML_Parse(std::vector<std::string> &xmlCommands,const CProjectConfigItem *p);
 
 #endif

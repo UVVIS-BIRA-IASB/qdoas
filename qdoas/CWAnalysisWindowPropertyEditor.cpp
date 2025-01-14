@@ -39,8 +39,8 @@ CWAnalysisWindowPropertyEditor::CWAnalysisWindowPropertyEditor(const QString &pr
 {
   const int cDoubleEditWidth = 70;
 
-  mediate_analysis_window_t *d = CWorkSpace::instance()->findAnalysisWindow(m_projectName, m_analysisWindowName);
-  mediate_project_t *p = CWorkSpace::instance()->findProject(m_projectName);
+  mediate_analysis_window_t *d = CWorkSpace::instance()->findAnalysisWindow(m_projectName.toStdString(), m_analysisWindowName.toStdString());
+  mediate_project_t *p = CWorkSpace::instance()->findProject(m_projectName.toStdString());
 
   assert(d != NULL);
 
@@ -472,8 +472,8 @@ bool CWAnalysisWindowPropertyEditor::actionOk(void)
   // NOTE: can perform and validation checks here .. if NOT ok, return false, otherwise proceed to set data ...
 
 
-  const mediate_project_t *p = CWorkSpace::instance()->findProject(m_projectName);
-  mediate_analysis_window_t *d = CWorkSpace::instance()->findAnalysisWindow(m_projectName, m_analysisWindowName);
+  const mediate_project_t *p = CWorkSpace::instance()->findProject(m_projectName.toStdString());
+  mediate_analysis_window_t *d = CWorkSpace::instance()->findAnalysisWindow(m_projectName.toStdString(), m_analysisWindowName.toStdString());
   bool brc=true;
 
   if (d) {
@@ -563,7 +563,7 @@ bool CWAnalysisWindowPropertyEditor::actionOk(void)
     // this is a change to the project properties (indirectly).
     QString updateBlock = m_projectName;
     m_projectName.clear();
-    ws->modifiedProjectProperties(updateBlock);
+    ws->modifiedProjectProperties(updateBlock.toStdString());
     m_projectName = updateBlock;
   }
  else
@@ -595,7 +595,7 @@ void CWAnalysisWindowPropertyEditor::updateModifyProject(const QString &projectN
 
 void CWAnalysisWindowPropertyEditor::projectPropertiesChanged()
 {
-  const mediate_project_t *d = CWorkSpace::instance()->findProject(m_projectName);
+  const mediate_project_t *d = CWorkSpace::instance()->findProject(m_projectName.toStdString());
 
   if (d) {
     // enable/disable filtering

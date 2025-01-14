@@ -7,6 +7,8 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 #include "CPlotDataSet.h"
 
+#include <cstring>
+
 CXYPlotData::CXYPlotData(const char *curveName,const double *x, const double *y, int n, enum eCurveStyleType curveType,int curveNumber) :
   m_curveName(curveName),
   m_xData(NULL),
@@ -62,7 +64,7 @@ void CPlotDataSet::addPlotData(const char *curveName,const double *x, const doub
 
 CPlotDataSet::~CPlotDataSet()
 {
-  while (!m_dataList.empty()) {
-    delete m_dataList.takeFirst();
+  for (auto ds : m_dataList) {
+    delete ds;
   }
 }

@@ -10,11 +10,10 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 #include <map>
 #include <list>
+#include <string>
 #include <vector>
 
-#include <QList>
-#include <QString>
-#include <QStringList>
+#include <boost/algorithm/string.hpp>
 
 #include "mediate.h"
 
@@ -44,17 +43,17 @@ struct SProjBucket
 
 struct SSymbolBucket
 {
-  QString description;
+  std::string description;
   int useCount;
 
-  SSymbolBucket(const QString &descr) : description(descr), useCount(0) {}
+  SSymbolBucket(const std::string &descr) : description(descr), useCount(0) {}
 };
 
 // The symbol map forces unqiueness of symbols at the case-insensive level.
 
 struct SymbolCmp
 {
-  bool operator()(const QString &lhs, const QString &rhs) const { return (QString::compare(lhs, rhs, Qt::CaseInsensitive) < 0); }
+  bool operator()(const std::string &lhs, const std::string &rhs) const { return boost::algorithm::ilexicographical_compare(lhs, rhs); }
 };
 
 class CWorkSpace
@@ -66,49 +65,49 @@ class CWorkSpace
 
   void removeAllContent(void);
 
-  mediate_project_t* findProject(const QString &projectName) const;
-  mediate_analysis_window_t* findAnalysisWindow(const QString &projectName, const QString &windowName) const;
+  mediate_project_t* findProject(const std::string &projectName) const;
+  mediate_analysis_window_t* findAnalysisWindow(const std::string &projectName, const std::string &windowName) const;
 
-  const mediate_site_t* findSite(const QString &siteName) const;
-  QString findSymbol(const QString &symbolName) const;
+  const mediate_site_t* findSite(const std::string &siteName) const;
+  std::string findSymbol(const std::string &symbolName) const;
 
-  void incrementUseCount(const QString &symbolName);
-  void decrementUseCount(const QString &symbolName);
+  void incrementUseCount(const std::string &symbolName);
+  void decrementUseCount(const std::string &symbolName);
 
   // create item and return pointer the storage allocated (and managed) by the workspace. NULL is returned on failure.
-  mediate_project_t* createProject(const QString &newProjectName);
-  mediate_analysis_window_t* createAnalysisWindow(const QString &projectName, const QString &newWindowName,
-                          const QString &preceedingWindowName = QString());
-  bool createSite(const QString &newSiteName, const QString &abbr, double longitude, double latitude, double altitude);
-  bool createSymbol(const QString &newSymbolName, const QString &description);
+  mediate_project_t* createProject(const std::string &newProjectName);
+  mediate_analysis_window_t* createAnalysisWindow(const std::string &projectName, const std::string &newWindowName,
+                          const std::string &preceedingWindowName = std::string());
+  bool createSite(const std::string &newSiteName, const std::string &abbr, double longitude, double latitude, double altitude);
+  bool createSymbol(const std::string &newSymbolName, const std::string &description);
 
-  bool renameProject(const QString &oldProjectName, const QString &newProjectName);
-  bool renameAnalysisWindow(const QString &projectName, const QString &oldWindowName, const QString &newWindowName);
+  bool renameProject(const std::string &oldProjectName, const std::string &newProjectName);
+  bool renameAnalysisWindow(const std::string &projectName, const std::string &oldWindowName, const std::string &newWindowName);
 
-  void setConfigFile(const QString &fileName);
-  const QString& getConfigFile();
+  void setConfigFile(const std::string &fileName);
+  const std::string& getConfigFile();
 
-  bool modifySite(const QString &siteName, const QString &abbr, double longitude, double latitude, double altitude);
-  bool modifySymbol(const QString &symbolName, const QString &description);
-  void modifiedProjectProperties(const QString &projectName);
+  bool modifySite(const std::string &siteName, const std::string &abbr, double longitude, double latitude, double altitude);
+  bool modifySymbol(const std::string &symbolName, const std::string &description);
+  void modifiedProjectProperties(const std::string &projectName);
 
   // return arrays ( allocated with new [] ).
   mediate_site_t* siteList(int &listLength) const;
   mediate_symbol_t* symbolList(int &listLength) const;
-  mediate_analysis_window_t* analysisWindowList(const QString &projectName, int &listLength) const;
+  mediate_analysis_window_t* analysisWindowList(const std::string &projectName, int &listLength) const;
 
   // return deep-copied list of analysis window properties
-  QList<mediate_analysis_window_t*> analysisWindowList(const QString &projectName) const;
+  std::vector<mediate_analysis_window_t*> analysisWindowList(const std::string &projectName) const;
 
-  QStringList symbolList(void) const;
-  QStringList analysisWindowsWithSymbol(const QString &projectName, const QString &symbol) const;
-  bool setAnalysisWindowEnabled(const QString &projectName,
-                const QString &windowName, bool enabled);
+  std::vector<std::string> symbolList(void) const;
+  std::vector<std::string> analysisWindowsWithSymbol(const std::string &projectName, const std::string &symbol) const;
+  bool setAnalysisWindowEnabled(const std::string &projectName,
+                const std::string &windowName, bool enabled);
 
-  bool destroyProject(const QString &projectName);
-  bool destroyAnalysisWindow(const QString &projectName, const QString &newWindowName);
-  bool destroySite(const QString &siteName);
-  bool destroySymbol(const QString &symbolName);
+  bool destroyProject(const std::string &projectName);
+  bool destroyAnalysisWindow(const std::string &projectName, const std::string &newWindowName);
+  bool destroySite(const std::string &siteName);
+  bool destroySymbol(const std::string &symbolName);
 
  private:
   // singleton => no copies permitted
@@ -125,27 +124,27 @@ class CWorkSpace
   void attach(CProjectObserver *observer);
   void detach(CProjectObserver *observer);
 
-  void notifyProjectObserversModified(const QString &projectName);
+  void notifyProjectObserversModified(const std::string &projectName);
 
   friend class CSitesObserver;
   friend class CSymbolObserver;
   friend class CProjectObserver;
 
  private:
-  typedef std::map<QString,SSymbolBucket,SymbolCmp> symbolmap_t;
+  typedef std::map<std::string,SSymbolBucket,SymbolCmp> symbolmap_t;
 
   static CWorkSpace *m_instance;
 
-  QString m_configFile;
-  std::map<QString,SProjBucket> m_projMap;
-  std::map<QString,mediate_site_t*> m_siteMap;
+  std::string m_configFile;
+  std::map<std::string,SProjBucket> m_projMap;
+  std::map<std::string,mediate_site_t*> m_siteMap;
   symbolmap_t m_symbolMap;
   std::list<CSitesObserver*> m_sitesObserverList;
   std::list<CSymbolObserver*> m_symbolObserverList;
   std::list<CProjectObserver*> m_projectObserverList;
 };
 
-inline void CWorkSpace::modifiedProjectProperties(const QString &projectName) {
+inline void CWorkSpace::modifiedProjectProperties(const std::string &projectName) {
   notifyProjectObserversModified(projectName);
 }
 
@@ -155,9 +154,9 @@ class CSitesObserver {
   CSitesObserver();   // attaches and detaches to the singleton during construction/destruction
   virtual ~CSitesObserver();
 
-  virtual void updateNewSite(const QString &newSiteName);
-  virtual void updateModifySite(const QString &siteName);
-  virtual void updateDeleteSite(const QString &siteName);
+  virtual void updateNewSite(const std::string &newSiteName);
+  virtual void updateModifySite(const std::string &siteName);
+  virtual void updateDeleteSite(const std::string &siteName);
 };
 
 class CSymbolObserver {
@@ -165,9 +164,9 @@ class CSymbolObserver {
   CSymbolObserver();   // attaches and detaches to the singleton during construction/destruction
   virtual ~CSymbolObserver();
 
-  virtual void updateNewSymbol(const QString &newSymbolName);
-  virtual void updateModifySymbol(const QString &symbolName);
-  virtual void updateDeleteSymbol(const QString &symbolName);
+  virtual void updateNewSymbol(const std::string &newSymbolName);
+  virtual void updateModifySymbol(const std::string &symbolName);
+  virtual void updateDeleteSymbol(const std::string &symbolName);
 };
 
 class CProjectObserver {
@@ -175,10 +174,9 @@ class CProjectObserver {
   CProjectObserver();   // attaches and detaches to the singleton during construction/destruction
   virtual ~CProjectObserver();
 
-  virtual void updateNewProject(const QString &newProjectName);
-  virtual void updateModifyProject(const QString &projectName);
-  virtual void updateDeleteProject(const QString &projectName);
+  virtual void updateNewProject(const std::string &newProjectName);
+  virtual void updateModifyProject(const std::string &projectName);
+  virtual void updateDeleteProject(const std::string &projectName);
 };
 
 #endif
-

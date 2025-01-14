@@ -7,6 +7,8 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #ifndef _CPROJECTTREECLIPBOARD_H_GUARD
 #define _CPROJECTTREECLIPBOARD_H_GUARD
 
+#include <vector>
+
 #include <QString>
 #include <QList>
 #include <QTreeWidgetItem>
@@ -50,8 +52,8 @@ class CProjectTreeClipboard
   // a complete project ... takes ownershift responsibility of data referenced
   // by pointer (ie. properties, AWs, tree items)
   void insertProject(const QString &projectName, mediate_project_t *properties,
-             QList<mediate_analysis_window_t*> &analysisWindows,
-             QList<QTreeWidgetItem*> &rawSpectraItems);
+                     std::vector<mediate_analysis_window_t*> &analysisWindows,
+                     QList<QTreeWidgetItem*> &rawSpectraItems);
 
   // a single analysis window ... takes ownership of the analysisWindow
   void insertAnalysisWindow(mediate_analysis_window_t *analysisWindow);

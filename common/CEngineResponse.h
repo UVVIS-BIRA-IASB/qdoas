@@ -8,8 +8,8 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #ifndef _CENGINERESPONSE_H_GUARD
 #define _CENGINERESPONSE_H_GUARD
 
-#include <QList>
-#include <QString>
+#include <vector>
+#include <string>
 
 #include "CPlotDataSet.h"
 #include "CPlotImage.h"
@@ -27,7 +27,7 @@ class CEngineResponse
   CEngineResponse() : m_highestErrorLevel(0) {};
   virtual ~CEngineResponse() {};
 
-  void addErrorMessage(const QString &tag, const QString &msg, int errorLevel);
+  void addErrorMessage(const std::string &tag, const std::string &msg, int errorLevel);
 
   virtual void process(CEngineController *engineController) = 0;
 
@@ -38,10 +38,10 @@ class CEngineResponse
 
  protected:
   int m_highestErrorLevel;
-  QList<CEngineError> m_errorMessages;
+  std::vector<CEngineError> m_errorMessages;
 };
 
-inline bool CEngineResponse::hasErrors(void) const { return !m_errorMessages.isEmpty(); }
+inline bool CEngineResponse::hasErrors(void) const { return !m_errorMessages.empty(); }
 inline bool CEngineResponse::hasFatalError(void) const { return (m_highestErrorLevel == FatalEngineError); }
 
 //------------------------------------------------------------
@@ -63,14 +63,14 @@ class CEngineResponseVisual : public CEngineResponse
 
   void addDataSet(int pageNumber, const CPlotDataSet *dataSet);
   void addImage(int pageNumber,const CPlotImage *plotImage);
-  void addPageTitleAndTag(int pageNumber, const QString &title, const QString &tag);
+  void addPageTitleAndTag(int pageNumber, const std::string &title, const std::string &tag);
   void addCell(int pageNumber, int row, int col, const QVariant &data);
 
  protected:
-  QList<SPlotData> m_plotDataList;
-  QList<STitleTag> m_titleList;
-  QList<SCell> m_cellList;
-  QList<SPlotImage> m_plotImageList;
+  std::vector<SPlotData> m_plotDataList;
+  std::vector<STitleTag> m_titleList;
+  std::vector<SCell> m_cellList;
+  std::vector<SPlotImage> m_plotImageList;
 };
 
 //------------------------------------------------------------
@@ -78,15 +78,15 @@ class CEngineResponseVisual : public CEngineResponse
 class CEngineResponseBeginAccessFile : public CEngineResponseVisual
 {
  public:
-  CEngineResponseBeginAccessFile(const QString &fileName) : m_fileName(fileName),
-                                                            m_numberOfRecords(-1) {};
+  CEngineResponseBeginAccessFile(const std::string& fileName) : m_fileName(fileName),
+                                                                m_numberOfRecords(-1) {};
 
   virtual void process(CEngineController *engineController);
 
   void setNumberOfRecords(int numberOfRecords);
 
  private:
-  QString m_fileName;
+  std::string m_fileName;
   int m_numberOfRecords;
 };
 

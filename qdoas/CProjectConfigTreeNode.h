@@ -4,18 +4,17 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 */
 
+#include<string>
 
 #ifndef _CPROJECTCONFIGTREENODE_H_GUARD
 #define _CPROJECTCONFIGTREENODE_H_GUARD
-
-#include <QString>
 
 class CProjectConfigTreeNode
 {
  public:
   enum Type { eFile, eFolder, eDirectory };
 
-  CProjectConfigTreeNode(const QString &name, bool enabled);
+  CProjectConfigTreeNode(const std::string &name, bool enabled);
   virtual ~CProjectConfigTreeNode();
 
   CProjectConfigTreeNode *firstChild(void) const;
@@ -24,23 +23,23 @@ class CProjectConfigTreeNode
   void addChild(CProjectConfigTreeNode *child);
   void setNextSibling(CProjectConfigTreeNode *sibling);
 
-  const QString &name(void) const;
+  const std::string &name(void) const;
   bool isEnabled(void) const;
 
   virtual Type type(void) const = 0;
-  virtual QString filter(void) const;
+  virtual std::string filter(void) const;
   virtual bool recursive(void) const;
 
  protected:
   CProjectConfigTreeNode *m_firstChild, *m_nextSibling;
-  QString m_name;
+  std::string m_name;
   bool m_enabled;
 };
 
 class CProjectConfigFile : public CProjectConfigTreeNode
 {
  public:
-  CProjectConfigFile(const QString &name, bool enabled);
+  CProjectConfigFile(const std::string &name, bool enabled);
 
   virtual Type type(void) const;
 };
@@ -48,7 +47,7 @@ class CProjectConfigFile : public CProjectConfigTreeNode
 class CProjectConfigFolder : public CProjectConfigTreeNode
 {
  public:
-  CProjectConfigFolder(const QString &name, bool enabled);
+  CProjectConfigFolder(const std::string &name, bool enabled);
 
   virtual Type type(void) const;
 };
@@ -56,21 +55,21 @@ class CProjectConfigFolder : public CProjectConfigTreeNode
 class CProjectConfigDirectory : public CProjectConfigTreeNode
 {
  public:
-  CProjectConfigDirectory(const QString &name, const QString &filter, bool recurse, bool enabled);
+  CProjectConfigDirectory(const std::string &name, const std::string &filter, bool recurse, bool enabled);
 
   virtual Type type(void) const;
-  virtual QString filter(void) const;
+  virtual std::string filter(void) const;
   virtual bool recursive(void) const;
 
  private:
-  QString m_filter;
+  std::string m_filter;
   bool m_recurse;
 };
 
 inline CProjectConfigTreeNode* CProjectConfigTreeNode::firstChild(void) const { return m_firstChild; }
 inline CProjectConfigTreeNode* CProjectConfigTreeNode::nextSibling(void) const { return m_nextSibling; }
 inline void CProjectConfigTreeNode::setNextSibling(CProjectConfigTreeNode *sibling) { m_nextSibling = sibling; }
-inline const QString& CProjectConfigTreeNode::name(void) const { return m_name; }
+inline const std::string& CProjectConfigTreeNode::name(void) const { return m_name; }
 inline bool CProjectConfigTreeNode::isEnabled(void) const { return m_enabled; }
 
 #endif

@@ -10,8 +10,6 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 #include <libxml++/libxml++.h>
 
-#include <QString>
-
 #include "CConfigHandler.h"
 
 #include "mediate_convolution.h"
@@ -28,7 +26,7 @@ class CConvConfigHandler : public CConfigHandler
 
 protected:
   virtual void start_subhandler(const Glib::ustring& name,
-                                const std::map<Glib::ustring, QString>& attributes) override;
+                                const std::map<Glib::ustring, std::string>& attributes) override;
  private:
   mediate_convolution_t m_properties;
 };
@@ -42,7 +40,7 @@ class CConvGeneralSubHandler : public CConfigSubHandler
  public:
   CConvGeneralSubHandler(CConfigHandler *master, mediate_conv_general_t *d);
 
-  virtual void start(const std::map<Glib::ustring, QString>& attributes) override;
+  virtual void start(const std::map<Glib::ustring, std::string>& attributes) override;
 
  private:
   mediate_conv_general_t *m_d;
@@ -56,7 +54,7 @@ class CConvSlitSubHandler : public CConfigSubHandler
   CConvSlitSubHandler(CConfigHandler *master, mediate_slit_function_t *d);
 
   virtual void start(const Glib::ustring& name,
-                     const std::map<Glib::ustring, QString>& attributes) override;
+                     const std::map<Glib::ustring, std::string>& attributes) override;
 
  private:
   mediate_slit_function_t *m_d;

@@ -9,9 +9,9 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 // storage class for CPlotDataSets grouped into a single page
 
-#include <QList>
-
 #include <memory>
+#include <string>
+#include <vector>
 
 #include "CPlotDataSet.h"
 #include "CPlotImage.h"
@@ -28,26 +28,26 @@ class CPlotPageData
   bool isEmpty(void) const;
   int pageNumber(void) const;
   int size(void) const;
-  const QString& title(void) const;
-  const QString& tag(void) const;
+  const std::string& title(void) const;
+  const std::string& tag(void) const;
   int type(void) const;
   std::shared_ptr<const CPlotDataSet> dataSet(int index) const;
   std::shared_ptr<const CPlotImage> dataImage(int index) const;
 
-  void setTitle(const QString &title);
-  void setTag(const QString &tag);
+  void setTitle(const std::string &title);
+  void setTag(const std::string &tag);
   void addPlotDataSet(const CPlotDataSet *dataSet); // page takes ownership responsibility
   void addPlotImage(const CPlotImage *dataImage);
 
  private:
   int m_pageNumber;
   int m_pageType;
-  QString m_title, m_tag;
-  QList<std::shared_ptr<const CPlotDataSet> > m_dataSets;
-  QList<std::shared_ptr<const CPlotImage> > m_dataImages;
+  std::string m_title, m_tag;
+  std::vector<std::shared_ptr<const CPlotDataSet> > m_dataSets;
+  std::vector<std::shared_ptr<const CPlotImage> > m_dataImages;
 };
 
-inline bool CPlotPageData::isEmpty(void) const { return (m_pageType==PLOTPAGE_DATASET)?m_dataSets.isEmpty():m_dataImages.isEmpty(); }
+inline bool CPlotPageData::isEmpty(void) const { return (m_pageType==PLOTPAGE_DATASET)?m_dataSets.empty():m_dataImages.empty(); }
 
 #endif
 

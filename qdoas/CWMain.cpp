@@ -369,7 +369,7 @@ void CWMain::setProjectFileName(const QString &fileName)
   QString str("Qdoas - ");
 
   m_projectFile = fileName;
-  CWorkSpace::instance()->setConfigFile(fileName);
+  CWorkSpace::instance()->setConfigFile(fileName.toStdString());
 
   if (m_projectFile.isEmpty()) {
     str += "Unnamed[*]";
@@ -436,11 +436,11 @@ void CWMain::openFile(const QString &fileName) {
 
       // store the paths in the pathMgr for simplification when saving ...
       for (int i = 0; i<10; ++i) {
-        QString path = handler.getPath(i);
+        QString path(QString::fromStdString(handler.getPath(i)));
         if (path.isEmpty())
-      pathMgr->removePath(i);
+          pathMgr->removePath(i);
         else
-      pathMgr->addPath(i, path);
+          pathMgr->addPath(i, path);
       }
 
       // sites

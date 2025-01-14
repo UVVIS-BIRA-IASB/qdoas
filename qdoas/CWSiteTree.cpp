@@ -97,7 +97,7 @@ void CWSiteTree::createSiteItem(const mediate_site_t *site)
 
 void CWSiteTree::updateNewSite(const QString &newSiteName)
 {
-  const mediate_site_t *site = CWorkSpace::instance()->findSite(newSiteName);
+  const mediate_site_t *site = CWorkSpace::instance()->findSite(newSiteName.toStdString());
 
   if (site != NULL) {
     createSiteItem(site);
@@ -106,7 +106,7 @@ void CWSiteTree::updateNewSite(const QString &newSiteName)
 
 void CWSiteTree::updateModifySite(const QString &siteName)
 {
-  const mediate_site_t *site = CWorkSpace::instance()->findSite(siteName);
+  const mediate_site_t *site = CWorkSpace::instance()->findSite(siteName.toStdString());
 
   if (site != NULL) {
 
@@ -140,7 +140,7 @@ void CWSiteTree::updateModifySite(const QString &siteName)
 
 void CWSiteTree::updateDeleteSite(const QString &siteName)
 {
-  const mediate_site_t *site = CWorkSpace::instance()->findSite(siteName);
+  const mediate_site_t *site = CWorkSpace::instance()->findSite(siteName.toStdString());
 
   if (site != NULL) {
 
@@ -214,7 +214,7 @@ void CWSiteTree::slotDeleteSite()
     QString siteName = item->text(0);
     ++it;
 
-    CWorkSpace::instance()->destroySite(siteName);
+    CWorkSpace::instance()->destroySite(siteName.toStdString());
   }
 }
 
