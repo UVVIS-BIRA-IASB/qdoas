@@ -444,22 +444,14 @@ void CWMain::openFile(const QString &fileName) {
       }
 
       // sites
-      const QList<const CSiteConfigItem*> &siteItems = handler.siteItems();
-      QList<const CSiteConfigItem*>::const_iterator siteIt = siteItems.begin();
-      while (siteIt != siteItems.end()) {
-
-        ws->createSite((*siteIt)->siteName(), (*siteIt)->abbreviation(),
-               (*siteIt)->longitude(), (*siteIt)->latitude(), (*siteIt)->altitude());
-        ++siteIt;
+      for (const auto item : handler.siteItems()) {
+        ws->createSite(item.siteName(), item.abbreviation(),
+                       item.longitude(), item.latitude(), item.altitude());
       }
 
       // symbols
-      const QList<const CSymbolConfigItem*> &symbolItems = handler.symbolItems();
-      QList<const CSymbolConfigItem*>::const_iterator symIt = symbolItems.begin();
-      while (symIt != symbolItems.end()) {
-
-        ws->createSymbol((*symIt)->symbolName(), (*symIt)->symbolDescription());
-        ++symIt;
+      for (const auto item : handler.symbolItems()) {
+        ws->createSymbol(item.symbolName(), item.symbolDescription());
       }
 
       // projects

@@ -15,21 +15,7 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #include "debugutil.h"
 
 using std::map;
-
-CQdoasConfigHandler::~CQdoasConfigHandler()
-{
-  while (!m_projectItemList.isEmpty()) {
-    delete m_projectItemList.takeFirst();
-  }
-
-  while (!m_siteItemList.isEmpty()) {
-    delete m_siteItemList.takeFirst();
-  }
-
-  while (!m_symbolList.isEmpty()) {
-    delete m_symbolList.takeFirst();
-  }
-}
+using std::vector;
 
 void CQdoasConfigHandler::start_subhandler(const Glib::ustring& name,
                                            const map<Glib::ustring, QString>& atts) {
@@ -52,41 +38,32 @@ void CQdoasConfigHandler::start_subhandler(const Glib::ustring& name,
   }
 }
 
-void CQdoasConfigHandler::addProjectItem(CProjectConfigItem *item)
+void CQdoasConfigHandler::addProjectItem(CProjectConfigItem item)
 {
   m_projectItemList.push_back(item);
 }
 
-QList<const CProjectConfigItem*> CQdoasConfigHandler::projectItems(void) const
+const vector<CProjectConfigItem>& CQdoasConfigHandler::projectItems() const
 {
   return m_projectItemList;
 }
 
-QList<const CProjectConfigItem*> CQdoasConfigHandler::takeProjectItems(void)
-{
-  QList<const CProjectConfigItem*> items = m_projectItemList; // copy the pointers...
-
-  m_projectItemList.clear(); // responsibility was passed to 'items' list
-
-  return items;
-}
-
-void CQdoasConfigHandler::addSiteItem(CSiteConfigItem *item)
+void CQdoasConfigHandler::addSiteItem(CSiteConfigItem item)
 {
   m_siteItemList.push_back(item);
 }
 
-QList<const CSiteConfigItem*> CQdoasConfigHandler::siteItems(void) const
+const vector<CSiteConfigItem>& CQdoasConfigHandler::siteItems() const
 {
   return m_siteItemList;
 }
 
 void CQdoasConfigHandler::addSymbol(const QString &symbolName, const QString &symbolDescription)
 {
-  m_symbolList.push_back(new CSymbolConfigItem(symbolName, symbolDescription));
+  m_symbolList.emplace_back(symbolName, symbolDescription);
 }
 
-QList<const CSymbolConfigItem*> CQdoasConfigHandler::symbolItems(void) const
+const vector<CSymbolConfigItem>& CQdoasConfigHandler::symbolItems() const
 {
   return m_symbolList;
 }
@@ -108,31 +85,30 @@ void CSiteSubHandler::start(const Glib::ustring& element, const map<Glib::ustrin
     double tmpDouble;
 
     // create a new config item for the site
-    CSiteConfigItem *item = new CSiteConfigItem;
+    CSiteConfigItem item;
 
     str = value(atts, "name");
     if (str.isEmpty()) {
-      delete item;
       throw std::runtime_error("Missing site name");
     }
     else
-      item->setSiteName(str);
+      item.setSiteName(str);
 
     str = value(atts, "abbrev");
     if (!str.isEmpty())
-      item->setAbbreviation(str);
+      item.setAbbreviation(str);
 
     tmpDouble = value(atts, "long").toDouble(&ok);
     if (ok)
-      item->setLongitude(tmpDouble);
+      item.setLongitude(tmpDouble);
 
     tmpDouble = value(atts, "lat").toDouble(&ok);
     if (ok)
-      item->setLatitude(tmpDouble);
+      item.setLatitude(tmpDouble);
 
     tmpDouble = value(atts, "alt").toDouble(&ok);
     if (ok)
-      item->setAltitude(tmpDouble);
+      item.setAltitude(tmpDouble);
 
     master()->addSiteItem(item);
 
@@ -176,22 +152,16 @@ void CSymbolSubHandler::start(const Glib::ustring &element, const map<Glib::ustr
 CProjectSubHandler::CProjectSubHandler(CQdoasConfigHandler *master) :
   CQdoasConfigSubHandler(master)
 {
-  m_project = new CProjectConfigItem;
-}
-
-CProjectSubHandler::~CProjectSubHandler()
-{
-  delete m_project;
 }
 
 void CProjectSubHandler::start(const map<Glib::ustring, QString> &atts)
 {
   // the project element - must have a name
 
-  m_project->setName(value(atts, "name"));
-  m_project->setEnabled(value(atts, "disable") != "true");
+  m_project.setName(value(atts, "name"));
+  m_project.setEnabled(value(atts, "disable") != "true");
 
-  if (m_project->name().isEmpty()) {
+  if (m_project.name().isEmpty()) {
     throw std::runtime_error("Project with empty name.");
   }
 }
@@ -199,7 +169,7 @@ void CProjectSubHandler::start(const map<Glib::ustring, QString> &atts)
 void CProjectSubHandler::start(const Glib::ustring &element, const map<Glib::ustring, QString> &atts)
 {
   // a sub element of project ... create a specialized handler and delegate
-  mediate_project_t *prop = m_project->properties();
+  mediate_project_t *prop = m_project.properties();
 
   if (element == "display") {
     return m_master->install_subhandler(new CProjectDisplaySubHandler(m_master, &(prop->display)), atts);
@@ -211,7 +181,7 @@ void CProjectSubHandler::start(const Glib::ustring &element, const map<Glib::ust
     return m_master->install_subhandler(new CProjectAnalysisSubHandler(m_master, &(prop->analysis)), atts);
   }
   else if (element == "raw_spectra") {
-    return m_master->install_subhandler(new CProjectRawSpectraSubHandler(m_master, m_project->rootNode()), atts);
+    return m_master->install_subhandler(new CProjectRawSpectraSubHandler(m_master, m_project.rootNode()), atts);
   }
   else if (element == "lowpass_filter") {
     return m_master->install_subhandler(new CFilteringSubHandler(m_master, &(prop->lowpass)), atts);
@@ -239,7 +209,7 @@ void CProjectSubHandler::start(const Glib::ustring &element, const map<Glib::ust
   }
   else if (element == "analysis_window") {
     // allocate a new item in the project for this AW
-    CAnalysisWindowConfigItem *awItem = m_project->issueNewAnalysisWindowItem();
+    CAnalysisWindowConfigItem *awItem = m_project.issueNewAnalysisWindowItem();
     if (awItem)
       return m_master->install_subhandler(new CAnalysisWindowSubHandler(m_master, awItem), atts);
   }
@@ -248,7 +218,5 @@ void CProjectSubHandler::start(const Glib::ustring &element, const map<Glib::ust
 void CProjectSubHandler::end()
 {
   // end of project ... hand project data over to the master handler
-
   master()->addProjectItem(m_project);
-  m_project = NULL; // releases ownership responsibility
 }
