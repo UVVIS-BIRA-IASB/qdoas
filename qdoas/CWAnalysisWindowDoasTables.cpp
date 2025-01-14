@@ -615,19 +615,19 @@ void CWMoleculesDoasTable::contextMenuEvent(QContextMenuEvent *e)
 
 void CWMoleculesDoasTable::slotInsertRow()
 {
-  QStringList allSymbols = CWorkSpace::instance()->symbolList();
+  auto allSymbols = CWorkSpace::instance()->symbolList();
   QStringList freeSymbols;
   QString filter;
   int index;
 
   // build a list of free symbol and a file filter string
-  QStringList::const_iterator it = allSymbols.begin();
+  auto it = allSymbols.begin();
   while (it != allSymbols.end()) {
-    index = m_symbols.indexOf(*it);
+    QString symbol_name= QString::fromStdString(*it);
+    index = m_symbols.indexOf(symbol_name);
     if (index == -1) {
       // a free symbol ...
-      freeSymbols << *it;
-      QString symbol_name=*it;
+      freeSymbols << symbol_name;
 
       // if the name of the symbol contains parenthesis (for example, slope and pukite), the selection is made on the symbol within parenthesis
       // Use only Slope* and Pukite* filters
@@ -635,12 +635,12 @@ void CWMoleculesDoasTable::slotInsertRow()
       if (symbol_name.startsWith("Slope") || symbol_name.startsWith("Pukite"))
        {
         if (symbol_name.startsWith("Slope"))
-         filter.append(*it).append(" (Slope*.*);;");
+         filter.append(symbol_name).append(" (Slope*.*);;");
         if (symbol_name.startsWith("Pukite"))
-         filter.append(*it).append(" (Pukite*.*);;");
+         filter.append(symbol_name).append(" (Pukite*.*);;");
        }
       else
-       filter.append(*it).append(" (").append(*it).append("_*.*);;");
+       filter.append(symbol_name).append(" (").append(symbol_name).append("_*.*);;");
     }
     ++it;
   }
@@ -652,7 +652,7 @@ void CWMoleculesDoasTable::slotInsertRow()
     CPreferences *prefs = CPreferences::instance();
 
     QString fileName = QFileDialog::getOpenFileName(this, "Select Cross Section File",
-                            prefs->directoryName("CrossSection"), filter);
+                                                    prefs->directoryName("CrossSection"), filter);
 
     if (!fileName.isEmpty() && fileName.length() < FILENAME_BUFFER_LENGTH) {
 
@@ -662,30 +662,30 @@ void CWMoleculesDoasTable::slotInsertRow()
       QString baseName = CPreferences::baseName(fileName);
 
       // the start of the filename MUST match a free symbol ...
-      it = freeSymbols.begin();
+      auto it = freeSymbols.begin();
       while (it != freeSymbols.end()) {
-    QString tmp(*it);
-    tmp.append('_');
-    if (baseName.startsWith(tmp, Qt::CaseInsensitive)) {
-      // a match to a symbol ... OK to add the row ...
-      QList<QVariant> initialValues;
-      // NOTE: initialized with default values here ...
-      initialValues.push_back(QString("None"));
-      initialValues.push_back(QString("Interpolate"));                             // cross type should be set to interpolate by default
-      initialValues.push_back(QString("None"));
-      initialValues.push_back(QString("None"));
-      initialValues.push_back(true);
-      initialValues.push_back(true);                                               // Require filter should be initialized at true !!!
-      initialValues.push_back(false);
-      initialValues.push_back(true);
-      initialValues.push_back(0.0);
-      initialValues.push_back(1.0e-3);
-      initialValues.push_back(0.0);
+        QString tmp(*it);
+        tmp.append('_');
+        if (baseName.startsWith(tmp, Qt::CaseInsensitive)) {
+          // a match to a symbol ... OK to add the row ...
+          QList<QVariant> initialValues;
+          // NOTE: initialized with default values here ...
+          initialValues.push_back(QString("None"));
+          initialValues.push_back(QString("Interpolate"));                             // cross type should be set to interpolate by default
+          initialValues.push_back(QString("None"));
+          initialValues.push_back(QString("None"));
+          initialValues.push_back(true);
+          initialValues.push_back(true);                                               // Require filter should be initialized at true !!!
+          initialValues.push_back(false);
+          initialValues.push_back(true);
+          initialValues.push_back(0.0);
+          initialValues.push_back(1.0e-3);
+          initialValues.push_back(0.0);
 
-      addRow(cStandardRowHeight, *it, initialValues, fileName, QString());
-      return;
-    }
-    ++it;
+          addRow(cStandardRowHeight, *it, initialValues, fileName, QString());
+          return;
+        }
+        ++it;
       }
     }
   }

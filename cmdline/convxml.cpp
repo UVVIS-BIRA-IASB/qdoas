@@ -53,210 +53,150 @@
 //
 //  ----------------------------------------------------------------------------
 
+#include <iostream>
+#include <vector>
+
+#include <boost/algorithm/string.hpp>
+
 #include "convxml.h"
+
+#include "constants.h"
+
+using std::string;
+using std::vector;
 
 const char *convFalseTrue[]={"false","true"};
 
-void ConvApplyString(QString *pXmlKey,                                          // the path of the field to replace
-                     QString *pXmlValue,                                        // string with the new value
+void ConvApplyString(const string& xmlKey,                                      // the path of the field to replace
+                     const string& xmlValue,                                    // string with the new value
                      char *newstring)                                           // pointer to the field to change
- {
-     // Declarations
-
-     char msgString[MAX_STR_LEN+1];
-
-     // Build message with old and new values
-
-  sprintf(msgString,"%s : %s replaced by %s",pXmlKey->toLocal8Bit().constData(),newstring,pXmlValue->toLocal8Bit().constData());
-  std::cout << msgString << std::endl;
-
+{
+  std::cout << xmlKey << ": " << newstring << " replaced by " << xmlValue << std::endl;
   // Replace the old value by the new one
+  strcpy(newstring,xmlValue.c_str());
+}
 
-  strcpy(newstring,pXmlValue->toLocal8Bit().constData());
- }
-
-void ConvApplyChoice(QString *pXmlKey,                                          // the path of the field to replace
-                     QString *pXmlValue,                                        // string with the new value
+void ConvApplyChoice(const string& xmlKey,                                          // the path of the field to replace
+                     const string& xmlValue,                                        // string with the new value
                      const char *optionsList[],                                 // list of possible options
                      int nOptions,                                              // number of options in the previous list
                      int *pNewIndexOption)                                      // index of the new option
- {
-     // Declarations
+{
+  int indexOption = 0;
+  for (indexOption=0; indexOption<nOptions; indexOption++)
+    if (xmlValue == optionsList[indexOption])
+      break;
 
-     char msgString[MAX_STR_LEN+1];
-     INDEX indexOption;
-
-  for (indexOption=0;indexOption<nOptions;indexOption++)
-      if (*pXmlValue==optionsList[indexOption])
-       break;
-
-  if (indexOption<nOptions)
-   {
-       // Build message with old and new values
-
-    sprintf(msgString,"%s : %s replaced by %s",
-                       pXmlKey->toLocal8Bit().constData(),
-                       optionsList[*pNewIndexOption],pXmlValue->toLocal8Bit().constData());
-
-    std::cout << msgString << std::endl;
-
-    // Replace the old value by the new one
-
+  if (indexOption<nOptions) {
+    // Print message with old and new values
+    std::cout << xmlKey << ": " << optionsList[*pNewIndexOption]
+              << " replaced by " << xmlValue << std::endl;
     *pNewIndexOption=indexOption;
    }
- }
+}
 
 // =========
 // SLIT PAGE
 // =========
 
-RC ParseSlit(QStringList &xmlFields,int xmlFieldN,int startingField,QString *pXmlKey,QString *pXmlValue,mediate_slit_function_t *pSlit)
- {
-     // Declarations
+RC ParseSlit(const vector<string>& xmlFields, size_t xmlFieldN, size_t startingField, const string& xmlKey, const string& xmlValue, mediate_slit_function_t *pSlit) {
+  int slitFuncFlag=0;
+  RC rc=ERROR_ID_NO;
 
-  int slitFuncFlag;
-     int indexField;
-     RC  rc;
-
-     // Initializations
-
-     slitFuncFlag=0;
-     rc=ERROR_ID_NO;
-
-     for (indexField=startingField;indexField<xmlFieldN;indexField++)
-      {
-    if (slitFuncFlag)
-     {
-         if (xmlFields.at(indexField)=="file")
-          {
-              if (indexField+1>=xmlFieldN)
-               std::cout << xmlFields.at(indexField).toLocal8Bit().constData() << " attribute is missing" << std::endl;
-              else if (xmlFields.at(indexField+1)=="file")
-               ConvApplyString(pXmlKey,pXmlValue,pSlit->file.filename);
-              else if (xmlFields.at(indexField+1)=="file2")
-               ConvApplyString(pXmlKey,pXmlValue,pSlit->file.filename2);
-              else if (xmlFields.at(indexField+1)=="wveDptFlag")
-         ConvApplyChoice(pXmlKey,pXmlValue,convFalseTrue,2,&pSlit->file.wveDptFlag);
-
+  for (size_t indexField=startingField; indexField<xmlFieldN; ++indexField) {
+    if (slitFuncFlag) {
+      if (xmlFields.at(indexField)=="file") {
+        if (indexField+1>=xmlFieldN)
+          std::cout << xmlFields.at(indexField) << " attribute is missing" << std::endl;
+        else if (xmlFields.at(indexField+1)=="file")
+          ConvApplyString(xmlKey,xmlValue,pSlit->file.filename);
+        else if (xmlFields.at(indexField+1)=="file2")
+          ConvApplyString(xmlKey,xmlValue,pSlit->file.filename2);
+        else if (xmlFields.at(indexField+1)=="wveDptFlag")
+          ConvApplyChoice(xmlKey,xmlValue,convFalseTrue,2,&pSlit->file.wveDptFlag);
         break;
-          }
-         else
-          std::cout << xmlFields.at(indexField).toLocal8Bit().constData() << " fields can not be changed yet" << std::endl;
-           }
-          else if (xmlFields.at(indexField)=="slit_func")
-           slitFuncFlag=1;
-          else
-     std::cout << pXmlKey->toLocal8Bit().constData() << " unknown path" << std::endl;
-   }
+      } else {
+        std::cout << xmlFields.at(indexField) << " fields can not be changed yet" << std::endl;
+      }
+    } else if (xmlFields.at(indexField)=="slit_func") {
+      slitFuncFlag=1;
+    } else {
+      std::cout << xmlKey << " unknown path" << std::endl;
+    }
+  }
 
   // Return
 
   return rc;
  }
 
-RC CONVXML_Parse(QList<QString> &xmlCommands,mediate_convolution_t *properties)
- {
-  QList<QString>::const_iterator it = xmlCommands.begin();
+RC CONVXML_Parse(const vector<string> &xmlCommands,mediate_convolution_t *properties) {
+  RC rc=ERROR_ID_NO;
 
-  QString newXmlCmd;
-  QStringList xmlParts;
-  QStringList xmlFields;
-  QString xmlKey,xmlValue;
+  for (const auto& xml_cmd : xmlCommands) {
+    vector<string> xmlParts;
+    boost::split(xmlParts, xml_cmd, boost::is_any_of("="));
+    if (xmlParts.size()==2) {
+      const auto xmlKey=xmlParts.at(0);
+      const auto xmlValue=xmlParts.at(1);
 
-  int xmlFieldsN,indexField;
-  RC rc;
+      vector<string> xmlFields;
+      boost::split(xmlFields, xmlKey, boost::is_any_of("/"));
+      size_t xmlFieldsN=xmlFields.size();
 
-  // Initializations
-
-  rc=ERROR_ID_NO;
-
-  while ((it!=xmlCommands.end()) && !rc)
-   {
-    newXmlCmd=*it;
-    xmlParts=newXmlCmd.split("=");
-    if (xmlParts.size()==2)
-     {
-         xmlKey=xmlParts.at(0);
-         xmlValue=xmlParts.at(1);
-
-         xmlFields=xmlKey.split("/");
-         xmlFieldsN=xmlFields.size();
-
-         for (indexField=0;(indexField<xmlFieldsN) && !rc;indexField++)
-          {
-        if (xmlFields.at(indexField)=="general")
-         {
-             if (xmlFields.at(indexField+1)=="calib")
-              {
-            ConvApplyString(&xmlKey,&xmlValue,properties->general.calibrationFile);        // the path of the field to replace
+      for (size_t indexField=0; (indexField<xmlFieldsN) && !rc; ++indexField) {
+        if (xmlFields.at(indexField)=="general") {
+          if (xmlFields.at(indexField+1)=="calib") {
+            ConvApplyString(xmlKey, xmlValue, properties->general.calibrationFile);        // the path of the field to replace
             break;
-           }
-         }
-        else if (xmlFields.at(indexField)=="con_slit")
-         {
-          rc=ParseSlit(xmlFields,xmlFieldsN,indexField+1,&xmlKey,&xmlValue,&properties->conslit);
-          break;
-         }
-        else if (xmlFields.at(indexField)=="dec_slit")
-         std::cout << xmlKey.toLocal8Bit().constData() << " fields can not be changed yet" << std::endl;
-        else if (xmlFields.at(indexField)=="lowpass_filter")
-         std::cout << xmlKey.toLocal8Bit().constData() << " fields can not be changed yet" << std::endl;
-        else if (xmlFields.at(indexField)=="highpass_filter")
-               std::cout << xmlKey.toLocal8Bit().constData() << " fields can not be changed yet" << std::endl;
           }
-     }
-
-
-    ++it;
-   }
-
+        } else if (xmlFields.at(indexField)=="con_slit") {
+          rc=ParseSlit(xmlFields,xmlFieldsN,indexField+1,xmlKey,xmlValue,&properties->conslit);
+          break;
+        } else if (xmlFields.at(indexField)=="dec_slit") {
+          std::cout << xmlKey << " fields can not be changed yet" << std::endl;
+        } else if (xmlFields.at(indexField)=="lowpass_filter") {
+          std::cout << xmlKey << " fields can not be changed yet" << std::endl;
+        } else if (xmlFields.at(indexField)=="highpass_filter") {
+          std::cout << xmlKey << " fields can not be changed yet" << std::endl;
+        }
+      }
+    }
+    if (rc) {
+      break;
+    }
+  }
   return rc;
- }
+}
 
-RC RINGXML_Parse(QList<QString> &xmlCommands,mediate_ring *properties)
+RC RINGXML_Parse(const vector<string> &xmlCommands,mediate_ring *properties)
  {
-  QList<QString>::const_iterator it = xmlCommands.begin();
+  RC rc = ERROR_ID_NO;
 
-  QString newXmlCmd;
-  QStringList xmlParts;
-  QStringList xmlFields;
-  QString xmlKey,xmlValue;
+  for (const auto& xml_cmd : xmlCommands) {
+    vector<string> xmlParts;
+    boost::split(xmlParts, xml_cmd, boost::is_any_of("="));
+    if (xmlParts.size()==2) {
+      const auto xmlKey=xmlParts.at(0);
+      const auto xmlValue=xmlParts.at(1);
 
-  int xmlFieldsN,indexField;
-  RC rc;
+      vector<string> xmlFields;
+      boost::split(xmlFields, xmlKey, boost::is_any_of("/"));
+      size_t xmlFieldsN=xmlFields.size();
 
-  // Initializations
-
-  rc=ERROR_ID_NO;
-
-  while ((it!=xmlCommands.end()) && !rc)
-   {
-    newXmlCmd=*it;
-    xmlParts=newXmlCmd.split("=");
-    if (xmlParts.size()==2)
-     {
-         xmlKey=xmlParts.at(0);
-         xmlValue=xmlParts.at(1);
-
-         xmlFields=xmlKey.split("/");
-         xmlFieldsN=xmlFields.size();
-
-         for (indexField=0;(indexField<xmlFieldsN) && !rc;indexField++)
-          {
-        if (xmlFields.at(indexField)=="general")
-         {
+      for (size_t indexField=0;(indexField<xmlFieldsN) && !rc;indexField++) {
+        if (xmlFields.at(indexField)=="general") {
           if (xmlFields.at(indexField+1)=="calib")
-           ConvApplyString(&xmlKey,&xmlValue,properties->calibrationFile);        // the path of the field to replace
+            ConvApplyString(xmlKey,xmlValue,properties->calibrationFile);        // the path of the field to replace
           else
-           rc=ParseSlit(xmlFields,xmlFieldsN,indexField+1,&xmlKey,&xmlValue,&properties->slit);
-
+            rc=ParseSlit(xmlFields,xmlFieldsN,indexField+1,xmlKey,xmlValue,&properties->slit);
           break;
-         }
-          }
-     }
-
-
-    ++it;
+        }
+      }
+    }
+    if (rc) {
+      break;
+    }
    }
 
   return rc;

@@ -102,7 +102,7 @@ bool CWProjectExportEditor::actionOk(void)
 
   m_selector->apply(&(m_properties->selection));
 
-  CWorkSpace::instance()->modifiedProjectProperties(m_projectName);
+  CWorkSpace::instance()->modifiedProjectProperties(m_projectName.toStdString());
   m_projectTree->ExportSpectra();
 
   return true;

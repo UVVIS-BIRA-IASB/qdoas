@@ -64,7 +64,7 @@ void CWUserSymbolTree::savePreferences(void)
 
 void CWUserSymbolTree::updateNewSymbol(const QString &newSymbolName)
 {
-  QString description = CWorkSpace::instance()->findSymbol(newSymbolName);
+  QString description(QString::fromStdString(CWorkSpace::instance()->findSymbol(newSymbolName.toStdString())));
 
   if (!description.isNull()) {
 
@@ -79,7 +79,7 @@ void CWUserSymbolTree::updateNewSymbol(const QString &newSymbolName)
 
 void CWUserSymbolTree::updateModifySymbol(const QString &symbolName)
 {
-  QString description = CWorkSpace::instance()->findSymbol(symbolName);
+  QString description(QString::fromStdString(CWorkSpace::instance()->findSymbol(symbolName.toStdString())));
 
   if (!description.isNull()) {
 
@@ -94,7 +94,7 @@ void CWUserSymbolTree::updateModifySymbol(const QString &symbolName)
 
 void CWUserSymbolTree::updateDeleteSymbol(const QString &symbolName)
 {
-  QString description = CWorkSpace::instance()->findSymbol(symbolName);
+  QString description(QString::fromStdString(CWorkSpace::instance()->findSymbol(symbolName.toStdString())));
 
   if (!description.isNull()) {
 
@@ -170,7 +170,7 @@ void CWUserSymbolTree::slotDeleteSymbol()
     QString symbolName = item->text(0);
     ++it;
 
-    if (!CWorkSpace::instance()->destroySymbol(symbolName))
+    if (!CWorkSpace::instance()->destroySymbol(symbolName.toStdString()))
       lockedSymbols << symbolName;
   }
 

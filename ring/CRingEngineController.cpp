@@ -1,5 +1,4 @@
-
-#include <QTextStream>
+#include <sstream>
 
 #include "CRingEngineController.h"
 
@@ -52,8 +51,7 @@ void CRingEngineController::notifyPlotData(QList<SPlotData> &plotDataList, QList
 void CRingEngineController::notifyErrorMessages(int highestErrorLevel, const QList<CEngineError> &errorMessages)
 {
   // format each into a message text and put in a single string for posting ...
-  QString msg;
-  QTextStream stream(&msg);
+  std::ostringstream stream;
 
   QList<CEngineError>::const_iterator it = errorMessages.begin();
   while (it != errorMessages.end()) {
@@ -75,6 +73,6 @@ void CRingEngineController::notifyErrorMessages(int highestErrorLevel, const QLi
     ++it;
   }
 
-  emit signalErrorMessages(highestErrorLevel, msg);
+  emit signalErrorMessages(highestErrorLevel, QString::fromStdString(stream.str()));
 }
 

@@ -8,11 +8,7 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #ifndef _CBATCHENGINECONTROLLER_H_GUARD
 #define _CBATCHENGINECONTROLLER_H_GUARD
 
-#include <QFileInfo>
-#include <QStringList>
-
 #include "CEngineController.h"
-
 #include "mediate_project.h"
 
 
@@ -25,10 +21,10 @@ class CBatchEngineController : public CEngineController
   bool active(void) const;
 
   // notify interface is for use by response classes
-  virtual void notifyReadyToNavigateRecords(const QString &filename, int numberOfRecords);
+  virtual void notifyReadyToNavigateRecords(const std::string &filename, int numberOfRecords);
   virtual void notifyEndOfRecords(void);
 
-  virtual void notifyErrorMessages(int highestErrorLevel, const QList<CEngineError> &errorMessages);
+  virtual void notifyErrorMessages(int highestErrorLevel, const std::vector<CEngineError> &errorMessages);
 
  private:
   bool    m_active;

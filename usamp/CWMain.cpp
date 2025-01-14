@@ -293,7 +293,7 @@ void CWMain::slotOpenFile()
 
     // store the paths in the pathMgr for simplification when saving ...
     for (int i = 0; i<10; ++i) {
-      QString path = handler.getPath(i);
+      QString path(QString::fromStdString(handler.getPath(i)));
       if (path.isEmpty())
     pathMgr->removePath(i);
       else
@@ -509,7 +509,7 @@ void CWMain::slotPlotPage(std::shared_ptr<const CPlotPageData> page)
       m_plotArea = new CWPlotArea;
       m_plotArea->setProperties(prop);
 
-      m_tab->addTab(m_plotArea, page->title());
+      m_tab->addTab(m_plotArea, QString::fromStdString(page->title()));
     }
 
     m_plotArea->setPage(page);

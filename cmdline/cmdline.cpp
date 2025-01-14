@@ -210,13 +210,13 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include <QFile>
-#include <QString>
-#include <QList>
+
 #include <QDir>
 #include <QFileInfo>
-#include <QLocale>
+#include <QStringList>
 #include <clocale>
+
+#include <boost/algorithm/string.hpp>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -227,6 +227,7 @@
 #include <sys/ioctl.h>
 #include <termios.h>
 
+using std::string;
 using std::vector;
 
 // kbhit function doesn't exist in Linux libraries (implementation found on the web)
@@ -248,7 +249,6 @@ bool kbhit()
     return byteswaiting > 0;
 }
 #endif
-#include "dir_iter.h"
 
 #include "CWorkSpace.h"
 #include "CQdoasConfigHandler.h"
@@ -299,13 +299,13 @@ enum BatchTool {
 
 typedef struct commands
 {
-  QString configFile;
-  QString projectName;
-  QString triggerDir;
-  QList<QString> filenames;
-  QList<QString> xmlCommands;
-  QString outputDir;
-  QString calibDir;
+  string configFile;
+  string projectName;
+  string triggerDir;
+  vector<string> filenames;
+  vector<string> xmlCommands;
+  string outputDir;
+  string calibDir;
 } commands_t;
 
 // -----------------------------------------------------------------------------
@@ -418,11 +418,11 @@ double GetLastTimestamp(char *timestampFile,timestamp_t *pTimestamp)
 // GetFiles : returns the list of files to process
 //            these files come from trigger lists in the trigger path with timestamp higher than the provided lastTimestamp
 
-double GetFiles(const QString &triggerPath,QList<QString> &filenames,double lastTimestamp)
+double GetFiles(const string &triggerPath,vector<string> &filenames,double lastTimestamp)
  {
   // Declarations
 
-  DIR *hDir=opendir(triggerPath.toLocal8Bit().data());
+  DIR *hDir=opendir(triggerPath.c_str());
   struct dirent *fileInfo = NULL;
   char newFileName[DOAS_MAX_PATH_LEN+1],fileToProcess[DOAS_MAX_PATH_LEN+1],*ptr;
   char renameCmd[MAX_ITEM_TEXT_LEN];
@@ -439,7 +439,7 @@ double GetFiles(const QString &triggerPath,QList<QString> &filenames,double last
 
   while (hDir!=NULL && ((fileInfo=readdir(hDir))!=NULL) )
    {
-    sprintf(newFileName,"%s/%s",triggerPath.toLocal8Bit().data(),fileInfo->d_name);
+    sprintf(newFileName,"%s/%s",triggerPath.c_str(),fileInfo->d_name);
 
     if (!STD_IsDir(newFileName) &&                                              // not a folder
         !strncmp(fileInfo->d_name,"trigger_qdoas_",14) &&                       // file name starts with trigger_qdoas_
@@ -508,14 +508,14 @@ double GetFiles(const QString &triggerPath,QList<QString> &filenames,double last
 //-------------------------------------------------------------------
 
 enum RunMode parseCommandLine(int argc, char **argv, commands_t *cmd);
-enum BatchTool requiredBatchTool(const QString &filename);
+enum BatchTool requiredBatchTool(const string &filename);
 void showUsage();
 void showHelp();
 int  batchProcess(commands_t *cmd);
 
 int batchProcessQdoas(commands_t *cmd);
 int readConfigQdoas(commands_t *cmd, vector<CProjectConfigItem> &projectItems);
-int analyseProjectQdoasPrepare(void **engineContext, const CProjectConfigItem *projItem, const QString &outputDir,const QString &calibDir,
+int analyseProjectQdoasPrepare(void **engineContext, const CProjectConfigItem *projItem, const string &outputDir,const string &calibDir,
                    CBatchEngineController *controller);
 
 int batchProcessConvolution(commands_t *cmd);
@@ -532,7 +532,7 @@ int verboseMode=0;
 class QdoasBatch {
 
 public:
-  QdoasBatch(const CProjectConfigItem& projItem, const QString &outputDir, const QString &calibDir, int& rc) :
+  QdoasBatch(const CProjectConfigItem& projItem, const string &outputDir, const string &calibDir, int& rc) :
     projItem(projItem), outputDir(outputDir), calibDir(calibDir), have_enginecontext(false), rc(rc), files_processed(0) {
   };
 
@@ -547,26 +547,26 @@ public:
     }
   }
 
-  int analyse_project(const QString& triggerDir);
+  int analyse_project(const string& triggerDir);
 
-  int analyse_project(const QList<QString> &filenames);
+  int analyse_project(const vector<string> &filenames);
 
   int analyse_project() {
     // recursive walk of the files in the config
     return analyse_treeNode(projItem.rootNode());
   }
 
-  int analyse_file(const QString &filename);
+  int analyse_file(const string &filename);
 
-  int analyse_directory(const QString &dir, const QString &filter, bool recursive);
+  int analyse_directory(const string &dir, const string &filter, bool recursive);
 
   int analyse_treeNode(const CProjectConfigTreeNode *node);
 
 private:
   CBatchEngineController controller;
   const CProjectConfigItem& projItem;
-  const QString &outputDir;
-  const QString &calibDir;
+  const string &outputDir;
+  const string &calibDir;
   void *engineContext;
   bool have_enginecontext;
   int& rc; // for final return code from destructor
@@ -580,12 +580,6 @@ int main(int argc, char **argv)
   int retCode = 0;
 
   // ----------------------------------------------------------------------------
-
-    // to avoid that a thousands comma separator (QT 4.7.3)
-
-       QLocale qlocale=QLocale::system();
-       qlocale.setNumberOptions(QLocale::OmitGroupSeparator);
-       QLocale::setDefault(qlocale);
 
   setlocale(LC_NUMERIC, "C");
 
@@ -637,7 +631,7 @@ enum RunMode parseCommandLine(int argc, char **argv, commands_t *cmd)
 
         if (++i < argc && argv[i][0] != '-') {
           fileSwitch=0;
-          if (cmd->configFile.isEmpty()) {
+          if (cmd->configFile.empty()) {
             cmd->configFile = argv[i];
             runMode = Batch;
           }
@@ -765,7 +759,7 @@ enum RunMode parseCommandLine(int argc, char **argv, commands_t *cmd)
 
   if ((runMode==None) && calibSaveSwitch && !calibSwitch)
    std::cerr << "Warning : -new_irrad switch to use only with -k option; ignored " << std::endl;
-  else if (!cmd->filenames.isEmpty() && triggerSwitch)
+  else if (!cmd->filenames.empty() && triggerSwitch)
    {
     std::cerr << "Warning : -t/-trigger switch ignored if switch -f is used" << std::endl;
     triggerSwitch=0;
@@ -806,9 +800,9 @@ int batchProcess(commands_t *cmd)
 
 //-------------------------------------------------------------------
 
-enum BatchTool requiredBatchTool(const QString &filename)
+enum BatchTool requiredBatchTool(const string &filename)
 {
-  xmlpp::TextReader reader(filename.toStdString());
+  xmlpp::TextReader reader(filename);
   if (!reader.read()) {
     return UnknownConfig; // XML parsing failed
   }
@@ -880,7 +874,7 @@ int batchProcessQdoas(commands_t *cmd)
     QdoasBatch batch(config_item, cmd->outputDir, cmd->calibDir, rc_batch);
     if (triggerSwitch) {
       retCode = batch.analyse_project(cmd->triggerDir);
-    } else if (!cmd->filenames.isEmpty()) {
+    } else if (!cmd->filenames.empty()) {
       // if files were specified on the command-line, then ignore the files in the project.
       if (projectItems.size() == 1) { // projectitem was the only project
         retCode = batch.analyse_project(cmd->filenames);
@@ -914,7 +908,7 @@ int readConfigQdoas(commands_t *cmd, vector<CProjectConfigItem>& projectItems)
   handler.set_substitute_entities(true);
 
   try {
-    handler.parse_file(cmd->configFile.toStdString());
+    handler.parse_file(cmd->configFile);
 
     CWorkSpace *ws = CWorkSpace::instance();
     ws->setConfigFile(cmd->configFile);
@@ -931,10 +925,10 @@ int readConfigQdoas(commands_t *cmd, vector<CProjectConfigItem>& projectItems)
     }
 
     // is a specific project required ...
-    if (!cmd->projectName.isEmpty()) {
+    if (!cmd->projectName.empty()) {
       // select only the matching project and discard the rest ...
       for (auto &p : handler.projectItems()) {
-        if (p.name().toUpper() == cmd->projectName.toUpper()) {
+        if (boost::iequals(p.name(), cmd->projectName)) {
           if (xmlSwitch) {
             QDOASXML_Parse(cmd->xmlCommands,&p);
           }
@@ -962,17 +956,17 @@ int readConfigQdoas(commands_t *cmd, vector<CProjectConfigItem>& projectItems)
   return retCode;
 }
 
-int QdoasBatch::analyse_project(const QString& triggerDir) {
+int QdoasBatch::analyse_project(const string& triggerDir) {
   char timestampFile[DOAS_MAX_PATH_LEN+1];
   int nsec = 0;
   int retCode = 0;
   timestamp_t last_timestamp;
 
-  sprintf(timestampFile,"%s/trigger_qdoas.tmstmp",triggerDir.toLocal8Bit().data());
+  sprintf(timestampFile,"%s/trigger_qdoas.tmstmp",triggerDir.c_str());
 
   double lastTm=GetLastTimestamp(timestampFile,&last_timestamp);
 
-  QList<QString> filenames;
+  vector<string> filenames;
   filenames.clear();
 
   // wait for new files
@@ -989,8 +983,8 @@ int QdoasBatch::analyse_project(const QString& triggerDir) {
 
             // loop trigger files ...
 
-            for(QList<QString>::const_iterator it = filenames.begin(); it != filenames.end(); ++it) {
-              QFileInfo info(*it);
+            for(vector<string>::const_iterator it = filenames.begin(); it != filenames.end(); ++it) {
+              QFileInfo info(QString::fromStdString(*it));
               if (info.isFile())
                 retCode = analyse_file(*it);
             }
@@ -1015,7 +1009,7 @@ int QdoasBatch::analyse_project(const QString& triggerDir) {
 }
 
 
-int analyseProjectQdoasPrepare(void **engineContext, const CProjectConfigItem *projItem, const QString &outputDir,const QString &calibDir,
+int analyseProjectQdoasPrepare(void **engineContext, const CProjectConfigItem *projItem, const string &outputDir,const string &calibDir,
                    CBatchEngineController *controller)
 {
   CWorkSpace *ws = CWorkSpace::instance();
@@ -1031,16 +1025,16 @@ int analyseProjectQdoasPrepare(void **engineContext, const CProjectConfigItem *p
 
   // TODO projectData.display.
 
-  if (!outputDir.isEmpty() && outputDir.size() < FILENAME_BUFFER_LENGTH-1) {
+  if (!outputDir.empty() && outputDir.size() < FILENAME_BUFFER_LENGTH-1) {
     // override the output directory
-    strcpy(projectData.output.path, outputDir.toLocal8Bit().data());
+    strcpy(projectData.output.path, outputDir.c_str());
   }
 
   projectData.output.newcalibFlag=calibSaveSwitch;
 
-  if (!calibDir.isEmpty() && calibDir.size() < FILENAME_BUFFER_LENGTH-1) {
+  if (!calibDir.empty() && calibDir.size() < FILENAME_BUFFER_LENGTH-1) {
     // override the output directory
-    strcpy(projectData.output.newCalibPath, calibDir.toLocal8Bit().data());
+    strcpy(projectData.output.newCalibPath, calibDir.c_str());
   }
 
   // create engine
@@ -1065,12 +1059,12 @@ int analyseProjectQdoasPrepare(void **engineContext, const CProjectConfigItem *p
 
   // set analysis windows
   if (!retCode) {
-    const QList<const CAnalysisWindowConfigItem*> awList = projItem->analysisWindowItems();
+    const auto awList = projItem->analysisWindowItems();
     int nWindows = awList.size();
     mediate_analysis_window_t *awDataList = new mediate_analysis_window_t[nWindows];
     mediate_analysis_window_t *awCursor = awDataList;
 
-    for (QList<const CAnalysisWindowConfigItem*>::const_iterator awIt = awList.begin(); awIt != awList.end(); ++awIt) {
+    for (auto awIt = awList.begin(); awIt != awList.end(); ++awIt) {
       // Do not account for disabled analysis windows
 
       if ((*awIt)->isEnabled()) {
@@ -1105,20 +1099,20 @@ int analyseProjectQdoasPrepare(void **engineContext, const CProjectConfigItem *p
   return retCode;
 }
 
-int QdoasBatch::analyse_project(const QList<QString> &filenames)  {
+int QdoasBatch::analyse_project(const vector<string> &filenames)  {
   // analyse provided list of files
   int retCode = 0;
   CBatchEngineController controller;
 
-  for(QList<QString>::const_iterator it = filenames.begin(); it != filenames.end(); ++it) {
-    QFileInfo info(*it);
+  for(auto it = filenames.begin(); it != filenames.end(); ++it) {
+    QFileInfo info(QString::fromStdString(*it));
 
     if (info.isFile()) {
       retCode = analyse_file(*it);
     } else if (info.isDir()) {
-      retCode = analyse_directory(info.filePath(), "*.*",1);
+      retCode = analyse_directory(info.filePath().toStdString(), "*.*",1);
     } else {
-      retCode = analyse_directory(info.path(),info.fileName(),1);
+      retCode = analyse_directory(info.path().toStdString(), info.fileName().toStdString(), 1);
       if (files_processed == 0) {
         std::cerr << "ERROR: No files matching pattern '" << info.fileName().toStdString()
                   << "' in directory '" << info.path().toStdString() << "' or subdirectories." << std::endl;
@@ -1130,9 +1124,9 @@ int QdoasBatch::analyse_project(const QList<QString> &filenames)  {
   return retCode;
 }
 
-int QdoasBatch::analyse_file(const QString &filename) {
+int QdoasBatch::analyse_file(const string &filename) {
   if (verboseMode)
-    std::cout << "Processing file " << filename.toStdString() << std::endl;
+    std::cout << "Processing file " << filename << std::endl;
 
   ++files_processed;
   int retCode = 0;
@@ -1150,9 +1144,9 @@ int QdoasBatch::analyse_file(const QString &filename) {
 
   int result = (!calibSwitch)
     ? mediateRequestBeginAnalyseSpectra(engineContext,
-                                        CWorkSpace::instance()->getConfigFile().toLocal8Bit().constData(),
-                                        filename.toLocal8Bit().constData(), &beginFileResp)
-    : mediateRequestBeginCalibrateSpectra(engineContext, filename.toLocal8Bit().constData(), &beginFileResp);
+                                        CWorkSpace::instance()->getConfigFile().c_str(),
+                                        filename.c_str(), &beginFileResp)
+    : mediateRequestBeginCalibrateSpectra(engineContext, filename.c_str(), &beginFileResp);
 
   beginFileResp.setNumberOfRecords(result);
   beginFileResp.process(&controller);
@@ -1210,11 +1204,11 @@ int QdoasBatch::analyse_treeNode(const CProjectConfigTreeNode *node) {
   return retCode;
 }
 
-int QdoasBatch::analyse_directory(const QString &dir, const QString &filter, bool recursive) {
+int QdoasBatch::analyse_directory(const string &dir, const string &filter, bool recursive) {
   int retCode = 0;
   QFileInfoList entries;
 
-  QDir directory(dir);
+  QDir directory(QString::fromStdString(dir));
 
   // first consder sub directories ...
   if (recursive) {
@@ -1222,23 +1216,23 @@ int QdoasBatch::analyse_directory(const QString &dir, const QString &filter, boo
 
     for (QFileInfoList::iterator it = entries.begin(); it != entries.end(); ++it) {
       if (it->isDir() && !it->fileName().startsWith('.')) {
-        retCode = analyse_directory(it->filePath(), filter, true);
+        retCode = analyse_directory(it->filePath().toStdString(), filter, true);
       }
     }
   }
 
   // now the files that match the filters
-  if (filter.isEmpty())
+  if (filter.empty())
     entries = directory.entryInfoList();
   else
-    entries = directory.entryInfoList(QStringList(filter));
+    entries = directory.entryInfoList(QStringList(QString::fromStdString(filter)));
 
   if (entries.empty()) {
     return -1;
   }
   for (QFileInfoList::iterator it = entries.begin(); it != entries.end(); ++it) {
     if (it->isFile()) {
-      retCode = analyse_file(it->filePath());
+      retCode = analyse_file(it->filePath().toStdString());
     }
   }
 
@@ -1257,7 +1251,7 @@ int batchProcessConvolution(commands_t *cmd)
   handler.set_substitute_entities(true);
 
   try {
-    handler.parse_file(cmd->configFile.toStdString());
+    handler.parse_file(cmd->configFile);
 
     void *engineContext = NULL;
 
@@ -1270,9 +1264,9 @@ int batchProcessConvolution(commands_t *cmd)
     if (xmlSwitch)
      CONVXML_Parse(cmd->xmlCommands,&properties);
 
-    if (!cmd->outputDir.isEmpty() && cmd->outputDir.size() < FILENAME_BUFFER_LENGTH-1) {
+    if (!cmd->outputDir.empty() && cmd->outputDir.size() < FILENAME_BUFFER_LENGTH-1) {
       // override the output directory
-      strcpy(properties.general.outputFile, cmd->outputDir.toLocal8Bit().data());
+      strcpy(properties.general.outputFile, cmd->outputDir.c_str());
     }
 
     if (mediateXsconvCreateContext(&engineContext, resp) != 0) {
@@ -1280,15 +1274,15 @@ int batchProcessConvolution(commands_t *cmd)
     }
     else {
 
-      const QList<QString> &filenames = cmd->filenames;
+      const vector<string> &filenames = cmd->filenames;
 
-      if (!filenames.isEmpty()) {
+      if (!filenames.empty()) {
 
     // can only process one file (because the output is a file name).
 
-    QList<QString>::const_iterator it = filenames.begin();
+    auto it = filenames.begin();
 
-    strcpy(properties.general.inputFile, it->toLocal8Bit().data());
+    strcpy(properties.general.inputFile, it->c_str());
 
     if ((retCode=mediateRequestConvolution(engineContext, &properties, resp))==ERROR_ID_NO)
      retCode = mediateConvolutionCalculate(engineContext,resp);
@@ -1300,7 +1294,7 @@ int batchProcessConvolution(commands_t *cmd)
       std::cout << "WARNING: Only one file can be processed. Ignoring the file(s)..." << std::endl;
       while (it != filenames.end()) {
 
-        std::cout << "    " << it->toStdString() << std::endl;
+        std::cout << "    " << *it << std::endl;
         ++it;
       }
     }
@@ -1344,7 +1338,7 @@ int batchProcessRing(commands_t *cmd)
   handler.set_substitute_entities(true);
 
   try {
-    handler.parse_file(cmd->configFile.toStdString());
+    handler.parse_file(cmd->configFile);
     void *engineContext = NULL;
 
     CEngineResponseVisual *resp = new CEngineResponseVisual;
@@ -1356,9 +1350,9 @@ int batchProcessRing(commands_t *cmd)
     if (xmlSwitch)
      RINGXML_Parse(cmd->xmlCommands,&properties);
 
-    if (!cmd->outputDir.isEmpty() && cmd->outputDir.size() < FILENAME_BUFFER_LENGTH-1)
+    if (!cmd->outputDir.empty() && cmd->outputDir.size() < FILENAME_BUFFER_LENGTH-1)
      {
-         strcpy(properties.outputFile,cmd->outputDir.toLocal8Bit().data());
+       strcpy(properties.outputFile,cmd->outputDir.c_str());
      }
 
     if (mediateXsconvCreateContext(&engineContext, resp) != 0)
@@ -1367,15 +1361,15 @@ int batchProcessRing(commands_t *cmd)
      }
     else
      {
-      const QList<QString> &filenames = cmd->filenames;
+      const vector<string> &filenames = cmd->filenames;
 
-      if (!filenames.isEmpty())
+      if (!filenames.empty())
        {
-           // can only process one file (because the output is a file name).
+         // can only process one file (because the output is a file name).
 
-           QList<QString>::const_iterator it = filenames.begin();
+         auto it = filenames.begin();
 
-           strcpy(properties.calibrationFile, it->toLocal8Bit().data());
+           strcpy(properties.calibrationFile, it->c_str());
 
            if ((retCode=mediateRequestRing(engineContext, &properties, resp))==ERROR_ID_NO)
             retCode = mediateRingCalculate(engineContext,resp);
@@ -1388,7 +1382,7 @@ int batchProcessRing(commands_t *cmd)
              std::cout << "WARNING: Only one file can be processed. Ignoring the file(s)..." << std::endl;
              while (it != filenames.end())
               {
-               std::cout << "    " << it->toStdString() << std::endl;
+               std::cout << "    " << *it << std::endl;
                ++it;
               }
             }
@@ -1433,7 +1427,7 @@ int batchProcessUsamp(commands_t *cmd)
   handler.set_substitute_entities(true);
 
   try {
-    handler.parse_file(cmd->configFile.toStdString());
+    handler.parse_file(cmd->configFile);
 
     void *engineContext = NULL;
 
@@ -1443,12 +1437,12 @@ int batchProcessUsamp(commands_t *cmd)
     // copy the properties data ...
     mediate_usamp_t properties = *(handler.properties()); // blot copy
 
-    if (!cmd->outputDir.isEmpty() && cmd->outputDir.size() < FILENAME_BUFFER_LENGTH-1)
+    if (!cmd->outputDir.empty() && cmd->outputDir.size() < FILENAME_BUFFER_LENGTH-1)
      {
          char *ptr;
          char  tmpFile[FILENAME_BUFFER_LENGTH];
 
-         strcpy(tmpFile,cmd->outputDir.toLocal8Bit().data());
+         strcpy(tmpFile,cmd->outputDir.c_str());
 
          if ((ptr=strchr(tmpFile,'_'))!=NULL)
           {
@@ -1469,15 +1463,15 @@ int batchProcessUsamp(commands_t *cmd)
      }
     else
      {
-      const QList<QString> &filenames = cmd->filenames;
+      const vector<string> &filenames = cmd->filenames;
 
-      if (!filenames.isEmpty())
+      if (!filenames.empty())
        {
            // can only process one file (because the output is a file name).
 
-           QList<QString>::const_iterator it = filenames.begin();
+           auto it = filenames.begin();
 
-           strcpy(properties.calibrationFile, it->toLocal8Bit().data());
+           strcpy(properties.calibrationFile, it->c_str());
 
            if ((retCode=mediateRequestUsamp(engineContext, &properties, resp))==ERROR_ID_NO)
             retCode = mediateUsampCalculate(engineContext,resp);
@@ -1490,7 +1484,7 @@ int batchProcessUsamp(commands_t *cmd)
              std::cout << "WARNING: Only one file can be processed. Ignoring the file(s)..." << std::endl;
              while (it != filenames.end())
               {
-               std::cout << "    " << it->toStdString() << std::endl;
+               std::cout << "    " << *it << std::endl;
                ++it;
               }
             }

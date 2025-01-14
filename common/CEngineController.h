@@ -7,7 +7,6 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #ifndef _CENGINECONTROLLER_H_GUARD
 #define _CENGINECONTROLLER_H_GUARD
 
-#include <QList>
 #include <memory>
 
 #include "CEngineError.h"
@@ -30,13 +29,13 @@ class CEngineController
   // notify interface is for use by response classes
   virtual void notifyNumberOfFiles(int nFiles) {};
   virtual void notifyCurrentFile(int fileNumber) {};
-  virtual void notifyReadyToNavigateRecords(const QString &filename, int numberOfRecords) {};
+  virtual void notifyReadyToNavigateRecords(const std::string &filename, int numberOfRecords) {};
   virtual void notifyCurrentRecord(int recordNumber) {};
   virtual void notifyEndOfRecords(void) {};
-  virtual void notifyPlotData(QList<SPlotData> &plotDataList, QList<STitleTag> &titleList,QList<SPlotImage> &plotImageList) {};
-  virtual void notifyTableData(QList<SCell> &cellList) {};
+  virtual void notifyPlotData(std::vector<SPlotData> &plotDataList, std::vector<STitleTag> &titleList,std::vector<SPlotImage> &plotImageList) {};
+  virtual void notifyTableData(std::vector<SCell> &cellList) {};
 
-  virtual void notifyErrorMessages(int highestErrorLevel, const QList<CEngineError> &errorMessages) {};
+  virtual void notifyErrorMessages(int highestErrorLevel, const std::vector<CEngineError> &errorMessages) {};
 };
 
 #endif

@@ -458,7 +458,7 @@ void CWActiveContext::slotPlotPages(const QList<shared_ptr<const CPlotPageData> 
     }
     else {
       // Set the tab label and store the page number as TabData
-      m_graphTab->setTabText(index, (*it)->tag());
+      m_graphTab->setTabText(index, QString::fromStdString((*it)->tag()));
     }
     m_graphTab->setTabData(index, QVariant(pageNumber));
 

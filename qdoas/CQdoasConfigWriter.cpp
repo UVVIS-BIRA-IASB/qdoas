@@ -108,7 +108,7 @@ void CQdoasConfigWriter::writeProjects(FILE *fp)
       // Should always be a project item ... with two children
       projName = projItem->text(0);
 
-      properties = CWorkSpace::instance()->findProject(projName);
+      properties = CWorkSpace::instance()->findProject(projName.toStdString());
       if (properties != NULL) {
     // write the project data
     fprintf(fp, "  <project name=\"%s\" disable=\"%s\">\n", projName.toUtf8().constData(),
@@ -1233,7 +1233,7 @@ void CQdoasConfigWriter::writeAnalysisWindows(FILE *fp, const QString &projectNa
     if (awItem != NULL) {
       awName = awItem->text(0);
 
-      properties = CWorkSpace::instance()->findAnalysisWindow(projectName, awName);
+      properties = CWorkSpace::instance()->findAnalysisWindow(projectName.toStdString(), awName.toStdString());
       if (properties != NULL) {
 
  fprintf(fp, "    <analysis_window name=\"%s\" disable=\"%s\" kurucz=", awName.toUtf8().constData(),

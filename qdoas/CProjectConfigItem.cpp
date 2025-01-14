@@ -1,6 +1,8 @@
+#include <cstring>
 
 #include "CProjectConfigItem.h"
 
+using std::vector;
 
 CAnalysisWindowConfigItem::CAnalysisWindowConfigItem() :
   m_enabled(true)
@@ -8,11 +10,11 @@ CAnalysisWindowConfigItem::CAnalysisWindowConfigItem() :
   initializeMediateAnalysisWindow(&m_awProp);
 }
 
-bool CAnalysisWindowConfigItem::setName(const QString &name)
+bool CAnalysisWindowConfigItem::setName(const std::string &name)
 {
   if (name.length() < (int)sizeof(m_awProp.name)) {
 
-    strcpy(m_awProp.name, name.toLocal8Bit().data());
+    strcpy(m_awProp.name, name.c_str());
     m_name = name;
 
     return true;
@@ -21,7 +23,7 @@ bool CAnalysisWindowConfigItem::setName(const QString &name)
   return false;
 }
 
-const QString& CAnalysisWindowConfigItem::name(void) const
+const std::string& CAnalysisWindowConfigItem::name(void) const
 {
   return m_name;
 }
@@ -67,19 +69,20 @@ CProjectConfigItem::CProjectConfigItem() :
 
 CProjectConfigItem::~CProjectConfigItem()
 {
-  while (!m_awItemList.empty())
-    delete m_awItemList.takeFirst();
+  for (auto item : m_awItemList) {
+    delete item;
+  }
 
   delete m_root;
 }
 
-void CProjectConfigItem::setName(const QString &name)
+void CProjectConfigItem::setName(const std::string &name)
 {
   m_name = name;
-  strncpy(m_projProp.project_name, name.toLocal8Bit().data(), PROJECT_NAME_BUFFER_LENGTH-1);
+  strncpy(m_projProp.project_name, name.c_str(), PROJECT_NAME_BUFFER_LENGTH-1);
 }
 
-const QString& CProjectConfigItem::name(void) const
+const std::string& CProjectConfigItem::name(void) const
 {
   return m_name;
 }
@@ -124,7 +127,7 @@ CAnalysisWindowConfigItem* CProjectConfigItem::issueNewAnalysisWindowItem(void)
   return tmp;
 }
 
-const QList<const CAnalysisWindowConfigItem*>& CProjectConfigItem::analysisWindowItems(void) const
+const vector<const CAnalysisWindowConfigItem*>& CProjectConfigItem::analysisWindowItems(void) const
 {
   return m_awItemList;
 }
@@ -151,7 +154,7 @@ CSiteConfigItem::CSiteConfigItem() :
 
 //------------------------------------------------------------
 
-CSymbolConfigItem::CSymbolConfigItem(const QString &name, const QString &description) :
+CSymbolConfigItem::CSymbolConfigItem(const std::string &name, const std::string &description) :
   m_name(name),
   m_description(description)
 {

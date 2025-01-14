@@ -128,11 +128,11 @@ bool CWSiteEditor::actionOk(void)
 
   if (m_validBits & BIT_EDIT_EXISTING_ITEM) {
     // existing set
-   CWorkSpace::instance()->modifySite(m_siteName->text(), m_abbreviation->text(), m_long, m_lat, m_alt);
+   CWorkSpace::instance()->modifySite(m_siteName->text().toStdString(), m_abbreviation->text().toStdString(), m_long, m_lat, m_alt);
   }
   else {
     // a new entry ...
-    CWorkSpace::instance()->createSite(m_siteName->text(), m_abbreviation->text(), m_long, m_lat, m_alt);
+    CWorkSpace::instance()->createSite(m_siteName->text().toStdString(), m_abbreviation->text().toStdString(), m_long, m_lat, m_alt);
   }
 
   return true;

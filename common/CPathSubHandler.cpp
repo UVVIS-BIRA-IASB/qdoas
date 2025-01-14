@@ -5,20 +5,23 @@
 #include "debugutil.h"
 
 using std::map;
+using std::string;
 
 //------------------------------------------------------------------------
 //
 // Handler for <paths> element (and sub elements)
 
-void CPathSubHandler::start(const Glib::ustring& element, const map<Glib::ustring, QString>& atts)
+void CPathSubHandler::start(const Glib::ustring& element, const map<Glib::ustring, string>& atts)
 {
   // should be a path element <path index="?">/this/is/the/path</path>
 
   if (element == "path") {
-    bool ok;
-    m_index = value(atts, "index").toInt(&ok);
-    if (!ok || m_index < 0 || m_index > 9) {
+    try {
+      m_index = stoi(value(atts, "index"));
+    } catch(std::invalid_argument &e) {
       m_index = -1;
+    }
+    if (m_index < 0 || m_index > 9) {
       throw std::runtime_error("Invalid path index");
     }
   }
@@ -30,7 +33,7 @@ void CPathSubHandler::start(const Glib::ustring& element, const map<Glib::ustrin
   m_path.clear();
 }
 
-void CPathSubHandler::character(const QString &ch)
+void CPathSubHandler::character(const string &ch)
 {
   // collect all path characters
   m_path += ch;

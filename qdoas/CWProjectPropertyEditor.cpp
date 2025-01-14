@@ -21,7 +21,7 @@ CWProjectPropertyEditor::CWProjectPropertyEditor(const QString &projectName, QWi
   CWEditor(parent),
   m_projectName(projectName)
 {
-  mediate_project_t *projectData = CWorkSpace::instance()->findProject(m_projectName);
+  mediate_project_t *projectData = CWorkSpace::instance()->findProject(m_projectName.toStdString());
 
   if (!projectData)
     return; // TODO - assert or throw
@@ -206,7 +206,7 @@ CWProjectPropertyEditor::CWProjectPropertyEditor(const QString &projectName, QWi
 bool CWProjectPropertyEditor::actionOk(void)
 {
   // call apply for all tabs ...
-  mediate_project_t *projectData = CWorkSpace::instance()->findProject(m_projectName);
+  mediate_project_t *projectData = CWorkSpace::instance()->findProject(m_projectName.toStdString());
 
   if (projectData) {
 
@@ -233,7 +233,7 @@ bool CWProjectPropertyEditor::actionOk(void)
 
     projectData->instrumental.format = m_selectedInstrument;
 
-    CWorkSpace::instance()->modifiedProjectProperties(m_projectName);
+    CWorkSpace::instance()->modifiedProjectProperties(m_projectName.toStdString());
 
     return true;
   }

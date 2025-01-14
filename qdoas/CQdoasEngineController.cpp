@@ -3,8 +3,8 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 */
 
-#include <QFile>
-#include <QTextStream>
+#include <sstream>
+
 #include <QMessageBox>
 
 #include "CQdoasEngineController.h"
@@ -123,8 +123,8 @@ void CQdoasEngineController::notifyPlotData(QList<SPlotData> &plotDataList, QLis
       // need a new page
       CPlotPageData *newPage = new CPlotPageData(pageNo,PLOTPAGE_IMAGE);
       CPlotImage myImage=*plotImageList.front().plotImage;
-      QString     str=myImage.GetFile();
-      QString titleStr=myImage.GetTitle();
+      //      QString str(QString::fromStdString(myImage.GetFile()));
+      auto titleStr = myImage.GetTitle();
 
       if (plotImageList.front().plotImage != NULL)
        {
@@ -132,7 +132,7 @@ void CQdoasEngineController::notifyPlotData(QList<SPlotData> &plotDataList, QLis
         newPage->setTitle(titleStr);
         newPage->setTag(titleStr);
        }
-          pageMap.insert(std::map<int,CPlotPageData*>::value_type(pageNo, newPage));
+      pageMap.insert(std::map<int,CPlotPageData*>::value_type(pageNo, newPage));
      }
     else
      {
@@ -214,8 +214,7 @@ void CQdoasEngineController::notifyTableData(QList<SCell> &cellList)
 void CQdoasEngineController::notifyErrorMessages(int highestErrorLevel, const QList<CEngineError> &errorMessages)
 {
   // format each into a message text and put in a single string for posting ...
-  QString msg;
-  QTextStream stream(&msg);
+  std::ostringstream stream;
 
   if (highestErrorLevel == FatalEngineError) {
     // abort the session
@@ -244,7 +243,7 @@ void CQdoasEngineController::notifyErrorMessages(int highestErrorLevel, const QL
     stream << it->tag() << ") " << it->message() << ".\n";
     ++n_errors;
   }
-  emit signalErrorMessages(highestErrorLevel, msg);
+  emit signalErrorMessages(highestErrorLevel, QString::fromStdString(stream.str()));
 }
 
 bool CQdoasEngineController::event(QEvent *e)
@@ -302,17 +301,17 @@ void CQdoasEngineController::slotNextFile()
 
       switch (m_session->mode()) {
       case CSession::Browse:
-    req->addRequest(new CEngineRequestBeginBrowseFile(m_currentIt.file().filePath()));
-    break;
+        req->addRequest(new CEngineRequestBeginBrowseFile(m_currentIt.file().filePath().toStdString()));
+        break;
       case CSession::Export:
-    req->addRequest(new CEngineRequestBeginExportFile(m_currentIt.file().filePath()));
-    break;
+        req->addRequest(new CEngineRequestBeginExportFile(m_currentIt.file().filePath().toStdString()));
+        break;
       case CSession::Calibrate:
-    req->addRequest(new CEngineRequestBeginCalibrateFile(m_currentIt.file().filePath()));
-    break;
+        req->addRequest(new CEngineRequestBeginCalibrateFile(m_currentIt.file().filePath().toStdString()));
+        break;
       case CSession::Analyse:
-    req->addRequest(new CEngineRequestBeginAnalyseFile(m_currentIt.file().filePath()));
-    break;
+        req->addRequest(new CEngineRequestBeginAnalyseFile(m_currentIt.file().filePath().toStdString()));
+        break;
       }
     }
 
@@ -350,16 +349,16 @@ void CQdoasEngineController::slotGotoFile(int number)
 
     switch (m_session->mode()) {
     case CSession::Browse:
-      req->addRequest(new CEngineRequestBeginBrowseFile(m_currentIt.file().filePath()));
+      req->addRequest(new CEngineRequestBeginBrowseFile(m_currentIt.file().filePath().toStdString()));
       break;
     case CSession::Export:
-      req->addRequest(new CEngineRequestBeginExportFile(m_currentIt.file().filePath()));
+      req->addRequest(new CEngineRequestBeginExportFile(m_currentIt.file().filePath().toStdString()));
       break;
     case CSession::Calibrate:
-      req->addRequest(new CEngineRequestBeginCalibrateFile(m_currentIt.file().filePath()));
+      req->addRequest(new CEngineRequestBeginCalibrateFile(m_currentIt.file().filePath().toStdString()));
       break;
     case CSession::Analyse:
-      req->addRequest(new CEngineRequestBeginAnalyseFile(m_currentIt.file().filePath()));
+      req->addRequest(new CEngineRequestBeginAnalyseFile(m_currentIt.file().filePath().toStdString()));
       break;
     }
   }
@@ -469,16 +468,16 @@ void CQdoasEngineController::slotStep()
 
               switch (m_session->mode()) {
                   case CSession::Browse:
-                      req->addRequest(new CEngineRequestBeginBrowseFile(m_currentIt.file().filePath()));
+                      req->addRequest(new CEngineRequestBeginBrowseFile(m_currentIt.file().filePath().toStdString()));
                       break;
                   case CSession::Export:
-                      req->addRequest(new CEngineRequestBeginExportFile(m_currentIt.file().filePath()));
+                      req->addRequest(new CEngineRequestBeginExportFile(m_currentIt.file().filePath().toStdString()));
                       break;
                   case CSession::Calibrate:
-                      req->addRequest(new CEngineRequestBeginCalibrateFile(m_currentIt.file().filePath()));
+                      req->addRequest(new CEngineRequestBeginCalibrateFile(m_currentIt.file().filePath().toStdString()));
                       break;
                   case CSession::Analyse:
-                      req->addRequest(new CEngineRequestBeginAnalyseFile(m_currentIt.file().filePath()));
+                      req->addRequest(new CEngineRequestBeginAnalyseFile(m_currentIt.file().filePath().toStdString()));
                       break;
               }
 
@@ -547,13 +546,12 @@ void CQdoasEngineController::slotStartSession(shared_ptr<CSession> session)
       if (m_session->mode() == CSession::Browse)
        {
         req->addRequest(new CEngineRequestSetProject(m_currentProject, THREAD_TYPE_SPECTRA));
-        req->addRequest(new CEngineRequestBeginBrowseFile(m_currentIt.file().filePath()));
+        req->addRequest(new CEngineRequestBeginBrowseFile(m_currentIt.file().filePath().toStdString()));
        }
-      else
-       {
-           req->addRequest(new CEngineRequestSetProject(m_currentProject, THREAD_TYPE_EXPORT));
-        req->addRequest(new CEngineRequestBeginExportFile(m_currentIt.file().filePath()));
-       }
+      else {
+        req->addRequest(new CEngineRequestSetProject(m_currentProject, THREAD_TYPE_EXPORT));
+        req->addRequest(new CEngineRequestBeginExportFile(m_currentIt.file().filePath().toStdString()));
+      }
     }
     else {
       // take the site and symbol lists from the session ... and hand responsibility over to request objects.
@@ -569,14 +567,14 @@ void CQdoasEngineController::slotStartSession(shared_ptr<CSession> session)
 
 
       if (m_session->mode() == CSession::Analyse) {
-    req->addRequest(new CEngineRequestSetProject(m_currentProject, THREAD_TYPE_ANALYSIS));
-    req->addRequest(new CEngineRequestSetAnalysisWindows(anlysWinList, nWindows, THREAD_TYPE_ANALYSIS));
-    req->addRequest(new CEngineRequestBeginAnalyseFile(m_currentIt.file().filePath()));
+        req->addRequest(new CEngineRequestSetProject(m_currentProject, THREAD_TYPE_ANALYSIS));
+        req->addRequest(new CEngineRequestSetAnalysisWindows(anlysWinList, nWindows, THREAD_TYPE_ANALYSIS));
+        req->addRequest(new CEngineRequestBeginAnalyseFile(m_currentIt.file().filePath().toStdString()));
       }
       else if (m_session->mode() == CSession::Calibrate) {
-    req->addRequest(new CEngineRequestSetProject(m_currentProject, THREAD_TYPE_KURUCZ));
-    req->addRequest(new CEngineRequestSetAnalysisWindows(anlysWinList, nWindows, THREAD_TYPE_KURUCZ));
-    req->addRequest(new CEngineRequestBeginCalibrateFile(m_currentIt.file().filePath()));
+        req->addRequest(new CEngineRequestSetProject(m_currentProject, THREAD_TYPE_KURUCZ));
+        req->addRequest(new CEngineRequestSetAnalysisWindows(anlysWinList, nWindows, THREAD_TYPE_KURUCZ));
+        req->addRequest(new CEngineRequestBeginCalibrateFile(m_currentIt.file().filePath().toStdString()));
       }
     }
 

@@ -126,7 +126,7 @@ QString CWPlotRegion::pageTitle(int pageNumber) const
 {
   std::map<int,shared_ptr<const CPlotPageData> >::const_iterator it = m_pageMap.find(pageNumber);
   if (it != m_pageMap.end())
-    return (it->second)->title();
+    return QString::fromStdString((it->second)->title());
 
   return QString();
 }
@@ -135,7 +135,7 @@ QString CWPlotRegion::pageTag(int pageNumber) const
 {
   std::map<int,shared_ptr<const CPlotPageData> >::const_iterator it = m_pageMap.find(pageNumber);
   if (it != m_pageMap.end())
-    return (it->second)->tag();
+    return QString::fromStdString((it->second)->tag());
 
   return QString();
 }
@@ -144,7 +144,7 @@ bool CWPlotRegion::pageExists(int pageNumber, QString &tag) const
 {
   std::map<int,shared_ptr<const CPlotPageData> >::const_iterator it = m_pageMap.find(pageNumber);
   if (it != m_pageMap.end()) {
-    tag = (it->second)->tag();
+    tag = QString::fromStdString((it->second)->tag());
     return true;
   }
 

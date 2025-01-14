@@ -105,12 +105,12 @@ class CEngineRequestSetSites : public CEngineRequest
 class CEngineRequestBeginBrowseFile : public CEngineRequest
 {
  public:
-  CEngineRequestBeginBrowseFile(const QString &fileName) : m_fileName(fileName) {};
+  CEngineRequestBeginBrowseFile(const std::string &fileName) : m_fileName(fileName) {};
 
   virtual bool process(CEngineThread *engineThread);
 
  private:
-  QString m_fileName;
+  std::string m_fileName;
 };
 
 //------------------------------------------------------------
@@ -139,12 +139,12 @@ class CEngineRequestBrowseSpecificRecord : public CEngineRequest
 class CEngineRequestBeginExportFile : public CEngineRequest
 {
  public:
-  CEngineRequestBeginExportFile(const QString &fileName) : m_fileName(fileName) {};
+  CEngineRequestBeginExportFile(const std::string& fileName) : m_fileName(fileName) {};
 
   virtual bool process(CEngineThread *engineThread);
 
  private:
-  QString m_fileName;
+  std::string m_fileName;
 };
 
 //------------------------------------------------------------
@@ -173,12 +173,12 @@ class CEngineRequestExportSpecificRecord : public CEngineRequest
 class CEngineRequestBeginAnalyseFile : public CEngineRequest
 {
  public:
-  CEngineRequestBeginAnalyseFile(const QString &fileName) : m_fileName(fileName) {};
+  CEngineRequestBeginAnalyseFile(const std::string &fileName) : m_fileName(fileName) {};
 
   virtual bool process(CEngineThread *engineThread);
 
  private:
-  QString m_fileName;
+  std::string m_fileName;
 };
 
 //------------------------------------------------------------
@@ -207,11 +207,11 @@ class CEngineRequestAnalyseSpecificRecord : public CEngineRequest
 class CEngineRequestBeginCalibrateFile : public CEngineRequest
 {
  public:
-  CEngineRequestBeginCalibrateFile(const QString &fileName) : m_fileName(fileName) {};
+  CEngineRequestBeginCalibrateFile(const std::string &fileName) : m_fileName(fileName) {};
   virtual bool process(CEngineThread *engineThread);
 
  private:
-  QString m_fileName;
+  std::string m_fileName;
 };
 
 //------------------------------------------------------------

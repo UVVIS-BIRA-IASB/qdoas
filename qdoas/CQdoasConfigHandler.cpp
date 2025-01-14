@@ -15,10 +15,11 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #include "debugutil.h"
 
 using std::map;
+using std::string;
 using std::vector;
 
 void CQdoasConfigHandler::start_subhandler(const Glib::ustring& name,
-                                           const map<Glib::ustring, QString>& atts) {
+                                           const map<Glib::ustring, string>& atts) {
 
   if (name == "project") {
     // new Project handler
@@ -58,7 +59,7 @@ const vector<CSiteConfigItem>& CQdoasConfigHandler::siteItems() const
   return m_siteItemList;
 }
 
-void CQdoasConfigHandler::addSymbol(const QString &symbolName, const QString &symbolDescription)
+void CQdoasConfigHandler::addSymbol(const string &symbolName, const string &symbolDescription)
 {
   m_symbolList.emplace_back(symbolName, symbolDescription);
 }
@@ -77,38 +78,28 @@ CSiteSubHandler::CSiteSubHandler(CQdoasConfigHandler *master) :
 {
 }
 
-void CSiteSubHandler::start(const Glib::ustring& element, const map<Glib::ustring, QString> &atts)
+void CSiteSubHandler::start(const Glib::ustring& element, const map<Glib::ustring, string> &atts)
 {
   if (element == "site") {
-    QString str;
-    bool ok;
-    double tmpDouble;
-
     // create a new config item for the site
     CSiteConfigItem item;
 
-    str = value(atts, "name");
-    if (str.isEmpty()) {
+    string str = value(atts, "name");
+    if (str.empty()) {
       throw std::runtime_error("Missing site name");
     }
     else
       item.setSiteName(str);
 
     str = value(atts, "abbrev");
-    if (!str.isEmpty())
+    if (!str.empty())
       item.setAbbreviation(str);
 
-    tmpDouble = value(atts, "long").toDouble(&ok);
-    if (ok)
-      item.setLongitude(tmpDouble);
+    item.setLongitude(stod(value(atts, "long")));
 
-    tmpDouble = value(atts, "lat").toDouble(&ok);
-    if (ok)
-      item.setLatitude(tmpDouble);
+    item.setLatitude(stod(value(atts, "lat")));
 
-    tmpDouble = value(atts, "alt").toDouble(&ok);
-    if (ok)
-      item.setAltitude(tmpDouble);
+    item.setAltitude(stod(value(atts, "alt")));
 
     master()->addSiteItem(item);
 
@@ -126,13 +117,13 @@ CSymbolSubHandler::CSymbolSubHandler(CQdoasConfigHandler *master) :
 {
 }
 
-void CSymbolSubHandler::start(const Glib::ustring &element, const map<Glib::ustring, QString> &atts)
+void CSymbolSubHandler::start(const Glib::ustring &element, const map<Glib::ustring, string> &atts)
 {
   if (element == "symbol") {
-    QString name;
+    string name;
 
     name = value(atts, "name");
-    if (name.isEmpty()) {
+    if (name.empty()) {
       throw std::runtime_error("Missing symbol name");
     }
 
@@ -154,19 +145,19 @@ CProjectSubHandler::CProjectSubHandler(CQdoasConfigHandler *master) :
 {
 }
 
-void CProjectSubHandler::start(const map<Glib::ustring, QString> &atts)
+void CProjectSubHandler::start(const map<Glib::ustring, string> &atts)
 {
   // the project element - must have a name
 
   m_project.setName(value(atts, "name"));
   m_project.setEnabled(value(atts, "disable") != "true");
 
-  if (m_project.name().isEmpty()) {
+  if (m_project.name().empty()) {
     throw std::runtime_error("Project with empty name.");
   }
 }
 
-void CProjectSubHandler::start(const Glib::ustring &element, const map<Glib::ustring, QString> &atts)
+void CProjectSubHandler::start(const Glib::ustring &element, const map<Glib::ustring, string> &atts)
 {
   // a sub element of project ... create a specialized handler and delegate
   mediate_project_t *prop = m_project.properties();

@@ -8,8 +8,8 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #ifndef _CPLOTIMAGE_H_GUARD
 #define _CPLOTIMAGE_H_GUARD
 
-#include <QString>
-#include <QList>
+#include <string>
+#include <vector>
 
 #include "mediate_types.h"
 
@@ -18,15 +18,15 @@ class CPlotImage
  public:
   CPlotImage(const char *filename,const char *title) : m_file(filename), m_title(title) {};
 
- const QString& GetFile(void) const;
- const QString& GetTitle(void) const;
+ const std::string& GetFile(void) const;
+ const std::string& GetTitle(void) const;
 
  private:
-  QString m_file,m_title;
+  std::string m_file,m_title;
 };
 
-inline const QString& CPlotImage::GetFile(void) const { return m_file; }
-inline const QString& CPlotImage::GetTitle(void) const { return m_title; }
+inline const std::string& CPlotImage::GetFile(void) const { return m_file; }
+inline const std::string& CPlotImage::GetTitle(void) const { return m_title; }
 
 struct SPlotImage
 {

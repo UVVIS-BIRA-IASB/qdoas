@@ -56,7 +56,7 @@ void CWPlotArea::exportPage(void)
 QString CWPlotArea::pageTitle(void) const
 {
   if (m_pageData)
-    return m_pageData->title();
+    return QString::fromStdString(m_pageData->title());
 
   return QString();
 }
@@ -64,7 +64,7 @@ QString CWPlotArea::pageTitle(void) const
 QString CWPlotArea::pageTag(void) const
 {
   if (m_pageData)
-    return m_pageData->tag();
+    return QString::fromStdString(m_pageData->tag());
 
   return QString();
 }

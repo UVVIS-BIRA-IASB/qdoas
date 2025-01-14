@@ -8,8 +8,7 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #ifndef _CPROJECTCONFIGITEM_H_GUARD
 #define _CPROJECTCONFIGITEM_H_GUARD
 
-#include <QString>
-#include <QList>
+#include <vector>
 
 #include "mediate.h"
 #include "CProjectConfigTreeNode.h"
@@ -19,8 +18,8 @@ class CAnalysisWindowConfigItem
  public:
   CAnalysisWindowConfigItem();
 
-  bool setName(const QString &name);
-  const QString& name(void) const;
+  bool setName(const std::string &name);
+  const std::string& name(void) const;
 
   void setEnabled(bool enabled);
   bool isEnabled(void) const;
@@ -31,7 +30,7 @@ class CAnalysisWindowConfigItem
   int SetProperties(mediate_analysis_window_t *p) const;
 
  private:
-  QString m_name;
+  std::string m_name;
   bool m_enabled;
   mediate_analysis_window_t m_awProp;
 };
@@ -42,8 +41,8 @@ class CProjectConfigItem
   ~CProjectConfigItem();
   CProjectConfigItem();
 
-  void setName(const QString &name);
-  const QString& name(void) const;
+  void setName(const std::string &name);
+  const std::string& name(void) const;
 
   void setEnabled(bool enabled);
   bool isEnabled(void) const;
@@ -52,7 +51,7 @@ class CProjectConfigItem
   const mediate_project_t* properties(void) const;
 
   CAnalysisWindowConfigItem* issueNewAnalysisWindowItem(void); // retains ownership
-  const QList<const CAnalysisWindowConfigItem*>& analysisWindowItems(void) const;
+  const std::vector<const CAnalysisWindowConfigItem*>& analysisWindowItems(void) const;
 
   CProjectConfigTreeNode* rootNode(void); // WARNING : allows (by design) poking at the internals ...
   const CProjectConfigTreeNode* rootNode(void) const;
@@ -60,11 +59,11 @@ class CProjectConfigItem
   int SetProperties(mediate_project_t *p) const;
 
  private:
-  QString m_name;
+  std::string m_name;
   bool m_enabled;
   mediate_project_t m_projProp;
   CProjectConfigTreeNode *m_root;
-  QList<const CAnalysisWindowConfigItem*> m_awItemList;
+  std::vector<const CAnalysisWindowConfigItem*> m_awItemList;
 };
 
 class CSiteConfigItem
@@ -72,48 +71,48 @@ class CSiteConfigItem
  public:
   CSiteConfigItem();
 
-  void setSiteName(const QString &name);
-  void setAbbreviation(const QString &abbreviation);
+  void setSiteName(const std::string &name);
+  void setAbbreviation(const std::string &abbreviation);
   void setLongitude(double longitude);
   void setLatitude(double latitude);
   void setAltitude(double altitude);
 
-  const QString& siteName(void) const;
-  const QString& abbreviation(void) const;
+  const std::string& siteName(void) const;
+  const std::string& abbreviation(void) const;
   double longitude(void) const;
   double latitude(void) const;
   double altitude(void) const;
 
  private:
-  QString m_siteName, m_abbreviation;
+  std::string m_siteName, m_abbreviation;
   double m_longitude, m_latitude, m_altitude;
 };
 
 class CSymbolConfigItem
 {
  public:
-  CSymbolConfigItem(const QString &name, const QString &description);
+  CSymbolConfigItem(const std::string &name, const std::string &description);
 
-  const QString& symbolName(void) const;
-  const QString& symbolDescription(void) const;
+  const std::string& symbolName(void) const;
+  const std::string& symbolDescription(void) const;
 
  private:
-  QString m_name, m_description;
+  std::string m_name, m_description;
 };
 
-inline void CSiteConfigItem::setSiteName(const QString &siteName) { m_siteName = siteName; }
-inline void CSiteConfigItem::setAbbreviation(const QString &abbreviation) { m_abbreviation = abbreviation; }
+inline void CSiteConfigItem::setSiteName(const std::string &siteName) { m_siteName = siteName; }
+inline void CSiteConfigItem::setAbbreviation(const std::string &abbreviation) { m_abbreviation = abbreviation; }
 inline void CSiteConfigItem::setLongitude(double longitude) { m_longitude = longitude; }
 inline void CSiteConfigItem::setLatitude(double latitude) { m_latitude = latitude; }
 inline void CSiteConfigItem::setAltitude(double altitude) { m_altitude = altitude; }
 
-inline const QString& CSiteConfigItem::siteName(void) const { return m_siteName; }
-inline const QString& CSiteConfigItem::abbreviation(void) const { return m_abbreviation; }
+inline const std::string& CSiteConfigItem::siteName(void) const { return m_siteName; }
+inline const std::string& CSiteConfigItem::abbreviation(void) const { return m_abbreviation; }
 inline double CSiteConfigItem::longitude(void) const { return m_longitude; }
 inline double CSiteConfigItem::latitude(void) const { return m_latitude; }
 inline double CSiteConfigItem::altitude(void) const { return m_altitude; }
 
-inline const QString& CSymbolConfigItem::symbolName(void) const { return m_name; }
-inline const QString& CSymbolConfigItem::symbolDescription(void) const { return m_description; }
+inline const std::string& CSymbolConfigItem::symbolName(void) const { return m_name; }
+inline const std::string& CSymbolConfigItem::symbolDescription(void) const { return m_description; }
 
 #endif

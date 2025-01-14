@@ -4,21 +4,25 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 
-#include <QTextStream>
+#include <sstream>
+
 
 #include "CPlotPageData.h"
 
 using std::shared_ptr;
+using std::string;
 
 CPlotPageData::CPlotPageData(int pageNumber,int pageType) :
   m_pageNumber(pageNumber),
   m_pageType(pageType)
 {
   // default tag
-  QTextStream(&m_tag) << "Tag-" << pageNumber;
+  std::ostringstream stream;
+  stream << "Tag-" << pageNumber;
+  m_tag = stream.str();
 }
 
 int CPlotPageData::pageNumber(void) const
@@ -31,12 +35,12 @@ int CPlotPageData::size(void) const
   return (m_pageType==PLOTPAGE_DATASET)?m_dataSets.size():m_dataImages.size();
 }
 
-const QString& CPlotPageData::title(void) const
+const string& CPlotPageData::title(void) const
 {
   return m_title;
 }
 
-const QString& CPlotPageData::tag(void) const
+const string& CPlotPageData::tag(void) const
 {
   return m_tag;
 }
@@ -62,12 +66,12 @@ shared_ptr<const CPlotImage> CPlotPageData::dataImage(int index) const
   return m_dataImages.at(index);
 }
 
-void CPlotPageData::setTitle(const QString &title)
+void CPlotPageData::setTitle(const string &title)
 {
   m_title = title;
 }
 
-void CPlotPageData::setTag(const QString &tag)
+void CPlotPageData::setTag(const string &tag)
 {
   m_tag = tag;
 }

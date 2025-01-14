@@ -4,12 +4,15 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 */
 
+#include <cassert>
 
-#include <iostream>
+#include <boost/algorithm/string.hpp>
 
 #include "CConfigHandler.h"
 
 using std::map;
+using std::string;
+using std::vector;
 
 CConfigHandler::CConfigHandler() :
   xmlpp::SaxParser(),
@@ -21,7 +24,7 @@ CConfigHandler::CConfigHandler() :
 CConfigHandler::~CConfigHandler()
 {
   // delete any sub handlers ...
-  while (!m_subHandlerStack.isEmpty()) {
+  while (!m_subHandlerStack.empty()) {
     delete m_subHandlerStack.back().handler;
     m_subHandlerStack.pop_back();
   }
@@ -30,9 +33,9 @@ CConfigHandler::~CConfigHandler()
 void CConfigHandler::on_start_element(const Glib::ustring& name,
                                       const AttributeList& attributes)
 {
-  map<Glib::ustring, QString> atts;
+  map<Glib::ustring, string> atts;
   for (const auto& att : attributes) {
-    atts[att.name] = QString::fromStdString(att.value);
+    atts[att.name] = att.value;
   }
 
   element_stack.push_back(name);
@@ -53,8 +56,8 @@ void CConfigHandler::on_end_element(const Glib::ustring& name)
     // delegate to the sub handler
 
     // first any collected character data
-    QString tmp(QString::fromStdString(collated_str).trimmed());
-    if (!tmp.isEmpty()) {
+    string tmp(boost::trim_copy(collated_str));
+    if (!tmp.empty()) {
       m_activeSubHandler->character(tmp);
     }
 
@@ -64,7 +67,7 @@ void CConfigHandler::on_end_element(const Glib::ustring& name)
       delete m_activeSubHandler;
       m_subHandlerStack.pop_back();
       // revert back to the previous handler
-      if (!m_subHandlerStack.isEmpty())
+      if (!m_subHandlerStack.empty())
         m_activeSubHandler = m_subHandlerStack.back().handler;
       else
         m_activeSubHandler = NULL;
@@ -83,18 +86,18 @@ void CConfigHandler::on_characters(const Glib::ustring& text)
   }
 }
 
-QString CConfigHandler::messages(void) const
+string CConfigHandler::messages(void) const
 {
   return m_errorMessages;
 }
 
-QString CConfigHandler::errorString() const
+string CConfigHandler::errorString() const
 {
   return m_subErrorMessage;
 }
 
 void CConfigHandler::install_subhandler(CConfigSubHandler *newHandler,
-                                        const map<Glib::ustring, QString>& attributes) {
+                                        const map<Glib::ustring, string>& attributes) {
   m_subHandlerStack.push_back(SSubHandlerItem(newHandler, element_stack.size()));
   m_activeSubHandler = newHandler;
 
@@ -102,43 +105,43 @@ void CConfigHandler::install_subhandler(CConfigSubHandler *newHandler,
 
 }
 
-void CConfigHandler::setPath(int index, const QString &pathPrefix)
+void CConfigHandler::setPath(int index, const string &pathPrefix)
 {
   // index MUST be in the range 0-9
   if (index < 0 || index > 9)
     return;
 
   // copy and remove any trailing '/' or '\' characters ...
-  QString tmp(pathPrefix);
+  string tmp(pathPrefix);
 
-  while (!tmp.isEmpty() && (tmp.endsWith('/') || tmp.endsWith('\\')))
-    tmp.chop(1);
+  while (!tmp.empty() && ((tmp.back() == '/') || (tmp.back() =='\\')))
+    tmp.pop_back();
 
   m_paths[index] = tmp;
 }
 
-QString CConfigHandler::getPath(int index) const
+string CConfigHandler::getPath(int index) const
 {
   if (index < 0 || index > 9)
-    return QString();
+    return string();
 
   return m_paths[index];
 }
 
-QString CConfigHandler::pathExpand(const QString &name)
+string CConfigHandler::pathExpand(const string &name)
 {
   // replace a '%?' prefix with a path (? must be a digit).
 
   int len = name.length();
-  if (len > 1 && name.startsWith('%') && name.at(1).isDigit()) {
+  if (len > 1 && name.at(0) =='%' && std::isdigit(name.at(1))) {
 
-    int index = name.at(1).digitValue();
+    int index = name.at(1) - '0';
 
     assert(index >= 0 && index <= 9);
 
-    QString tmp = m_paths.at(index);
+    string tmp = m_paths.at(index);
     if (len > 2)
-      tmp += name.right(len - 2);
+      tmp += name.substr(2);
 
     return tmp;
   }

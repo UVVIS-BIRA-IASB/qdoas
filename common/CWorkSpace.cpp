@@ -5,11 +5,16 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 */
 
 #include <algorithm>
-#include <QTextStream>
+#include <vector>
+
+#include <cstring>
 
 #include "CWorkSpace.h"
 
 #include "debugutil.h"
+
+using std::string;
+using std::vector;
 
 CWorkSpace *CWorkSpace::m_instance = NULL;
 
@@ -26,7 +31,7 @@ CWorkSpace::~CWorkSpace()
   // free all dynamic memory
 
   // Project ...
-  std::map<QString,SProjBucket>::iterator pIt = m_projMap.begin();
+  std::map<string,SProjBucket>::iterator pIt = m_projMap.begin();
   while (pIt != m_projMap.end()) {
     std::vector<SAnlysWinBucket>::iterator wIt = (pIt->second).window.begin();
     while (wIt != (pIt->second).window.end()) {
@@ -40,7 +45,7 @@ CWorkSpace::~CWorkSpace()
   m_projMap.clear(); // happens anyway
 
   // site
-  std::map<QString,mediate_site_t*>::iterator sIt = m_siteMap.begin();
+  std::map<string,mediate_site_t*>::iterator sIt = m_siteMap.begin();
   while (sIt != m_siteMap.end()) {
     delete sIt->second;
     ++sIt;
@@ -55,7 +60,7 @@ void CWorkSpace::removeAllContent(void)
   // Projects ...  Dont worry about reference count handling because
   // the symbol list will be cleared as well.
 
-  std::map<QString,SProjBucket>::iterator pIt = m_projMap.begin();
+  std::map<string,SProjBucket>::iterator pIt = m_projMap.begin();
   while (pIt != m_projMap.end()) {
     // notify the observers
     std::list<CProjectObserver*>::iterator obs = m_projectObserverList.begin();
@@ -77,7 +82,7 @@ void CWorkSpace::removeAllContent(void)
   m_projMap.clear();
 
   // sites
-  std::map<QString,mediate_site_t*>::iterator sIt = m_siteMap.begin();
+  std::map<string,mediate_site_t*>::iterator sIt = m_siteMap.begin();
   while (sIt != m_siteMap.end()) {
     // notify the observers
     std::list<CSitesObserver*>::iterator obs = m_sitesObserverList.begin();
@@ -106,19 +111,19 @@ void CWorkSpace::removeAllContent(void)
 
 }
 
-mediate_project_t* CWorkSpace::findProject(const QString &projectName) const
+mediate_project_t* CWorkSpace::findProject(const string &projectName) const
 {
-  std::map<QString,SProjBucket>::const_iterator pIt = m_projMap.find(projectName);
+  std::map<string,SProjBucket>::const_iterator pIt = m_projMap.find(projectName);
   if (pIt != m_projMap.end())
     return (pIt->second).project;
 
   return NULL; // not found
 }
 
-mediate_analysis_window_t* CWorkSpace::findAnalysisWindow(const QString &projectName,
-                              const QString &windowName) const
+mediate_analysis_window_t* CWorkSpace::findAnalysisWindow(const string &projectName,
+                              const string &windowName) const
 {
-  std::map<QString,SProjBucket>::const_iterator pIt = m_projMap.find(projectName);
+  std::map<string,SProjBucket>::const_iterator pIt = m_projMap.find(projectName);
   if (pIt != m_projMap.end()) {
     // project exists
     std::vector<SAnlysWinBucket>::const_iterator wIt = (pIt->second).window.begin();
@@ -130,9 +135,9 @@ mediate_analysis_window_t* CWorkSpace::findAnalysisWindow(const QString &project
   return NULL; // not found
 }
 
-const mediate_site_t* CWorkSpace::findSite(const QString &siteName) const
+const mediate_site_t* CWorkSpace::findSite(const string &siteName) const
 {
-  std::map<QString,mediate_site_t*>::const_iterator it = m_siteMap.find(siteName);
+  std::map<string,mediate_site_t*>::const_iterator it = m_siteMap.find(siteName);
   if (it != m_siteMap.end()) {
     return it->second;
   }
@@ -140,7 +145,7 @@ const mediate_site_t* CWorkSpace::findSite(const QString &siteName) const
   return NULL; // not found
 }
 
-QString CWorkSpace::findSymbol(const QString &symbolName) const
+string CWorkSpace::findSymbol(const string &symbolName) const
 {
   symbolmap_t::const_iterator it = m_symbolMap.find(symbolName);
   if (it != m_symbolMap.end()) {
@@ -148,40 +153,40 @@ QString CWorkSpace::findSymbol(const QString &symbolName) const
     return (it->second).description; // The string returned may be empty, but is not null.
   }
 
-  return QString(); // a NULL string
+  return string(); // a NULL string
 }
 
-void CWorkSpace::incrementUseCount(const QString &symbolName)
+void CWorkSpace::incrementUseCount(const string &symbolName)
 {
   symbolmap_t::iterator it = m_symbolMap.find(symbolName);
   if (it != m_symbolMap.end())
     ++((it->second).useCount);
 }
 
-void CWorkSpace::decrementUseCount(const QString &symbolName)
+void CWorkSpace::decrementUseCount(const string &symbolName)
 {
   symbolmap_t::iterator it = m_symbolMap.find(symbolName);
   if (it != m_symbolMap.end() && (it->second).useCount)
     --((it->second).useCount);
 }
 
-mediate_project_t* CWorkSpace::createProject(const QString &newProjectName)
+mediate_project_t* CWorkSpace::createProject(const string &newProjectName)
 {
-  if (newProjectName.isEmpty())
+  if (newProjectName.empty())
     return NULL;
 
   mediate_project_t *tmp = NULL;
 
   // does it already exist?
-  std::map<QString,SProjBucket>::iterator pIt = m_projMap.find(newProjectName);
+  std::map<string,SProjBucket>::iterator pIt = m_projMap.find(newProjectName);
   if (pIt == m_projMap.end()) {
     // does not exist
     tmp = new mediate_project_t;
 
-    initializeMediateProject(tmp, m_configFile.toLocal8Bit().data(), newProjectName.toLocal8Bit().data() );
+    initializeMediateProject(tmp, m_configFile.c_str(), newProjectName.c_str() );
 
     // insert the project (with no windows)
-    m_projMap.insert(std::map<QString,SProjBucket>::value_type(newProjectName,SProjBucket(tmp)));
+    m_projMap.insert(std::map<string,SProjBucket>::value_type(newProjectName,SProjBucket(tmp)));
 
     // notify the observers
     std::list<CProjectObserver*>::iterator obs = m_projectObserverList.begin();
@@ -194,16 +199,16 @@ mediate_project_t* CWorkSpace::createProject(const QString &newProjectName)
   return tmp;
 }
 
-mediate_analysis_window_t*  CWorkSpace::createAnalysisWindow(const QString &projectName, const QString &newWindowName,
-                                 const QString &preceedingWindowName)
+mediate_analysis_window_t*  CWorkSpace::createAnalysisWindow(const string &projectName, const string &newWindowName,
+                                 const string &preceedingWindowName)
 {
-  if (newWindowName.isEmpty())
+  if (newWindowName.empty())
     return NULL;
 
   mediate_analysis_window_t *tmp = NULL;
 
   // project must exist
-  std::map<QString,SProjBucket>::iterator pIt = m_projMap.find(projectName);
+  std::map<string,SProjBucket>::iterator pIt = m_projMap.find(projectName);
   if (pIt != m_projMap.end()) {
     std::vector<SAnlysWinBucket>::iterator nextIt = (pIt->second).window.begin();
     std::vector<SAnlysWinBucket>::iterator wIt = (pIt->second).window.begin();
@@ -222,7 +227,7 @@ mediate_analysis_window_t*  CWorkSpace::createAnalysisWindow(const QString &proj
       if (newWindowName.length() < (int)sizeof(tmp->name)) {
     initializeMediateAnalysisWindow(tmp);
     // set its name ...
-    strcpy(tmp->name, newWindowName.toLocal8Bit().data());
+    strcpy(tmp->name, newWindowName.c_str());
 
     // insert at the specified position - ie. before nextIt
     if (nextIt == (pIt->second).window.end())
@@ -243,26 +248,26 @@ mediate_analysis_window_t*  CWorkSpace::createAnalysisWindow(const QString &proj
   return tmp;
 }
 
-bool CWorkSpace::createSite(const QString &newSiteName, const QString &abbr,
+bool CWorkSpace::createSite(const string &newSiteName, const string &abbr,
                 double longitude, double latitude, double altitude)
 {
   mediate_site_t *tmp;
 
   // limit check ...
-  if (newSiteName.isEmpty() || newSiteName.length() >= (int)sizeof(tmp->name) || abbr.length() >= (int)sizeof(tmp->abbreviation))
+  if (newSiteName.empty() || newSiteName.length() >= (int)sizeof(tmp->name) || abbr.length() >= (int)sizeof(tmp->abbreviation))
     return false;
 
-  std::map<QString,mediate_site_t*>::iterator it = m_siteMap.find(newSiteName);
+  std::map<string,mediate_site_t*>::iterator it = m_siteMap.find(newSiteName);
   if (it == m_siteMap.end()) {
     tmp = new mediate_site_t;
 
-    strcpy(tmp->name, newSiteName.toLocal8Bit().data());
-    strcpy(tmp->abbreviation, abbr.toLocal8Bit().data());
+    strcpy(tmp->name, newSiteName.c_str());
+    strcpy(tmp->abbreviation, abbr.c_str());
     tmp->longitude = longitude;
     tmp->latitude = latitude;
     tmp->altitude = altitude;
 
-    m_siteMap.insert(std::map<QString,mediate_site_t*>::value_type(newSiteName, tmp));
+    m_siteMap.insert(std::map<string,mediate_site_t*>::value_type(newSiteName, tmp));
 
     // notify the observers
     std::list<CSitesObserver*>::iterator obs = m_sitesObserverList.begin();
@@ -275,18 +280,18 @@ bool CWorkSpace::createSite(const QString &newSiteName, const QString &abbr,
   return false;
 }
 
-bool CWorkSpace::createSymbol(const QString &newSymbolName, const QString &description)
+bool CWorkSpace::createSymbol(const string &newSymbolName, const string &description)
 {
   mediate_symbol_t *tmp; // just for size checking ....
 
-  if (newSymbolName.isEmpty() || newSymbolName.length() >= (int)sizeof(tmp->name) || description.length() >= (int)sizeof(tmp->description) || newSymbolName.contains(';'))
+  if (newSymbolName.empty() || newSymbolName.length() >= (int)sizeof(tmp->name) || description.length() >= (int)sizeof(tmp->description) || (newSymbolName.find(';') != string::npos))
     return false;
 
   symbolmap_t::iterator it = m_symbolMap.find(newSymbolName);
   if (it == m_symbolMap.end()) {
-    if (description.isNull()) {
+    if (description.empty()) {
       // make an empty description
-      QString emptyStr = "";
+      string emptyStr = "";
       m_symbolMap.insert(symbolmap_t::value_type(newSymbolName, SSymbolBucket(emptyStr)));
     }
     else
@@ -303,17 +308,17 @@ bool CWorkSpace::createSymbol(const QString &newSymbolName, const QString &descr
   return false;
 }
 
-bool CWorkSpace::renameProject(const QString &oldProjectName, const QString &newProjectName)
+bool CWorkSpace::renameProject(const string &oldProjectName, const string &newProjectName)
 {
   // project must exist - locate by old name
-  std::map<QString,SProjBucket>::iterator oldIt = m_projMap.find(oldProjectName);
+  std::map<string,SProjBucket>::iterator oldIt = m_projMap.find(oldProjectName);
   if (oldIt != m_projMap.end()) {
     // no change is OK
     if (oldProjectName == newProjectName)
       return true;
 
     // check that the new name is not in use
-    std::map<QString,SProjBucket>::iterator newIt = m_projMap.find(newProjectName);
+    std::map<string,SProjBucket>::iterator newIt = m_projMap.find(newProjectName);
     if (newIt == m_projMap.end()) {
       // ok to rename - first notify, then touch the map, then notify again
 
@@ -325,11 +330,11 @@ bool CWorkSpace::renameProject(const QString &oldProjectName, const QString &new
       }
 
       // change of key so insert for the new key then remove the old entry
-      SProjBucket inserted = m_projMap.insert(std::map<QString,SProjBucket>::value_type(newProjectName, oldIt->second)).first->second;
+      SProjBucket inserted = m_projMap.insert(std::map<string,SProjBucket>::value_type(newProjectName, oldIt->second)).first->second;
       m_projMap.erase(oldIt);
 
       // update project name metadata in mediate_project_t structure:
-      strncpy(inserted.project->project_name, newProjectName.toLocal8Bit().data(), PROJECT_NAME_BUFFER_LENGTH-1);
+      strncpy(inserted.project->project_name, newProjectName.c_str(), PROJECT_NAME_BUFFER_LENGTH-1);
 
       // notify the observers again
       obs = m_projectObserverList.begin();
@@ -345,11 +350,11 @@ bool CWorkSpace::renameProject(const QString &oldProjectName, const QString &new
   return false;
 }
 
-bool CWorkSpace::renameAnalysisWindow(const QString &projectName, const QString &oldWindowName,
-                      const QString &newWindowName)
+bool CWorkSpace::renameAnalysisWindow(const string &projectName, const string &oldWindowName,
+                      const string &newWindowName)
 {
   // project must exist
-  std::map<QString,SProjBucket>::iterator pIt = m_projMap.find(projectName);
+  std::map<string,SProjBucket>::iterator pIt = m_projMap.find(projectName);
   if (pIt != m_projMap.end()) {
     // locate the window by the old name - must exist
     std::vector<SAnlysWinBucket>::iterator oldIt = (pIt->second).window.begin();
@@ -363,7 +368,7 @@ bool CWorkSpace::renameAnalysisWindow(const QString &projectName, const QString 
       while (newIt != (pIt->second).window.end() && newWindowName != newIt->aw->name) ++ newIt;
       if (newIt == (pIt->second).window.end()) {
     // new name is not in use .. ok to change the name
-    strcpy(oldIt->aw->name, newWindowName.toLocal8Bit().data());
+    strcpy(oldIt->aw->name, newWindowName.c_str());
 
     // notify the observers - Treated as a modification to the project
     notifyProjectObserversModified(projectName);
@@ -374,15 +379,15 @@ bool CWorkSpace::renameAnalysisWindow(const QString &projectName, const QString 
   return false;
 }
 
-void CWorkSpace::setConfigFile(const QString &fileName) {
+void CWorkSpace::setConfigFile(const string &fileName) {
   m_configFile = fileName;
 }
 
-const QString& CWorkSpace::getConfigFile() {
+const string& CWorkSpace::getConfigFile() {
   return m_configFile;
 }
 
-bool CWorkSpace::modifySite(const QString &siteName, const QString &abbr,
+bool CWorkSpace::modifySite(const string &siteName, const string &abbr,
                 double longitude, double latitude, double altitude)
 {
   mediate_site_t *tmp;
@@ -391,13 +396,13 @@ bool CWorkSpace::modifySite(const QString &siteName, const QString &abbr,
   if (siteName.length() >= (int)sizeof(tmp->name) || abbr.length() >= (int)sizeof(tmp->abbreviation))
     return false;
 
-  std::map<QString,mediate_site_t*>::iterator it = m_siteMap.find(siteName);
+  std::map<string,mediate_site_t*>::iterator it = m_siteMap.find(siteName);
   if (it != m_siteMap.end()) {
 
     tmp = it->second;
 
     // cant change the name
-    strcpy(tmp->abbreviation, abbr.toLocal8Bit().data());
+    strcpy(tmp->abbreviation, abbr.c_str());
     tmp->longitude = longitude;
     tmp->latitude = latitude;
     tmp->altitude = altitude;
@@ -414,12 +419,12 @@ bool CWorkSpace::modifySite(const QString &siteName, const QString &abbr,
   return false;
 }
 
-bool CWorkSpace::modifySymbol(const QString &symbolName, const QString &description)
+bool CWorkSpace::modifySymbol(const string &symbolName, const string &description)
 {
   symbolmap_t::iterator it = m_symbolMap.find(symbolName);
   if (it != m_symbolMap.end()) {
     // symbol exists - and should - only the description can be modified.
-    if (description.isNull())
+    if (description.empty())
       (it->second).description = ""; // empty
     else
       (it->second).description = description;
@@ -449,7 +454,7 @@ mediate_site_t* CWorkSpace::siteList(int &listLength) const
     mediate_site_t *tmp = siteList;
 
     // walk the list and copy
-    std::map<QString,mediate_site_t*>::const_iterator it = m_siteMap.begin();
+    std::map<string,mediate_site_t*>::const_iterator it = m_siteMap.begin();
     while (it != m_siteMap.end()) {
       *tmp = *(it->second);
       ++tmp;
@@ -478,8 +483,8 @@ mediate_symbol_t* CWorkSpace::symbolList(int &listLength) const
     // walk the list and copy
     symbolmap_t::const_iterator it = m_symbolMap.begin();
     while (it != m_symbolMap.end()) {
-      strcpy(tmp->name, (it->first).toLocal8Bit().data());
-      strcpy(tmp->description, (it->second).description.toLocal8Bit().data());
+      strcpy(tmp->name, (it->first).c_str());
+      strcpy(tmp->description, (it->second).description.c_str());
       ++tmp;
       ++it;
     }
@@ -495,9 +500,9 @@ mediate_symbol_t* CWorkSpace::symbolList(int &listLength) const
 
 // Only provides 'enabled' windows. Will return NULL if no windows are enabled.
 
-mediate_analysis_window_t* CWorkSpace::analysisWindowList(const QString &projectName, int &listLength) const
+mediate_analysis_window_t* CWorkSpace::analysisWindowList(const string &projectName, int &listLength) const
 {
-  std::map<QString,SProjBucket>::const_iterator pIt = m_projMap.find(projectName);
+  std::map<string,SProjBucket>::const_iterator pIt = m_projMap.find(projectName);
   if (pIt != m_projMap.end()) {
     // project exists
     size_t n = (pIt->second).window.size();
@@ -529,11 +534,11 @@ mediate_analysis_window_t* CWorkSpace::analysisWindowList(const QString &project
   return NULL;
 }
 
-QList<mediate_analysis_window_t*> CWorkSpace::analysisWindowList(const QString &projectName) const
+vector<mediate_analysis_window_t*> CWorkSpace::analysisWindowList(const string &projectName) const
 {
-  QList<mediate_analysis_window_t*> result;
+  vector<mediate_analysis_window_t*> result;
 
-  std::map<QString,SProjBucket>::const_iterator pIt = m_projMap.find(projectName);
+  std::map<string,SProjBucket>::const_iterator pIt = m_projMap.find(projectName);
   if (pIt != m_projMap.end()) {
     // project exists
     std::vector<SAnlysWinBucket>::const_iterator wIt = (pIt->second).window.begin();
@@ -548,25 +553,25 @@ QList<mediate_analysis_window_t*> CWorkSpace::analysisWindowList(const QString &
   return result;
 }
 
-QStringList CWorkSpace::symbolList(void) const
+vector<string> CWorkSpace::symbolList(void) const
 {
-  QStringList symbolList;
+  vector<string> symbolList;
 
   symbolmap_t::const_iterator it = m_symbolMap.begin();
   while (it != m_symbolMap.end()) {
-    symbolList << (it->first);
+    symbolList.push_back(it->first);
     ++it;
   }
 
   return symbolList;
 }
 
-QStringList CWorkSpace::analysisWindowsWithSymbol(const QString &projectName, const QString &symbol) const
+vector<string> CWorkSpace::analysisWindowsWithSymbol(const string &projectName, const string &symbol) const
 {
   // buld a list of names of analysis windows that contains 'symbol' in the crossSectionList...
-  QStringList result;
+  vector<string> result;
 
-  std::map<QString,SProjBucket>::const_iterator pIt = m_projMap.find(projectName);
+  std::map<string,SProjBucket>::const_iterator pIt = m_projMap.find(projectName);
   if (pIt != m_projMap.end()) {
     // project exists
     std::vector<SAnlysWinBucket>::const_iterator wIt = (pIt->second).window.begin();
@@ -574,8 +579,8 @@ QStringList CWorkSpace::analysisWindowsWithSymbol(const QString &projectName, co
       const cross_section_list_t *d = &(wIt->aw->crossSectionList);
       int i = 0;
       while (i < d->nCrossSection) {
-    if (symbol == QString(d->crossSection[i].symbol)) {
-      result << QString(wIt->aw->name); // this AW contains the symbol as a cross section
+    if (symbol == string(d->crossSection[i].symbol)) {
+      result.push_back(wIt->aw->name); // this AW contains the symbol as a cross section
       break;
     }
     ++i;
@@ -587,10 +592,10 @@ QStringList CWorkSpace::analysisWindowsWithSymbol(const QString &projectName, co
   return result;
 }
 
-bool CWorkSpace::destroyProject(const QString &projectName)
+bool CWorkSpace::destroyProject(const string &projectName)
 {
   // project must exist
-  std::map<QString,SProjBucket>::iterator pIt = m_projMap.find(projectName);
+  std::map<string,SProjBucket>::iterator pIt = m_projMap.find(projectName);
   if (pIt != m_projMap.end()) {
 
     // notify the observers
@@ -624,10 +629,10 @@ bool CWorkSpace::destroyProject(const QString &projectName)
   return false;
 }
 
-bool CWorkSpace::destroyAnalysisWindow(const QString &projectName, const QString &windowName)
+bool CWorkSpace::destroyAnalysisWindow(const string &projectName, const string &windowName)
 {
   // project must exist
-  std::map<QString,SProjBucket>::iterator pIt = m_projMap.find(projectName);
+  std::map<string,SProjBucket>::iterator pIt = m_projMap.find(projectName);
   if (pIt != m_projMap.end()) {
     std::vector<SAnlysWinBucket>::iterator wIt = (pIt->second).window.begin();
     while (wIt != (pIt->second).window.end() && windowName != wIt->aw->name) ++wIt;
@@ -649,9 +654,9 @@ bool CWorkSpace::destroyAnalysisWindow(const QString &projectName, const QString
   return false;
 }
 
-bool CWorkSpace::destroySite(const QString &siteName)
+bool CWorkSpace::destroySite(const string &siteName)
 {
-  std::map<QString,mediate_site_t*>::iterator it = m_siteMap.find(siteName);
+  std::map<string,mediate_site_t*>::iterator it = m_siteMap.find(siteName);
   if (it != m_siteMap.end()) {
 
     // notify the observers
@@ -668,7 +673,7 @@ bool CWorkSpace::destroySite(const QString &siteName)
   return false;
 }
 
-bool CWorkSpace::destroySymbol(const QString &symbolName)
+bool CWorkSpace::destroySymbol(const string &symbolName)
 {
   symbolmap_t::iterator it = m_symbolMap.find(symbolName);
   if (it != m_symbolMap.end()) {
@@ -687,10 +692,10 @@ bool CWorkSpace::destroySymbol(const QString &symbolName)
   return false;
 }
 
-bool CWorkSpace::setAnalysisWindowEnabled(const QString &projectName,
-                      const QString &windowName, bool enabled)
+bool CWorkSpace::setAnalysisWindowEnabled(const string &projectName,
+                      const string &windowName, bool enabled)
 {
-  std::map<QString,SProjBucket>::iterator pIt = m_projMap.find(projectName);
+  std::map<string,SProjBucket>::iterator pIt = m_projMap.find(projectName);
   if (pIt != m_projMap.end()) {
     // project exists
     std::vector<SAnlysWinBucket>::iterator wIt = (pIt->second).window.begin();
@@ -736,7 +741,7 @@ void CWorkSpace::detach(CProjectObserver *observer)
   m_projectObserverList.remove(observer);
 }
 
-void CWorkSpace::notifyProjectObserversModified(const QString &projectName)
+void CWorkSpace::notifyProjectObserversModified(const string &projectName)
 {
   // notify the observers - Treated as a modification to the project
   std::list<CProjectObserver*>::iterator obs = m_projectObserverList.begin();
@@ -758,15 +763,15 @@ CSitesObserver::~CSitesObserver()
   CWorkSpace::instance()->detach(this);
 }
 
-void CSitesObserver::updateNewSite(const QString &newSiteName)
+void CSitesObserver::updateNewSite(const string &newSiteName)
 {
 }
 
-void CSitesObserver::updateModifySite(const QString &siteName)
+void CSitesObserver::updateModifySite(const string &siteName)
 {
 }
 
-void CSitesObserver::updateDeleteSite(const QString &siteName)
+void CSitesObserver::updateDeleteSite(const string &siteName)
 {
 }
 
@@ -782,15 +787,15 @@ CSymbolObserver::~CSymbolObserver()
   CWorkSpace::instance()->detach(this);
 }
 
-void CSymbolObserver::updateNewSymbol(const QString &newSymbolName)
+void CSymbolObserver::updateNewSymbol(const string &newSymbolName)
 {
 }
 
-void CSymbolObserver::updateModifySymbol(const QString &symbolName)
+void CSymbolObserver::updateModifySymbol(const string &symbolName)
 {
 }
 
-void CSymbolObserver::updateDeleteSymbol(const QString &symbolName)
+void CSymbolObserver::updateDeleteSymbol(const string &symbolName)
 {
 }
 
@@ -806,15 +811,15 @@ CProjectObserver::~CProjectObserver()
   CWorkSpace::instance()->detach(this);
 }
 
-void CProjectObserver::updateNewProject(const QString &newProjectName)
+void CProjectObserver::updateNewProject(const string &newProjectName)
 {
 }
 
-void CProjectObserver::updateModifyProject(const QString &projectName)
+void CProjectObserver::updateModifyProject(const string &projectName)
 {
 }
 
-void CProjectObserver::updateDeleteProject(const QString &projectName)
+void CProjectObserver::updateDeleteProject(const string &projectName)
 {
 }
 

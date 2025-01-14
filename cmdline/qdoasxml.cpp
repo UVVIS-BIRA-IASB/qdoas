@@ -53,109 +53,84 @@
 //
 //  ----------------------------------------------------------------------------
 
-#include "qdoasxml.h"
+#include <boost/algorithm/string.hpp>
+
+#include <cstdio>
 #include <cstdlib>
+#include <cstring>
+
+#include <iostream>
+
+#include "qdoasxml.h"
+
+using std::string;
+using std::vector;
 
 void ProjectApplyDouble(const CProjectConfigItem *p,                            // project to modify
-                        QString *pXmlKey,                                       // the path of the field to replace
-                        QString *pXmlValue,                                     // string with the new value
+                        const string& xmlKey,                                   // the path of the field to replace
+                        const string& xmlValue,                                 // string with the new value
                         double *pDoubleField)                                   // pointer to the field to change (should point within the previous target structure)
  {
-     // Declarations
-
-     char msgString[MAX_STR_LEN+1];
-
-     // Build message with old and new values
-
-  sprintf(msgString,"%s : %.2lf replaced by %s (%s)",
-                     pXmlKey->toLocal8Bit().constData(),
-                    *pDoubleField,pXmlValue->toLocal8Bit().constData(),p->name().toLocal8Bit().constData());
-  std::cout << msgString << std::endl;
+   // Print message with old and new values
+  std::cout << xmlKey << ": "
+            << *pDoubleField << " replaced by " << xmlValue
+            << " (" << p->name() << ")" << std::endl;
 
   // Replace the old value by the new one
-
-  *pDoubleField=(double)atof(pXmlValue->toLocal8Bit().constData());
+  *pDoubleField = std::stod(xmlValue);
  }
 
 void ProjectApplyInt(const CProjectConfigItem *p,                               // project to modify
-                     QString *pXmlKey,                                          // the path of the field to replace
-                     QString *pXmlValue,                                        // string with the new value
+                     const string& xmlKey,                                      // the path of the field to replace
+                     const string& xmlValue,                                    // string with the new value
                      int *pIntField)                                            // pointer to the field to change (should point within the previous target structure)
  {
-     // Declarations
-
-     char msgString[MAX_STR_LEN+1];
-
-     // Build message with old and new values
-
-  sprintf(msgString,"%s : %d replaced by %s (%s)",
-                     pXmlKey->toLocal8Bit().constData(),
-                    *pIntField,pXmlValue->toLocal8Bit().constData(),p->name().toLocal8Bit().constData());
-  std::cout << msgString << std::endl;
-
+  std::cout << xmlKey << ": "
+            << *pIntField << " replaced by " << xmlValue
+            << " (" << p->name() << ")" << std::endl;
   // Replace the old value by the new one
-
-  *pIntField=atoi(pXmlValue->toLocal8Bit().constData());
+  *pIntField=stoi(xmlValue);
  }
 
 void ProjectApplyChoice(const CProjectConfigItem *p,                            // project to modify
-                        QString *pXmlKey,                                       // the path of the field to replace
-                        QString *pXmlValue,                                     // string with the new value
+                        const string& xmlKey,                                   // the path of the field to replace
+                        const string& xmlValue,                                 // string with the new value
                         const char *optionsList[],                              // list of possible options
                         int nOptions,                                           // number of options in the previous list
                         int *pNewIndexOption)                                   // index of the new option
- {
-     // Declarations
-
-     char msgString[MAX_STR_LEN+1];
-     INDEX indexOption;
+{
+  int indexOption;
 
   for (indexOption=0;indexOption<nOptions;indexOption++)
-      if (*pXmlValue==optionsList[indexOption])
+      if (xmlValue==optionsList[indexOption])
        break;
 
-  if (indexOption<nOptions)
-   {
-       // Build message with old and new values
-
-    sprintf(msgString,"%s : %s replaced by %s (%s)",
-                       pXmlKey->toLocal8Bit().constData(),
-                       optionsList[*pNewIndexOption],pXmlValue->toLocal8Bit().constData(),p->name().toLocal8Bit().constData());
-
-    std::cout << msgString << std::endl;
+  if (indexOption<nOptions) {
+    std::cout << xmlKey << ": " << optionsList[*pNewIndexOption]
+              << " replaced by " << xmlValue << " (" << p->name() << ")" << std::endl;
 
     // Replace the old value by the new one
-
     *pNewIndexOption=indexOption;
-   }
- }
+  }
+}
 
 void ProjectApplyString(const CProjectConfigItem *p,                               // project to modify
-                     QString *pXmlKey,                                          // the path of the field to replace
-                     QString *pXmlValue,                                        // string with the new value
+                     const string& xmlKey,                                          // the path of the field to replace
+                     const string& xmlValue,                                        // string with the new value
                      char *field)                                            // pointer to the field to change (should point within the previous target structure)
- {
-     // Declarations
-
-     char msgString[MAX_STR_LEN+1];
-
-     // Build message with old and new values
-
-  sprintf(msgString,"%s : %s replaced by %s (%s)",
-                     pXmlKey->toLocal8Bit().constData(),field,
-                     pXmlValue->toLocal8Bit().constData(),p->name().toLocal8Bit().constData());
-  std::cout << msgString << std::endl;
-
+{
+  std::cout << xmlKey << ": "
+            << field << " replaced by " << xmlValue
+            << " ("  << p->name() << ")" << std::endl;
   // Replace the old value by the new one
-
-  strcpy(field,pXmlValue->toLocal8Bit().constData());
- }
+  strcpy(field,xmlValue.c_str());
+}
 
 // ===================================
 // PROJECT PROPERTIES : SELECTION PAGE
 // ===================================
 
-RC ParseSelection(QStringList &xmlFields,int xmlFieldN,int startingField,QString *pXmlKey,QString *pXmlValue,const CProjectConfigItem *p)
+RC ParseSelection(const vector<string>& xmlFields,int xmlFieldN,int startingField,const string& xmlKey,const string& xmlValue,const CProjectConfigItem *p)
  {
      // Declarations
 
@@ -176,72 +151,72 @@ RC ParseSelection(QStringList &xmlFields,int xmlFieldN,int startingField,QString
                if (indexField+1>=xmlFieldN)
                 std::cout << "sza attribute is missing" << std::endl;
                else if (xmlFields.at(indexField+1)=="min")
-                ProjectApplyDouble(p,pXmlKey,pXmlValue,&newProjectProperties.selection.szaMinimum);
+                ProjectApplyDouble(p,xmlKey,xmlValue,&newProjectProperties.selection.szaMinimum);
                else if (xmlFields.at(indexField+1)=="max")
-                ProjectApplyDouble(p,pXmlKey,pXmlValue,&newProjectProperties.selection.szaMaximum);
+                ProjectApplyDouble(p,xmlKey,xmlValue,&newProjectProperties.selection.szaMaximum);
                else if (xmlFields.at(indexField+1)=="delta")
-                ProjectApplyDouble(p,pXmlKey,pXmlValue,&newProjectProperties.selection.szaDelta);
+                ProjectApplyDouble(p,xmlKey,xmlValue,&newProjectProperties.selection.szaDelta);
            }
     else if (xmlFields.at(indexField)=="record")
      {
                if (indexField+1>=xmlFieldN)
                 std::cout << "record attribute is missing" << std::endl;
                else if (xmlFields.at(indexField+1)=="min")
-                ProjectApplyInt(p,pXmlKey,pXmlValue,&newProjectProperties.selection.recordNumberMinimum);
+                ProjectApplyInt(p,xmlKey,xmlValue,&newProjectProperties.selection.recordNumberMinimum);
                else if (xmlFields.at(indexField+1)=="max")
-                ProjectApplyInt(p,pXmlKey,pXmlValue,&newProjectProperties.selection.recordNumberMaximum);
+                ProjectApplyInt(p,xmlKey,xmlValue,&newProjectProperties.selection.recordNumberMaximum);
      }
           else if (xmlFields.at(indexField)=="cloud")
            {
                if (indexField+1>=xmlFieldN)
                 std::cout << "cloud attribute is missing" << std::endl;
                else if (xmlFields.at(indexField+1)=="min")
-                ProjectApplyDouble(p,pXmlKey,pXmlValue,&newProjectProperties.selection.cloudFractionMinimum);
+                ProjectApplyDouble(p,xmlKey,xmlValue,&newProjectProperties.selection.cloudFractionMinimum);
                else if (xmlFields.at(indexField+1)=="max")
-                ProjectApplyDouble(p,pXmlKey,pXmlValue,&newProjectProperties.selection.cloudFractionMaximum);
+                ProjectApplyDouble(p,xmlKey,xmlValue,&newProjectProperties.selection.cloudFractionMaximum);
            }
           else if (xmlFields.at(indexField)=="geolocation")
            {
                if (indexField+1>=xmlFieldN)
                 std::cout << "geolocation attribute is missing" << std::endl;
                else if (xmlFields.at(indexField+1)=="selected")
-       ProjectApplyChoice(p,pXmlKey,pXmlValue,geoSelectionMode,PRJCT_SPECTRA_MODES_MAX,&newProjectProperties.selection.geo.mode);
+       ProjectApplyChoice(p,xmlKey,xmlValue,geoSelectionMode,PRJCT_SPECTRA_MODES_MAX,&newProjectProperties.selection.geo.mode);
                else if (xmlFields.at(indexField+1)=="circle")
                 {
                     if (indexField+2>=xmlFieldN)
                   std::cout << "geolocation/circle attribute is missing" << std::endl;
                  else if (xmlFields.at(indexField+2)=="radius")
-                  ProjectApplyDouble(p,pXmlKey,pXmlValue,&newProjectProperties.selection.geo.circle.radius);
+                  ProjectApplyDouble(p,xmlKey,xmlValue,&newProjectProperties.selection.geo.circle.radius);
                  else if (xmlFields.at(indexField+2)=="long")
-                  ProjectApplyDouble(p,pXmlKey,pXmlValue,&newProjectProperties.selection.geo.circle.centerLongitude);
+                  ProjectApplyDouble(p,xmlKey,xmlValue,&newProjectProperties.selection.geo.circle.centerLongitude);
                  else if (xmlFields.at(indexField+2)=="lat")
-                  ProjectApplyDouble(p,pXmlKey,pXmlValue,&newProjectProperties.selection.geo.circle.centerLatitude);
+                  ProjectApplyDouble(p,xmlKey,xmlValue,&newProjectProperties.selection.geo.circle.centerLatitude);
                 }
                else if (xmlFields.at(indexField+1)=="rectangle")
                 {
                     if (indexField+2>=xmlFieldN)
                   std::cout << "geolocation/rectangle attribute is missing" << std::endl;
                  else if (xmlFields.at(indexField+2)=="west")
-                  ProjectApplyDouble(p,pXmlKey,pXmlValue,&newProjectProperties.selection.geo.rectangle.westernLongitude);
+                  ProjectApplyDouble(p,xmlKey,xmlValue,&newProjectProperties.selection.geo.rectangle.westernLongitude);
                  else if (xmlFields.at(indexField+2)=="east")
-                  ProjectApplyDouble(p,pXmlKey,pXmlValue,&newProjectProperties.selection.geo.rectangle.easternLongitude);
+                  ProjectApplyDouble(p,xmlKey,xmlValue,&newProjectProperties.selection.geo.rectangle.easternLongitude);
                  else if (xmlFields.at(indexField+2)=="south")
-                  ProjectApplyDouble(p,pXmlKey,pXmlValue,&newProjectProperties.selection.geo.rectangle.southernLatitude);
+                  ProjectApplyDouble(p,xmlKey,xmlValue,&newProjectProperties.selection.geo.rectangle.southernLatitude);
                  else if (xmlFields.at(indexField+2)=="north")
-                  ProjectApplyDouble(p,pXmlKey,pXmlValue,&newProjectProperties.selection.geo.rectangle.northernLatitude);
+                  ProjectApplyDouble(p,xmlKey,xmlValue,&newProjectProperties.selection.geo.rectangle.northernLatitude);
                 }
                else if (xmlFields.at(indexField+1)=="sites")
                 {
                     if (indexField+2>=xmlFieldN)
                   std::cout << "geolocation/sites attribute is missing" << std::endl;
                  else if (xmlFields.at(indexField+2)=="radius")
-                  ProjectApplyDouble(p,pXmlKey,pXmlValue,&newProjectProperties.selection.geo.sites.radius);
+                  ProjectApplyDouble(p,xmlKey,xmlValue,&newProjectProperties.selection.geo.sites.radius);
                 }
             else
-       std::cout << pXmlKey->toLocal8Bit().constData() << " unknown path" << std::endl;
+       std::cout << xmlKey << " unknown path" << std::endl;
            }
           else
-     std::cout << pXmlKey->toLocal8Bit().constData() << " unknown path" << std::endl;
+     std::cout << xmlKey << " unknown path" << std::endl;
    }
 
   p->SetProperties((mediate_project_t *)&newProjectProperties);
@@ -255,7 +230,7 @@ RC ParseSelection(QStringList &xmlFields,int xmlFieldN,int startingField,QString
 // PROJECT PROPERTIES : ANALYSIS PAGE
 // ==================================
 
-RC ParseAnalysis(QStringList &xmlFields,int xmlFieldN,int startingField,QString *pXmlKey,QString *pXmlValue,const CProjectConfigItem *p)
+RC ParseAnalysis(const vector<string>& xmlFields,int xmlFieldN,int startingField,const string& xmlKey,const string& xmlValue,const CProjectConfigItem *p)
  {
      // Declarations
 
@@ -276,14 +251,14 @@ RC ParseAnalysis(QStringList &xmlFields,int xmlFieldN,int startingField,QString 
               (xmlFields.at(indexField)=="interpolation") ||
               (xmlFields.at(indexField)=="gap"))
 
-           std::cout << pXmlKey->toLocal8Bit().constData() << " can not be changed" << std::endl;
+           std::cout << xmlKey << " can not be changed" << std::endl;
 
           else if (xmlFields.at(indexField)=="converge")
-           ProjectApplyDouble(p,pXmlKey,pXmlValue,&newProjectProperties.analysis.convergenceCriterion);
+           ProjectApplyDouble(p,xmlKey,xmlValue,&newProjectProperties.analysis.convergenceCriterion);
           else if (xmlFields.at(indexField)=="max_iterations")
-           ProjectApplyInt(p,pXmlKey,pXmlValue,&newProjectProperties.analysis.maxIterations);
+           ProjectApplyInt(p,xmlKey,xmlValue,&newProjectProperties.analysis.maxIterations);
           else
-           std::cout << pXmlKey->toLocal8Bit().constData() << " unknown path" << std::endl;
+           std::cout << xmlKey << " unknown path" << std::endl;
       }
 
   p->SetProperties((mediate_project_t *)&newProjectProperties);
@@ -297,7 +272,7 @@ RC ParseAnalysis(QStringList &xmlFields,int xmlFieldN,int startingField,QString 
 // PROJECT PROPERTIES : CALIBRATION PAGE
 // =====================================
 
-RC ParseCalibration(QStringList &xmlFields,int xmlFieldN,int startingField,QString *pXmlKey,QString *pXmlValue,const CProjectConfigItem *p)
+RC ParseCalibration(const vector<string>& xmlFields,int xmlFieldN,int startingField,const string& xmlKey,const string& xmlValue,const CProjectConfigItem *p)
  {
   // Declarations
 
@@ -319,9 +294,9 @@ RC ParseCalibration(QStringList &xmlFields,int xmlFieldN,int startingField,QStri
       if (indexField+1>=xmlFieldN)
        std::cout << "line attributes are missing" << std::endl;
       else if (xmlFields.at(indexField+1)=="slfFile")
-       ProjectApplyString(p,pXmlKey,pXmlValue,newProjectProperties.calibration.slfFile);
+       ProjectApplyString(p,xmlKey,xmlValue,newProjectProperties.calibration.slfFile);
       else
-       std::cout << pXmlKey->toLocal8Bit().constData() << " can not be changed " << std::endl;
+       std::cout << xmlKey << " can not be changed " << std::endl;
      }
    }
 
@@ -336,7 +311,7 @@ RC ParseCalibration(QStringList &xmlFields,int xmlFieldN,int startingField,QStri
 // PROJECT PROPERTIES : INSTRUMENTAL PAGE
 // ======================================
 
-RC ParseInstrumental(QStringList &xmlFields,int xmlFieldN,int startingField,QString *pXmlValue,const CProjectConfigItem *p)
+RC ParseInstrumental(const vector<string>& xmlFields,int xmlFieldN,int startingField,const string& xmlValue,const CProjectConfigItem *p)
  {
    // Declarations
 
@@ -409,13 +384,13 @@ RC ParseInstrumental(QStringList &xmlFields,int xmlFieldN,int startingField,QStr
         std::cout << "project/instrumental/omi/ave field can not be changed" << std::endl;
        else if (xmlFields.at(indexField+1)=="trackSelection")
         {
-         std::cout << "project/instrumental/omi/trackSelection : " << newProjectProperties.instrumental.omi.trackSelection << " replaced by " << pXmlValue->toLocal8Bit().constData() << std::endl;
-         strcpy(newProjectProperties.instrumental.omi.trackSelection,pXmlValue->toLocal8Bit().constData());
+         std::cout << "project/instrumental/omi/trackSelection : " << newProjectProperties.instrumental.omi.trackSelection << " replaced by " << xmlValue << std::endl;
+         strcpy(newProjectProperties.instrumental.omi.trackSelection,xmlValue.c_str());
         }
        else if (xmlFields.at(indexField+1)=="xTrackMode")
         {
-         std::cout << "project/instrumental/omi/xTrackMode : " << pXmlValue->toLocal8Bit().constData() << std::endl;
-         newProjectProperties.instrumental.omi.xtrack_mode = str_to_mode(pXmlValue->toLocal8Bit().constData());
+         std::cout << "project/instrumental/omi/xTrackMode : " << xmlValue << std::endl;
+         newProjectProperties.instrumental.omi.xtrack_mode = str_to_mode(xmlValue.c_str());
         }
        else if (xmlFields.at(indexField+1)=="calib")
         std::cout << "project/instrumental/omi/calib field can not be changed" << std::endl;
@@ -428,8 +403,8 @@ RC ParseInstrumental(QStringList &xmlFields,int xmlFieldN,int startingField,QStr
         std::cout << "tropomi attribute is missing" << std::endl;
        else if (xmlFields.at(indexField+1)=="trackSelection")
         {
-         std::cout << "project/instrumental/tropomi/trackSelection : " << newProjectProperties.instrumental.tropomi.trackSelection << " replaced by " << pXmlValue->toLocal8Bit().constData() << std::endl;
-         strcpy(newProjectProperties.instrumental.tropomi.trackSelection,pXmlValue->toLocal8Bit().constData());
+         std::cout << "project/instrumental/tropomi/trackSelection : " << newProjectProperties.instrumental.tropomi.trackSelection << " replaced by " << xmlValue << std::endl;
+         strcpy(newProjectProperties.instrumental.tropomi.trackSelection,xmlValue.c_str());
         }
       }
      else if (xmlFields.at(indexField)=="apex")
@@ -438,8 +413,8 @@ RC ParseInstrumental(QStringList &xmlFields,int xmlFieldN,int startingField,QStr
         std::cout << "apex attribute is missing" << std::endl;
        else if (xmlFields.at(indexField+1)=="trackSelection")
         {
-         std::cout << "project/instrumental/apex/trackSelection : " << newProjectProperties.instrumental.apex.trackSelection << " replaced by " << pXmlValue->toLocal8Bit().constData() << std::endl;
-         strcpy(newProjectProperties.instrumental.apex.trackSelection,pXmlValue->toLocal8Bit().constData());
+         std::cout << "project/instrumental/apex/trackSelection : " << newProjectProperties.instrumental.apex.trackSelection << " replaced by " << xmlValue << std::endl;
+         strcpy(newProjectProperties.instrumental.apex.trackSelection,xmlValue.c_str());
         }
       }
      else if (xmlFields.at(indexField)=="gome2")
@@ -466,26 +441,25 @@ RC ParseInstrumental(QStringList &xmlFields,int xmlFieldN,int startingField,QStr
 // ANALYSIS WINDOWS PROPERTIES
 // ===========================
 
-void AnalysisWindowApplyInt(const QList<const CAnalysisWindowConfigItem*>awList,        // list of analysis windows
-                               QString *pWindowName,                                    // the name of a specific analysis window (all windows will be modified if this string is empty)
-                               QString *pXmlKey,                                        // the path of the field to replace
-                               int newValue,                                            // new value
-                               mediate_analysis_window_t *pNewAnalysisWindow,           // target structure for analysis windows properties
-                               int *pIntField)                                          // pointer to the field to change (should point within the previous target structure)
+void AnalysisWindowApplyInt(const vector<const CAnalysisWindowConfigItem*>& awList,   // list of analysis windows
+                            const string& windowName,                                // the name of a specific analysis window (all windows will be modified if this string is empty)
+                            const string& xmlKey,                                    // the path of the field to replace
+                            int newValue,                                            // new value
+                            mediate_analysis_window_t *pNewAnalysisWindow,           // target structure for analysis windows properties
+                            int *pIntField)                                          // pointer to the field to change (should point within the previous target structure)
 {
   // Declarations
-
-  QList<const CAnalysisWindowConfigItem*>::const_iterator awIt = awList.begin();
+  auto awIt = awList.begin();
   char msgString[MAX_STR_LEN+1];
 
   // Browse
 
   while (awIt!=awList.end()) {
-    if (pWindowName->isEmpty() || (*pWindowName==(*awIt)->name())) {
+    if (windowName.empty() || (windowName==(*awIt)->name())) {
       memcpy(pNewAnalysisWindow,(mediate_analysis_window_t *)((*awIt)->properties()),sizeof(mediate_analysis_window_t));
       sprintf(msgString,"%s : %d replaced by %d (%s)",
-              pXmlKey->toLocal8Bit().constData(),
-              *pIntField,newValue,(*awIt)->name().toLocal8Bit().constData());
+              xmlKey.c_str(),
+              *pIntField,newValue,(*awIt)->name().c_str());
       std::cout << msgString << std::endl;
       *pIntField=newValue;
       (*awIt)->SetProperties(( mediate_analysis_window_t *)pNewAnalysisWindow);
@@ -494,73 +468,70 @@ void AnalysisWindowApplyInt(const QList<const CAnalysisWindowConfigItem*>awList,
   }
 }
 
-void AnalysisWindowApplyDouble(const QList<const CAnalysisWindowConfigItem*>awList,     // list of analysis windows
-                               QString *pWindowName,                                    // the name of a specific analysis window (all windows will be modified if this string is empty)
-                               QString *pXmlKey,                                        // the path of the field to replace
-                               QString *pXmlValue,                                      // string with the new value
+void AnalysisWindowApplyDouble(const vector<const CAnalysisWindowConfigItem*>awList,     // list of analysis windows
+                               const string& windowName,                                // the name of a specific analysis window (all windows will be modified if this string is empty)
+                               const string& xmlKey,                                    // the path of the field to replace
+                               const string& xmlValue,                                  // string with the new value
                                mediate_analysis_window_t *pNewAnalysisWindow,           // target structure for analysis windows properties
                                double *pDoubleField)                                    // pointer to the field to change (should point within the previous target structure)
 {
   // Declarations
 
-  QList<const CAnalysisWindowConfigItem*>::const_iterator awIt = awList.begin();
+  auto awIt = awList.begin();
   char msgString[MAX_STR_LEN+1];
 
   // Browse
 
   while (awIt!=awList.end()) {
-    if (pWindowName->isEmpty() || (*pWindowName==(*awIt)->name())) {
+    if (windowName.empty() || (windowName==(*awIt)->name())) {
       memcpy(pNewAnalysisWindow,(mediate_analysis_window_t *)((*awIt)->properties()),sizeof(mediate_analysis_window_t));
       sprintf(msgString,"%s : %.2lf replaced by %s (%s)",
-              pXmlKey->toLocal8Bit().constData(),
-              *pDoubleField,pXmlValue->toLocal8Bit().constData(),(*awIt)->name().toLocal8Bit().constData());
+              xmlKey.c_str(),
+              *pDoubleField,xmlValue.c_str(),(*awIt)->name().c_str());
       std::cout << msgString << std::endl;
-      *pDoubleField=(double)atof(pXmlValue->toLocal8Bit().constData());
+      *pDoubleField=(double)atof(xmlValue.c_str());
       (*awIt)->SetProperties(( mediate_analysis_window_t *)pNewAnalysisWindow);
     }
     ++awIt;
   }
 }
 
-void AnalysisWindowApplyString(const QList<const CAnalysisWindowConfigItem*>awList,     // list of analysis windows
-                               QString *pWindowName,                                    // the name of a specific analysis window (all windows will be modified if this string is empty)
-                               QString *pXmlKey,                                        // the path of the field to replace
-                               QString *pXmlValue,                                      // string with the new value
+void AnalysisWindowApplyString(const vector<const CAnalysisWindowConfigItem*>awList,     // list of analysis windows
+                               const string& windowName,                                // the name of a specific analysis window (all windows will be modified if this string is empty)
+                               const string& xmlKey,                                    // the path of the field to replace
+                               const string& xmlValue,                                  // string with the new value
                                mediate_analysis_window_t *pNewAnalysisWindow,           // target structure for analysis windows properties
-                               char *field)                                    // pointer to the field to change (should point within the previous target structure)
+                               char *field)                                             // pointer to the field to change (should point within the previous target structure)
  {
-     // Declarations
+   // Declarations
 
-     QList<const CAnalysisWindowConfigItem*>::const_iterator awIt = awList.begin();
-     char msgString[MAX_STR_LEN+1];
+   auto awIt = awList.begin();
+   char msgString[MAX_STR_LEN+1];
 
-     // Browse
-
-  while (awIt!=awList.end())
-   {
-       if (pWindowName->isEmpty() || (*pWindowName==(*awIt)->name()))
-        {
-      memcpy(pNewAnalysisWindow,(mediate_analysis_window_t *)((*awIt)->properties()),sizeof(mediate_analysis_window_t));
-      sprintf(msgString,"%s : %s replaced by %s (%s)",
-              pXmlKey->toLocal8Bit().constData(),
-              field,pXmlValue->toLocal8Bit().constData(),(*awIt)->name().toLocal8Bit().constData());
-      std::cout << msgString << std::endl;
-      strcpy(field,pXmlValue->toLocal8Bit().constData());
-      (*awIt)->SetProperties(( mediate_analysis_window_t *)pNewAnalysisWindow);
+   // Browse
+   while (awIt!=awList.end()) {
+     if (windowName.empty() || (windowName==(*awIt)->name())) {
+       memcpy(pNewAnalysisWindow,(mediate_analysis_window_t *)((*awIt)->properties()),sizeof(mediate_analysis_window_t));
+       sprintf(msgString,"%s : %s replaced by %s (%s)",
+               xmlKey.c_str(),
+               field,xmlValue.c_str(),(*awIt)->name().c_str());
+       std::cout << msgString << std::endl;
+       strcpy(field,xmlValue.c_str());
+       (*awIt)->SetProperties(( mediate_analysis_window_t *)pNewAnalysisWindow);
      }
-    ++awIt;
+     ++awIt;
    }
  }
 
-RC ParseAnalysisWindow(QStringList &xmlFields,int xmlFieldN,int startingField,QString *pXmlKey,QString *pXmlValue,const CProjectConfigItem *p)
+RC ParseAnalysisWindow(const vector<string>& xmlFields,int xmlFieldN,int startingField,const string& xmlKey,const string& xmlValue,const CProjectConfigItem *p)
 {
   // Declarations
 
-  const QList<const CAnalysisWindowConfigItem*> awList = p->analysisWindowItems();
+  auto awList = p->analysisWindowItems();
   mediate_analysis_window_t newAnalysisProperties;
-  // QList<const CAnalysisWindowConfigItem*>::const_iterator awIt = awList.begin();
+  auto awIt = awList.begin();
 
-  QString windowName=QString();
+  string windowName;
 
   int indexField;
   int displayField;
@@ -581,26 +552,26 @@ RC ParseAnalysisWindow(QStringList &xmlFields,int xmlFieldN,int startingField,QS
           if ((xmlFields.at(indexField)=="disable") ||
               (xmlFields.at(indexField)=="kurucz"))
 
-            std::cout << pXmlKey->toLocal8Bit().constData() << " can not be changed" << std::endl;
+            std::cout << xmlKey << " can not be changed" << std::endl;
 
           // Fitting interval
 
           else if (xmlFields.at(indexField)=="min")
-            AnalysisWindowApplyDouble(awList,&windowName,pXmlKey,pXmlValue,&newAnalysisProperties,&newAnalysisProperties.fitMinWavelength);
+            AnalysisWindowApplyDouble(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,&newAnalysisProperties.fitMinWavelength);
           else if (xmlFields.at(indexField)=="max")
-            AnalysisWindowApplyDouble(awList,&windowName,pXmlKey,pXmlValue,&newAnalysisProperties,&newAnalysisProperties.fitMaxWavelength);
+            AnalysisWindowApplyDouble(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,&newAnalysisProperties.fitMaxWavelength);
           else if (xmlFields.at(indexField)=="resol_fwhm")
-            AnalysisWindowApplyDouble(awList,&windowName,pXmlKey,pXmlValue,&newAnalysisProperties,&newAnalysisProperties.resolFwhm);
+            AnalysisWindowApplyDouble(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,&newAnalysisProperties.resolFwhm);
           else if (xmlFields.at(indexField)=="lambda0")
-            AnalysisWindowApplyDouble(awList,&windowName,pXmlKey,pXmlValue,&newAnalysisProperties,&newAnalysisProperties.lambda0);
+            AnalysisWindowApplyDouble(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,&newAnalysisProperties.lambda0);
           else if (xmlFields.at(indexField)=="display")
             std::cout << "project/analysis_window/display fields can not be changed" << std::endl;
           else if (xmlFields.at(indexField)=="refsel")
             {
-              if ((*pXmlValue!="auto") && (*pXmlValue!="file"))
-                std::cout << pXmlKey->toLocal8Bit().constData() << " do not support " << pXmlValue->toLocal8Bit().constData() << std::endl;
+              if ((xmlValue!="auto") && (xmlValue!="file"))
+                std::cout << xmlKey << " do not support " << xmlValue << std::endl;
               else
-                AnalysisWindowApplyInt(awList,&windowName,pXmlKey,(*pXmlValue=="auto")?ANLYS_REF_SELECTION_MODE_AUTOMATIC:ANLYS_REF_SELECTION_MODE_FILE,&newAnalysisProperties,&newAnalysisProperties.refSpectrumSelection);
+                AnalysisWindowApplyInt(awList,windowName,xmlKey,(xmlValue=="auto")?ANLYS_REF_SELECTION_MODE_AUTOMATIC:ANLYS_REF_SELECTION_MODE_FILE,&newAnalysisProperties,&newAnalysisProperties.refSpectrumSelection);
             }
           else if (xmlFields.at(indexField)=="files")
             filesField=1;
@@ -613,48 +584,48 @@ RC ParseAnalysisWindow(QStringList &xmlFields,int xmlFieldN,int startingField,QS
       else if (filesField)
         {
           if (xmlFields.at(indexField)=="refone")
-            AnalysisWindowApplyString(awList,&windowName,pXmlKey,pXmlValue,&newAnalysisProperties,newAnalysisProperties.refOneFile);
+            AnalysisWindowApplyString(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,newAnalysisProperties.refOneFile);
           else if (xmlFields.at(indexField)=="reftwo")
-            AnalysisWindowApplyString(awList,&windowName,pXmlKey,pXmlValue,&newAnalysisProperties,newAnalysisProperties.refTwoFile);
+            AnalysisWindowApplyString(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,newAnalysisProperties.refTwoFile);
           else if (xmlFields.at(indexField)=="residual")
-            AnalysisWindowApplyString(awList,&windowName,pXmlKey,pXmlValue,&newAnalysisProperties,newAnalysisProperties.residualFile);
+            AnalysisWindowApplyString(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,newAnalysisProperties.residualFile);
           else if (xmlFields.at(indexField)=="szacenter")
-            AnalysisWindowApplyDouble(awList,&windowName,pXmlKey,pXmlValue,&newAnalysisProperties,&newAnalysisProperties.refSzaCenter);
+            AnalysisWindowApplyDouble(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,&newAnalysisProperties.refSzaCenter);
           else if (xmlFields.at(indexField)=="szadelta")
-            AnalysisWindowApplyDouble(awList,&windowName,pXmlKey,pXmlValue,&newAnalysisProperties,&newAnalysisProperties.refSzaDelta);
+            AnalysisWindowApplyDouble(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,&newAnalysisProperties.refSzaDelta);
           else if (xmlFields.at(indexField)=="minlon")
-            AnalysisWindowApplyDouble(awList,&windowName,pXmlKey,pXmlValue,&newAnalysisProperties,&newAnalysisProperties.refMinLongitude);
+            AnalysisWindowApplyDouble(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,&newAnalysisProperties.refMinLongitude);
           else if (xmlFields.at(indexField)=="maxlon")
-            AnalysisWindowApplyDouble(awList,&windowName,pXmlKey,pXmlValue,&newAnalysisProperties,&newAnalysisProperties.refMaxLongitude);
+            AnalysisWindowApplyDouble(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,&newAnalysisProperties.refMaxLongitude);
           else if (xmlFields.at(indexField)=="minlat")
-            AnalysisWindowApplyDouble(awList,&windowName,pXmlKey,pXmlValue,&newAnalysisProperties,&newAnalysisProperties.refMinLatitude);
+            AnalysisWindowApplyDouble(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,&newAnalysisProperties.refMinLatitude);
           else if (xmlFields.at(indexField)=="maxlat")
-            AnalysisWindowApplyDouble(awList,&windowName,pXmlKey,pXmlValue,&newAnalysisProperties,&newAnalysisProperties.refMaxLatitude);
+            AnalysisWindowApplyDouble(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,&newAnalysisProperties.refMaxLatitude);
           else if (xmlFields.at(indexField)=="refns")
-            AnalysisWindowApplyInt(awList,&windowName,pXmlKey,atoi(pXmlValue->toLocal8Bit().constData()),&newAnalysisProperties,&newAnalysisProperties.refSpectrumSelection);
+            AnalysisWindowApplyInt(awList,windowName,xmlKey,atoi(xmlValue.c_str()),&newAnalysisProperties,&newAnalysisProperties.refSpectrumSelection);
           else if (xmlFields.at(indexField)=="cloudfmin")
-            AnalysisWindowApplyDouble(awList,&windowName,pXmlKey,pXmlValue,&newAnalysisProperties,&newAnalysisProperties.cloudFractionMin);
+            AnalysisWindowApplyDouble(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,&newAnalysisProperties.cloudFractionMin);
           else if (xmlFields.at(indexField)=="cloudfmax")
-            AnalysisWindowApplyDouble(awList,&windowName,pXmlKey,pXmlValue,&newAnalysisProperties,&newAnalysisProperties.cloudFractionMax);
+            AnalysisWindowApplyDouble(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,&newAnalysisProperties.cloudFractionMax);
           else if (xmlFields.at(indexField)=="maxdoasrefmode")
             {
-              if ((*pXmlValue!="scan") && (*pXmlValue!="sza"))
-                std::cout << pXmlKey->toLocal8Bit().constData() << " do not support " << pXmlValue->toLocal8Bit().constData() << std::endl;
+              if ((xmlValue!="scan") && (xmlValue!="sza"))
+                std::cout << xmlKey << " do not support " << xmlValue << std::endl;
               else
-                AnalysisWindowApplyInt(awList,&windowName,pXmlKey,(*pXmlValue=="scan")?ANLYS_MAXDOAS_REF_SCAN:ANLYS_MAXDOAS_REF_SZA,&newAnalysisProperties,&newAnalysisProperties.refSpectrumSelection);
+                AnalysisWindowApplyInt(awList,windowName,xmlKey,(xmlValue=="scan")?ANLYS_MAXDOAS_REF_SCAN:ANLYS_MAXDOAS_REF_SZA,&newAnalysisProperties,&newAnalysisProperties.refSpectrumSelection);
             }
           else if (xmlFields.at(indexField)=="scanmode")
             {
-                 if (*pXmlValue=="before")
-                  AnalysisWindowApplyInt(awList,&windowName,pXmlKey,ANLYS_MAXDOAS_REF_SCAN_BEFORE,&newAnalysisProperties,&newAnalysisProperties.refSpectrumSelection);
-                 else if (*pXmlValue=="after")
-                  AnalysisWindowApplyInt(awList,&windowName,pXmlKey,ANLYS_MAXDOAS_REF_SCAN_AFTER,&newAnalysisProperties,&newAnalysisProperties.refSpectrumSelection);
-                 else if (*pXmlValue=="average")
-                  AnalysisWindowApplyInt(awList,&windowName,pXmlKey,ANLYS_MAXDOAS_REF_SCAN_AVERAGE,&newAnalysisProperties,&newAnalysisProperties.refSpectrumSelection);
-                 else if (*pXmlValue=="interpolate")
-                  AnalysisWindowApplyInt(awList,&windowName,pXmlKey,ANLYS_MAXDOAS_REF_SCAN_INTERPOLATE,&newAnalysisProperties,&newAnalysisProperties.refSpectrumSelection);
+                 if (xmlValue=="before")
+                  AnalysisWindowApplyInt(awList,windowName,xmlKey,ANLYS_MAXDOAS_REF_SCAN_BEFORE,&newAnalysisProperties,&newAnalysisProperties.refSpectrumSelection);
+                 else if (xmlValue=="after")
+                  AnalysisWindowApplyInt(awList,windowName,xmlKey,ANLYS_MAXDOAS_REF_SCAN_AFTER,&newAnalysisProperties,&newAnalysisProperties.refSpectrumSelection);
+                 else if (xmlValue=="average")
+                  AnalysisWindowApplyInt(awList,windowName,xmlKey,ANLYS_MAXDOAS_REF_SCAN_AVERAGE,&newAnalysisProperties,&newAnalysisProperties.refSpectrumSelection);
+                 else if (xmlValue=="interpolate")
+                  AnalysisWindowApplyInt(awList,windowName,xmlKey,ANLYS_MAXDOAS_REF_SCAN_INTERPOLATE,&newAnalysisProperties,&newAnalysisProperties.refSpectrumSelection);
                  else
-               std::cout << pXmlKey->toLocal8Bit().constData() << " do not support " << pXmlValue->toLocal8Bit().constData() << std::endl;
+               std::cout << xmlKey << " do not support " << xmlValue << std::endl;
             }
 
           // pixel selection for GOME-ERS2 -> not supported
@@ -664,7 +635,7 @@ RC ParseAnalysisWindow(QStringList &xmlFields,int xmlFieldN,int startingField,QS
                      (xmlFields.at(indexField)=="west") ||
                      (xmlFields.at(indexField)=="backscan"))
 
-                    std::cout << pXmlKey->toLocal8Bit().constData() << " can not be changed" << std::endl;
+                    std::cout << xmlKey << " can not be changed" << std::endl;
         }
     }
 
@@ -674,63 +645,47 @@ RC ParseAnalysisWindow(QStringList &xmlFields,int xmlFieldN,int startingField,QS
   return rc;
  }
 
-RC QDOASXML_Parse(QList<QString> &xmlCommands,const CProjectConfigItem *p)
+RC QDOASXML_Parse(vector<string> &xmlCommands,const CProjectConfigItem *p)
  {
-  QList<QString>::const_iterator it = xmlCommands.begin();
+  RC rc = ERROR_ID_NO;
 
-  QString newXmlCmd;
-  QStringList xmlParts;
-  QStringList xmlFields;
-  QString xmlKey,xmlValue;
+  for (const auto& xml_cmd : xmlCommands) {
+    vector<string> xmlParts;
+    boost::split(xmlParts, xml_cmd, boost::is_any_of("="));
+    if (xmlParts.size()==2) {
+      const auto xmlKey=xmlParts.at(0);
+      const auto xmlValue=xmlParts.at(1);
 
-  int xmlFieldsN,indexField,projectField,analysisField;
-  RC rc;
+      vector<string> xmlFields;
+      boost::split(xmlFields, xmlKey, boost::is_any_of("/"));
+      size_t xmlFieldsN=xmlFields.size();
 
-  // Initializations
+      int projectField = 0;
 
-  rc=ERROR_ID_NO;
-
-  while ((it!=xmlCommands.end()) && !rc)
-   {
-    newXmlCmd=*it;
-    xmlParts=newXmlCmd.split("=");
-    if (xmlParts.size()==2)
-     {
-         xmlKey=xmlParts.at(0);
-         xmlValue=xmlParts.at(1);
-
-         xmlFields=xmlKey.split("/");
-         xmlFieldsN=xmlFields.size();
-
-         projectField=analysisField=0;
-
-         for (indexField=0;(indexField<xmlFieldsN) && !rc;indexField++)
-          {
-        if (projectField)
-         {
-             if (xmlFields.at(indexField)=="display")
-               std::cout << xmlKey.toLocal8Bit().constData() << " fields can not be changed" << std::endl;
-             else if (xmlFields.at(indexField)=="selection")
-              rc=ParseSelection(xmlFields,xmlFieldsN,indexField+1,&xmlKey,&xmlValue,p);
-             else if (xmlFields.at(indexField)=="analysis")
-              rc=ParseAnalysis(xmlFields,xmlFieldsN,indexField+1,&xmlKey,&xmlValue,p);
-             else if (xmlFields.at(indexField)=="instrumental")
-              rc=ParseInstrumental(xmlFields,xmlFieldsN,indexField+1,&xmlValue,p);
-             else if (xmlFields.at(indexField)=="analysis_window")
-                 rc=ParseAnalysisWindow(xmlFields,xmlFieldsN,indexField+1,&xmlKey,&xmlValue,p);
-             else if (xmlFields.at(indexField)=="calibration")
-                 rc=ParseCalibration(xmlFields,xmlFieldsN,indexField+1,&xmlKey,&xmlValue,p);
-
-                break;
-         }
-              else if (xmlFields.at(indexField)=="project")
-               projectField=1;
-          }
-     }
-
-
-    ++it;
-   }
+      for (size_t indexField=0;(indexField<xmlFieldsN) && !rc;indexField++) {
+        if (projectField) {
+          if (xmlFields.at(indexField)=="display")
+            std::cout << xmlKey << " fields can not be changed" << std::endl;
+          else if (xmlFields.at(indexField)=="selection")
+            rc=ParseSelection(xmlFields,xmlFieldsN,indexField+1,xmlKey,xmlValue,p);
+          else if (xmlFields.at(indexField)=="analysis")
+            rc=ParseAnalysis(xmlFields,xmlFieldsN,indexField+1,xmlKey,xmlValue,p);
+          else if (xmlFields.at(indexField)=="instrumental")
+            rc=ParseInstrumental(xmlFields,xmlFieldsN,indexField+1,xmlValue,p);
+          else if (xmlFields.at(indexField)=="analysis_window")
+            rc=ParseAnalysisWindow(xmlFields,xmlFieldsN,indexField+1,xmlKey,xmlValue,p);
+          else if (xmlFields.at(indexField)=="calibration")
+            rc=ParseCalibration(xmlFields,xmlFieldsN,indexField+1,xmlKey,xmlValue,p);
+          break;
+        }
+        else if (xmlFields.at(indexField)=="project")
+          projectField=1;
+      }
+    }
+    if (rc) {
+      break;
+    }
+  }
 
   return rc;
  }
