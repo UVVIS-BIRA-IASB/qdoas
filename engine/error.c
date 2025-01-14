@@ -174,7 +174,7 @@ ERROR_TABLE errorTable[]=
   { ERROR_ID_FWHM                      , "Wrong value for the FWHM %g"                                                                                        },
   { ERROR_ID_FWHM_INCOMPATIBLE_OPTIONS , "Incompatible options (fit of the slit function in Kurucz and fwhm correction)"                                      },
   { ERROR_ID_OUT_OF_RANGE              , "%s is out of %d..%d range"                                                                                          },
-  { ERROR_ID_FILE_AUTOMATIC            , "No automatic reference selection can be perform on this type of file"                                               },
+  { ERROR_ID_FILE_AUTOMATIC            , "No automatic reference selection can be performed on this type of file"                                             },
   { ERROR_ID_REFERENCE_SELECTION       , "Can't find spectra matching automatic reference criteria%s"                                                         },
   { ERROR_ID_NO_REF                    , "No reference spectrum found for %s in file %s"                                                                      },
   { ERROR_ID_VZA_REF                   , "No reference spectrum matching criteria for VZA bin [%.1f - %.1f]." },
