@@ -78,7 +78,7 @@ void CEngineResponseVisual::addPageTitleAndTag(int pageNumber, const string &tit
   m_titleList.push_back(STitleTag(pageNumber, title, tag));
 }
 
-void CEngineResponseVisual::addCell(int pageNumber, int row, int col, const QVariant &data)
+void CEngineResponseVisual::addCell(int pageNumber, int row, int col, const cell_data &data)
 {
   m_cellList.push_back(SCell(pageNumber, row, col, data));
 }

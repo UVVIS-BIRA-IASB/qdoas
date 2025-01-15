@@ -14,6 +14,8 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #include "CEngineResponse.h"
 #include "CPlotDataSet.h"
 
+using std::string;
+
 void mediateAllocateAndSetPlotData(plot_data_t *d, const char *curveName, const double *xData, const double *yData, int len, enum eCurveStyleType type)
 {
   d->curveNumber = -1;
@@ -117,7 +119,7 @@ void mediateResponseCellDataDouble(int page,
                    void *responseHandle)
 {
   CEngineResponseVisual *resp = static_cast<CEngineResponseVisual*>(responseHandle);
-  resp->addCell(page, row, column, QVariant(doubleValue));
+  resp->addCell(page, row, column, cell_data(doubleValue));
 }
 
 void mediateResponseCellDataInteger(int page,
@@ -127,7 +129,7 @@ void mediateResponseCellDataInteger(int page,
                     void *responseHandle)
 {
   CEngineResponseVisual *resp = static_cast<CEngineResponseVisual*>(responseHandle);
-  resp->addCell(page, row, column, QVariant(integerValue));
+  resp->addCell(page, row, column, cell_data(integerValue));
 }
 
 void mediateResponseCellDataString(int page,
@@ -137,7 +139,7 @@ void mediateResponseCellDataString(int page,
                    void *responseHandle)
 {
   CEngineResponseVisual *resp = static_cast<CEngineResponseVisual*>(responseHandle);
-  resp->addCell(page, row, column, QVariant(QString(stringValue)));
+  resp->addCell(page, row, column, cell_data(string(stringValue)));
 }
 
 void mediateResponseCellInfo(int page,
@@ -156,8 +158,8 @@ void mediateResponseCellInfo(int page,
 
   CEngineResponseVisual *resp = static_cast<CEngineResponseVisual*>(responseHandle);
 
-  resp->addCell(page,row,column,QVariant(QString(label)));
-  resp->addCell(page,row,column+1,QVariant(QString(stringValue)));
+  resp->addCell(page,row,column,cell_data(string(label)));
+  resp->addCell(page,row,column+1,cell_data(string(stringValue)));
  }
 
 void mediateResponseCellInfoNoLabel(int page,
@@ -174,7 +176,7 @@ void mediateResponseCellInfoNoLabel(int page,
    va_end(argList);
 
    CEngineResponseVisual *resp = static_cast<CEngineResponseVisual*>(responseHandle);
-   resp->addCell(page,row,column,QVariant(QString(stringValue)));
+   resp->addCell(page,row,column,cell_data(string(stringValue)));
  }
 
 void mediateResponseLabelPage(int page,
@@ -190,7 +192,7 @@ void mediateResponseRetainPage(int page, void * responseHandle)
 {
   CEngineResponseVisual *resp = static_cast<CEngineResponseVisual*>(responseHandle);
   // an invalid cell position
-  resp->addCell(page, -1, -1, QVariant());
+  resp->addCell(page, -1, -1, cell_data());
   // a NULL data set
   resp->addDataSet(page, NULL);
 }
