@@ -204,17 +204,15 @@
 //
 //  ----------------------------------------------------------------------------
 //
+#include <clocale>
 #include <cstdio>
 #include <cstring>
 #include <ctime>
+
+#include <filesystem>
 #include <iostream>
 #include <memory>
 #include <string>
-
-#include <QDir>
-#include <QFileInfo>
-#include <QStringList>
-#include <clocale>
 
 #include <boost/algorithm/string.hpp>
 
@@ -229,6 +227,8 @@
 
 using std::string;
 using std::vector;
+
+namespace fs = std::filesystem;
 
 // kbhit function doesn't exist in Linux libraries (implementation found on the web)
 
@@ -984,9 +984,9 @@ int QdoasBatch::analyse_project(const string& triggerDir) {
             // loop trigger files ...
 
             for(vector<string>::const_iterator it = filenames.begin(); it != filenames.end(); ++it) {
-              QFileInfo info(QString::fromStdString(*it));
-              if (info.isFile())
+              if (fs::is_regular_file(*it)) {
                 retCode = analyse_file(*it);
+              }
             }
 
             std::cout << "Found files" << std::endl;
@@ -1105,17 +1105,17 @@ int QdoasBatch::analyse_project(const vector<string> &filenames)  {
   CBatchEngineController controller;
 
   for(auto it = filenames.begin(); it != filenames.end(); ++it) {
-    QFileInfo info(QString::fromStdString(*it));
-
-    if (info.isFile()) {
+    if (fs::is_regular_file(*it)) {
       retCode = analyse_file(*it);
-    } else if (info.isDir()) {
-      retCode = analyse_directory(info.filePath().toStdString(), "*.*",1);
-    } else {
-      retCode = analyse_directory(info.path().toStdString(), info.fileName().toStdString(), 1);
+    } else if (fs::is_directory(*it)) {
+      retCode = analyse_directory(*it, "*.*", 1);
+    } else {  // not an existing file or directory -> assume a filename pattern was provided
+              // and recursively search for matching files:
+      auto path = fs::path(*it);
+      retCode = analyse_directory(path.parent_path(), path.filename(), 1);
       if (files_processed == 0) {
-        std::cerr << "ERROR: No files matching pattern '" << info.fileName().toStdString()
-                  << "' in directory '" << info.path().toStdString() << "' or subdirectories." << std::endl;
+        std::cerr << "ERROR: No files matching pattern '" << path.filename()
+                  << "' in directory '" << path.parent_path() << "' or subdirectories." << std::endl;
         return -1;
       }
     }
@@ -1205,38 +1205,32 @@ int QdoasBatch::analyse_treeNode(const CProjectConfigTreeNode *node) {
 }
 
 int QdoasBatch::analyse_directory(const string &dir, const string &filter, bool recursive) {
-  int retCode = 0;
-  QFileInfoList entries;
-
-  QDir directory(QString::fromStdString(dir));
+  // analyse all files found in a directory (recursively).  Return an
+  // error if no files were processed successfully.
+  int result = -1;
 
   // first consder sub directories ...
   if (recursive) {
-    entries = directory.entryInfoList(); // all entries ... but only take directories on this pass
-
-    for (QFileInfoList::iterator it = entries.begin(); it != entries.end(); ++it) {
-      if (it->isDir() && !it->fileName().startsWith('.')) {
-        retCode = analyse_directory(it->filePath().toStdString(), filter, true);
+    for (auto& p : fs::directory_iterator(dir)) {
+      if (fs::is_directory(p)) {
+        int dir_result = analyse_directory(p.path(), filter, true);
+        if (dir_result == 0) {  // got positive result from at least one subdir
+          result = 0;
+        }
       }
     }
   }
 
-  // now the files that match the filters
-  if (filter.empty())
-    entries = directory.entryInfoList();
-  else
-    entries = directory.entryInfoList(QStringList(QString::fromStdString(filter)));
-
-  if (entries.empty()) {
-    return -1;
-  }
-  for (QFileInfoList::iterator it = entries.begin(); it != entries.end(); ++it) {
-    if (it->isFile()) {
-      retCode = analyse_file(it->filePath().toStdString());
+  for (auto &p : fs::directory_iterator(dir)) {
+    if (fs::is_regular_file(p)) {  // TODO use filter!
+      int file_result = analyse_file(p.path());
+      if (file_result == 0) {
+        result = 0;
+      }
     }
   }
 
-  return retCode;
+  return result;
 }
 
 int batchProcessConvolution(commands_t *cmd)
