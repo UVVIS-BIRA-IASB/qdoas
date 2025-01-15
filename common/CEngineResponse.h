@@ -64,7 +64,7 @@ class CEngineResponseVisual : public CEngineResponse
   void addDataSet(int pageNumber, const CPlotDataSet *dataSet);
   void addImage(int pageNumber,const CPlotImage *plotImage);
   void addPageTitleAndTag(int pageNumber, const std::string &title, const std::string &tag);
-  void addCell(int pageNumber, int row, int col, const QVariant &data);
+  void addCell(int pageNumber, int row, int col, const cell_data &data);
 
  protected:
   std::vector<SPlotData> m_plotDataList;

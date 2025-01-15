@@ -10,6 +10,22 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 using std::shared_ptr;
 
+class qvariant_visitor : public boost::static_visitor<QVariant> {
+public:
+  QVariant operator()(int i) const {
+    return QVariant(i);
+  }
+
+  QVariant operator()(double d) const {
+    return QVariant(d);
+  }
+
+  QVariant operator()(std::string s) const {
+    return QVariant(QString::fromStdString(s));
+  }
+};
+
+
 void CMultiPageTableModel::addPage(shared_ptr<const CTablePageData> page)
 {
   if (!page) return;
@@ -127,12 +143,15 @@ QVariant CMultiPageTableModel::data(const QModelIndex &index, int role) const
   if (!index.isValid() || !m_currentPage)
     return QVariant();
 
+  QVariant data = boost::apply_visitor(qvariant_visitor(),
+                                       m_currentPage->cellData(index.row(), index.column()));
+
   // respond to display and alignment roles
   if (role == Qt::DisplayRole) {
-    return m_currentPage->cellData(index.row(), index.column());
+    return data;
   }
   else if (role == Qt::TextAlignmentRole) {
-    QVariant::Type type = m_currentPage->cellData(index.row(), index.column()).type();
+    QVariant::Type type = data.type();
 
     return QVariant((type == QVariant::Int || type == QVariant::Double) ?
             Qt::AlignRight : Qt::AlignLeft);

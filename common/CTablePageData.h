@@ -9,14 +9,16 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 #include <map>
 
-#include <QVariant>
+#include <boost/variant.hpp>
+
+using cell_data = boost::variant<int, double, std::string>;
 
 struct SCell
 {
   int page, row, col;
-  QVariant data;
+  cell_data data;
 
-  SCell(int p, int r, int c, const QVariant &d) : page(p), row(r), col(c), data(d) {}
+  SCell(int p, int r, int c, const cell_data &d) : page(p), row(r), col(c), data(d) {}
 };
 
 struct SCellIndex
@@ -32,7 +34,7 @@ class CTablePageData
  public:
   CTablePageData(int pageNumber);
 
-  void addCell(int row, int col, const QVariant &data);
+  void addCell(int row, int col, const cell_data &data);
 
   int pageNumber(void) const;
   int rowCount(void) const;
@@ -40,10 +42,10 @@ class CTablePageData
 
   bool isEmpty(void) const;
 
-  QVariant cellData(int row, int col) const;
+  cell_data cellData(int row, int col) const;
 
  private:
-  std::map<SCellIndex,QVariant> m_dataMap;
+  std::map<SCellIndex,cell_data> m_dataMap;
   int m_pageNumber;
   int m_rows, m_columns;
 };
