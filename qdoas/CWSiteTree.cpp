@@ -95,25 +95,25 @@ void CWSiteTree::createSiteItem(const mediate_site_t *site)
   addTopLevelItem(siteItem);
 }
 
-void CWSiteTree::updateNewSite(const QString &newSiteName)
+void CWSiteTree::updateNewSite(const std::string &newSiteName)
 {
-  const mediate_site_t *site = CWorkSpace::instance()->findSite(newSiteName.toStdString());
+  const mediate_site_t *site = CWorkSpace::instance()->findSite(newSiteName);
 
   if (site != NULL) {
     createSiteItem(site);
   }
 }
 
-void CWSiteTree::updateModifySite(const QString &siteName)
+void CWSiteTree::updateModifySite(const std::string &siteName)
 {
-  const mediate_site_t *site = CWorkSpace::instance()->findSite(siteName.toStdString());
+  const mediate_site_t *site = CWorkSpace::instance()->findSite(siteName);
 
   if (site != NULL) {
 
     QTreeWidgetItem *siteItem;
     int i = 0;
 
-    while ((siteItem = topLevelItem(i)) != NULL && siteItem->text(0) != siteName) ++i;
+    while ((siteItem = topLevelItem(i)) != NULL && siteItem->text(0).toStdString() != siteName) ++i;
     if (siteItem != NULL) {
       // located the existing item - update it's children
 
@@ -138,16 +138,16 @@ void CWSiteTree::updateModifySite(const QString &siteName)
   }
 }
 
-void CWSiteTree::updateDeleteSite(const QString &siteName)
+void CWSiteTree::updateDeleteSite(const std::string &siteName)
 {
-  const mediate_site_t *site = CWorkSpace::instance()->findSite(siteName.toStdString());
+  const mediate_site_t *site = CWorkSpace::instance()->findSite(siteName);
 
   if (site != NULL) {
 
     QTreeWidgetItem *siteItem;
     int i = 0;
 
-    while ((siteItem = topLevelItem(i)) != NULL && siteItem->text(0) != siteName) ++i;
+    while ((siteItem = topLevelItem(i)) != NULL && siteItem->text(0).toStdString() != siteName) ++i;
     if (siteItem != NULL) {
       delete takeTopLevelItem(i);
     }

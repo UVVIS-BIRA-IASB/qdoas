@@ -587,9 +587,9 @@ void CWAnalysisWindowPropertyEditor::actionHelp(void)
  CHelpSystem::showHelpTopic("Analysis",((m_selectedPage>=0) && (m_selectedPage<6))?analysisPages[m_selectedPage]:"Analysis");
 }
 
-void CWAnalysisWindowPropertyEditor::updateModifyProject(const QString &projectName)
+void CWAnalysisWindowPropertyEditor::updateModifyProject(const std::string &projectName)
 {
-  if (projectName == m_projectName)
+  if (projectName == m_projectName.toStdString())
     projectPropertiesChanged();
 }
 

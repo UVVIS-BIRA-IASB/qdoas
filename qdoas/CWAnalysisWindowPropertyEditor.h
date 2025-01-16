@@ -32,7 +32,7 @@ Q_OBJECT
   virtual bool actionOk();
   virtual void actionHelp();
 
-  virtual void updateModifyProject(const QString &projectName);
+  virtual void updateModifyProject(const std::string& projectName) override;
 
  private:
   void projectPropertiesChanged();

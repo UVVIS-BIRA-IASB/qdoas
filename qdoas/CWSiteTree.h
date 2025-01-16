@@ -22,9 +22,9 @@ Q_OBJECT
 
   void savePreferences(void);
 
-  virtual void updateNewSite(const QString &newSiteName);
-  virtual void updateModifySite(const QString &siteName);
-  virtual void updateDeleteSite(const QString &siteName);
+  virtual void updateNewSite(const std::string &newSiteName) override;
+  virtual void updateModifySite(const std::string &siteName) override;
+  virtual void updateDeleteSite(const std::string &siteName) override;
 
  protected:
   virtual void contextMenuEvent(QContextMenuEvent *e);

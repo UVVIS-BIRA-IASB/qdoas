@@ -21,15 +21,15 @@ CConfigStateMonitor::~CConfigStateMonitor()
 }
 
 // Monitor changes to the workspace. Any change invalidates the state.
-void CConfigStateMonitor::updateNewSite(const QString &newSiteName) { slotInvalidate(); }
-void CConfigStateMonitor::updateModifySite(const QString &siteName) { slotInvalidate(); }
-void CConfigStateMonitor::updateDeleteSite(const QString &siteName) { slotInvalidate(); }
-void CConfigStateMonitor::updateNewSymbol(const QString &newSymbolName) { slotInvalidate(); }
-void CConfigStateMonitor::updateModifySymbol(const QString &symbolName) { slotInvalidate(); }
-void CConfigStateMonitor::updateDeleteSymbol(const QString &symbolName) { slotInvalidate(); }
-void CConfigStateMonitor::updateNewProject(const QString &newProjectName) { slotInvalidate(); }
-void CConfigStateMonitor::updateModifyProject(const QString &projectName) { slotInvalidate(); }
-void CConfigStateMonitor::updateDeleteProject(const QString &projectName) { slotInvalidate(); }
+void CConfigStateMonitor::updateNewSite(const std::string &newSiteName) { slotInvalidate(); }
+void CConfigStateMonitor::updateModifySite(const std::string &siteName) { slotInvalidate(); }
+void CConfigStateMonitor::updateDeleteSite(const std::string &siteName) { slotInvalidate(); }
+void CConfigStateMonitor::updateNewSymbol(const std::string &newSymbolName) { slotInvalidate(); }
+void CConfigStateMonitor::updateModifySymbol(const std::string &symbolName) { slotInvalidate(); }
+void CConfigStateMonitor::updateDeleteSymbol(const std::string &symbolName) { slotInvalidate(); }
+void CConfigStateMonitor::updateNewProject(const std::string &newProjectName) { slotInvalidate(); }
+void CConfigStateMonitor::updateModifyProject(const std::string &projectName) { slotInvalidate(); }
+void CConfigStateMonitor::updateDeleteProject(const std::string &projectName) { slotInvalidate(); }
 
 // validate the state.
 void CConfigStateMonitor::slotValidate()

@@ -62,14 +62,14 @@ void CWUserSymbolTree::savePreferences(void)
   CPreferences::instance()->setColumnWidthList("UserSymbolTree", widthList);
 }
 
-void CWUserSymbolTree::updateNewSymbol(const QString &newSymbolName)
+void CWUserSymbolTree::updateNewSymbol(const std::string &newSymbolName)
 {
-  QString description(QString::fromStdString(CWorkSpace::instance()->findSymbol(newSymbolName.toStdString())));
+  QString description(QString::fromStdString(CWorkSpace::instance()->findSymbol(newSymbolName)));
 
   if (!description.isNull()) {
 
     QStringList labelList;
-    labelList << newSymbolName << description;
+    labelList << QString::fromStdString(newSymbolName) << description;
 
     QTreeWidgetItem *userSymbolItem = new  QTreeWidgetItem(labelList);
 
@@ -77,31 +77,31 @@ void CWUserSymbolTree::updateNewSymbol(const QString &newSymbolName)
   }
 }
 
-void CWUserSymbolTree::updateModifySymbol(const QString &symbolName)
+void CWUserSymbolTree::updateModifySymbol(const std::string &symbolName)
 {
-  QString description(QString::fromStdString(CWorkSpace::instance()->findSymbol(symbolName.toStdString())));
+  QString description(QString::fromStdString(CWorkSpace::instance()->findSymbol(symbolName)));
 
   if (!description.isNull()) {
 
     QTreeWidgetItem *symbolItem;
     int i = 0;
 
-    while ((symbolItem = topLevelItem(i)) != NULL && symbolItem->text(0) != symbolName) ++i;
+    while ((symbolItem = topLevelItem(i)) != NULL && symbolItem->text(0).toStdString() != symbolName) ++i;
     if (symbolItem != NULL)
       symbolItem->setText(1, description);
   }
 }
 
-void CWUserSymbolTree::updateDeleteSymbol(const QString &symbolName)
+void CWUserSymbolTree::updateDeleteSymbol(const std::string &symbolName)
 {
-  QString description(QString::fromStdString(CWorkSpace::instance()->findSymbol(symbolName.toStdString())));
+  QString description(QString::fromStdString(CWorkSpace::instance()->findSymbol(symbolName)));
 
   if (!description.isNull()) {
 
     QTreeWidgetItem *symbolItem;
     int i = 0;
 
-    while ((symbolItem = topLevelItem(i)) != NULL && symbolItem->text(0) != symbolName) ++i;
+    while ((symbolItem = topLevelItem(i)) != NULL && symbolItem->text(0).toStdString() != symbolName) ++i;
     if (symbolItem != NULL) {
       delete takeTopLevelItem(i);
     }
