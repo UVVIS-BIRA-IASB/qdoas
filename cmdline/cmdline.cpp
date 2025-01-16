@@ -560,7 +560,7 @@ public:
 
   int analyse_directory(const string &dir, const string &filter, bool recursive);
 
-  int analyse_treeNode(const CProjectConfigTreeNode *node);
+  int analyse_treeNode(std::shared_ptr<CProjectConfigTreeNode> node);
 
 private:
   CBatchEngineController controller;
@@ -1067,8 +1067,8 @@ int analyseProjectQdoasPrepare(void **engineContext, const CProjectConfigItem *p
     for (auto awIt = awList.begin(); awIt != awList.end(); ++awIt) {
       // Do not account for disabled analysis windows
 
-      if ((*awIt)->isEnabled()) {
-        *awCursor = *((*awIt)->properties());
+      if (awIt->isEnabled()) {
+        *awCursor = *(awIt->properties());
         // mask any display flags ...
         ++awCursor;
       } else {
@@ -1181,7 +1181,7 @@ int QdoasBatch::analyse_file(const string &filename) {
   return retCode;
 }
 
-int QdoasBatch::analyse_treeNode(const CProjectConfigTreeNode *node) {
+int QdoasBatch::analyse_treeNode(std::shared_ptr<CProjectConfigTreeNode> node) {
   int retCode = 0;
 
   while (!retCode && node != NULL) {

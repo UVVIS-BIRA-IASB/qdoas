@@ -9,20 +9,14 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 using std::string;
 
 CProjectConfigTreeNode::CProjectConfigTreeNode(const string &name, bool enabled) :
-  m_firstChild(NULL),
-  m_nextSibling(NULL),
+  m_firstChild(),
+  m_nextSibling(),
   m_name(name),
   m_enabled(enabled)
 {
 }
 
-CProjectConfigTreeNode::~CProjectConfigTreeNode()
-{
-  delete m_nextSibling;
-  delete m_firstChild;
-}
-
-void CProjectConfigTreeNode::addChild(CProjectConfigTreeNode *child)
+void CProjectConfigTreeNode::addChild(std::shared_ptr<CProjectConfigTreeNode> child)
 {
   if (m_firstChild)
     child->setNextSibling(m_firstChild);

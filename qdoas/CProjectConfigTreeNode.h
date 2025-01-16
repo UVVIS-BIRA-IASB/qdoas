@@ -4,7 +4,9 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 */
 
-#include<string>
+
+#include <memory>
+#include <string>
 
 #ifndef _CPROJECTCONFIGTREENODE_H_GUARD
 #define _CPROJECTCONFIGTREENODE_H_GUARD
@@ -15,13 +17,12 @@ class CProjectConfigTreeNode
   enum Type { eFile, eFolder, eDirectory };
 
   CProjectConfigTreeNode(const std::string &name, bool enabled);
-  virtual ~CProjectConfigTreeNode();
 
-  CProjectConfigTreeNode *firstChild(void) const;
-  CProjectConfigTreeNode *nextSibling(void) const;
+  std::shared_ptr<CProjectConfigTreeNode> firstChild(void) const;
+  std::shared_ptr<CProjectConfigTreeNode> nextSibling(void) const;
 
-  void addChild(CProjectConfigTreeNode *child);
-  void setNextSibling(CProjectConfigTreeNode *sibling);
+  void addChild(std::shared_ptr<CProjectConfigTreeNode> child);
+  void setNextSibling(std::shared_ptr<CProjectConfigTreeNode> sibling);
 
   const std::string &name(void) const;
   bool isEnabled(void) const;
@@ -31,7 +32,7 @@ class CProjectConfigTreeNode
   virtual bool recursive(void) const;
 
  protected:
-  CProjectConfigTreeNode *m_firstChild, *m_nextSibling;
+  std::shared_ptr<CProjectConfigTreeNode> m_firstChild, m_nextSibling;
   std::string m_name;
   bool m_enabled;
 };
@@ -66,9 +67,9 @@ class CProjectConfigDirectory : public CProjectConfigTreeNode
   bool m_recurse;
 };
 
-inline CProjectConfigTreeNode* CProjectConfigTreeNode::firstChild(void) const { return m_firstChild; }
-inline CProjectConfigTreeNode* CProjectConfigTreeNode::nextSibling(void) const { return m_nextSibling; }
-inline void CProjectConfigTreeNode::setNextSibling(CProjectConfigTreeNode *sibling) { m_nextSibling = sibling; }
+inline std::shared_ptr<CProjectConfigTreeNode> CProjectConfigTreeNode::firstChild(void) const { return m_firstChild; }
+inline std::shared_ptr<CProjectConfigTreeNode> CProjectConfigTreeNode::nextSibling(void) const { return m_nextSibling; }
+inline void CProjectConfigTreeNode::setNextSibling(std::shared_ptr<CProjectConfigTreeNode> sibling) { m_nextSibling = sibling; }
 inline const std::string& CProjectConfigTreeNode::name(void) const { return m_name; }
 inline bool CProjectConfigTreeNode::isEnabled(void) const { return m_enabled; }
 

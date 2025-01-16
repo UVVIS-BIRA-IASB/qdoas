@@ -38,7 +38,6 @@ class CAnalysisWindowConfigItem
 class CProjectConfigItem
 {
  public:
-  ~CProjectConfigItem();
   CProjectConfigItem();
 
   void setName(const std::string &name);
@@ -51,10 +50,9 @@ class CProjectConfigItem
   const mediate_project_t* properties(void) const;
 
   CAnalysisWindowConfigItem* issueNewAnalysisWindowItem(void); // retains ownership
-  const std::vector<const CAnalysisWindowConfigItem*>& analysisWindowItems(void) const;
+  const std::vector<CAnalysisWindowConfigItem>& analysisWindowItems(void) const;
 
-  CProjectConfigTreeNode* rootNode(void); // WARNING : allows (by design) poking at the internals ...
-  const CProjectConfigTreeNode* rootNode(void) const;
+  std::shared_ptr<CProjectConfigTreeNode> rootNode(void) const; // WARNING : allows (by design) poking at the internals ...
 
   int SetProperties(mediate_project_t *p) const;
 
@@ -62,8 +60,8 @@ class CProjectConfigItem
   std::string m_name;
   bool m_enabled;
   mediate_project_t m_projProp;
-  CProjectConfigTreeNode *m_root;
-  std::vector<const CAnalysisWindowConfigItem*> m_awItemList;
+  std::shared_ptr<CProjectConfigTreeNode> m_root;
+  std::vector<CAnalysisWindowConfigItem> m_awItemList;
 };
 
 class CSiteConfigItem
