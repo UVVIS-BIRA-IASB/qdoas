@@ -41,7 +41,6 @@ add_executable(doas_cl
 target_compile_features(doas_cl PUBLIC cxx_std_11)
 target_link_libraries(doas_cl
   engine mediate
-  Qt::Core
   ${LIBXMLXX_LIBRARIES})
 
 target_include_directories(doas_cl PRIVATE

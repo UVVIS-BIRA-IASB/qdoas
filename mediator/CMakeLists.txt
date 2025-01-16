@@ -29,7 +29,6 @@ target_compile_features(mediate PUBLIC cxx_std_11)
 set_property(TARGET mediate PROPERTY C_STANDARD 99)
 target_link_libraries(mediate PRIVATE
   engine
-  Qt::Core
   ${netCDF_LIBRARIES}
 )
 target_include_directories(mediate PRIVATE ${netCDF_INCLUDE_DIR})
