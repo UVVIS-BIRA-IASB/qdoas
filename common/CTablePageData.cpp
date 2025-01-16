@@ -43,5 +43,5 @@ cell_data CTablePageData::cellData(int row, int col) const
     return it->second;
 
   // default is null data
-  return cell_data();
+  return cell_data(nullptr);
 }

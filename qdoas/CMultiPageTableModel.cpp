@@ -12,6 +12,10 @@ using std::shared_ptr;
 
 class qvariant_visitor : public boost::static_visitor<QVariant> {
 public:
+  QVariant operator()(void *p) const {
+    return QVariant();
+  }
+
   QVariant operator()(int i) const {
     return QVariant(i);
   }
