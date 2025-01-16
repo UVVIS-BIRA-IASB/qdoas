@@ -15,6 +15,8 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #include "debugutil.h"
 
 using std::shared_ptr;
+using std::string;
+using std::vector;
 
 CQdoasEngineController::CQdoasEngineController(QObject *parent) :
   QObject(parent),
@@ -34,10 +36,10 @@ CQdoasEngineController::CQdoasEngineController(QObject *parent) :
   m_thread->setRunState(true);
 }
 
-void CQdoasEngineController::notifyReadyToNavigateRecords(const QString &filename, int numberOfRecords)
+void CQdoasEngineController::notifyReadyToNavigateRecords(const string& filename, int numberOfRecords)
 {
   // sanity check - currentIt and filename must be consistent
-  assert(m_currentIt.file().filePath() == filename);
+  assert(m_currentIt.file().filePath().toStdString() == filename);
 
   m_numberOfRecords = numberOfRecords;
   m_currentRecord = 0;
@@ -47,7 +49,7 @@ void CQdoasEngineController::notifyReadyToNavigateRecords(const QString &filenam
   // signals for navigation control
   emit signalCurrentFileChanged(m_currentIt.index(), m_numberOfRecords);
   // files
-  emit signalCurrentFileChanged(filename);
+  emit signalCurrentFileChanged(QString::fromStdString(filename));
 
   // session is up and running
   emit signalSessionRunning(true);
@@ -82,7 +84,7 @@ void CQdoasEngineController::notifyEndOfRecords(void)
   emit signalCurrentRecordChanged(m_currentRecord, 1);
 }
 
-void CQdoasEngineController::notifyPlotData(QList<SPlotData> &plotDataList, QList<STitleTag> &titleList, QList<SPlotImage> &plotImageList)
+void CQdoasEngineController::notifyPlotData(vector<SPlotData>& plotDataList, vector<STitleTag>& titleList, vector<SPlotImage>& plotImageList)
 {
   // the controller takes the data in plotDataList and titleList
   // and organises the data-sets into a set of pages. Each page is
@@ -92,9 +94,10 @@ void CQdoasEngineController::notifyPlotData(QList<SPlotData> &plotDataList, QLis
   std::map<int,CPlotPageData*>::iterator mIt;
   int pageNo;
 
-  while (!plotDataList.isEmpty()) {
+  // build a map of pages and emptied the plotDataList list (argument).
+  for (auto& plot_data : plotDataList) {
     // existing page?
-    pageNo = plotDataList.front().page;
+    pageNo = plot_data.page;
 
     mIt = pageMap.find(pageNo);
 
@@ -104,31 +107,28 @@ void CQdoasEngineController::notifyPlotData(QList<SPlotData> &plotDataList, QLis
 
       mIt = pageMap.insert(std::map<int,CPlotPageData*>::value_type(pageNo, newPage)).first;
     }
-    if (plotDataList.front().data != NULL) {
-      (mIt->second)->addPlotDataSet(plotDataList.front().data);
+    if (plot_data.data != NULL) {
+      (mIt->second)->addPlotDataSet(plot_data.data);
     }
-    plotDataList.pop_front();
   }
+  plotDataList.clear();
 
-  // built a map of pages and emptied the plotDataList list (argument).
-
-  while (!plotImageList.isEmpty())
-   {
+  for (auto& plot_image : plotImageList) {
     // existing page?
-    pageNo = plotImageList.front().page;
+    pageNo = plot_image.page;
 
     mIt = pageMap.find(pageNo);
     if (mIt == pageMap.end())
      {
       // need a new page
       CPlotPageData *newPage = new CPlotPageData(pageNo,PLOTPAGE_IMAGE);
-      CPlotImage myImage=*plotImageList.front().plotImage;
+      CPlotImage myImage=*plot_image.plotImage;
       //      QString str(QString::fromStdString(myImage.GetFile()));
       auto titleStr = myImage.GetTitle();
 
-      if (plotImageList.front().plotImage != NULL)
+      if (plot_image.plotImage != NULL)
        {
-        newPage->addPlotImage(plotImageList.front().plotImage);
+        newPage->addPlotImage(plot_image.plotImage);
         newPage->setTitle(titleStr);
         newPage->setTag(titleStr);
        }
@@ -137,25 +137,23 @@ void CQdoasEngineController::notifyPlotData(QList<SPlotData> &plotDataList, QLis
     else
      {
      // exists
-     if (plotImageList.front().plotImage != NULL)
-      (mIt->second)->addPlotImage(plotImageList.front().plotImage);
+     if (plot_image.plotImage != NULL)
+      (mIt->second)->addPlotImage(plot_image.plotImage);
      }
-    plotImageList.pop_front();
   }
+  plotImageList.clear();
 
   // set page titles and tags if specified ... emptying the list as we go
-  while (!titleList.isEmpty()) {
-    mIt = pageMap.find(titleList.front().page);
+  for (auto& title : titleList) {
+    mIt = pageMap.find(title.page);
     if (mIt != pageMap.end()) {
-      (mIt->second)->setTitle(titleList.front().title);
-      (mIt->second)->setTag(titleList.front().tag);
+      (mIt->second)->setTitle(title.title);
+      (mIt->second)->setTag(title.tag);
     }
-    titleList.pop_front();
-
   }
+  titleList.clear();
 
   // shift the items in the pageMap to a QList for cheap and safe dispatch.
-
   QList<shared_ptr<const CPlotPageData> > pageList;
 
   mIt = pageMap.begin();
@@ -169,7 +167,7 @@ void CQdoasEngineController::notifyPlotData(QList<SPlotData> &plotDataList, QLis
   emit signalPlotPages(pageList);
 }
 
-void CQdoasEngineController::notifyTableData(QList<SCell> &cellList)
+void CQdoasEngineController::notifyTableData(vector<SCell> &cellList)
 {
   // the controller takes the cells and organises the data into
   // pages. Each page is then (safely) dispatched.
@@ -178,28 +176,26 @@ void CQdoasEngineController::notifyTableData(QList<SCell> &cellList)
   std::map<int,CTablePageData*>::iterator mIt;
   int pageNo;
 
-  while (!cellList.isEmpty()) {
+  for (auto& cell : cellList) {
     // existing page?
-    pageNo = cellList.front().page;
+    pageNo = cell.page;
     mIt = pageMap.find(pageNo);
     if (mIt == pageMap.end()) {
       // need a new page
       CTablePageData *newPage = new CTablePageData(pageNo);
-      newPage->addCell(cellList.front().row, cellList.front().col, cellList.front().data);
+      newPage->addCell(cell.row, cell.col, cell.data);
       pageMap.insert(std::map<int,CTablePageData*>::value_type(pageNo, newPage));
     }
     else {
       // exists
-      (mIt->second)->addCell(cellList.front().row, cellList.front().col, cellList.front().data);
+      (mIt->second)->addCell(cell.row, cell.col, cell.data);
     }
-    cellList.pop_front();
   }
+  cellList.clear();
 
-  // built a map of pages and emptied cellList (argument).
+  // build a map of pages and emptied cellList (argument).
   // shift them to a QList for cheap and safe dispatch.
-
   QList<shared_ptr<const CTablePageData> > pageList;
-
   mIt = pageMap.begin();
   while (mIt != pageMap.end()) {
     pageList.push_back(shared_ptr<const CTablePageData>(mIt->second));
@@ -211,7 +207,7 @@ void CQdoasEngineController::notifyTableData(QList<SCell> &cellList)
   emit signalTablePages(pageList);
 }
 
-void CQdoasEngineController::notifyErrorMessages(int highestErrorLevel, const QList<CEngineError> &errorMessages)
+void CQdoasEngineController::notifyErrorMessages(int highestErrorLevel, const vector<CEngineError> &errorMessages)
 {
   // format each into a message text and put in a single string for posting ...
   std::ostringstream stream;
@@ -222,14 +218,13 @@ void CQdoasEngineController::notifyErrorMessages(int highestErrorLevel, const QL
   }
 
   size_t n_errors=0;
-  for (QList<CEngineError>::const_iterator it = errorMessages.begin();
-       it != errorMessages.end(); ++it) {
+  for (const auto& msg : errorMessages) {
     if (n_errors >= 10) {
       stream << "(more warnings and/or errors reported; stopping here)";
       break;
     }
     // one message per line
-    switch (it->errorLevel()) {
+    switch (msg.errorLevel()) {
     case InformationEngineError:
       stream << "INFO    (";
       break;
@@ -240,7 +235,7 @@ void CQdoasEngineController::notifyErrorMessages(int highestErrorLevel, const QL
       stream << "FATAL   (";
       break;
     }
-    stream << it->tag() << ") " << it->message() << ".\n";
+    stream << msg.tag() << ") " << msg.message() << ".\n";
     ++n_errors;
   }
   emit signalErrorMessages(highestErrorLevel, QString::fromStdString(stream.str()));
@@ -256,7 +251,7 @@ bool CQdoasEngineController::event(QEvent *e)
     m_thread->takeResponses(responses);
 
     // work through the responses ...
-    while (!responses.isEmpty()) {
+    while (!responses.empty()) {
       CEngineResponse *tmp = responses.takeFirst();
 
       tmp->process(this);

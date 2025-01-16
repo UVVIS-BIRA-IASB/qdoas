@@ -2,6 +2,8 @@
 
 #include "CUsampEngineController.h"
 
+using std::vector;
+
 CUsampEngineController::CUsampEngineController(QObject *parent) :
   QObject(parent),
   CEngineController()
@@ -12,51 +14,43 @@ CUsampEngineController::~CUsampEngineController()
 {
 }
 
-void CUsampEngineController::notifyPlotData(QList<SPlotData> &plotDataList, QList<STitleTag> &titleList,QList<SPlotImage> &plotDataImage)
+void CUsampEngineController::notifyPlotData(vector<SPlotData> &plotDataList, vector<STitleTag> &titleList, vector<SPlotImage> &plotDataImage)
 {
   // the controller takes the data in plotDataList and titleList
   // and organises the data-sets into a single pages. The page is
   // then (safely) dispatched.
 
-  if (!plotDataList.isEmpty()) {
+  if (!plotDataList.empty()) {
 
     // create a page ... give it page number 0
     CPlotPageData *plotPage = new CPlotPageData(0,PLOTPAGE_DATASET);
 
-    while (!plotDataList.isEmpty()) {
-      plotPage->addPlotDataSet(plotDataList.front().data);
-      plotDataList.pop_front();
+    for (auto& plot_data : plotDataList) {
+      plotPage->addPlotDataSet(plot_data.data);
     }
+    plotDataList.clear();
 
-    // built a page and emptied the plotDataList list (argument).
-
-    if (!titleList.isEmpty()) {
+    if (!titleList.empty()) {
       // take the first title ...
       plotPage->setTitle(titleList.front().title);
       plotPage->setTag(titleList.front().tag);
-
-      // discard the rest ...
-      while (!titleList.isEmpty())
-    titleList.pop_front();
+      titleList.clear();
     }
 
     // put the page in a smart pointer for safe dispatch.
-
     std::shared_ptr<const CPlotPageData> page(plotPage);
-
     emit signalPlotPage(page);
   }
 }
 
-void CUsampEngineController::notifyErrorMessages(int highestErrorLevel, const QList<CEngineError> &errorMessages)
+void CUsampEngineController::notifyErrorMessages(int highestErrorLevel, const vector<CEngineError> &errorMessages)
 {
   // format each into a message text and put in a single string for posting ...
   std::ostringstream stream;
 
-  QList<CEngineError>::const_iterator it = errorMessages.begin();
-  while (it != errorMessages.end()) {
+  for (const auto& msg : errorMessages) {
     // one message per line
-    switch (it->errorLevel()) {
+    switch (msg.errorLevel()) {
     case InformationEngineError:
       stream << "INFO    (";
       break;
@@ -67,12 +61,8 @@ void CUsampEngineController::notifyErrorMessages(int highestErrorLevel, const QL
       stream << "FATAL   (";
       break;
     }
-
-    stream << it->tag() << ") " << it->message() << ".\n";
-
-    ++it;
+    stream << msg.tag() << ") " << msg.message() << ".\n";
   }
-
   emit signalErrorMessages(highestErrorLevel, QString::fromStdString(stream.str()));
 }
 

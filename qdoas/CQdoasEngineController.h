@@ -36,13 +36,13 @@ Q_OBJECT
   bool isSessionRunning(void) const;
 
   // notify interface is for use by response classes
-  virtual void notifyReadyToNavigateRecords(const QString &filename, int numberOfRecords);
-  virtual void notifyCurrentRecord(int recordNumber);
-  virtual void notifyEndOfRecords(void);
-  virtual void notifyPlotData(QList<SPlotData> &plotDataList, QList<STitleTag> &titleList,QList<SPlotImage> &plotDataImage);
-  virtual void notifyTableData(QList<SCell> &cellList);
+  virtual void notifyReadyToNavigateRecords(const std::string &filename, int numberOfRecords) override;
+  virtual void notifyCurrentRecord(int recordNumber) override;
+  virtual void notifyEndOfRecords(void) override;
+  virtual void notifyPlotData(std::vector<SPlotData> &plotDataList, std::vector<STitleTag> &titleList, std::vector<SPlotImage> &plotDataImage) override;
+  virtual void notifyTableData(std::vector<SCell> &cellList) override;
 
-  virtual void notifyErrorMessages(int highestErrorLevel, const QList<CEngineError> &errorMessages);
+  virtual void notifyErrorMessages(int highestErrorLevel, const std::vector<CEngineError> &errorMessages) override;
 
  protected:
   virtual bool event(QEvent *e);
