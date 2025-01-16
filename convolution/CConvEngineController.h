@@ -19,10 +19,10 @@ Q_OBJECT
   CConvEngineController(QObject *parent=0);
   virtual ~CConvEngineController();
 
-  // only need to worry about plot data and erro messages
+  // only need to worry about plot data and error messages
 
-  virtual void notifyPlotData(QList<SPlotData> &plotDataList, QList<STitleTag> &titleList,QList<SPlotImage> &plotDataImage);
-  virtual void notifyErrorMessages(int highestErrorLevel, const QList<CEngineError> &errorMessages);
+  virtual void notifyPlotData(std::vector<SPlotData> &plotDataList, std::vector<STitleTag> &titleList,std::vector<SPlotImage> &plotDataImage) override;
+  virtual void notifyErrorMessages(int highestErrorLevel, const std::vector<CEngineError> &errorMessages) override;
 
  signals:
   void signalPlotPage(std::shared_ptr<const CPlotPageData> page);
