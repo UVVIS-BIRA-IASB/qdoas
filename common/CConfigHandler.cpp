@@ -56,7 +56,7 @@ void CConfigHandler::on_end_element(const Glib::ustring& name)
     // delegate to the sub handler
 
     // first any collected character data
-    string tmp(boost::trim_copy(collated_str));
+    string tmp(boost::trim_copy(string(collated_str)));
     if (!tmp.empty()) {
       m_activeSubHandler->character(tmp);
     }
