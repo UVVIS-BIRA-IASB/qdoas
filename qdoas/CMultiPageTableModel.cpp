@@ -10,7 +10,7 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 using std::shared_ptr;
 
-class qvariant_visitor : public boost::static_visitor<QVariant> {
+class qvariant_visitor {
 public:
   QVariant operator()(void *p) const {
     return QVariant();
@@ -147,8 +147,8 @@ QVariant CMultiPageTableModel::data(const QModelIndex &index, int role) const
   if (!index.isValid() || !m_currentPage)
     return QVariant();
 
-  QVariant data = boost::apply_visitor(qvariant_visitor(),
-                                       m_currentPage->cellData(index.row(), index.column()));
+  QVariant data = std::visit(qvariant_visitor(),
+                             m_currentPage->cellData(index.row(), index.column()));
 
   // respond to display and alignment roles
   if (role == Qt::DisplayRole) {
