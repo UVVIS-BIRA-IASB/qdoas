@@ -435,7 +435,7 @@ void CProjectAnalysisSubHandler::start(const map<Glib::ustring, string> &atts)
 // handler for <raw_spectra> (child of project)
 
 CProjectRawSpectraSubHandler::CProjectRawSpectraSubHandler(CConfigHandler *master,
-                               CProjectConfigTreeNode *node) :
+                                                           std::shared_ptr<CProjectConfigTreeNode> node) :
   CConfigSubHandler(master),
   m_node(node)
 {
@@ -455,18 +455,20 @@ void CProjectRawSpectraSubHandler::start(const Glib::ustring &element, const map
   if (element == "file") {
     // expand the name (the filename)
     name = m_master->pathExpand(name);
-    m_node->addChild(new CProjectConfigFile(name, enabled));
+    m_node->addChild(std::make_shared<CProjectConfigFile>(name, enabled));
   }
   else if (element == "directory") {
 
     // expand the name (the directory name)
     name = m_master->pathExpand(name);
-    m_node->addChild(new CProjectConfigDirectory(name, value(atts, "filters"),
-                         (value(atts, "recursive") == "true"), enabled));
+    m_node->addChild(std::make_shared<CProjectConfigDirectory>(name,
+                                                               value(atts, "filters"),
+                                                               value(atts, "recursive") == "true",
+                                                               enabled));
   }
   else if (element == "folder") {
     // create an item for the folder now ...
-    CProjectConfigFolder *item = new CProjectConfigFolder(name, enabled);
+    auto item = std::make_shared<CProjectConfigFolder>(name, enabled);
     m_node->addChild(item);
 
     // and a sub handler for child items

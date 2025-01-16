@@ -756,7 +756,7 @@ QString CWProjectTree::loadConfiguration(const vector<CProjectConfigItem>& itemL
     item = projItem->child(0); // raw spectra node for the project
 
     // recursive construction of the project tree from the config tree ...
-    const CProjectConfigTreeNode *firstChild = config_item.rootNode()->firstChild();
+    const CProjectConfigTreeNode *firstChild = config_item.rootNode()->firstChild().get();
     // top-down construction of the tree ...
     errStrPartial = CWProjectTree::buildRawSpectraTree(item, firstChild);
 
@@ -770,7 +770,7 @@ QString CWProjectTree::loadConfiguration(const vector<CProjectConfigItem>& itemL
     auto awList = config_item.analysisWindowItems();
     auto awIt = awList.begin();
     while (awIt != awList.end()) {
-      QString awName(QString::fromStdString((*awIt)->name()));
+      QString awName(QString::fromStdString(awIt->name()));
 
       // create the item with the edit iterface
       errStrPartial = editInsertNewAnalysisWindow(item, awName, precedingWindowName, &awItem);
@@ -780,13 +780,13 @@ QString CWProjectTree::loadConfiguration(const vector<CProjectConfigItem>& itemL
       // locate the properties in the workspace and copy
       awProp = CWorkSpace::instance()->findAnalysisWindow(projName.toStdString(), awName.toStdString());
       assert(awProp != NULL);
-      *awProp = *((*awIt)->properties()); // blot copy
+      *awProp = *(awIt->properties()); // blot copy
       // update useCount for the symbols used in the molecules
       for (int i=0; i < awProp->crossSectionList.nCrossSection; ++i)
     ws->incrementUseCount(awProp->crossSectionList.crossSection[i].symbol);
 
       // enable or disable the analyis window
-      awItem->setEnabled((*awIt)->isEnabled());
+      awItem->setEnabled(awIt->isEnabled());
 
       precedingWindowName = awName;
       ++awIt;
@@ -833,7 +833,7 @@ QString CWProjectTree::buildRawSpectraTree(QTreeWidgetItem *parent, const CProje
       folderItem->setEnabled(childConfigItem->isEnabled());
 
       // can have children ...
-      const CProjectConfigTreeNode *firstChild = childConfigItem->firstChild();
+      const CProjectConfigTreeNode *firstChild = childConfigItem->firstChild().get();
       if (firstChild != NULL) {
         collateErrorMessage(errStr, CWProjectTree::buildRawSpectraTree(folderItem, firstChild));
       }
@@ -856,7 +856,7 @@ QString CWProjectTree::buildRawSpectraTree(QTreeWidgetItem *parent, const CProje
       break;
     }
 
-    childConfigItem = childConfigItem->nextSibling();
+    childConfigItem = childConfigItem->nextSibling().get();
   }
 
   return errStr;

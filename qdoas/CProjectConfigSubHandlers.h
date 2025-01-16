@@ -73,12 +73,12 @@ class CProjectRawSpectraSubHandler : public CConfigSubHandler
 {
  public:
   CProjectRawSpectraSubHandler(CConfigHandler *master,
-                  CProjectConfigTreeNode *node);
+                               std::shared_ptr<CProjectConfigTreeNode> node);
 
   virtual void start(const Glib::ustring& element, const std::map<Glib::ustring, std::string> &atts);
 
  private:
-  CProjectConfigTreeNode *m_node;
+  std::shared_ptr<CProjectConfigTreeNode> m_node;
 };
 
 //-------------------------------------------------------------------

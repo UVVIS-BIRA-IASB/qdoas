@@ -61,19 +61,10 @@ int CAnalysisWindowConfigItem::SetProperties(mediate_analysis_window_t *a) const
 //------------------------------------------------------------
 
 CProjectConfigItem::CProjectConfigItem() :
-  m_enabled(true)
+  m_enabled(true),
+  m_root(std::make_shared<CProjectConfigFolder>("root", true))
 {
-  m_root = new CProjectConfigFolder("root", true);
   initializeMediateProject(&m_projProp, "", "");
-}
-
-CProjectConfigItem::~CProjectConfigItem()
-{
-  for (auto item : m_awItemList) {
-    delete item;
-  }
-
-  delete m_root;
 }
 
 void CProjectConfigItem::setName(const std::string &name)
@@ -120,28 +111,21 @@ int CProjectConfigItem::SetProperties(mediate_project_t *p) const
 
 CAnalysisWindowConfigItem* CProjectConfigItem::issueNewAnalysisWindowItem(void)
 {
-  CAnalysisWindowConfigItem *tmp = new CAnalysisWindowConfigItem;
-  m_awItemList.push_back(tmp);
+  m_awItemList.emplace_back();
 
   // retains ownership
-  return tmp;
+  return &m_awItemList.back();
 }
 
-const vector<const CAnalysisWindowConfigItem*>& CProjectConfigItem::analysisWindowItems(void) const
+const vector<CAnalysisWindowConfigItem>& CProjectConfigItem::analysisWindowItems(void) const
 {
   return m_awItemList;
 }
 
-CProjectConfigTreeNode* CProjectConfigItem::rootNode(void)
+std::shared_ptr<CProjectConfigTreeNode> CProjectConfigItem::rootNode(void) const
 {
   return m_root;
 }
-
-const CProjectConfigTreeNode* CProjectConfigItem::rootNode(void) const
-{
-  return m_root;
-}
-
 
 //------------------------------------------------------------
 

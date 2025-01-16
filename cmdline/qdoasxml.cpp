@@ -441,7 +441,7 @@ RC ParseInstrumental(const vector<string>& xmlFields,int xmlFieldN,int startingF
 // ANALYSIS WINDOWS PROPERTIES
 // ===========================
 
-void AnalysisWindowApplyInt(const vector<const CAnalysisWindowConfigItem*>& awList,   // list of analysis windows
+void AnalysisWindowApplyInt(const vector<CAnalysisWindowConfigItem>& awList,   // list of analysis windows
                             const string& windowName,                                // the name of a specific analysis window (all windows will be modified if this string is empty)
                             const string& xmlKey,                                    // the path of the field to replace
                             int newValue,                                            // new value
@@ -455,20 +455,20 @@ void AnalysisWindowApplyInt(const vector<const CAnalysisWindowConfigItem*>& awLi
   // Browse
 
   while (awIt!=awList.end()) {
-    if (windowName.empty() || (windowName==(*awIt)->name())) {
-      memcpy(pNewAnalysisWindow,(mediate_analysis_window_t *)((*awIt)->properties()),sizeof(mediate_analysis_window_t));
+    if (windowName.empty() || (windowName==awIt->name())) {
+      memcpy(pNewAnalysisWindow,(mediate_analysis_window_t *)(awIt->properties()),sizeof(mediate_analysis_window_t));
       sprintf(msgString,"%s : %d replaced by %d (%s)",
               xmlKey.c_str(),
-              *pIntField,newValue,(*awIt)->name().c_str());
+              *pIntField,newValue,awIt->name().c_str());
       std::cout << msgString << std::endl;
       *pIntField=newValue;
-      (*awIt)->SetProperties(( mediate_analysis_window_t *)pNewAnalysisWindow);
+      awIt->SetProperties(( mediate_analysis_window_t *)pNewAnalysisWindow);
     }
     ++awIt;
   }
 }
 
-void AnalysisWindowApplyDouble(const vector<const CAnalysisWindowConfigItem*>awList,     // list of analysis windows
+void AnalysisWindowApplyDouble(const vector<CAnalysisWindowConfigItem>& awList,     // list of analysis windows
                                const string& windowName,                                // the name of a specific analysis window (all windows will be modified if this string is empty)
                                const string& xmlKey,                                    // the path of the field to replace
                                const string& xmlValue,                                  // string with the new value
@@ -483,20 +483,20 @@ void AnalysisWindowApplyDouble(const vector<const CAnalysisWindowConfigItem*>awL
   // Browse
 
   while (awIt!=awList.end()) {
-    if (windowName.empty() || (windowName==(*awIt)->name())) {
-      memcpy(pNewAnalysisWindow,(mediate_analysis_window_t *)((*awIt)->properties()),sizeof(mediate_analysis_window_t));
+    if (windowName.empty() || (windowName==awIt->name())) {
+      memcpy(pNewAnalysisWindow,(mediate_analysis_window_t *)(awIt->properties()),sizeof(mediate_analysis_window_t));
       sprintf(msgString,"%s : %.2lf replaced by %s (%s)",
               xmlKey.c_str(),
-              *pDoubleField,xmlValue.c_str(),(*awIt)->name().c_str());
+              *pDoubleField,xmlValue.c_str(),awIt->name().c_str());
       std::cout << msgString << std::endl;
       *pDoubleField=(double)atof(xmlValue.c_str());
-      (*awIt)->SetProperties(( mediate_analysis_window_t *)pNewAnalysisWindow);
+      awIt->SetProperties(( mediate_analysis_window_t *)pNewAnalysisWindow);
     }
     ++awIt;
   }
 }
 
-void AnalysisWindowApplyString(const vector<const CAnalysisWindowConfigItem*>awList,     // list of analysis windows
+void AnalysisWindowApplyString(const vector<CAnalysisWindowConfigItem>& awList,     // list of analysis windows
                                const string& windowName,                                // the name of a specific analysis window (all windows will be modified if this string is empty)
                                const string& xmlKey,                                    // the path of the field to replace
                                const string& xmlValue,                                  // string with the new value
@@ -510,14 +510,14 @@ void AnalysisWindowApplyString(const vector<const CAnalysisWindowConfigItem*>awL
 
    // Browse
    while (awIt!=awList.end()) {
-     if (windowName.empty() || (windowName==(*awIt)->name())) {
-       memcpy(pNewAnalysisWindow,(mediate_analysis_window_t *)((*awIt)->properties()),sizeof(mediate_analysis_window_t));
+     if (windowName.empty() || (windowName==awIt->name())) {
+       memcpy(pNewAnalysisWindow,(mediate_analysis_window_t *)(awIt->properties()),sizeof(mediate_analysis_window_t));
        sprintf(msgString,"%s : %s replaced by %s (%s)",
                xmlKey.c_str(),
-               field,xmlValue.c_str(),(*awIt)->name().c_str());
+               field,xmlValue.c_str(),awIt->name().c_str());
        std::cout << msgString << std::endl;
        strcpy(field,xmlValue.c_str());
-       (*awIt)->SetProperties(( mediate_analysis_window_t *)pNewAnalysisWindow);
+       awIt->SetProperties(( mediate_analysis_window_t *)pNewAnalysisWindow);
      }
      ++awIt;
    }
