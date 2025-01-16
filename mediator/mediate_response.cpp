@@ -192,7 +192,7 @@ void mediateResponseRetainPage(int page, void * responseHandle)
 {
   CEngineResponseVisual *resp = static_cast<CEngineResponseVisual*>(responseHandle);
   // an invalid cell position
-  resp->addCell(page, -1, -1, cell_data());
+  resp->addCell(page, -1, -1, cell_data(nullptr));
   // a NULL data set
   resp->addDataSet(page, NULL);
 }

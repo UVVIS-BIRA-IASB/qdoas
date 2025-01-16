@@ -11,7 +11,7 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 #include <boost/variant.hpp>
 
-using cell_data = boost::variant<int, double, std::string>;
+using cell_data = boost::variant<void *, int, double, std::string>;
 
 struct SCell
 {
