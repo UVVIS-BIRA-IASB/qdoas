@@ -10,7 +10,7 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 using std::shared_ptr;
 
-class qvariant_visitor {
+class data_visitor {
 public:
   QVariant operator()(void *p) const {
     return QVariant();
@@ -26,6 +26,22 @@ public:
 
   QVariant operator()(std::string s) const {
     return QVariant(QString::fromStdString(s));
+  }
+};
+
+class alignment_visitor {
+public:
+  QVariant operator()(int i) const {
+    return QVariant(Qt::AlignRight);
+  }
+
+  QVariant operator()(double d) const {
+    return QVariant(Qt::AlignRight);
+  }
+
+  template<typename T>
+  QVariant operator()(T) const {
+    return QVariant(Qt::AlignLeft);
   }
 };
 
@@ -147,18 +163,14 @@ QVariant CMultiPageTableModel::data(const QModelIndex &index, int role) const
   if (!index.isValid() || !m_currentPage)
     return QVariant();
 
-  QVariant data = std::visit(qvariant_visitor(),
-                             m_currentPage->cellData(index.row(), index.column()));
-
   // respond to display and alignment roles
   if (role == Qt::DisplayRole) {
-    return data;
+    return std::visit(data_visitor(),
+                      m_currentPage->cellData(index.row(), index.column()));
   }
   else if (role == Qt::TextAlignmentRole) {
-    QVariant::Type type = data.type();
-
-    return QVariant((type == QVariant::Int || type == QVariant::Double) ?
-            Qt::AlignRight : Qt::AlignLeft);
+    return std::visit(alignment_visitor(),
+                      m_currentPage->cellData(index.row(), index.column()));
   }
 
   return QVariant();
