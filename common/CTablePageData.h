@@ -8,10 +8,10 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #define _CTABLEPAGEDATA_H_GUARD
 
 #include <map>
+#include <string>
+#include <variant>
 
-#include <boost/variant.hpp>
-
-using cell_data = boost::variant<void *, int, double, std::string>;
+using cell_data = std::variant<void *, int, double, std::string>;
 
 struct SCell
 {

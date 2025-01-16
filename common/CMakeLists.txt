@@ -49,7 +49,7 @@ add_library(common STATIC
   visual_c_compat.h
 )
 
-target_compile_features(common PUBLIC cxx_std_11)
+target_compile_features(common PUBLIC cxx_std_17)
 target_link_libraries(common Qt::Widgets Qt::PrintSupport)
 target_include_directories(common PRIVATE ${QWT_INCLUDE_DIR})
 target_include_directories(common PUBLIC ../engine ../mediator)
