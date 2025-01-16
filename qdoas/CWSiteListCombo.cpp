@@ -14,7 +14,7 @@ CWSiteListCombo::CWSiteListCombo(QWidget *parent) :
   repopulate();
 }
 
-void CWSiteListCombo::updateNewSite(const QString &newSiteName)
+void CWSiteListCombo::updateNewSite(const std::string &newSiteName)
 {
   QString selected = currentText();
 
@@ -25,7 +25,7 @@ void CWSiteListCombo::updateNewSite(const QString &newSiteName)
     setCurrentIndex(index);
 }
 
-void CWSiteListCombo::updateDeleteSite(const QString &siteName)
+void CWSiteListCombo::updateDeleteSite(const std::string &siteName)
 {
   updateNewSite(siteName);
 }

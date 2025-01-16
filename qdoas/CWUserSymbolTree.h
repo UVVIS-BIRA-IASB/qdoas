@@ -22,9 +22,9 @@ Q_OBJECT
 
   void savePreferences(void);
 
-  virtual void updateNewSymbol(const QString &newSymbolName);
-  virtual void updateModifySymbol(const QString &symbolName);
-  virtual void updateDeleteSymbol(const QString &symbolName);
+  virtual void updateNewSymbol(const std::string &newSymbolName) override;
+  virtual void updateModifySymbol(const std::string &symbolName) override;
+  virtual void updateDeleteSymbol(const std::string &symbolName) override;
 
  protected:
   virtual void contextMenuEvent(QContextMenuEvent *e);

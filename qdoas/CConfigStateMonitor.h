@@ -25,15 +25,15 @@ Q_OBJECT
 
   bool isValid(void) const;
 
-  virtual void updateNewSite(const QString &newSiteName);
-  virtual void updateModifySite(const QString &siteName);
-  virtual void updateDeleteSite(const QString &siteName);
-  virtual void updateNewSymbol(const QString &newSymbolName);
-  virtual void updateModifySymbol(const QString &symbolName);
-  virtual void updateDeleteSymbol(const QString &symbolName);
-  virtual void updateNewProject(const QString &newProjectName);
-  virtual void updateModifyProject(const QString &projectName);
-  virtual void updateDeleteProject(const QString &projectName);
+  virtual void updateNewSite(const std::string &newSiteName) override;
+  virtual void updateModifySite(const std::string &siteName) override;
+  virtual void updateDeleteSite(const std::string &siteName) override;
+  virtual void updateNewSymbol(const std::string &newSymbolName) override;
+  virtual void updateModifySymbol(const std::string &symbolName) override;
+  virtual void updateDeleteSymbol(const std::string &symbolName) override;
+  virtual void updateNewProject(const std::string &newProjectName) override;
+  virtual void updateModifyProject(const std::string &projectName) override;
+  virtual void updateDeleteProject(const std::string &projectName) override;
 
  public slots:
   void slotValidate();
