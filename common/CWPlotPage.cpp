@@ -205,7 +205,7 @@ CWPlot::CWPlot(std::shared_ptr<const CPlotImage> dataImage,
   m_zoomer(NULL),
   m_type(PLOTPAGE_IMAGE)
  {
-  QString filename(QString::fromStdString(m_dataImage->GetFile()));
+  QString filename(QString::fromStdString(m_dataImage->getFile()));
   QwtText tmpTitle=title();
   const QByteArray fname=filename.toLocal8Bit();
   const char *ptr=strrchr(fname.constData(),'/')+1;

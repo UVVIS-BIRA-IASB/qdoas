@@ -32,7 +32,7 @@ class CEngineController
   virtual void notifyReadyToNavigateRecords(const std::string &filename, int numberOfRecords) {};
   virtual void notifyCurrentRecord(int recordNumber) {};
   virtual void notifyEndOfRecords(void) {};
-  virtual void notifyPlotData(std::vector<SPlotData> &plotDataList, std::vector<STitleTag> &titleList,std::vector<SPlotImage> &plotImageList) {};
+  virtual void notifyPlotData(std::map<int, CPlotPageData> pageData) {};
   virtual void notifyTableData(std::vector<SCell> &cellList) {};
 
   virtual void notifyErrorMessages(int highestErrorLevel, const std::vector<CEngineError> &errorMessages) {};

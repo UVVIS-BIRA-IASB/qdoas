@@ -18,22 +18,14 @@ class CPlotImage
  public:
   CPlotImage(const char *filename,const char *title) : m_file(filename), m_title(title) {};
 
- const std::string& GetFile(void) const;
- const std::string& GetTitle(void) const;
+ const std::string& getFile(void) const;
+ const std::string& getTitle(void) const;
 
  private:
   std::string m_file,m_title;
 };
 
-inline const std::string& CPlotImage::GetFile(void) const { return m_file; }
-inline const std::string& CPlotImage::GetTitle(void) const { return m_title; }
-
-struct SPlotImage
-{
- int page;
- const CPlotImage *plotImage;
-
- SPlotImage(int p,const CPlotImage *i) : page(p),plotImage(i) {}
-};
+inline const std::string& CPlotImage::getFile(void) const { return m_file; }
+inline const std::string& CPlotImage::getTitle(void) const { return m_title; }
 
 #endif

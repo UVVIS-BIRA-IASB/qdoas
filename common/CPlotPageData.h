@@ -8,7 +8,7 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #define _CPLOTPAGEDATA_H_GUARD
 
 // storage class for CPlotDataSets grouped into a single page
-
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -36,8 +36,8 @@ class CPlotPageData
 
   void setTitle(const std::string &title);
   void setTag(const std::string &tag);
-  void addPlotDataSet(const CPlotDataSet *dataSet); // page takes ownership responsibility
-  void addPlotImage(const CPlotImage *dataImage);
+  void addPlotDataSet(CPlotDataSet dataSet);
+  void addPlotImage(CPlotImage dataImage);
 
  private:
   int m_pageNumber;
@@ -50,4 +50,3 @@ class CPlotPageData
 inline bool CPlotPageData::isEmpty(void) const { return (m_pageType==PLOTPAGE_DATASET)?m_dataSets.empty():m_dataImages.empty(); }
 
 #endif
-

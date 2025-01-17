@@ -29,6 +29,8 @@ add_executable(doas_cl
   ../common/CWorkSpace.h
   ../common/CPlotDataSet.cpp
   ../common/CPlotDataSet.h
+  ../common/CPlotPageData.h
+  ../common/CPlotPageData.cpp
   CBatchEngineController.cpp
   CBatchEngineController.h
   cmdline.cpp
