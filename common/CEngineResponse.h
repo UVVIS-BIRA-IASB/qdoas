@@ -8,11 +8,11 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #ifndef _CENGINERESPONSE_H_GUARD
 #define _CENGINERESPONSE_H_GUARD
 
+#include <map>
 #include <vector>
 #include <string>
 
-#include "CPlotDataSet.h"
-#include "CPlotImage.h"
+#include "CPlotPageData.h"
 #include "CTablePageData.h"
 #include "CEngineError.h"
 #include "mediate_types.h"
@@ -25,7 +25,7 @@ class CEngineResponse
 {
  public:
   CEngineResponse() : m_highestErrorLevel(0) {};
-  virtual ~CEngineResponse() {};
+  virtual ~CEngineResponse() = default;
 
   void addErrorMessage(const std::string &tag, const std::string &msg, int errorLevel);
 
@@ -57,20 +57,19 @@ class CEngineResponseMessage : public CEngineResponse
 class CEngineResponseVisual : public CEngineResponse
 {
  public:
-  virtual ~CEngineResponseVisual();
-
   virtual void process(CEngineController *engineController);
 
-  void addDataSet(int pageNumber, const CPlotDataSet *dataSet);
-  void addImage(int pageNumber,const CPlotImage *plotImage);
-  void addPageTitleAndTag(int pageNumber, const std::string &title, const std::string &tag);
+  void addDataSet(int pageNumber, CPlotDataSet dataSet);
+  void addImage(int pageNumber, CPlotImage plotImage);
+  void addPageTitleAndTag(int pageNumber, std::string title, std::string tag);
   void addCell(int pageNumber, int row, int col, const cell_data &data);
 
  protected:
-  std::vector<SPlotData> m_plotDataList;
-  std::vector<STitleTag> m_titleList;
   std::vector<SCell> m_cellList;
-  std::vector<SPlotImage> m_plotImageList;
+  std::map<int, CPlotPageData> m_plotPages;
+
+public:
+  decltype(m_plotPages)::iterator getOrAddPage(int pageNumber, int pageType, const std::string title, const std::string tag);
 };
 
 //------------------------------------------------------------

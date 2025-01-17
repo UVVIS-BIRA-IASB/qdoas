@@ -90,27 +90,25 @@ void mediateResponsePlotData(int page,
 {
   CEngineResponseVisual *resp = static_cast<CEngineResponseVisual*>(responseHandle);
 
-  CPlotDataSet *dataSet = new CPlotDataSet(type, forceAutoScaling, title, xLabel, yLabel);
+  CPlotDataSet dataSet(type, forceAutoScaling, title, xLabel, yLabel);
 
   int i = 0;
   while (i < arrayLength) {
     if(plotDataArray[i].curveNumber >= 0)
-      dataSet->addPlotData(plotDataArray[i].curveName,plotDataArray[i].x, plotDataArray[i].y, plotDataArray[i].length, plotDataArray[i].curveType, plotDataArray[i].curveNumber);
+      dataSet.addPlotData(plotDataArray[i].curveName,plotDataArray[i].x, plotDataArray[i].y, plotDataArray[i].length, plotDataArray[i].curveType, plotDataArray[i].curveNumber);
     else
-      dataSet->addPlotData(plotDataArray[i].curveName,plotDataArray[i].x, plotDataArray[i].y, plotDataArray[i].length, plotDataArray[i].curveType);
+      dataSet.addPlotData(plotDataArray[i].curveName,plotDataArray[i].x, plotDataArray[i].y, plotDataArray[i].length, plotDataArray[i].curveType);
     ++i;
   }
 
-  resp->addDataSet(page, dataSet);
+  resp->addDataSet(page, std::move(dataSet));
 }
 
 void mediateResponsePlotImage(int page,const char *imageFile,const char *title,void *responseHandle)
  {
   CEngineResponseVisual *resp = static_cast<CEngineResponseVisual*>(responseHandle);
 
-  CPlotImage *plotImage = new CPlotImage(imageFile,title);
-
-  resp->addImage(page,plotImage);
+  resp->addImage(page, CPlotImage(imageFile,title));
  }
 
 void mediateResponseCellDataDouble(int page,
@@ -194,8 +192,8 @@ void mediateResponseRetainPage(int page, void * responseHandle)
   CEngineResponseVisual *resp = static_cast<CEngineResponseVisual*>(responseHandle);
   // an invalid cell position
   resp->addCell(page, -1, -1, cell_data(nullptr));
-  // a NULL data set
-  resp->addDataSet(page, NULL);
+  // an empty data set
+  resp->addDataSet(page, CPlotDataSet(Spectrum, forceAutoScale, "", "", ""));
 }
 
 void mediateResponseErrorMessage(const char *function,

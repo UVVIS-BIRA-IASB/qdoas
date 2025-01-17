@@ -76,34 +76,4 @@ inline const std::string& CPlotDataSet::plotTitle(void) const { return m_title; 
 inline const std::string& CPlotDataSet::xAxisLabel(void) const { return m_xLabel; }
 inline const std::string& CPlotDataSet::yAxisLabel(void) const { return m_yLabel; }
 
-// structures to assist in the collation of data bundled in a response from the engine.
-// specifically for control of the page distribution of plot.
-
-struct SPlotData
-{
-  int page;
-  const CPlotDataSet *data;
-
-  SPlotData(int p, const CPlotDataSet *d) : page(p), data(d) {}
-};
-
-struct STitleTag
-{
-  int page;
-  std::string title;
-  std::string tag;
-
-  STitleTag(int p, const std::string &ti, const std::string &ta) : page(p), title(ti), tag(ta) {}
-};
-
-struct SImage
-{
-//  int page;
-//  std::string imageFilename;
-//  QImage image;
-//
-//  SImage(int p,const std::string &fn,const QImage &img) : page(p),imageFilename(fn),image(img) {}
-
-};
-
 #endif

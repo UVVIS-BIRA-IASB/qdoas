@@ -44,38 +44,48 @@ void CEngineResponseMessage::process(CEngineController *engineController)
 
 //------------------------------------------------------------
 
-CEngineResponseVisual::~CEngineResponseVisual()
-{
-  for (auto plot_data : m_plotDataList) {
-    delete plot_data.data;
-  }
-
-}
-
 void CEngineResponseVisual::process(CEngineController *engineController)
 {
   if (!hasFatalError()
-      && !(m_cellList.empty() && m_plotDataList.empty() && m_plotImageList.empty() ) ) {
+      && !(m_cellList.empty() && m_plotPages.empty())) {
     engineController->notifyTableData(m_cellList);
-    engineController->notifyPlotData(m_plotDataList, m_titleList, m_plotImageList);
+    engineController->notifyPlotData(std::move(m_plotPages));
   }
 
   processErrors(engineController);
 }
 
-void CEngineResponseVisual::addDataSet(int pageNumber, const CPlotDataSet *dataSet)
-{
-  m_plotDataList.push_back(SPlotData(pageNumber, dataSet));
+decltype(CEngineResponseVisual::m_plotPages)::iterator CEngineResponseVisual::getOrAddPage(int pageNumber, int pageType, string title="", string tag="") {
+  // check if we already have that page, and insert it if not
+  auto i_plotPage = m_plotPages.find(pageNumber);
+
+  if (i_plotPage == m_plotPages.end()) {
+    i_plotPage =  m_plotPages.insert(decltype(m_plotPages)::value_type(pageNumber, CPlotPageData(pageNumber, pageType))).first;
+    i_plotPage->second.setTitle(title);
+    i_plotPage->second.setTag(tag);
+  }
+  return i_plotPage;
 }
 
-void CEngineResponseVisual::addImage(int pageNumber, const CPlotImage *plotImage)
+void CEngineResponseVisual::addDataSet(int pageNumber, CPlotDataSet dataSet)
 {
-  m_plotImageList.push_back(SPlotImage(pageNumber, plotImage));
+  auto i_plotPage = getOrAddPage(pageNumber, PLOTPAGE_DATASET);
+  if (dataSet.count() != 0) {
+    (i_plotPage->second).addPlotDataSet(std::move(dataSet));
+  }
 }
 
-void CEngineResponseVisual::addPageTitleAndTag(int pageNumber, const string &title, const string &tag)
+void CEngineResponseVisual::addImage(int pageNumber, CPlotImage plotImage)
 {
-  m_titleList.push_back(STitleTag(pageNumber, title, tag));
+  auto i_plotPage = getOrAddPage(pageNumber, PLOTPAGE_IMAGE, plotImage.getTitle(), plotImage.getTitle());
+  i_plotPage->second.addPlotImage(std::move(plotImage));
+}
+
+void CEngineResponseVisual::addPageTitleAndTag(int pageNumber, string title, string tag)
+{
+  auto i_plotPage = getOrAddPage(pageNumber, PLOTPAGE_DATASET);
+  i_plotPage->second.setTitle(title);
+  i_plotPage->second.setTag(tag);
 }
 
 void CEngineResponseVisual::addCell(int pageNumber, int row, int col, const cell_data &data)
@@ -88,9 +98,9 @@ void CEngineResponseVisual::addCell(int pageNumber, int row, int col, const cell
 void CEngineResponseBeginAccessFile::process(CEngineController *engineController)
 {
   if (!hasFatalError() &&
-      !(m_cellList.empty() && m_plotDataList.empty() && m_plotImageList.empty()) ) {
+      !(m_cellList.empty() && m_plotPages.empty())) {
     engineController->notifyTableData(m_cellList);
-    engineController->notifyPlotData(m_plotDataList, m_titleList, m_plotImageList);
+    engineController->notifyPlotData(std::move(m_plotPages));
   }
 
   if (processErrors(engineController)) {
@@ -126,7 +136,7 @@ void CEngineResponseSpecificRecord::process(CEngineController *engineController)
     else if (m_recordNumber > 0) {
       // display ... table data MUST be before plot data
       engineController->notifyTableData(m_cellList);
-      engineController->notifyPlotData(m_plotDataList, m_titleList, m_plotImageList);
+      engineController->notifyPlotData(std::move(m_plotPages));
 
       engineController->notifyCurrentRecord(m_recordNumber);
     }
