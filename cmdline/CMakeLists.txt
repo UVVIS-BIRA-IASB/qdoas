@@ -32,6 +32,8 @@ add_executable(doas_cl
   CBatchEngineController.cpp
   CBatchEngineController.h
   cmdline.cpp
+  ./glob_match/glob_match.hpp
+  ./glob_match/glob_match.cpp
   convxml.cpp
   convxml.h
   qdoasxml.cpp
@@ -44,6 +46,7 @@ target_link_libraries(doas_cl
   ${LIBXMLXX_LIBRARIES})
 
 target_include_directories(doas_cl PRIVATE
+  ./glob_match
   ../qdoas ../convolution ../usamp ../ring
   ${LIBXMLXX_INCLUDE_DIRS})
 
