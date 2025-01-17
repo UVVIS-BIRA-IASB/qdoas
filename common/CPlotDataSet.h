@@ -41,14 +41,11 @@ inline int CXYPlotData::size(void) const { return m_xData.size(); }
 inline int CXYPlotData::curveNumber(void) const { return m_curveNumber; }
 
 
-
 // A collection of curves for one plot and plot labels/titles
-
 class CPlotDataSet
 {
  public:
   CPlotDataSet(enum ePlotScaleType type, bool forceAutoScaling, const char *title, const char *xlabel, const char *ylabel);
-  ~CPlotDataSet();
 
   void addPlotData(const char *curveName,const double *x, const double *y, int n, enum eCurveStyleType type);
   void addPlotData(const char *curveName,const double *x, const double *y, int n, enum eCurveStyleType curveType, int curveNumber);
@@ -64,21 +61,20 @@ class CPlotDataSet
   const std::string& yAxisLabel(void) const;
 
  private:
-  std::vector<CXYPlotData*> m_dataList;
+  std::vector<CXYPlotData> m_dataList;
   enum ePlotScaleType m_scaleType;
   bool m_forceAutoScaling;
-  std::string m_file,m_title, m_xLabel, m_yLabel;
+  std::string m_title, m_xLabel, m_yLabel;
 };
 
 inline int CPlotDataSet::count(void) const { return m_dataList.size(); }
-inline const CXYPlotData& CPlotDataSet::rawData(int index) const { return *(m_dataList.at(index)); }
-inline enum eCurveStyleType CPlotDataSet::curveType(int index) const { return m_dataList.at(index)->curveType(); }
+inline const CXYPlotData& CPlotDataSet::rawData(int index) const { return m_dataList.at(index); }
+inline enum eCurveStyleType CPlotDataSet::curveType(int index) const { return m_dataList.at(index).curveType(); }
 inline enum ePlotScaleType CPlotDataSet::scaleType(void) const { return m_scaleType; }
 inline bool CPlotDataSet::forceAutoScaling(void) const { return m_forceAutoScaling; }
 inline const std::string& CPlotDataSet::plotTitle(void) const { return m_title; }
 inline const std::string& CPlotDataSet::xAxisLabel(void) const { return m_xLabel; }
 inline const std::string& CPlotDataSet::yAxisLabel(void) const { return m_yLabel; }
-
 
 // structures to assist in the collation of data bundled in a response from the engine.
 // specifically for control of the page distribution of plot.
