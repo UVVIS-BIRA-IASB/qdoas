@@ -21,7 +21,7 @@ add_definitions(-DAPP_USAMP)
 
 target_compile_features(usamp PUBLIC cxx_std_11)
 target_link_libraries(usamp
-  common mediate engine
+  engine mediate common
   Qt::Widgets Qt::PrintSupport
   ${QWT_LIBRARY}
   ${LIBXMLXX_LIBRARIES}

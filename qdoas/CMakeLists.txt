@@ -103,7 +103,7 @@ add_definitions(-DAPP_QDOAS)
 
 target_compile_features(qdoas PUBLIC cxx_std_11)
 target_link_libraries(qdoas
-  common engine mediate
+  engine mediate common
   Qt::Widgets Qt::PrintSupport
   ${QWT_LIBRARY}
   ${LIBXMLXX_LIBRARIES}

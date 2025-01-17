@@ -21,7 +21,7 @@ add_definitions(-DAPP_RING)
 
 target_compile_features(ring PUBLIC cxx_std_11)
 target_link_libraries(ring
-  common mediate engine
+  engine mediate common
   Qt::Widgets Qt::PrintSupport
   ${QWT_LIBRARY}
   ${LIBXMLXX_LIBRARIES}

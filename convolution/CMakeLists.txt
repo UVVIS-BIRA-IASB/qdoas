@@ -24,7 +24,7 @@ add_definitions(-DAPP_CONV)
 
 target_compile_features(convolution PUBLIC cxx_std_11)
 target_link_libraries(convolution
-  common mediate engine
+  engine mediate common
   Qt::Widgets Qt::PrintSupport
   ${QWT_LIBRARY}
   ${LIBXMLXX_LIBRARIES}
