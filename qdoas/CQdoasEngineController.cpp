@@ -84,84 +84,15 @@ void CQdoasEngineController::notifyEndOfRecords(void)
   emit signalCurrentRecordChanged(m_currentRecord, 1);
 }
 
-void CQdoasEngineController::notifyPlotData(vector<SPlotData>& plotDataList, vector<STitleTag>& titleList, vector<SPlotImage>& plotImageList)
+void CQdoasEngineController::notifyPlotData(std::map<int, CPlotPageData> pageMap)
 {
-  // the controller takes the data in plotDataList and titleList
-  // and organises the data-sets into a set of pages. Each page is
-  // then (safely) dispatched.
-
-  std::map<int,CPlotPageData*> pageMap;
-  std::map<int,CPlotPageData*>::iterator mIt;
-  int pageNo;
-
-  // build a map of pages and emptied the plotDataList list (argument).
-  for (auto& plot_data : plotDataList) {
-    // existing page?
-    pageNo = plot_data.page;
-
-    mIt = pageMap.find(pageNo);
-
-    if (mIt == pageMap.end()) {
-      // need a new page
-      CPlotPageData *newPage = new CPlotPageData(pageNo,PLOTPAGE_DATASET);
-
-      mIt = pageMap.insert(std::map<int,CPlotPageData*>::value_type(pageNo, newPage)).first;
-    }
-    if (plot_data.data != NULL) {
-      (mIt->second)->addPlotDataSet(plot_data.data);
-    }
-  }
-  plotDataList.clear();
-
-  for (auto& plot_image : plotImageList) {
-    // existing page?
-    pageNo = plot_image.page;
-
-    mIt = pageMap.find(pageNo);
-    if (mIt == pageMap.end())
-     {
-      // need a new page
-      CPlotPageData *newPage = new CPlotPageData(pageNo,PLOTPAGE_IMAGE);
-      CPlotImage myImage=*plot_image.plotImage;
-      //      QString str(QString::fromStdString(myImage.GetFile()));
-      auto titleStr = myImage.GetTitle();
-
-      if (plot_image.plotImage != NULL)
-       {
-        newPage->addPlotImage(plot_image.plotImage);
-        newPage->setTitle(titleStr);
-        newPage->setTag(titleStr);
-       }
-      pageMap.insert(std::map<int,CPlotPageData*>::value_type(pageNo, newPage));
-     }
-    else
-     {
-     // exists
-     if (plot_image.plotImage != NULL)
-      (mIt->second)->addPlotImage(plot_image.plotImage);
-     }
-  }
-  plotImageList.clear();
-
-  // set page titles and tags if specified ... emptying the list as we go
-  for (auto& title : titleList) {
-    mIt = pageMap.find(title.page);
-    if (mIt != pageMap.end()) {
-      (mIt->second)->setTitle(title.title);
-      (mIt->second)->setTag(title.tag);
-    }
-  }
-  titleList.clear();
-
   // shift the items in the pageMap to a QList for cheap and safe dispatch.
-  QList<shared_ptr<const CPlotPageData> > pageList;
-
-  mIt = pageMap.begin();
+  QList<shared_ptr<const CPlotPageData>> pageList;
+  auto mIt = pageMap.begin();
   while (mIt != pageMap.end()) {
-    pageList.push_back(shared_ptr<const CPlotPageData>(mIt->second));
+    pageList.push_back(std::make_shared<const CPlotPageData>(std::move(mIt->second)));
     ++mIt;
   }
-  pageMap.clear();
 
   // send the pages to any connected slots
   emit signalPlotPages(pageList);
@@ -171,37 +102,31 @@ void CQdoasEngineController::notifyTableData(vector<SCell> &cellList)
 {
   // the controller takes the cells and organises the data into
   // pages. Each page is then (safely) dispatched.
-
-  std::map<int,CTablePageData*> pageMap;
-  std::map<int,CTablePageData*>::iterator mIt;
-  int pageNo;
-
+  std::map<int,CTablePageData> pageMap;
   for (auto& cell : cellList) {
     // existing page?
-    pageNo = cell.page;
-    mIt = pageMap.find(pageNo);
+    int pageNo = cell.page;
+    auto mIt = pageMap.find(pageNo);
     if (mIt == pageMap.end()) {
       // need a new page
-      CTablePageData *newPage = new CTablePageData(pageNo);
-      newPage->addCell(cell.row, cell.col, cell.data);
-      pageMap.insert(std::map<int,CTablePageData*>::value_type(pageNo, newPage));
+      CTablePageData newPage(pageNo);
+      newPage.addCell(cell.row, cell.col, cell.data);
+      pageMap.insert(std::map<int,CTablePageData>::value_type(pageNo, newPage));
     }
     else {
       // exists
-      (mIt->second)->addCell(cell.row, cell.col, cell.data);
+      (mIt->second).addCell(cell.row, cell.col, cell.data);
     }
   }
-  cellList.clear();
 
   // build a map of pages and emptied cellList (argument).
   // shift them to a QList for cheap and safe dispatch.
   QList<shared_ptr<const CTablePageData> > pageList;
-  mIt = pageMap.begin();
+  auto mIt = pageMap.begin();
   while (mIt != pageMap.end()) {
-    pageList.push_back(shared_ptr<const CTablePageData>(mIt->second));
+    pageList.push_back(std::make_shared<const CTablePageData>(std::move(mIt->second)));
     ++mIt;
   }
-  pageMap.clear();
 
   // send the pages to any connected slots
   emit signalTablePages(pageList);

@@ -21,7 +21,7 @@ Q_OBJECT
 
   // only need to worry about plot data and erro messages
 
-  virtual void notifyPlotData(std::vector<SPlotData> &plotDataList, std::vector<STitleTag> &titleList,std::vector<SPlotImage> &plotDataImage) override;
+  virtual void notifyPlotData(std::map<int, CPlotPageData> pageMap) override;
   virtual void notifyErrorMessages(int highestErrorLevel, const std::vector<CEngineError> &errorMessages) override;
 
  signals:

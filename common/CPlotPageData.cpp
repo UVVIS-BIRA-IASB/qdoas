@@ -76,20 +76,12 @@ void CPlotPageData::setTag(const string &tag)
   m_tag = tag;
 }
 
-void CPlotPageData::addPlotDataSet(const CPlotDataSet *dataSet)
+void CPlotPageData::addPlotDataSet(CPlotDataSet dataSet)
 {
-  // page takes ownership responsibility, which means it is safe
-  // to wrap it in a reference counting pointer
-
-  m_dataSets.push_back(shared_ptr<const CPlotDataSet>(dataSet));
+  m_dataSets.push_back(std::make_shared<const CPlotDataSet>(std::move(dataSet)));
 }
 
-void CPlotPageData::addPlotImage(const CPlotImage *image)
+void CPlotPageData::addPlotImage(CPlotImage image)
 {
-  // page takes ownership responsibility, which means it is safe
-  // to wrap it in a reference counting pointer
-
-  m_dataImages.push_back(shared_ptr<const CPlotImage>(image));
+  m_dataImages.push_back(std::make_shared<const CPlotImage>(std::move(image)));
 }
-
-
