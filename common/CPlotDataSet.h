@@ -1,7 +1,6 @@
 /*
 Qdoas is a cross-platform application for spectral analysis with the DOAS
 algorithm.  Copyright (C) 2007  S[&]T and BIRA
-
 */
 
 
@@ -18,9 +17,7 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 class CXYPlotData
 {
  public:
-  CXYPlotData(const char *curveName,const double *x, const double *y, int n, enum eCurveStyleType type);
   CXYPlotData(const char *curveName,const double *x, const double *y, int n, enum eCurveStyleType type, int curveNumber);
-  ~CXYPlotData();
 
   enum eCurveStyleType curveType(void) const;
   const std::string& curveName(void) const;
@@ -31,17 +28,16 @@ class CXYPlotData
 
  private:
   std::string m_curveName;
-  double *m_xData, *m_yData;
-  int m_nSamples;
+  std::vector<double> m_xData, m_yData;
   int m_curveNumber;
   enum eCurveStyleType m_curveType;
 };
 
 inline enum eCurveStyleType CXYPlotData::curveType(void) const { return m_curveType; }
 inline const std::string& CXYPlotData::curveName(void) const { return m_curveName; }
-inline const double* CXYPlotData::xRawData(void) const { return m_xData; }
-inline const double* CXYPlotData::yRawData(void) const { return m_yData; }
-inline int CXYPlotData::size(void) const { return m_nSamples; }
+inline const double* CXYPlotData::xRawData(void) const { return m_xData.data(); }
+inline const double* CXYPlotData::yRawData(void) const { return m_yData.data(); }
+inline int CXYPlotData::size(void) const { return m_xData.size(); }
 inline int CXYPlotData::curveNumber(void) const { return m_curveNumber; }
 
 
