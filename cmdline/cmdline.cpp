@@ -225,11 +225,6 @@
 #include <sys/ioctl.h>
 #include <termios.h>
 
-using std::string;
-using std::vector;
-
-namespace fs = std::filesystem;
-
 // kbhit function doesn't exist in Linux libraries (implementation found on the web)
 
 bool kbhit()
@@ -268,7 +263,7 @@ bool kbhit()
 #include "debugutil.h"
 #include "qdoasxml.h"
 #include "convxml.h"
-
+#include "glob_match.hpp"
 
 extern "C" {
 #include "stdfunc.h"
@@ -277,6 +272,10 @@ extern "C" {
 
 #define TRIGGER_DEFAULT_PAUSE  15   // checks the trigger path every 15 sec
 
+using std::string;
+using std::vector;
+
+namespace fs = std::filesystem;
 
 //-------------------------------------------------------------------
 // types
@@ -1222,7 +1221,8 @@ int QdoasBatch::analyse_directory(const string &dir, const string &filter, bool 
   }
 
   for (auto &p : fs::directory_iterator(dir)) {
-    if (fs::is_regular_file(p)) {  // TODO use filter!
+    if (fs::is_regular_file(p) &&
+        (filter.empty() || glob_match(filter, string(p.path().filename())))) {
       int file_result = analyse_file(p.path());
       if (file_result == 0) {
         result = 0;
