@@ -3,11 +3,7 @@ Qdoas is a cross-platform application for spectral analysis with the DOAS
 algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 */
-
-
 #include "CPlotDataSet.h"
-
-#include <cstring>
 
 CXYPlotData::CXYPlotData(const char *curveName,const double *x, const double *y, int n, enum eCurveStyleType curveType,int curveNumber) :
   m_curveName(curveName),
@@ -36,18 +32,10 @@ CPlotDataSet::CPlotDataSet(enum ePlotScaleType scaleType, bool forceAutoScaling,
 
 void CPlotDataSet::addPlotData(const char *curveName,const double *x, const double *y, int n, enum eCurveStyleType curveType)
 {
-  m_dataList.push_back(new CXYPlotData(curveName, x, y, n, curveType, m_dataList.size()));
+  m_dataList.emplace_back(curveName, x, y, n, curveType, m_dataList.size());
 }
 
-void CPlotDataSet::addPlotData(const char *curveName,const double *x, const double *y, int n, enum eCurveStyleType curveType,int curveNumber)
+void CPlotDataSet::addPlotData(const char *curveName,const double *x, const double *y, int n, enum eCurveStyleType curveType, int curveNumber)
 {
-  m_dataList.push_back(new CXYPlotData(curveName, x, y, n, curveType, curveNumber));
-}
-
-
-CPlotDataSet::~CPlotDataSet()
-{
-  for (auto ds : m_dataList) {
-    delete ds;
-  }
+  m_dataList.emplace_back(curveName, x, y, n, curveType, curveNumber);
 }
