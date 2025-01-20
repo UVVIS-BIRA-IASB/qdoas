@@ -86,7 +86,6 @@ class CConfigHandler : public xmlpp::SaxParser
 
 inline void CConfigHandler::setSubErrorMessage(const std::string &msg) { m_subErrorMessage = msg; }
 
-// Get value from a map of xml attributes, or an empty string.  Mimics the behaviour of QXmlAttributes::value().
 inline std::string value(const std::map<Glib::ustring, std::string>& attributes, const Glib::ustring& key) {
   auto i_val = attributes.find(key);
   if (i_val != attributes.end()) {
@@ -95,5 +94,34 @@ inline std::string value(const std::map<Glib::ustring, std::string>& attributes,
     return "";
   }
 };
+
+template<typename T>
+inline T parse_str(const std::string& val);
+
+template<>
+inline double parse_str(const std::string& val) {
+  return stod(val);
+}
+
+template<>
+inline int parse_str(const std::string& val) {
+  return stoi(val);
+}
+
+template<>
+inline unsigned long parse_str(const std::string& val) {
+  return stoul(val);
+}
+
+// Look up an attribute and parse its value as a number. Return a default value if the attribute is missing.
+template<typename T>
+inline T parse_value(const std::map<Glib::ustring, std::string>& attributes, const Glib::ustring& key, T default_value=0) {
+  auto i_val = attributes.find(key);
+  if (i_val != attributes.end()) {
+    return parse_str<T>(i_val->second);
+  } else {
+    return default_value;
+  }
+}
 
 #endif

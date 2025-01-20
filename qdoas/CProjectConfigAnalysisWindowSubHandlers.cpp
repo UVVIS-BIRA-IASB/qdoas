@@ -42,10 +42,10 @@ void CAnalysisWindowSubHandler::start(const map<Glib::ustring, string> &atts)
 
   d->refSpectrumSelection = (value(atts, "refsel") == "auto") ? ANLYS_REF_SELECTION_MODE_AUTOMATIC :  ANLYS_REF_SELECTION_MODE_FILE;
 
-  d->fitMinWavelength = stod(value(atts, "min"));
-  d->fitMaxWavelength = stod(value(atts, "max"));
-  d->resolFwhm=(!value(atts, "resol_fwhm").empty())?stod(value(atts, "resol_fwhm")):0.5;
-  d->lambda0=(!value(atts, "lambda0").empty())?stod(value(atts, "lambda0")):0.5*(d->fitMinWavelength+d->fitMaxWavelength);
+  d->fitMinWavelength = parse_value<double>(atts, "min");
+  d->fitMaxWavelength = parse_value<double>(atts, "max");
+  d->resolFwhm= parse_value<double>(atts, "resol_fwhm", 0.5);
+  d->lambda0= parse_value<double>(atts, "lambda0", 0.5*(d->fitMinWavelength+d->fitMaxWavelength));
 
   // MUST have a valid name
   if (m_item->name().empty()) {
@@ -98,19 +98,19 @@ void CAnalysisWindowSubHandler::start(const Glib::ustring &element, const map<Gl
 
     d->saveResidualsFlag = (value(atts, "saveresiduals") == "true") ? 1 : 0;
 
-    d->refMinLongitude = stod(value(atts, "minlon"));
-    d->refMaxLongitude = stod(value(atts, "maxlon"));
-    d->refMinLatitude = stod(value(atts, "minlat"));
-    d->refMaxLatitude = stod(value(atts, "maxlat"));
-    d->refNs = stoi(value(atts, "refns"));
+    d->refMinLongitude = parse_value<double>(atts, "minlon");
+    d->refMaxLongitude = parse_value<double>(atts, "maxlon");
+    d->refMinLatitude = parse_value<double>(atts, "minlat");
+    d->refMaxLatitude = parse_value<double>(atts, "maxlat");
+    d->refNs = parse_value<int>(atts, "refns");
 
     if (d->refNs<=0)
      d->refNs=1;
     else if (d->refNs>50)
      d->refNs=50;
 
-    d->cloudFractionMin = stod(value(atts, "cloudfmin"));
-    d->cloudFractionMax = stod(value(atts, "cloudfmax"));
+    d->cloudFractionMin = parse_value<double>(atts, "cloudfmin");
+    d->cloudFractionMax = parse_value<double>(atts, "cloudfmax");
 
     d->refMaxdoasSelection = (value(atts, "maxdoasrefmode") == "scan") ? ANLYS_MAXDOAS_REF_SCAN :  ANLYS_MAXDOAS_REF_SZA;
 
@@ -126,13 +126,13 @@ void CAnalysisWindowSubHandler::start(const Glib::ustring &element, const map<Gl
 
     if (d->refMaxdoasSelection==ANLYS_MAXDOAS_REF_SCAN)
      {
-       d->refSzaCenter = stod(value(atts, "maxdoasszacenter"));
-       d->refSzaDelta = stod(value(atts, "maxdoasszadelta"));
+       d->refSzaCenter = parse_value<double>(atts, "maxdoasszacenter");
+       d->refSzaDelta = parse_value<double>(atts, "maxdoasszadelta");
      }
     else
      {
-       d->refSzaCenter = stod(value(atts, "szacenter"));
-       d->refSzaDelta = stod(value(atts, "szadelta"));
+       d->refSzaCenter = parse_value<double>(atts, "szacenter");
+       d->refSzaDelta = parse_value<double>(atts, "szadelta");
      }
   }
   else if (element == "cross_section") {
@@ -241,11 +241,11 @@ void CAnalysisWindowCrossSectionSubHandler::start(const map<Glib::ustring, strin
     d->requireFilter = (value(atts, "filter") == "true") ? 1 : 0;
     d->constrainedCc = (value(atts, "cstrncc") == "true") ? 1 : 0;
     d->requireCcFit = (value(atts, "ccfit") == "true") ? 1 : 0;
-    d->initialCc = stod(value(atts, "icc"));
-    d->deltaCc = stod(value(atts, "dcc"));
-    d->ccIo = stod(value(atts, "ccio"));
-    d->ccMin = stod(value(atts, "ccmin"));
-    d->ccMax = stod(value(atts, "ccmax"));
+    d->initialCc = parse_value<double>(atts, "icc");
+    d->deltaCc = parse_value<double>(atts, "dcc");
+    d->ccIo = parse_value<double>(atts, "ccio");
+    d->ccMin = parse_value<double>(atts, "ccmin");
+    d->ccMax = parse_value<double>(atts, "ccmax");
 
     if (fabs(d->deltaCc)<(double)EPSILON)
      d->deltaCc=(double)1.e-3;
@@ -317,8 +317,8 @@ void CAnalysisWindowNonLinearSubHandler::start(const map<Glib::ustring, string> 
   string str;
 
   m_d->solFlagFit = (value(atts, "solfit") == "true") ? 1 : 0;
-  m_d->solInitial = stod(value(atts, "solinit"));
-  m_d->solDelta = stod(value(atts, "soldelt"));
+  m_d->solInitial = parse_value<double>(atts, "solinit");
+  m_d->solDelta = parse_value<double>(atts, "soldelt");
   m_d->solFlagFitStore = (value(atts, "solfstr") == "true") ? 1 : 0;
   m_d->solFlagErrStore = (value(atts, "solestr") == "true") ? 1 : 0;
 
@@ -326,8 +326,8 @@ void CAnalysisWindowNonLinearSubHandler::start(const map<Glib::ustring, string> 
    m_d->solDelta=(double)1.e-3;
 
   m_d->off0FlagFit = (value(atts, "o0fit") == "true") ? 1 : 0;
-  m_d->off0Initial = stod(value(atts, "o0init"));
-  m_d->off0Delta = stod(value(atts, "o0delt"));
+  m_d->off0Initial = parse_value<double>(atts, "o0init");
+  m_d->off0Delta = parse_value<double>(atts, "o0delt");
   m_d->off0FlagFitStore = (value(atts, "o0fstr") == "true") ? 1 : 0;
   m_d->off0FlagErrStore = (value(atts, "o0estr") == "true") ? 1 : 0;
 
@@ -335,8 +335,8 @@ void CAnalysisWindowNonLinearSubHandler::start(const map<Glib::ustring, string> 
    m_d->off0Delta=(double)1.e-3;
 
   m_d->off1FlagFit = (value(atts, "o1fit") == "true") ? 1 : 0;
-  m_d->off1Initial = stod(value(atts, "o1init"));
-  m_d->off1Delta = stod(value(atts, "o1delt"));
+  m_d->off1Initial = parse_value<double>(atts, "o1init");
+  m_d->off1Delta = parse_value<double>(atts, "o1delt");
   m_d->off1FlagFitStore = (value(atts, "o1fstr") == "true") ? 1 : 0;
   m_d->off1FlagErrStore = (value(atts, "o1estr") == "true") ? 1 : 0;
 
@@ -344,8 +344,8 @@ void CAnalysisWindowNonLinearSubHandler::start(const map<Glib::ustring, string> 
    m_d->off1Delta=(double)1.e-3;
 
   m_d->off2FlagFit = (value(atts, "o2fit") == "true") ? 1 : 0;
-  m_d->off2Initial = stod(value(atts, "o2init"));
-  m_d->off2Delta = stod(value(atts, "o2delt"));
+  m_d->off2Initial = parse_value<double>(atts, "o2init");
+  m_d->off2Delta = parse_value<double>(atts, "o2delt");
   m_d->off2FlagFitStore = (value(atts, "o2fstr") == "true") ? 1 : 0;
   m_d->off2FlagErrStore = (value(atts, "o2estr") == "true") ? 1 : 0;
 
@@ -353,8 +353,8 @@ void CAnalysisWindowNonLinearSubHandler::start(const map<Glib::ustring, string> 
    m_d->off2Delta=(double)1.e-3;
 
   m_d->comFlagFit = (value(atts, "comfit") == "true") ? 1 : 0;
-  m_d->comInitial = stod(value(atts, "cominit"));
-  m_d->comDelta = stod(value(atts, "comdelt"));
+  m_d->comInitial = parse_value<double>(atts, "cominit");
+  m_d->comDelta = parse_value<double>(atts, "comdelt");
   m_d->comFlagFitStore = (value(atts, "comfstr") == "true") ? 1 : 0;
   m_d->comFlagErrStore = (value(atts, "comestr") == "true") ? 1 : 0;
 
@@ -362,8 +362,8 @@ void CAnalysisWindowNonLinearSubHandler::start(const map<Glib::ustring, string> 
    m_d->comDelta=(double)1.e-3;
 
   m_d->usamp1FlagFit = (value(atts, "u1fit") == "true") ? 1 : 0;
-  m_d->usamp1Initial = stod(value(atts, "u1init"));
-  m_d->usamp1Delta = stod(value(atts, "u1delt"));
+  m_d->usamp1Initial = parse_value<double>(atts, "u1init");
+  m_d->usamp1Delta = parse_value<double>(atts, "u1delt");
   m_d->usamp1FlagFitStore = (value(atts, "u1str") == "true") ? 1 : 0;
   m_d->usamp1FlagErrStore = (value(atts, "u1estr") == "true") ? 1 : 0;
 
@@ -371,8 +371,8 @@ void CAnalysisWindowNonLinearSubHandler::start(const map<Glib::ustring, string> 
    m_d->usamp1Delta=(double)1.e-3;
 
   m_d->usamp2FlagFit = (value(atts, "u2fit") == "true") ? 1 : 0;
-  m_d->usamp2Initial = stod(value(atts, "u2init"));
-  m_d->usamp2Delta = stod(value(atts, "u2delt"));
+  m_d->usamp2Initial = parse_value<double>(atts, "u2init");
+  m_d->usamp2Delta = parse_value<double>(atts, "u2delt");
   m_d->usamp2FlagFitStore = (value(atts, "u2str") == "true") ? 1 : 0;
   m_d->usamp2FlagErrStore = (value(atts, "u2estr") == "true") ? 1 : 0;
 
@@ -380,8 +380,8 @@ void CAnalysisWindowNonLinearSubHandler::start(const map<Glib::ustring, string> 
    m_d->usamp2Delta=(double)1.e-3;
 
   m_d->resolFlagFit = (value(atts, "resolfit") == "true") ? 1 : 0;
-  m_d->resolInitial = stod(value(atts, "resolinit"));
-  m_d->resolDelta = stod(value(atts, "resoldelt"));
+  m_d->resolInitial = parse_value<double>(atts, "resolinit");
+  m_d->resolDelta = parse_value<double>(atts, "resoldelt");
   m_d->resolFlagFitStore = (value(atts, "resolstr") == "true") ? 1 : 0;
   m_d->resolFlagErrStore = (value(atts, "resolestr") == "true") ? 1 : 0;
 
@@ -448,16 +448,16 @@ void CAnalysisWindowShiftStretchSubHandler::start(const map<Glib::ustring, strin
     d->stStore = (value(atts, "ststr") == "true") ? 1 : 0;
     d->errStore = (value(atts, "errstr") == "true") ? 1 : 0;
 
-    d->shInit = stod(value(atts, "shini"));
-    d->stInit = stod(value(atts, "stini"));
-    d->stInit2 = stod(value(atts, "stini2"));
+    d->shInit = parse_value<double>(atts, "shini");
+    d->stInit = parse_value<double>(atts, "stini");
+    d->stInit2 = parse_value<double>(atts, "stini2");
 
-    if (fabs((double)(d->shDelta = stod(value(atts, "shdel"))  ))<EPSILON) d->shDelta  =(double)1.e-3;
-    if (fabs((double)(d->stDelta = stod(value(atts, "stdel"))  ))<EPSILON) d->stDelta  =(double)1.e-3;
-    if (fabs((double)(d->stDelta2 = stod(value(atts, "stdel2"))))<EPSILON) d->stDelta2 =(double)1.e-3;
+    if (fabs((double)(d->shDelta = parse_value<double>(atts, "shdel")  ))<EPSILON) d->shDelta  =(double)1.e-3;
+    if (fabs((double)(d->stDelta = parse_value<double>(atts, "stdel")  ))<EPSILON) d->stDelta  =(double)1.e-3;
+    if (fabs((double)(d->stDelta2 = parse_value<double>(atts, "stdel2")))<EPSILON) d->stDelta2 =(double)1.e-3;
 
-    d->shMin = stod(value(atts, "shmin"));
-    d->shMax = stod(value(atts, "shmax"));
+    d->shMin = parse_value<double>(atts, "shmin");
+    d->shMax = parse_value<double>(atts, "shmax");
 
     return;
   }
@@ -502,8 +502,8 @@ CAnalysisWindowGapSubHandler::CAnalysisWindowGapSubHandler(CConfigHandler *maste
 void CAnalysisWindowGapSubHandler::start(const map<Glib::ustring, string> &atts)
 {
   if (m_d->nGap < MAX_AW_GAP) {
-    m_d->gap[m_d->nGap].minimum = stod(value(atts, "min"));
-    m_d->gap[m_d->nGap].maximum = stod(value(atts, "max"));
+    m_d->gap[m_d->nGap].minimum = parse_value<double>(atts, "min");
+    m_d->gap[m_d->nGap].maximum = parse_value<double>(atts, "max");
     if (m_d->gap[m_d->nGap].minimum < m_d->gap[m_d->nGap].maximum) {
       ++(m_d->nGap);
       return;
@@ -538,13 +538,13 @@ void CAnalysisWindowOutputSubHandler::start(const map<Glib::ustring, string> &at
       throw std::runtime_error("missing symbol (or name too long)");
 
     d->amf = (value(atts, "amf") == "true") ? 1 : 0;
-    d->resCol = stod(value(atts, "rescol"));
+    d->resCol = parse_value<double>(atts, "rescol");
     d->slantCol = (value(atts, "scol") == "true") ? 1 : 0;
     d->slantErr = (value(atts, "serr") == "true") ? 1 : 0;
-    d->slantFactor = stod(value(atts, "sfact"));
+    d->slantFactor = parse_value<double>(atts, "sfact");
     d->vertCol = (value(atts, "vcol") == "true") ? 1 : 0;
     d->vertErr = (value(atts, "verr") == "true") ? 1 : 0;
-    d->vertFactor = stod(value(atts, "vfact"));
+    d->vertFactor = parse_value<double>(atts, "vfact");
 
     // All OK
     ++(m_d->nOutput);
@@ -566,14 +566,14 @@ CAnalysisWindowSfpSubHandler::CAnalysisWindowSfpSubHandler(CConfigHandler *maste
 
 void CAnalysisWindowSfpSubHandler::start(const map<Glib::ustring, string> &atts)
 {
-  int index = stoi(value(atts, "index"));
+  int index = parse_value<int>(atts, "index");
 
   if (index > 0 && index <= 4) {
     struct calibration_sfp *p = (m_d + index - 1);
 
     p->fitFlag = (value(atts, "fit") == "true") ? 1 : 0;
-    p->initialValue = stod(value(atts, "init"));
-    p->deltaValue = stod(value(atts, "delta"));
+    p->initialValue = parse_value<double>(atts, "init");
+    p->deltaValue = parse_value<double>(atts, "delta");
     p->fitStore = (value(atts, "fstr") == "true") ? 1 : 0;
     p->errStore = (value(atts, "estr") == "true") ? 1 : 0;
 
