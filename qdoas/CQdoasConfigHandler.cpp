@@ -95,11 +95,11 @@ void CSiteSubHandler::start(const Glib::ustring& element, const map<Glib::ustrin
     if (!str.empty())
       item.setAbbreviation(str);
 
-    item.setLongitude(stod(value(atts, "long")));
+    item.setLongitude(parse_value<double>(atts, "long"));
 
-    item.setLatitude(stod(value(atts, "lat")));
+    item.setLatitude(parse_value<double>(atts, "lat"));
 
-    item.setAltitude(stod(value(atts, "alt")));
+    item.setAltitude(parse_value<double>(atts, "alt"));
 
     master()->addSiteItem(item);
 
