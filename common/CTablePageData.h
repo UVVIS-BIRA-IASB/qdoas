@@ -12,6 +12,7 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #include <variant>
 
 using cell_data = std::variant<void *, int, double, std::string>;
+using SCellIndex = std::pair<int, int>;
 
 struct SCell
 {
@@ -19,14 +20,6 @@ struct SCell
   cell_data data;
 
   SCell(int p, int r, int c, const cell_data &d) : page(p), row(r), col(c), data(d) {}
-};
-
-struct SCellIndex
-{
-  int r, c;
-
-  SCellIndex(int row, int col) : r(row), c(col) {}
-  bool operator<(const SCellIndex &rhs) const { return (r<rhs.r || (r==rhs.r && c<rhs.c)); }
 };
 
 class CTablePageData
