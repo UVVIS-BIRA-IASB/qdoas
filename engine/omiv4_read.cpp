@@ -47,7 +47,7 @@ using array2d = boost::const_multi_array_ref<T, 2>;
 
 namespace {
   // Due to compression settings of OMI Collection 4 L1B, we need a large NetCDF/HDF5 cache to get acceptable performance.
-  const size_t nc_cache_size = 85 * 1024 * 1024;
+  const size_t nc_cache_size = 150 * 1024 * 1024;
 
   const map<int, const string> band_names = {
     {PRJCT_INSTR_OMI_TYPE_UV1, "BAND1"},
