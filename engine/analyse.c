@@ -3850,7 +3850,7 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
 
     if (THRD_id==THREAD_TYPE_ANALYSIS) {
       // Browse analysis windows
-      for (int WrkFeno=0;(WrkFeno<NFeno) && (rc!=THREAD_EVENT_STOP);WrkFeno++) {
+      for (int WrkFeno=0; (WrkFeno != NFeno) && (rc<THREAD_EVENT_STOP); ++WrkFeno) {
        indexPage=WrkFeno+plotPageAnalysis;
         Feno=&TabFeno[indexFenoColumn][WrkFeno];
         if (((pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_GOME1_NETCDF) ||
@@ -4000,27 +4000,25 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
             memset(Feno->omiRejPixelsQF,0,sizeof(int)*Feno->NDET);
             int start = spectrum_start(old_range);
             int end = spectrum_end(old_range);
-            for (int j= start; j<= end; j++)
-             if ( ((pixelQF[j]&pInstrumental->omi.pixelQFMask)!=0) &&
-                  (spectrum_num_windows(Feno->fit_properties.specrange)<=pInstrumental->omi.pixelQFMaxGaps))
-              {
-               spectrum_remove_pixel(Feno->fit_properties.specrange,j);
-               Feno->omiRejPixelsQF[j]=1;
-             }
+            for (int j= start; j<= end; j++) {
+              if ( ((pixelQF[j]&pInstrumental->omi.pixelQFMask)!=0) &&
+                   (spectrum_num_windows(Feno->fit_properties.specrange)<=pInstrumental->omi.pixelQFMaxGaps)) {
+                spectrum_remove_pixel(Feno->fit_properties.specrange,j);
+                Feno->omiRejPixelsQF[j]=1;
+              }
+            }
 
             if ((spectrum_num_windows(Feno->fit_properties.specrange) > pInstrumental->omi.pixelQFMaxGaps) ||
-                ((rc=reinit_analysis(Feno, n_wavel))!=ERROR_ID_NO))
-             {
+                ((rc=reinit_analysis(Feno, n_wavel))!=ERROR_ID_NO)) {
               spectrum_destroy(Feno->fit_properties.specrange);
               Feno->fit_properties.specrange = old_range;
 
               rc=ERROR_SetLast(__func__,ERROR_TYPE_WARNING,ERROR_ID_OMI_PIXELQF);
               goto EndAnalysis;
-             }
-           } else if ((rc=ANALYSE_SvdInit(Feno,&Feno->fit_properties, n_wavel, Feno->LambdaK))!=ERROR_ID_NO)
-           {
-            goto EndAnalysis;
-           }
+            }
+          } else if ((rc=ANALYSE_SvdInit(Feno,&Feno->fit_properties, n_wavel, Feno->LambdaK))!=ERROR_ID_NO) {
+            goto restore_specrange;
+          }
 
           // Global variables initializations
 
@@ -4062,7 +4060,7 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
 
             free(spectre_plot);
             if (rc)
-             goto EndAnalysis;
+             goto restore_specrange;
            }
 
           // Analysis method
@@ -4085,7 +4083,7 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
           int num_repeats_ring = 0;
 
           if (Feno->molecularCorrection && ((rc=Analyse_Molecular_Ring_Init(Feno,Feno->LambdaK,n_wavel))>THREAD_EVENT_STOP))
-            goto EndAnalysis;
+            goto restore_specrange;
 
           do {
             if ((num_repeats_ring && ((rc=Analyse_Molecular_Ring_Calculate(Feno,Feno->LambdaK,n_wavel,molecularRing_a))!=ERROR_ID_NO)) ||
@@ -4124,7 +4122,7 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
            Analyse_Molecular_Ring_End(Feno,n_wavel);
 
           if (rc == THREAD_EVENT_STOP || ERROR_Fatal())
-           goto EndAnalysis;
+           goto restore_specrange;
           else if (rc>THREAD_EVENT_STOP)
            Feno->rc=rc;
 
@@ -4156,7 +4154,7 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
            rc=AnalyseSaveResiduals(Feno->residualsFile,pEngineContext,n_wavel);
 
           if (rc!=ERROR_ID_NO)  
-           goto EndAnalysis;
+           goto restore_specrange;
 
           if  (Feno->displayResidue && (Feno->analysisMethod!=OPTICAL_DENSITY_FIT))
            {
@@ -4339,7 +4337,7 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
            }  // if (displayFlag && saveFlag)
 
           // Recover spectral window limits and gaps which were possibly modified after spike removal
-
+        restore_specrange:
           if (!spectrum_isequal(old_range,Feno->fit_properties.specrange)) {
             //AnalyseCopyFenetre(Feno->fit_properties.Fenetre,&Feno->fit_properties.Z,oldFenetre,oldZ);
             spectrum_destroy(Feno->fit_properties.specrange);
