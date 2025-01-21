@@ -32,7 +32,7 @@ int CPlotPageData::pageNumber(void) const
 
 int CPlotPageData::size(void) const
 {
-  return (m_pageType==PLOTPAGE_DATASET)?m_dataSets.size():m_dataImages.size();
+  return (m_pageType==PLOTPAGE_DATASET)?m_dataSets.size():m_images.size();
 }
 
 const string& CPlotPageData::title(void) const
@@ -50,38 +50,32 @@ int CPlotPageData::type(void) const
   return m_pageType;
 }
 
-shared_ptr<const CPlotDataSet> CPlotPageData::dataSet(int index) const
+const CPlotDataSet& CPlotPageData::dataSet(int index) const
 {
-  if (index < 0 || index > m_dataSets.size())
-    return shared_ptr<const CPlotDataSet>();
-
   return m_dataSets.at(index);
 }
 
-shared_ptr<const CPlotImage> CPlotPageData::dataImage(int index) const
+const CPlotImage& CPlotPageData::image(int index) const
 {
-  if (index < 0 || index > m_dataImages.size())
-    return shared_ptr<const CPlotImage>();
-
-  return m_dataImages.at(index);
+  return m_images.at(index);
 }
 
-void CPlotPageData::setTitle(const string &title)
+void CPlotPageData::setTitle(string title)
 {
   m_title = title;
 }
 
-void CPlotPageData::setTag(const string &tag)
+void CPlotPageData::setTag(string tag)
 {
   m_tag = tag;
 }
 
 void CPlotPageData::addPlotDataSet(CPlotDataSet dataSet)
 {
-  m_dataSets.push_back(std::make_shared<const CPlotDataSet>(std::move(dataSet)));
+  m_dataSets.push_back(std::move(dataSet));
 }
 
 void CPlotPageData::addPlotImage(CPlotImage image)
 {
-  m_dataImages.push_back(std::make_shared<const CPlotImage>(std::move(image)));
+  m_images.push_back(std::move(image));
 }

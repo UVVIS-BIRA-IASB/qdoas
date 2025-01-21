@@ -92,11 +92,11 @@ bool CWPlot::getImageSaveNameAndFormat(QWidget *parent, QString &fileName, QStri
   return false;
 }
 
-CWPlot::CWPlot(std::shared_ptr<const CPlotDataSet> dataSet,
+CWPlot::CWPlot(const CPlotDataSet& dataSet,
            CPlotProperties &plotProperties, QWidget *parent) :
   QwtPlot(parent),
-  m_dataSet(dataSet),
-//  m_dataImage(""),
+  m_dataSet(&dataSet),
+  m_image(nullptr),
   m_plotProperties(plotProperties),
   m_zoomer(NULL),
   m_type(PLOTPAGE_DATASET)
@@ -116,10 +116,10 @@ CWPlot::CWPlot(std::shared_ptr<const CPlotDataSet> dataSet,
 
   //setTitle(m_dataSet->plotTitle());
   //setAxisTitle(QwtPlot::xBottom, m_dataSet->xAxisLabel());
-
+  
   setAxisTitle(QwtPlot::yLeft, QString::fromStdString(m_dataSet->yAxisLabel()));
 
-    // curves ...
+  // curves ...
 
   int n = m_dataSet->count();
   int i = 0;
@@ -186,8 +186,8 @@ CWPlot::CWPlot(std::shared_ptr<const CPlotDataSet> dataSet,
 
     if (m_plotProperties.scaleControl(m_dataSet->scaleType()).isFixedScale()) {
       setAxisScale(QwtPlot::yLeft,
-           m_plotProperties.scaleControl(m_dataSet->scaleType()).minimum(),
-           m_plotProperties.scaleControl(m_dataSet->scaleType()).maximum());
+                   m_plotProperties.scaleControl(m_dataSet->scaleType()).minimum(),
+                   m_plotProperties.scaleControl(m_dataSet->scaleType()).maximum());
 
     }
   }
@@ -197,15 +197,16 @@ CWPlot::CWPlot(std::shared_ptr<const CPlotDataSet> dataSet,
   replot();
 }
 
-CWPlot::CWPlot(std::shared_ptr<const CPlotImage> dataImage,
+CWPlot::CWPlot(const CPlotImage& image,
            CPlotProperties &plotProperties, QWidget *parent) :
   QwtPlot(parent),
-  m_dataImage(dataImage),
+  m_dataSet(nullptr),
+  m_image(&image),
   m_plotProperties(plotProperties),
   m_zoomer(NULL),
   m_type(PLOTPAGE_IMAGE)
  {
-  QString filename(QString::fromStdString(m_dataImage->getFile()));
+  QString filename(QString::fromStdString(m_image->getFile()));
   QwtText tmpTitle=title();
   const QByteArray fname=filename.toLocal8Bit();
   const char *ptr=strrchr(fname.constData(),'/')+1;
@@ -492,7 +493,7 @@ CWPlotPage::CWPlotPage(CPlotProperties &plotProperties, QWidget *parent) :
 }
 
 CWPlotPage::CWPlotPage(CPlotProperties &plotProperties,
-               std::shared_ptr<const CPlotPageData> page, QWidget *parent) :
+                       std::shared_ptr<const CPlotPageData> page, QWidget *parent) :
   QFrame(parent),
   m_plotProperties(plotProperties),
   m_pageType(page->type())
@@ -512,7 +513,7 @@ CWPlotPage::CWPlotPage(CPlotProperties &plotProperties,
       int i = 0;
 
       while (i < nplots) {
-        CWPlot *tmp = new CWPlot(page->dataImage(i), m_plotProperties, this);
+        CWPlot *tmp = new CWPlot(page->image(i), m_plotProperties, this);
         tmp->hide();
         m_plots.push_back(tmp);
         ++i;
@@ -625,7 +626,6 @@ void CWPlotPage::slotPrintAllPlots()
     QRect tmp(cPageBorder, cPageBorder, page.width() - 2 * cPageBorder, page.height() - 2 * cPageBorder);
 
     p.drawRect(tmp);
-
 
     // work out the layout ... and size ...
 

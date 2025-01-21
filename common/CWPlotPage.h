@@ -38,8 +38,8 @@ class CWPlot : public QwtPlot
 {
 Q_OBJECT
  public:
-  CWPlot(std::shared_ptr<const CPlotDataSet> dataSet, CPlotProperties &plotProperties, QWidget *parent = 0);
-  CWPlot(std::shared_ptr<const CPlotImage> dataImage, CPlotProperties &plotProperties, QWidget *parent = 0);
+  CWPlot(const CPlotDataSet& dataSet, CPlotProperties &plotProperties, QWidget *parent = 0);
+  CWPlot(const CPlotImage& image, CPlotProperties &plotProperties, QWidget *parent = 0);
   virtual ~CWPlot() {};
 
   static bool getImageSaveNameAndFormat(QWidget *parent, QString &fileName, QString &saveFormat);
@@ -56,8 +56,8 @@ Q_OBJECT
   void slotToggleInteraction();
 
  private:
-  std::shared_ptr<const CPlotDataSet> m_dataSet;
-  std::shared_ptr<const CPlotImage> m_dataImage;
+  const CPlotDataSet *m_dataSet;
+  const CPlotImage *m_image;
   CPlotProperties &m_plotProperties;
   QwtPlotZoomer *m_zoomer;
   int m_type;
