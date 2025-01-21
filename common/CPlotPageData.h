@@ -31,22 +31,22 @@ class CPlotPageData
   const std::string& title(void) const;
   const std::string& tag(void) const;
   int type(void) const;
-  std::shared_ptr<const CPlotDataSet> dataSet(int index) const;
-  std::shared_ptr<const CPlotImage> dataImage(int index) const;
+  const CPlotDataSet& dataSet(int index) const;
+  const CPlotImage& image(int index) const;
 
-  void setTitle(const std::string &title);
-  void setTag(const std::string &tag);
+  void setTitle(std::string title);
+  void setTag(std::string tag);
   void addPlotDataSet(CPlotDataSet dataSet);
-  void addPlotImage(CPlotImage dataImage);
+  void addPlotImage(CPlotImage image);
 
  private:
   int m_pageNumber;
   int m_pageType;
   std::string m_title, m_tag;
-  std::vector<std::shared_ptr<const CPlotDataSet> > m_dataSets;
-  std::vector<std::shared_ptr<const CPlotImage> > m_dataImages;
+  std::vector<CPlotDataSet> m_dataSets;
+  std::vector<CPlotImage> m_images;
 };
 
-inline bool CPlotPageData::isEmpty(void) const { return (m_pageType==PLOTPAGE_DATASET)?m_dataSets.empty():m_dataImages.empty(); }
+inline bool CPlotPageData::isEmpty(void) const { return (m_pageType==PLOTPAGE_DATASET)?m_dataSets.empty():m_images.empty(); }
 
 #endif
