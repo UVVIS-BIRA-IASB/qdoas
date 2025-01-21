@@ -1013,7 +1013,7 @@ int analyseProjectQdoasPrepare(void **engineContext, const CProjectConfigItem *p
 {
   CWorkSpace *ws = CWorkSpace::instance();
   int n;
-  const mediate_site_t *siteList = ws->siteList(n);
+  std::unique_ptr<const mediate_site_t[]>siteList(ws->siteList(n));
   int retCode = 0;
   CEngineResponseVisual *msgResp = new CEngineResponseVisual;
 
@@ -1047,7 +1047,7 @@ int analyseProjectQdoasPrepare(void **engineContext, const CProjectConfigItem *p
 
   // set project
   if (!retCode &&
-     ((mediateRequestSetSites(*engineContext,n,siteList,msgResp)!=0) ||
+      ((mediateRequestSetSites(*engineContext,n,siteList.get(),msgResp)!=0) ||
       (mediateRequestSetProject(*engineContext, &projectData, (!calibSwitch)?THREAD_TYPE_ANALYSIS:THREAD_TYPE_KURUCZ, msgResp)!= 0))) {
     msgResp->process(controller);
     delete msgResp;
