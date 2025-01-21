@@ -374,6 +374,9 @@ RC EngineSetProject(ENGINE_CONTEXT *pEngineContext)
        max_ndet = NDET[i];
    }
 
+   ANALYSE_plFilter=&pEngineContext->project.lfilter;
+   ANALYSE_phFilter=&pEngineContext->project.hfilter;
+
    ANALYSE_plotKurucz=ANALYSE_plotRef=0;
    ANALYSE_indexLine=1;
    pBuffers=&pEngineContext->buffers;
