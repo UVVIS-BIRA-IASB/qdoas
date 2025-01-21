@@ -773,27 +773,28 @@ enum RunMode parseCommandLine(int argc, char **argv, commands_t *cmd)
 
 int batchProcess(commands_t *cmd)
 {
+  try {
   // determine the tool to use based on the config file ...
+    enum BatchTool batchTool = requiredBatchTool(cmd->configFile);
 
-  enum BatchTool batchTool = requiredBatchTool(cmd->configFile);
-
-  switch (batchTool) {
-  case Qdoas:
-    return batchProcessQdoas(cmd);
-    break;
-  case Convolution:
-    return batchProcessConvolution(cmd);
-    break;
-  case Ring:
-    return batchProcessRing(cmd);
-    break;
-  case Usamp:
-    return batchProcessUsamp(cmd);
-    break;
-  default:
-    std::cerr << "Failed to open or determine configuration file type." << std::endl;
+    switch (batchTool) {
+    case Qdoas:
+      return batchProcessQdoas(cmd);
+      break;
+    case Convolution:
+      return batchProcessConvolution(cmd);
+      break;
+    case Ring:
+      return batchProcessRing(cmd);
+      break;
+    case Usamp:
+      return batchProcessUsamp(cmd);
+      break;
+    }
+  } catch (std::exception& e) {
+    std::cerr << "Failed to parse configuration file \""
+              << cmd->configFile  << "\"" << std::endl;
   }
-
   return 1;
 }
 
@@ -1113,8 +1114,8 @@ int QdoasBatch::analyse_project(const vector<string> &filenames)  {
       auto path = fs::path(*it);
       retCode = analyse_directory(path.parent_path(), path.filename(), 1);
       if (files_processed == 0) {
-        std::cerr << "ERROR: No files matching pattern '" << path.filename()
-                  << "' in directory '" << path.parent_path() << "' or subdirectories." << std::endl;
+        std::cerr << "ERROR: No files matching pattern " << path.filename()
+                  << " in directory " << path.parent_path() << " or subdirectories." << std::endl;
         return -1;
       }
     }
@@ -1208,7 +1209,12 @@ int QdoasBatch::analyse_directory(const string &dir, const string &filter, bool 
   // error if no files were processed successfully.
   int result = -1;
 
-  // first consder sub directories ...
+  if(!fs::exists(dir)) {
+    std::cerr << "ERROR: directory \"" << dir << "\" does not exist." << std::endl;
+    return -1;
+  }
+
+  // first consider sub directories ...
   if (recursive) {
     for (auto& p : fs::directory_iterator(dir)) {
       if (fs::is_directory(p)) {
