@@ -728,6 +728,9 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
   case PRJCT_INSTR_MAXDOAS_TYPE_ALMUCANTAR:
     fprintf(fp, "\"almucantar\"");
     break;
+  case PRJCT_INSTR_MAXDOAS_TYPE_ZENITH:
+    fprintf(fp, "\"zenith-only\"");
+    break;    
   default:
     fprintf(fp, "\"invalid\"");
   }

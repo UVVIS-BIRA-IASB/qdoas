@@ -1108,6 +1108,8 @@ bool CProjectInstrumentalSubHandler::start(const QString &element, const QXmlAtt
         m_instrumental->ccdeev.spectralType = PRJCT_INSTR_MAXDOAS_TYPE_DIRECTSUN;
       else if (str == "almucantar")
         m_instrumental->ccdeev.spectralType = PRJCT_INSTR_MAXDOAS_TYPE_ALMUCANTAR;
+      else if (str == "zenith-only")
+        m_instrumental->ccdeev.spectralType = PRJCT_INSTR_MAXDOAS_TYPE_ZENITH;      
       else
         return postErrorMessage("Invalid ccdeev Type");
      }
