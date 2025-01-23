@@ -977,15 +977,10 @@ static int show_ref_info(int i_row, const FENO *pTabFeno, const struct reference
     mediateResponseCellDataDouble(plotPageRef, i_row, 3 + i_column,refs[i].stretch, responseHandle);
     ++i_row;
     const char* labelfmt = "Reference %s";
-    char *plot_label = malloc(strlen(labelfmt) +strlen(pixeltype[i]));
+    char *plot_label = malloc(sizeof(labelfmt) +strlen(pixeltype[i]));
     sprintf(plot_label, labelfmt, pixeltype[i]);
-    plot_data_t spectrum_data;
-    spectrum_data.x = pTabFeno->LambdaRef;
-    spectrum_data.y = refs[i].spectrum;
-    spectrum_data.length = refs[i].n_wavel;
-    spectrum_data.curveName[0] = '\0';
-
-    mediateResponsePlotData(plotPageRef,&spectrum_data,1,Spectrum,forceAutoScale,plot_label,"Wavelength (nm)","Intensity", responseHandle);
+    MEDIATE_PLOT_CURVES(plotPageRef,Spectrum,forceAutoScale,plot_label,"Wavelength (nm)","Intensity", responseHandle,
+                        CURVE(.x=pTabFeno->LambdaRef, .y=refs[i].spectrum, .length=refs[i].n_wavel));
     free(plot_label);
   }
   return ++i_row;

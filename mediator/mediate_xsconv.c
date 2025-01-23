@@ -529,19 +529,15 @@ RC mediateConvolutionCalculate(void *engineContext,void *responseHandle)
 
         if (!rc && dispConv)
          {
-          plot_data_t spectrumData[2];
-
           if (pEngineContext->n_groundpixel_slit==1)
            sprintf(windowTitle,(pEngineContext->convolutionType!=CONVOLUTION_TYPE_NONE)?"Spectrum after convolution":"Spectrum after interpolation");
           else
            sprintf(windowTitle,(pEngineContext->convolutionType!=CONVOLUTION_TYPE_NONE)?"Spectrum after convolution (%d)":"Spectrum after interpolation (%d)",islit);
 
-          mediateAllocateAndSetPlotData(&spectrumData[0],"High resolution spectrum",XSCONV_xshr.matrix[0],XSCONV_xshr.matrix[1],XSCONV_xshr.nl,Line);
-          mediateAllocateAndSetPlotData(&spectrumData[1],windowTitle,XSCONV_xsnew.matrix[0]+nFilter,XSCONV_xsnew.matrix[1]+nFilter,XSCONV_xsnew.nl-2*nFilter,Line);
-          mediateResponsePlotData(0,spectrumData,2,Spectrum,forceAutoScale,windowTitle,"Wavelength (nm)","",responseHandle);
+          MEDIATE_PLOT_CURVES(0,Spectrum,forceAutoScale,windowTitle,"Wavelength (nm)","",responseHandle,
+                              CURVE(.name="High resolution spectrum", .x=XSCONV_xshr.matrix[0], .y=XSCONV_xshr.matrix[1], .length=XSCONV_xshr.nl),
+                              CURVE(.name=windowTitle, .x=XSCONV_xsnew.matrix[0]+nFilter,.y=XSCONV_xsnew.matrix[1]+nFilter,.length=XSCONV_xsnew.nl-2*nFilter));
           mediateResponseLabelPage(0,pageTitle,"",responseHandle);
-          mediateReleasePlotData(&spectrumData[1]);
-          mediateReleasePlotData(&spectrumData[0]);
          }
 
         if (pEngineContext->filterVector!=NULL)
@@ -555,19 +551,15 @@ RC mediateConvolutionCalculate(void *engineContext,void *responseHandle)
           (((lowFilterType==PRJCT_FILTER_TYPE_ODDEVEN) && !(rc=FILTER_OddEvenCorrection(XSCONV_xsnew.matrix[0],XSCONV_xsnew.matrix[1],pEngineContext->filterVector,XSCONV_xsnew.nl))) ||
            ((lowFilterType!=PRJCT_FILTER_TYPE_ODDEVEN) && !(rc=FILTER_Vector(plFilter,pEngineContext->filterVector,pEngineContext->filterVector,NULL,XSCONV_xsnew.nl,PRJCT_FILTER_OUTPUT_LOW)))) && dispConv)
          {
-          plot_data_t spectrumData[2];
-
           if (pEngineContext->n_groundpixel_slit==1) 
            sprintf(windowTitle,"Spectrum after low-pass filtering");
           else
            sprintf(windowTitle,"Spectrum after low-pass filtering (%d)",islit);
 
-          mediateAllocateAndSetPlotData(&spectrumData[0],"Convoluted spectrum before low pass filtering",XSCONV_xsnew.matrix[0]+nFilter,XSCONV_xsnew.matrix[1]+nFilter,XSCONV_xsnew.nl-2*nFilter,Line);
-          mediateAllocateAndSetPlotData(&spectrumData[1],"Convoluted spectrum after low pass filtering",XSCONV_xsnew.matrix[0]+nFilter,pEngineContext->filterVector+nFilter,XSCONV_xsnew.nl-2*nFilter,Line);
-          mediateResponsePlotData(0,spectrumData,2,Spectrum,forceAutoScale,windowTitle,"Wavelength (nm)","",responseHandle);
+          MEDIATE_PLOT_CURVES(0,Spectrum,forceAutoScale,windowTitle,"Wavelength (nm)","",responseHandle,
+                              CURVE(.name="Convolved spectrum before low pass filtering", .x=XSCONV_xsnew.matrix[0]+nFilter, .y=XSCONV_xsnew.matrix[1]+nFilter, .length=XSCONV_xsnew.nl-2*nFilter),
+                              CURVE(.name="Convolved spectrum after low pass filtering", .x=XSCONV_xsnew.matrix[0]+nFilter, .y=pEngineContext->filterVector+nFilter, .length=XSCONV_xsnew.nl-2*nFilter));
           mediateResponseLabelPage(0,pageTitle,"",responseHandle);
-          mediateReleasePlotData(&spectrumData[1]);
-          mediateReleasePlotData(&spectrumData[0]);
          }
 
         // -------------------
@@ -577,29 +569,24 @@ RC mediateConvolutionCalculate(void *engineContext,void *responseHandle)
         if ((highFilterType!=PRJCT_FILTER_TYPE_NONE) && (highFilterType!=PRJCT_FILTER_TYPE_ODDEVEN) && (pEngineContext->filterVector!=NULL) && !rc &&
            !(rc=FILTER_Vector(phFilter,pEngineContext->filterVector,pEngineContext->filterVector,tmpVector,XSCONV_xsnew.nl,phFilter->filterAction)) && dispConv)
          {
-          plot_data_t spectrumData[2];
-
           if (pEngineContext->n_groundpixel_slit==1)
            sprintf(windowTitle,"Spectrum after high-pass filtering");
           else
            sprintf(windowTitle,"Spectrum after high-pass filtering (%d)",islit);
 
-          mediateAllocateAndSetPlotData(&spectrumData[0],windowTitle,XSCONV_xsnew.matrix[0]+nFilter,XSCONV_xsnew.matrix[1]+nFilter,XSCONV_xsnew.nl-2*nFilter,Line);
-          mediateAllocateAndSetPlotData(&spectrumData[1],windowTitle,XSCONV_xsnew.matrix[0]+nFilter,tmpVector+nFilter,XSCONV_xsnew.nl-2*nFilter,Line);
-
-          mediateResponsePlotData(0,spectrumData,2,Spectrum,forceAutoScale,windowTitle,"Wavelength (nm)","",responseHandle);
+          MEDIATE_PLOT_CURVES(0,Spectrum,forceAutoScale,windowTitle,"Wavelength (nm)","",responseHandle,
+                              CURVE(.name=windowTitle, .x=XSCONV_xsnew.matrix[0]+nFilter, .y=XSCONV_xsnew.matrix[1]+nFilter, .length=XSCONV_xsnew.nl-2*nFilter),
+                              CURVE(.name=windowTitle, .x=XSCONV_xsnew.matrix[0]+nFilter, .y=tmpVector+nFilter, .length=XSCONV_xsnew.nl-2*nFilter));
           mediateResponseLabelPage(0,pageTitle,"",responseHandle);
-          mediateReleasePlotData(&spectrumData[0]);
 
           if (pEngineContext->n_groundpixel_slit==1)
            sprintf(windowTitle,"Spectrum after %s",(phFilter->filterAction==PRJCT_FILTER_OUTPUT_HIGH_SUB)?"subtraction":"division");
           else
            sprintf(windowTitle,"Spectrum after %s (%d)",(phFilter->filterAction==PRJCT_FILTER_OUTPUT_HIGH_SUB)?"subtraction":"division",islit);
 
-          mediateAllocateAndSetPlotData(&spectrumData[0],windowTitle,XSCONV_xsnew.matrix[0]+nFilter,pEngineContext->filterVector+nFilter,XSCONV_xsnew.nl-2*nFilter,Line);
-          mediateResponsePlotData(1,spectrumData,1,Spectrum,forceAutoScale,windowTitle,"Wavelength (nm)","",responseHandle);
+          MEDIATE_PLOT_CURVES(1,Spectrum,forceAutoScale,windowTitle,"Wavelength (nm)","",responseHandle,
+                              CURVE(.name=windowTitle, .x=XSCONV_xsnew.matrix[0]+nFilter, .y=pEngineContext->filterVector+nFilter, .length=XSCONV_xsnew.nl-2*nFilter));
           mediateResponseLabelPage(1,pageTitle,"",responseHandle);
-          mediateReleasePlotData(&spectrumData[0]);
          }
        }
 
@@ -992,7 +979,6 @@ RC mediateRingCalculate(void *engineContext,void *responseHandle)
           wveDptFlag,
           slitType;                                                             // type of the slit function
   INDEX   i,islit;                                                            // indexes for loops and arrays
-  plot_data_t spectrumData[1];
   RC      rc;                                                                   // return code
 
   // Debugging
@@ -1169,13 +1155,11 @@ RC mediateRingCalculate(void *engineContext,void *responseHandle)
       
       if (!rc)
        rc=(pEngineContext->formatType==CONVOLUTION_FORMAT_NETCDF)?netcdf_save_ring((void *)pEngineContext):mediateRingSaveAscii((void *)pEngineContext,ramanint,ringVector);
-       
+
       strcpy(pageTitle,"Ring"); 
-       
-      mediateAllocateAndSetPlotData(&spectrumData[0],"Calculated ring cross section",ringLambda,pEngineContext->xsNew.matrix[1],nring,Line);
-      mediateResponsePlotData(0,spectrumData,1,Spectrum,forceAutoScale,"Calculated ring cross section","Wavelength (nm)","",responseHandle);
+      MEDIATE_PLOT_CURVES(0,Spectrum,forceAutoScale,"Calculated ring cross section","Wavelength (nm)","",responseHandle,
+                          CURVE(.name="Calculated ring cross section", .x=ringLambda, .y=pEngineContext->xsNew.matrix[1], .length=nring));
       mediateResponseLabelPage(0,pageTitle,"",responseHandle);
-      mediateReleasePlotData(&spectrumData[0]);
      }
    }
 
@@ -1483,11 +1467,6 @@ RC mediateUsampCalculate(void *engineContext,void *responseHandle)
 
     if (!rc)
      {
-      // Local declarations
-
-      plot_data_t spectrumData[2];
-      char pageTitle[MAX_ITEM_TEXT_LEN];
-
       // Save
 
       if (!(rc=mediateUsampSave(pEngineContext,pEngineContext->path,1,calibrationMatrix.matrix[0],phase1,nSize,responseHandle)))
@@ -1495,14 +1474,10 @@ RC mediateUsampCalculate(void *engineContext,void *responseHandle)
 
       // Plot
 
-      sprintf(pageTitle,"Undersampling");
-
-      mediateAllocateAndSetPlotData(&spectrumData[0],"Phase 1",calibrationMatrix.matrix[0],phase1,nSize,Line);
-      mediateAllocateAndSetPlotData(&spectrumData[1],"Phase 2",calibrationMatrix.matrix[0],phase2,nSize,Line);
-      mediateResponsePlotData(0,spectrumData,2,Spectrum,forceAutoScale,"Calculated undersampling cross sections","Wavelength (nm)","",responseHandle);
-      mediateResponseLabelPage(0,pageTitle,"",responseHandle);
-      mediateReleasePlotData(&spectrumData[1]);
-      mediateReleasePlotData(&spectrumData[0]);
+      MEDIATE_PLOT_CURVES(0,Spectrum,forceAutoScale,"Calculated undersampling cross sections","Wavelength (nm)","",responseHandle,
+                          CURVE(.name="Phase 1", .x=calibrationMatrix.matrix[0], .y=phase1, .length=nSize),
+                          CURVE(.name="Phase 2", .x=calibrationMatrix.matrix[0], .y=phase2, .length=nSize));
+      mediateResponseLabelPage(0, "Undersampling", "", responseHandle);
      }
    }
 

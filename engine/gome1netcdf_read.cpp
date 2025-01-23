@@ -1471,13 +1471,8 @@ static int show_ref_info(int i_row, const FENO *pTabFeno, const struct reference
     ++i_row;
     string labelfmt("Reference ");
     labelfmt += pixeltype[i];
-    plot_data_t spectrum_data;
-    spectrum_data.x = pTabFeno->LambdaRef;
-    spectrum_data.y = refs[i].spectrum;
-    spectrum_data.length = refs[i].n_wavel;
-    spectrum_data.curveName[0] = '\0';
-
-    mediateResponsePlotData(plotPageRef,&spectrum_data,1,Spectrum,forceAutoScale, labelfmt.c_str(), "Wavelength (nm)", "Intensity", responseHandle);
+    MEDIATE_PLOT_CURVES(plotPageRef,Spectrum,forceAutoScale, labelfmt.c_str(), "Wavelength (nm)", "Intensity", responseHandle,
+                        (struct curve_data) {.x=pTabFeno->LambdaRef, .y=refs[i].spectrum, .length=refs[i].n_wavel});
   }
   return ++i_row;
 }

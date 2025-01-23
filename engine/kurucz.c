@@ -528,7 +528,7 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
                    i,j,k;                                                    // temporary indexes
   double j0,lambda0,shiftSign;
   RC               rc;                                                          // return code
-  plot_data_t      *spectrumData;
+  struct curve_data *spectrumData;
   KURUCZ *pKurucz;
 
 #if defined(__DEBUG_) && __DEBUG_
@@ -557,7 +557,7 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
   double *calib_stretch2 = malloc(pKurucz->Nb_Win * sizeof(*calib_stretch2));
 
   if (((shiftPoly=(double *)MEMORY_AllocDVector("KURUCZ_Spectrum ","shiftPoly",0,oldNDET-1))==NULL) ||
-        ((spectrumData=(plot_data_t *)MEMORY_AllocBuffer(__func__,"spectrumData",pKurucz->Nb_Win*2,sizeof(plot_data_t),0,MEMORY_TYPE_STRUCT))==NULL))
+      ((spectrumData=MEMORY_AllocBuffer(__func__,"spectrumData",pKurucz->Nb_Win*2,sizeof(*spectrumData),0,MEMORY_TYPE_STRUCT))==NULL))
    {
     rc=ERROR_ID_ALLOC;
     goto EndKuruczSpectrum;
@@ -900,14 +900,10 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
       else
         sprintf(string,"Complete fit (%d/%d)",indexFenoColumn+1,ANALYSE_swathSize);
 
-     if (pKuruczOptions->divisionMode==PRJCT_CALIB_WINDOWS_CONTIGUOUS)
-      {
-       mediateAllocateAndSetPlotData(&spectrumData[0],"Spectrum",&Lambda[0],&spectrum[0],n_wavel,Line);
-       mediateAllocateAndSetPlotData(&spectrumData[1],"Adjusted Kurucz",&Lambda[0],&ANALYSE_secX[0],n_wavel,Line);
-
-       mediateResponsePlotData(plotPageCalib,spectrumData,2,Spectrum,forceAutoScale,string,"Wavelength (nm)","Intensity", responseHandle);
-       mediateReleasePlotData(&spectrumData[0]);
-       mediateReleasePlotData(&spectrumData[1]);
+     if (pKuruczOptions->divisionMode==PRJCT_CALIB_WINDOWS_CONTIGUOUS) {
+       MEDIATE_PLOT_CURVES(plotPageCalib, Spectrum, forceAutoScale, string, "Wavelength (nm)", "Intensity", responseHandle,
+                           CURVE(.name="Spectrum", .x=Lambda, .y=spectrum, .length=n_wavel),
+                           CURVE(.name="Adjusted Kurucz", .x=Lambda, .y=ANALYSE_secX, .length=n_wavel));
       }
      else
       {
@@ -916,16 +912,10 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
          pixMin=spectrum_start(subwindow_fit[indexWindow].specrange);
          pixMax=spectrum_end(subwindow_fit[indexWindow].specrange);
 
-         mediateAllocateAndSetNumberedPlotData(&spectrumData[(indexWindow<<1)],"Spectrum",&Lambda[pixMin],&spectrum[pixMin],pixMax-pixMin+1,(indexWindow%2)?DashLine:Line,0);
-         mediateAllocateAndSetNumberedPlotData(&spectrumData[(indexWindow<<1)+1],"Adjusted Kurucz",&Lambda[pixMin],&pKurucz->dispSecX[indexWindow][pixMin],pixMax-pixMin+1,(indexWindow%2)?DashLine:Line,1);
+         spectrumData[2*indexWindow] = CURVE(.name="Spectrum", .x=&Lambda[pixMin], .y=&spectrum[pixMin], .length=pixMax-pixMin+1, .style=(indexWindow%2)?DashLine:Line, .number=0);
+         spectrumData[2*indexWindow+1] = CURVE(.name="Adjusted Kurucz", .x=&Lambda[pixMin], .y=&pKurucz->dispSecX[indexWindow][pixMin], .length=pixMax-pixMin+1, .style=(indexWindow%2)?DashLine:Line, .number=1);
         }
        mediateResponsePlotData(plotPageCalib,spectrumData,Nb_Win*2,Spectrum,forceAutoScale,string,"Wavelength (nm)","Intensity", responseHandle);
-
-       for (indexWindow=0;indexWindow<Nb_Win;indexWindow++)
-        {
-         mediateReleasePlotData(&spectrumData[(indexWindow<<1)]);
-         mediateReleasePlotData(&spectrumData[(indexWindow<<1)+1]);
-        }
       }
     }
 
@@ -938,27 +928,17 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
       else
         sprintf(string,"Residual (%d/%d)",indexFenoColumn+1,ANALYSE_swathSize);
 
-      if (pKuruczOptions->divisionMode==PRJCT_CALIB_WINDOWS_CONTIGUOUS)
-       {
-        mediateAllocateAndSetPlotData(&spectrumData[0],"Residual",&Lambda[0],&ANALYSE_absolu[0],n_wavel,Line);
-        mediateResponsePlotData(plotPageCalib,spectrumData,1,Spectrum,forceAutoScale,string,"Wavelength (nm)","", responseHandle);
-        mediateReleasePlotData(&spectrumData[0]);
-       }
-      else
-       {
-        for (indexWindow=0;indexWindow<Nb_Win;indexWindow++)
-         {
-             pixMin=spectrum_start(subwindow_fit[indexWindow].specrange);
+      if (pKuruczOptions->divisionMode==PRJCT_CALIB_WINDOWS_CONTIGUOUS) {
+        MEDIATE_PLOT_CURVES(plotPageCalib,Spectrum,forceAutoScale,string,"Wavelength (nm)","", responseHandle,
+                            CURVE(.name="Residual", .x=&Lambda[0], .y=&ANALYSE_absolu[0], .length=n_wavel));
+      } else {
+        for (indexWindow=0;indexWindow<Nb_Win;indexWindow++) {
+          pixMin=spectrum_start(subwindow_fit[indexWindow].specrange);
           pixMax=spectrum_end(subwindow_fit[indexWindow].specrange);
-
-          mediateAllocateAndSetNumberedPlotData(&spectrumData[indexWindow],"Residual",&Lambda[pixMin],&pKurucz->dispAbsolu[indexWindow][pixMin],pixMax-pixMin+1,(indexWindow%2)?DashLine:Line,0);
-         }
-
+          spectrumData[indexWindow] = CURVE(.name="Residual", .x=&Lambda[pixMin], .y=&pKurucz->dispAbsolu[indexWindow][pixMin], .length=pixMax-pixMin+1, .style=(indexWindow%2)?DashLine:Line, .number=0);
+        }
         mediateResponsePlotData(plotPageCalib,spectrumData,Nb_Win,Spectrum,forceAutoScale,string,"Wavelength (nm)","", responseHandle);
-
-        for (indexWindow=0;indexWindow<Nb_Win;indexWindow++)
-         mediateReleasePlotData(&spectrumData[indexWindow]);
-       }
+      }
     }
 
     memcpy(ANALYSE_secX,ANALYSE_zeros,sizeof(double)*n_wavel);
@@ -983,44 +963,29 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
         else
           sprintf(string,"Offset (%d/%d)",indexFenoColumn+1,ANALYSE_swathSize);
 
-        if (pKuruczOptions->divisionMode==PRJCT_CALIB_WINDOWS_CONTIGUOUS)
-         {
+        if (pKuruczOptions->divisionMode==PRJCT_CALIB_WINDOWS_CONTIGUOUS) {
           for (j=SvdPDeb;j<=SvdPFin;j++) // !!!!!!!!!!!!!!!!!!! to test
            {
             ANALYSE_absolu[j]+=offset[j]-ANALYSE_secX[j];
             ANALYSE_secX[j]=offset[j];
            }
-
-          mediateAllocateAndSetPlotData(&spectrumData[0],"Measured",&Lambda[0],&ANALYSE_absolu[0],n_wavel,Line);
-          mediateAllocateAndSetPlotData(&spectrumData[1],"Calculated",&Lambda[0],&ANALYSE_secX[0],n_wavel,Line);
-          mediateResponsePlotData(plotPageCalib,spectrumData,2,Spectrum,forceAutoScale,string,"Wavelength (nm)","",responseHandle);
-          mediateReleasePlotData(&spectrumData[1]);
-          mediateReleasePlotData(&spectrumData[0]);
-         }
-        else
-         {
-          for (indexWindow=0;indexWindow<Nb_Win;indexWindow++)
-           {
-               pixMin=spectrum_start(subwindow_fit[indexWindow].specrange);
+          MEDIATE_PLOT_CURVES(plotPageCalib,Spectrum,forceAutoScale,string,"Wavelength (nm)","",responseHandle,
+                              CURVE(.name="Measured", .x=Lambda, .y=ANALYSE_absolu, .length=n_wavel),
+                              CURVE(.name="Calculated", .x=Lambda, .y=ANALYSE_secX, .length=n_wavel));
+        } else {
+          for (indexWindow=0;indexWindow<Nb_Win;indexWindow++) {
+            pixMin=spectrum_start(subwindow_fit[indexWindow].specrange);
             pixMax=spectrum_end(subwindow_fit[indexWindow].specrange);
 
-            for (j=pixMin;j<=pixMax;j++)
-             {
+            for (j=pixMin;j<=pixMax;j++) {
               pKurucz->dispAbsolu[indexWindow][j]+=offset[j]-pKurucz->dispSecX[indexWindow][j];
               pKurucz->dispSecX[indexWindow][j]=offset[j];
-             }
+            }
 
-            mediateAllocateAndSetNumberedPlotData(&spectrumData[(indexWindow<<1)],"Measured",&Lambda[pixMin],&pKurucz->dispAbsolu[indexWindow][pixMin],pixMax-pixMin+1,(indexWindow%2)?DashLine:Line,0);
-            mediateAllocateAndSetNumberedPlotData(&spectrumData[(indexWindow<<1)+1],"Calculated",&Lambda[pixMin],&pKurucz->dispSecX[indexWindow][pixMin],pixMax-pixMin+1,(indexWindow%2)?DashLine:Line,0);
-           }
-
+            spectrumData[(indexWindow<<1)] = CURVE(.name="Measured", .x=&Lambda[pixMin], .y=&pKurucz->dispAbsolu[indexWindow][pixMin], .length=pixMax-pixMin+1, .style=(indexWindow%2)?DashLine:Line, .number=0);
+            spectrumData[(indexWindow<<1)+1] = CURVE(.name="Calculated", .x=&Lambda[pixMin], .y=&pKurucz->dispSecX[indexWindow][pixMin], .length=pixMax-pixMin+1, .style=(indexWindow%2)?DashLine:Line, .number=0);
+          }
           mediateResponsePlotData(plotPageCalib,spectrumData,Nb_Win,Spectrum,forceAutoScale,string,"Wavelength (nm)","", responseHandle);
-
-          for (indexWindow=0;indexWindow<Nb_Win;indexWindow++)
-           {
-            mediateReleasePlotData(&spectrumData[(indexWindow<<1)]);
-            mediateReleasePlotData(&spectrumData[(indexWindow<<1)+1]);
-           }
          }
       }
     }
@@ -1038,46 +1003,31 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
           else
             sprintf(string,"%s fit (%d/%d)",WorkSpace[pTabCross->Comp].symbolName,indexFenoColumn+1,ANALYSE_swathSize);
 
-          if (pKuruczOptions->divisionMode==PRJCT_CALIB_WINDOWS_CONTIGUOUS)
-           {
+          if (pKuruczOptions->divisionMode==PRJCT_CALIB_WINDOWS_CONTIGUOUS) {
             for (j=SvdPDeb;j<=SvdPFin;j++) {
               ANALYSE_absolu[j]+=pKurucz->crossFits.matrix[indexCrossFit][j]-ANALYSE_secX[j];
               ANALYSE_secX[j]=pKurucz->crossFits.matrix[indexCrossFit][j];
             }
 
-             mediateAllocateAndSetPlotData(&spectrumData[0],"Measured",&Lambda[0],&ANALYSE_absolu[0],n_wavel,Line);
-             mediateAllocateAndSetPlotData(&spectrumData[1],"Calculated",&Lambda[0],&ANALYSE_secX[0],n_wavel,Line);
-             mediateResponsePlotData(plotPageCalib,spectrumData,2,Spectrum,forceAutoScale,string,"Wavelength (nm)","", responseHandle);
-             mediateReleasePlotData(&spectrumData[1]);
-             mediateReleasePlotData(&spectrumData[0]);
+            MEDIATE_PLOT_CURVES(plotPageCalib,Spectrum,forceAutoScale,string,"Wavelength (nm)","", responseHandle,
+                                CURVE(.name="Measured", .x=Lambda, .y=ANALYSE_absolu, .length=n_wavel),
+                                CURVE(.name="Calculated", .x=Lambda, .y=ANALYSE_secX, .length=n_wavel));
 
-           }
-          else
-           {
-            for (indexWindow=0;indexWindow<Nb_Win;indexWindow++)
-             {
-                 pixMin=spectrum_start(subwindow_fit[indexWindow].specrange);
+          } else {
+            for (indexWindow=0;indexWindow<Nb_Win;indexWindow++) {
+              pixMin=spectrum_start(subwindow_fit[indexWindow].specrange);
               pixMax=spectrum_end(subwindow_fit[indexWindow].specrange);
 
-              for (j=pixMin;j<=pixMax;j++)
-               {
+              for (j=pixMin;j<=pixMax;j++) {
                 pKurucz->dispAbsolu[indexWindow][j]+=pKurucz->crossFits.matrix[indexCrossFit][j]-pKurucz->dispSecX[indexWindow][j];
                 pKurucz->dispSecX[indexWindow][j]=pKurucz->crossFits.matrix[indexCrossFit][j];
-               }
+              }
 
-              mediateAllocateAndSetNumberedPlotData(&spectrumData[(indexWindow<<1)],"Measured",&Lambda[pixMin],&pKurucz->dispAbsolu[indexWindow][pixMin],pixMax-pixMin+1,(indexWindow%2)?DashLine:Line,0);
-              mediateAllocateAndSetNumberedPlotData(&spectrumData[(indexWindow<<1)+1],"Calculated",&Lambda[pixMin],&pKurucz->dispSecX[indexWindow][pixMin],pixMax-pixMin+1,(indexWindow%2)?DashLine:Line,1);
-             }
-
+              spectrumData[(indexWindow<<1)] = CURVE(.name="Measured", .x=&Lambda[pixMin], .y=&pKurucz->dispAbsolu[indexWindow][pixMin], .length=pixMax-pixMin+1, .style=(indexWindow%2)?DashLine:Line, .number=0);
+              spectrumData[(indexWindow<<1)+1] = CURVE(.name="Calculated", .x=&Lambda[pixMin], .y=&pKurucz->dispSecX[indexWindow][pixMin], .length=pixMax-pixMin+1, .style=(indexWindow%2)?DashLine:Line, .number=1);
+            }
             mediateResponsePlotData(plotPageCalib,spectrumData,Nb_Win,Spectrum,forceAutoScale,string,"Wavelength (nm)","", responseHandle);
-
-            for (indexWindow=0;indexWindow<Nb_Win;indexWindow++)
-             {
-              mediateReleasePlotData(&spectrumData[(indexWindow<<1)]);
-              mediateReleasePlotData(&spectrumData[(indexWindow<<1)+1]);
-             }
-           }
-
+          }
           indexCrossFit++;
         }
       }
@@ -1091,11 +1041,9 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
       else
         sprintf(string,"Shift (%d/%d)",indexFenoColumn+1,ANALYSE_swathSize);
 
-      mediateAllocateAndSetPlotData(&spectrumData[0],"Polynomial fitting individual shift points",&Lambda[0],&shiftPoly[0],n_wavel,Line);
-      mediateAllocateAndSetPlotData(&spectrumData[1],"Shift calculated in the individual small windows",VLambda+1,VShift+1,Nb_Win,Point);
-      mediateResponsePlotData(plotPageCalib,spectrumData,2,Spectrum,forceAutoScale,string,"Wavelength (nm)","Shift (nm)", responseHandle);
-      mediateReleasePlotData(&spectrumData[1]);
-      mediateReleasePlotData(&spectrumData[0]);
+      MEDIATE_PLOT_CURVES(plotPageCalib,Spectrum,forceAutoScale,string,"Wavelength (nm)","Shift (nm)", responseHandle,
+                          CURVE(.name="Polynomial fitting individual shift points", .x=Lambda, .y=shiftPoly, .length=n_wavel),
+                          CURVE(.name="Shift calculated in the individual small windows", .x=VLambda+1, .y=VShift+1, .length=Nb_Win, .style=Point));
     }
 
     // Display wavelength dependence of fwhm
@@ -1119,11 +1067,9 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
         }
 
         if (pKurucz->displayShift) {
-          mediateAllocateAndSetPlotData(&spectrumData[0],"Polynomial fitting individual FWHM points",&Lambda[0],&fwhmVector[indexParam][0],n_wavel,Line);
-          mediateAllocateAndSetPlotData(&spectrumData[1],"FWHM calculated in the individual small windows",VLambda+1,fwhm[indexParam],Nb_Win,Point);
-          mediateResponsePlotData(plotPageCalib,spectrumData,2,Spectrum,forceAutoScale,string,"Wavelength (nm)",(pKuruczOptions->fwhmType==SLIT_TYPE_FILE)?"":"SFP (nm)", responseHandle);
-          mediateReleasePlotData(&spectrumData[1]);
-          mediateReleasePlotData(&spectrumData[0]);
+          MEDIATE_PLOT_CURVES(plotPageCalib,Spectrum,forceAutoScale,string,"Wavelength (nm)",(pKuruczOptions->fwhmType==SLIT_TYPE_FILE)?"":"SFP (nm)", responseHandle,
+                              CURVE(.name="Polynomial fitting individual FWHM points", .x=Lambda, .y=fwhmVector[indexParam], .length=n_wavel),
+                              CURVE(.name="FWHM calculated in the individual small windows", .x=VLambda+1, .y=fwhm[indexParam], .length=Nb_Win, .style=Point));
         }
       }
     }
