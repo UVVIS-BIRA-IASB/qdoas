@@ -369,9 +369,8 @@ void mediateRequestPlotSpectra(ENGINE_CONTEXT *pEngineContext,void *responseHand
    PRJCT_INSTRUMENTAL *pInstrumental;                                           // pointer to the instrumental part of the project
    BUFFERS *pBuffers;                                                           // pointer to the buffers part of the engine context
    RECORD_INFO *pRecord;                                                        // pointer to the record part of the engine context
-   char tmpString[80],tmpTitle[80];                                             // buffer for formatted strings
+   char tmpString[80];                                                          // buffer for formatted strings
    char *fileName;                                                              // the name of the current file
-   plot_data_t spectrumData;
 
    // Initializations
 
@@ -432,16 +431,16 @@ void mediateRequestPlotSpectra(ENGINE_CONTEXT *pEngineContext,void *responseHand
              tempSpectrum[i]/=pBuffers->instrFunction[i];
        }
 
+       const char *tmpTitle;
        if ((pInstrumental->readOutFormat!=PRJCT_INSTR_FORMAT_MFC_BIRA) || ((pEngineContext->recordInfo.mfcBira.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_DARK) && (pEngineContext->recordInfo.mfcBira.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_OFFSET)))
-         sprintf(tmpTitle,"Spectrum");
+         tmpTitle = "Spectrum";
        else if (pEngineContext->recordInfo.mfcBira.measurementType==PRJCT_INSTR_MAXDOAS_TYPE_DARK)
-         sprintf(tmpTitle,"Dark Current");
+         tmpTitle = "Dark Current";
        else if (pEngineContext->recordInfo.mfcBira.measurementType==PRJCT_INSTR_MAXDOAS_TYPE_OFFSET)
-         sprintf(tmpTitle,"Offset");
+         tmpTitle = "Offset";
 
-       mediateAllocateAndSetPlotData(&spectrumData,tmpTitle,pBuffers->lambda, tempSpectrum, n_wavel, Line);
-       mediateResponsePlotData(plotPageSpectrum, &spectrumData, 1, Spectrum, allowFixedScale, tmpTitle, "Wavelength (nm)", y_units, responseHandle);
-       mediateReleasePlotData(&spectrumData);
+       MEDIATE_PLOT_CURVES(plotPageSpectrum, Spectrum, allowFixedScale, tmpTitle, "Wavelength (nm)", y_units, responseHandle,
+                           CURVE(.name=tmpTitle, .x=pBuffers->lambda, .y=tempSpectrum, .length=n_wavel));
        mediateResponseLabelPage(plotPageSpectrum, fileName, tmpString, responseHandle);
 
        MEMORY_ReleaseDVector(__func__,"spectrum",tempSpectrum,0);
@@ -450,28 +449,23 @@ void mediateRequestPlotSpectra(ENGINE_CONTEXT *pEngineContext,void *responseHand
      if (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_MKZY) {
        if ((pBuffers->offset!=NULL) && pEngineContext->recordInfo.mkzy.offsetFlag) {
          sprintf(tmpString,"Offset");
-
-         mediateAllocateAndSetPlotData(&spectrumData, tmpString,pBuffers->lambda, pBuffers->offset, n_wavel, Line);
-         mediateResponsePlotData(plotPageOffset, &spectrumData, 1, Spectrum, forceAutoScale, tmpString, "Wavelength (nm)", "Counts", responseHandle);
-         mediateReleasePlotData(&spectrumData);
+         MEDIATE_PLOT_CURVES(plotPageOffset, Spectrum, forceAutoScale, tmpString, "Wavelength (nm)", "Counts", responseHandle,
+                             CURVE(.name=tmpString, .x=pBuffers->lambda, .y=pBuffers->offset, .length=n_wavel));
          mediateResponseLabelPage(plotPageOffset, fileName, tmpString, responseHandle);
        }
 
        if ((pBuffers->darkCurrent!=NULL) && pEngineContext->recordInfo.mkzy.darkFlag) {
          sprintf(tmpString,(pEngineContext->recordInfo.mkzy.offsetFlag)?"Dark current":"Offset");
-
-         mediateAllocateAndSetPlotData(&spectrumData,tmpString,pBuffers->lambda, pBuffers->darkCurrent, n_wavel, Line);
-         mediateResponsePlotData(plotPageDarkCurrent, &spectrumData, 1, Spectrum, forceAutoScale,tmpString, "Wavelength (nm)", "Counts", responseHandle);
-         mediateReleasePlotData(&spectrumData);
+         MEDIATE_PLOT_CURVES(plotPageDarkCurrent, Spectrum, forceAutoScale,tmpString, "Wavelength (nm)", "Counts", responseHandle,
+                             CURVE(.name=tmpString, .x=pBuffers->lambda, .y=pBuffers->darkCurrent, .length=n_wavel));
          mediateResponseLabelPage(plotPageDarkCurrent, fileName, tmpString, responseHandle);
        }
 
        if ((pBuffers->scanRef!=NULL) && pEngineContext->recordInfo.mkzy.skyFlag) {
          sprintf(tmpString,"Sky spectrum");
 
-         mediateAllocateAndSetPlotData(&spectrumData, "Sky spectrum",pBuffers->lambda, pBuffers->scanRef, n_wavel, Line);
-         mediateResponsePlotData(plotPageIrrad, &spectrumData, 1, Spectrum, forceAutoScale, "Sky spectrum", "Wavelength (nm)", "Counts", responseHandle);
-         mediateReleasePlotData(&spectrumData);
+         MEDIATE_PLOT_CURVES(plotPageIrrad, Spectrum, forceAutoScale, "Sky spectrum", "Wavelength (nm)", "Counts", responseHandle,
+                             CURVE(.name="Sky spectrum", .x=pBuffers->lambda, .y=pBuffers->scanRef, .length=n_wavel));
          mediateResponseLabelPage(plotPageIrrad, fileName, tmpString, responseHandle);
        }
       }
@@ -487,18 +481,16 @@ void mediateRequestPlotSpectra(ENGINE_CONTEXT *pEngineContext,void *responseHand
          (pEngineContext->fileInfo.darkFp!=NULL) && (pBuffers->darkCurrent!=NULL)) {
        sprintf(tmpString,"Dark current (%d/%d)",pEngineContext->indexRecord,pEngineContext->recordNumber);
 
-       mediateAllocateAndSetPlotData(&spectrumData, "Dark current",pBuffers->lambda, pBuffers->darkCurrent, n_wavel, Line);
-       mediateResponsePlotData(plotPageDarkCurrent, &spectrumData, 1, Spectrum, forceAutoScale, "Dark current", "Wavelength (nm)", "Counts", responseHandle);
-       mediateReleasePlotData(&spectrumData);
+       MEDIATE_PLOT_CURVES(plotPageDarkCurrent, Spectrum, forceAutoScale, "Dark current", "Wavelength (nm)", "Counts", responseHandle,
+                           CURVE(.name="Dark current", .x=pBuffers->lambda, .y=pBuffers->darkCurrent, .length=n_wavel));
        mediateResponseLabelPage(plotPageDarkCurrent, fileName, tmpString, responseHandle);
      }
 
      if (pBuffers->sigmaSpec!=NULL) {
        sprintf(tmpString,"Error (%d/%d)",pEngineContext->indexRecord,pEngineContext->recordNumber);
 
-       mediateAllocateAndSetPlotData(&spectrumData, "Error",pBuffers->lambda, pBuffers->sigmaSpec, n_wavel, Line);
-       mediateResponsePlotData(plotPageErrors, &spectrumData, 1, Spectrum, forceAutoScale, "Error", "Wavelength (nm)", "Counts", responseHandle);
-       mediateReleasePlotData(&spectrumData);
+       MEDIATE_PLOT_CURVES(plotPageErrors, Spectrum, forceAutoScale, "Error", "Wavelength (nm)", "Counts", responseHandle,
+                           CURVE(.name="Error", .x=pBuffers->lambda, .y=pBuffers->sigmaSpec, .length=n_wavel));
        mediateResponseLabelPage(plotPageErrors, fileName, tmpString, responseHandle);
       }
 
@@ -511,10 +503,8 @@ void mediateRequestPlotSpectra(ENGINE_CONTEXT *pEngineContext,void *responseHand
                 pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF)
               || THRD_id==THREAD_TYPE_ANALYSIS) ) {
 
-       mediateAllocateAndSetPlotData(&spectrumData, "Irradiance spectrum", pBuffers->lambda_irrad, pBuffers->irrad, n_wavel, Line);
-       mediateResponsePlotData(plotPageIrrad, &spectrumData, 1, Spectrum, forceAutoScale,
-                               "Irradiance spectrum", "Wavelength/(nm)", y_units, responseHandle);
-       mediateReleasePlotData(&spectrumData);
+       MEDIATE_PLOT_CURVES(plotPageIrrad, Spectrum, forceAutoScale, "Irradiance spectrum", "Wavelength/(nm)", y_units, responseHandle,
+                           CURVE(.name="Irradiance spectrum", .x=pBuffers->lambda_irrad, .y=pBuffers->irrad, .length=n_wavel));
        mediateResponseLabelPage(plotPageIrrad, fileName, "Irradiance", responseHandle);
      }
 
@@ -525,19 +515,16 @@ void mediateRequestPlotSpectra(ENGINE_CONTEXT *pEngineContext,void *responseHand
          #endif 
           (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_CCD_EEV)) &&
          (pBuffers->specMax!=NULL) &&
-         (pRecord->NSomme>1))
-      {
-          sprintf(tmpString,"SpecMax (%d/%d)",pEngineContext->indexRecord,pEngineContext->recordNumber);
+         (pRecord->NSomme>1)) {
+       sprintf(tmpString,"SpecMax (%d/%d)",pEngineContext->indexRecord,pEngineContext->recordNumber);
 
-       mediateAllocateAndSetPlotData(&spectrumData, "SpecMax",pBuffers->specMaxx, pBuffers->specMax,pRecord->rejected+pRecord->NSomme, Line);
-       mediateResponsePlotData(plotPageSpecMax, &spectrumData, 1, SpecMax, allowFixedScale, "SpecMax", "Scans number", "Signal Maximum", responseHandle);
-       mediateReleasePlotData(&spectrumData);
+       MEDIATE_PLOT_CURVES(plotPageSpecMax, SpecMax, allowFixedScale, "SpecMax", "Scans number", "Signal Maximum", responseHandle,
+                           CURVE(.name="SpecMax", .x=pBuffers->specMaxx, .y=pBuffers->specMax, .length=pRecord->rejected+pRecord->NSomme));
        mediateResponseLabelPage(plotPageSpecMax, fileName, tmpString, responseHandle);
       }
 
-    if ((pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_CCD_EEV) && (strlen(pInstrumental->imagePath)>0))
-     {
-         sprintf(tmpString,"Sky picture (%d/%d)",pEngineContext->indexRecord,pEngineContext->recordNumber);
+    if ((pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_CCD_EEV) && (strlen(pInstrumental->imagePath)>0)) {
+      sprintf(tmpString,"Sky picture (%d/%d)",pEngineContext->indexRecord,pEngineContext->recordNumber);
       mediateResponsePlotImage(plotPageImage,(pRecord->ccd.indexImage!=ITEM_NONE)?CCD_GetImageFile(pRecord->ccd.indexImage):"./no-image-available.jpg","Sky picture",responseHandle);
       mediateResponseLabelPage(plotPageImage, fileName, tmpString, responseHandle);
      }
@@ -2595,7 +2582,6 @@ int mediateRequestViewCrossSections(void *engineContext, char *awName,double min
    MATRIX_OBJECT xs;                                                            // matrix to load the cross section
    INDEX indexFile;                                                             // browse files
    int   indexLine,indexColumn;                                                 // browse lines and column in the data page
-   plot_data_t xs2plot;                                                         // cross  section to plot
    bool use_rows[MAX_SWATHSIZE];                                                // only select the first row
 
    // Initializations
@@ -2643,16 +2629,13 @@ int mediateRequestViewCrossSections(void *engineContext, char *awName,double min
                       0,   // no derivatives
                       1,   // reverse vectors if needed
                       use_rows,
-                      "mediateRequestViewCrossSections") && (xs.nl>1) && (xs.nc>1)))
-      {
+                      "mediateRequestViewCrossSections") && (xs.nl>1) && (xs.nc>1))) {
        // Plot the cross section
-
-       mediateAllocateAndSetPlotData(&xs2plot,symbolName,xs.matrix[0],xs.matrix[1],xs.nl,Line);
-       mediateResponsePlotData(plotPageCross,&xs2plot,1,Spectrum,0,symbolName,"Wavelength","cm**2 / molec", responseHandle);
-       mediateResponseLabelPage(plotPageCross,windowTitle,tabTitle, responseHandle);
-       mediateReleasePlotData(&xs2plot);
-       mediateResponseCellInfo(plotPageCross,indexLine,indexColumn,responseHandle,filenames[indexFile],"%s","Loaded");
-      }
+        MEDIATE_PLOT_CURVES(plotPageCross, Spectrum, allowFixedScale, symbolName, "Wavelength", "cm**2 / molec", responseHandle,
+                            CURVE(.name = symbolName, .x = xs.matrix[0], .y = xs.matrix[1], .length = xs.nl));
+        mediateResponseLabelPage(plotPageCross,windowTitle,tabTitle, responseHandle);
+        mediateResponseCellInfo(plotPageCross,indexLine,indexColumn,responseHandle,filenames[indexFile],"%s","Loaded");
+     }
      else
       mediateResponseCellInfo(plotPageCross,indexLine,indexColumn,responseHandle,filenames[indexFile],"%s","Not found !!!");
 

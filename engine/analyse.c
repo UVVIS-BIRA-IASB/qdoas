@@ -255,27 +255,22 @@ void plot_curves( int page,
                   int forceAutoScaling,
                   const char *title,
                   void *responseHandle,
-                  doas_spectrum* specrange)
- {
+                  doas_spectrum* specrange) {
   int num_segments = num_curves * spectrum_num_windows(specrange);
-  plot_data_t *plotdata = malloc(num_segments * sizeof(*plotdata));
-  plot_data_t *plot = plotdata;
+  struct curve_data *plot_curves = malloc(num_segments * sizeof(*plot_curves));
   doas_iterator my_iterator;
+  size_t segment = 0;
   for (doas_interval *interval = iterator_start_interval(&my_iterator, specrange);
        interval != NULL;
        interval = iterator_next_interval(&my_iterator)) {
-   int start = interval_start(interval);
-   int end = interval_end(interval);
-   for (int j = 0; j < num_curves; j++,plot++) {
-     mediateAllocateAndSetNumberedPlotData(plot,"",(curve_data[j][0])+start,(curve_data[j][1])+start,end-start+1,Line, j);
-   }
+    int start = interval_start(interval);
+    int end = interval_end(interval);
+    for (int j = 0; j!=num_curves; ++j,++segment) {
+      plot_curves[segment] = CURVE(.x = (curve_data[j][0])+start, .y = (curve_data[j][1])+start, .length = end-start+1, .number=j);
+    }
   }
-  mediateResponsePlotData( page,plotdata,num_segments,type,forceAutoScaling,title,"Wavelength (nm)","", responseHandle);
-
-  plot = plotdata;
-  for (int i = 0; i < num_segments; i++)
-    mediateReleasePlotData(plot++);
-  free(plotdata);
+  mediateResponsePlotData(page, plot_curves, num_segments, type, forceAutoScaling, title, "Wavelength (nm)", "", responseHandle);
+  free(plot_curves);
  }
 
 static inline double sum_of_squares(const double *array, const doas_spectrum *ranges) {
@@ -2530,27 +2525,22 @@ RC ANALYSE_AlignReference(ENGINE_CONTEXT *pEngineContext,int refFlag,void *respo
 
       // Display fit
       if (pFeno->displayRefEtalon && pEngineContext->project.spectra.displaySpectraFlag) {
-
-        char refTitle[256];
-
         memcpy(ANALYSE_secX,ANALYSE_zeros,sizeof(*ANALYSE_secX)*pFeno->NDET);
 
         for (int i=SvdPDeb;i<=SvdPFin;i++)
           ANALYSE_secX[i]=exp(log(pFeno->SrefEtalon[i])+ANALYSE_absolu[i]);
 
+        char refTitle[256];
         if (ANALYSE_swathSize==1)
          sprintf(refTitle,"Ref1/Ref2 in %s",pFeno->windowName);
         else
          sprintf(refTitle,"Ref1/Ref2 in %s (%d)",pFeno->windowName,indexFenoColumn+1);
 
-        plot_data_t spectrumData[2];
         const int indexPage=plotPageRef; // (pEngineContext->satelliteFlag || (ANALYSE_swathSize>1))?plotPageRef:WrkFeno+plotPageAnalysis-1;
-        mediateAllocateAndSetPlotData(&spectrumData[0],"Measured",&lambda[SvdPDeb],&pFeno->SrefEtalon[SvdPDeb],SvdPFin-SvdPDeb+1,Line);
-        mediateAllocateAndSetPlotData(&spectrumData[1],"Calculated",&lambda[SvdPDeb],&ANALYSE_secX[SvdPDeb],SvdPFin-SvdPDeb+1,Line);
-        mediateResponsePlotData(indexPage,spectrumData,2,Spectrum,forceAutoScale,refTitle,"Wavelength (nm)","Intensity", responseHandle);
+        MEDIATE_PLOT_CURVES(indexPage, Spectrum, forceAutoScale, refTitle, "Wavelength (nm)", "Intensity", responseHandle,
+                            CURVE(.name="Measured", .x=&lambda[SvdPDeb], .y=&pFeno->SrefEtalon[SvdPDeb], .length=SvdPFin-SvdPDeb+1),
+                            CURVE(.name="Calculated", .x=&lambda[SvdPDeb], .y=&ANALYSE_secX[SvdPDeb], .length=SvdPFin-SvdPDeb+1));
         mediateResponseLabelPage(indexPage,pEngineContext->fileInfo.fileName, "Reference", responseHandle);
-        mediateReleasePlotData(&spectrumData[1]);
-        mediateReleasePlotData(&spectrumData[0]);
 
         ANALYSE_plotRef=1;
         int indexLine=ANALYSE_indexLine;

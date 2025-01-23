@@ -17,76 +17,15 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 using std::string;
 
-void mediateAllocateAndSetPlotData(plot_data_t *d, const char *curveName, const double *xData, const double *yData, int len, enum eCurveStyleType type)
-{
-  d->curveNumber = -1;
-
-  int byteLen = len * sizeof(double);
-
-  d->x = (double*)malloc(byteLen);
-  d->y = (double*)malloc(byteLen);
-
-  strcpy(d->curveName,curveName);
-
-  if (d->x == NULL || d->y == NULL) {
-    // bail out ...
-    mediateReleasePlotData(d);
-    d->x = d->y = NULL;
-    d->length = 0;
-    d->curveType = type;
-  }
-  else {
-    memcpy(d->x, xData, byteLen);
-    memcpy(d->y, yData, byteLen);
-    d->length = len;
-    d->curveType = type;
-  }
-}
-
-void mediateAllocateAndSetNumberedPlotData(plot_data_t *d, const char *curveName, const double *xData, const double *yData, int len, enum eCurveStyleType type, int curveNumber)
-{
-  d->curveNumber = curveNumber;
-  int byteLen = len * sizeof(double);
-
-  d->x = (double*)malloc(byteLen);
-  d->y = (double*)malloc(byteLen);
-
-  strcpy(d->curveName,curveName);
-
-  if (d->x == NULL || d->y == NULL) {
-    // bail out ...
-    mediateReleasePlotData(d);
-    d->x = d->y = NULL;
-    d->length = 0;
-    d->curveType = type;
-  }
-  else {
-    memcpy(d->x, xData, byteLen);
-    memcpy(d->y, yData, byteLen);
-    d->length = len;
-    d->curveType = type;
-  }
-}
-
-void mediateReleasePlotData(plot_data_t *d)
-{
-  d->length=0;
-  strcpy(d->curveName,"");
-
-  free(d->x);
-  free(d->y);
-}
-
-
 void mediateResponsePlotData(int page,
-                 plot_data_t *plotDataArray,
-                 int arrayLength,
-                 enum ePlotScaleType type,
-                 int forceAutoScaling,
-                 const char *title,
-                 const char *xLabel,
-                 const char *yLabel,
-                 void *responseHandle)
+                             const struct curve_data *plotDataArray,
+                             int arrayLength,
+                             enum ePlotScaleType type,
+                             int forceAutoScaling,
+                             const char *title,
+                             const char *xLabel,
+                             const char *yLabel,
+                             void *responseHandle)
 {
   CEngineResponseVisual *resp = static_cast<CEngineResponseVisual*>(responseHandle);
 
@@ -94,10 +33,10 @@ void mediateResponsePlotData(int page,
 
   int i = 0;
   while (i < arrayLength) {
-    if(plotDataArray[i].curveNumber >= 0)
-      dataSet.addPlotData(plotDataArray[i].curveName,plotDataArray[i].x, plotDataArray[i].y, plotDataArray[i].length, plotDataArray[i].curveType, plotDataArray[i].curveNumber);
+    if(plotDataArray[i].number >= 0)
+      dataSet.addPlotData(plotDataArray[i].name,plotDataArray[i].x, plotDataArray[i].y, plotDataArray[i].length, plotDataArray[i].style, plotDataArray[i].number);
     else
-      dataSet.addPlotData(plotDataArray[i].curveName,plotDataArray[i].x, plotDataArray[i].y, plotDataArray[i].length, plotDataArray[i].curveType);
+      dataSet.addPlotData(plotDataArray[i].name,plotDataArray[i].x, plotDataArray[i].y, plotDataArray[i].length, plotDataArray[i].style);
     ++i;
   }
 

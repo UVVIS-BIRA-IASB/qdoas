@@ -24,32 +24,40 @@ extern "C" {
 // Plotting oriented interface
 //----------------------------------------------------------
 
-typedef struct plot_data {
-  char curveName[80];
-  double *x, *y;
-  int length;
-  int curveNumber;
-  enum eCurveStyleType curveType;
-} plot_data_t;
+// Add C++11 default member initializers when if __cplusplus.  For C files, we use the macro below
+#if defined(__cplusplus)
+#define DEFAULT_INIT(VAL) = VAL
+#else
+#define DEFAULT_INIT(VAL)
+#endif
+struct curve_data {
+  const char *name DEFAULT_INIT("");
+  const double *x, *y;
+  size_t length;
+  int number DEFAULT_INIT(-1);
+  enum eCurveStyleType style DEFAULT_INIT(Line);
+};
 
-
-void mediateAllocateAndSetPlotData(plot_data_t *d, const char *curveName, const double *xData, const double *yData, int len, enum eCurveStyleType type);
-void mediateAllocateAndSetNumberedPlotData(plot_data_t *d, const char *curveName, const double *xData, const double *yData, int len, enum eCurveStyleType type, int curveNumber);
-void mediateReleasePlotData(plot_data_t *d);
+// macro to "default-initialize" some fields of a plot_data struct in C
+#define CURVE(...) ((struct curve_data) { .name="", .number=-1, .style=Line, ##__VA_ARGS__ })
 
 void mediateResponseAddImage(int page,const char *imageFile,void *responseHandle);
+
+int mediateRequestDisplaySpecInfo(void *engineContext,int page,void *responseHandle);
 
 // mediateResponsePlotData
 //
 // provide the GUI with plots data. The data is contained in an array
-// of plot_data of length arrayLength.
+// of curve_data of length arrayLength.
+void mediateResponsePlotData(int page, const struct curve_data *plotDataArray, int arrayLength,
+                             enum ePlotScaleType type, int forceAutoScaling,
+                             const char *title, const char *xLabel,
+                             const char *yLabel, void *responseHandle);
 
-int mediateRequestDisplaySpecInfo(void *engineContext,int page,void *responseHandle);
-
-void mediateResponsePlotData(int page, plot_data_t *plotDataArray, int arrayLength,
-                 enum ePlotScaleType type, int forceAutoScaling,
-                 const char *title, const char *xLabel,
-                 const char *yLabel, void *responseHandle);
+#define MEDIATE_PLOT_CURVES(page, type, forceAutoScaling, title, xLabel, yLabel, responseHandle, curve_args...) ({ \
+      struct curve_data _curves[] = {curve_args};                                \
+      mediateResponsePlotData(page, _curves, sizeof(_curves) / sizeof(*_curves), type, forceAutoScaling, title, xLabel, yLabel, responseHandle); \
+    })
 
 void mediateResponsePlotImage(int page,const char *imageFile,const char *title,void *responseHandle);
 

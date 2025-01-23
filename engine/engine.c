@@ -2213,7 +2213,6 @@ RC EngineNewRef(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
          struct date *pDay;                                                      // pointer to measurement date
          struct time *pTime;                                                     // pointer to measurement date
          char string[80],tabTitle[80];
-         plot_data_t spectrumData;
          int SvdPDeb,SvdPFin;
          int indexLine;
 
@@ -2231,10 +2230,9 @@ RC EngineNewRef(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
 
          sprintf(tabTitle,"%s results (%d/%d)",pTabFeno->windowName,pEngineContext->indexRecord,pEngineContext->recordNumber);
 
-         mediateAllocateAndSetPlotData(&spectrumData,"Measured",&pTabFeno->LambdaRef[SvdPDeb],&pTabFeno->Sref[SvdPDeb],SvdPFin-SvdPDeb+1,Line);
-         mediateResponsePlotData(indexPage,&spectrumData,1,Spectrum,forceAutoScale,string,"Wavelength (nm)","Intensity", responseHandle);
+         MEDIATE_PLOT_CURVES(indexPage,Spectrum,forceAutoScale,string,"Wavelength (nm)","Intensity", responseHandle,
+                             CURVE(.name="Measured", .x=&pTabFeno->LambdaRef[SvdPDeb], .y=&pTabFeno->Sref[SvdPDeb], .length=SvdPFin-SvdPDeb+1));
          mediateResponseLabelPage(indexPage, pEngineContext->fileInfo.fileName, tabTitle, responseHandle);
-         mediateReleasePlotData(&spectrumData);
 
          if (pEngineContext->project.spectra.displayDataFlag)
           {
