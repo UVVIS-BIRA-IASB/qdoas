@@ -1123,8 +1123,9 @@ int analyseProjectQdoasPrepare(void **engineContext, const CProjectConfigItem *p
         nWindows--;
       }
     }
-    if (mediateRequestSetAnalysisWindows(*engineContext, nWindows, awDataList, (!calibSwitch)?THREAD_TYPE_ANALYSIS:THREAD_TYPE_KURUCZ, msgResp) != 0) {
-      msgResp->process(controller);
+    int rc = mediateRequestSetAnalysisWindows(*engineContext, nWindows, awDataList, (!calibSwitch)?THREAD_TYPE_ANALYSIS:THREAD_TYPE_KURUCZ, msgResp);
+    msgResp->process(controller);
+    if (rc != 0) {
       delete msgResp;
       msgResp = new CEngineResponseVisual;
       retCode = 1;
@@ -1210,13 +1211,13 @@ int QdoasBatch::analyse_file(const QString &filename) {
     result = (!calibSwitch) ? mediateRequestNextMatchingAnalyseSpectrum(engineContext, &resp) :
       mediateRequestNextMatchingCalibrateSpectrum(engineContext, &resp);
 
+    resp.process(&controller);
     if ((result!=0) && (result!=oldResult)) {
       resp.setRecordNumber(result);
       if (result == -1)
         retCode = 1;
       else if (verboseMode)
         std::cout << "  completed record " << result << std::endl;
-      resp.process(&controller);
     }
   }
 
