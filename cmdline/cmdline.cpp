@@ -1210,8 +1210,6 @@ int QdoasBatch::analyse_file(const QString &filename) {
     oldResult=result;
     result = (!calibSwitch) ? mediateRequestNextMatchingAnalyseSpectrum(engineContext, &resp) :
       mediateRequestNextMatchingCalibrateSpectrum(engineContext, &resp);
-
-    resp.process(&controller);
     if ((result!=0) && (result!=oldResult)) {
       resp.setRecordNumber(result);
       if (result == -1)
@@ -1219,6 +1217,7 @@ int QdoasBatch::analyse_file(const QString &filename) {
       else if (verboseMode)
         std::cout << "  completed record " << result << std::endl;
     }
+    resp.process(&controller);
   }
 
   CEngineResponseMessage resp;

@@ -225,6 +225,10 @@ void CQdoasEngineController::notifyErrorMessages(int highestErrorLevel, const QL
   size_t n_errors=0;
   for (QList<CEngineError>::const_iterator it = errorMessages.begin();
        it != errorMessages.end(); ++it) {
+    if (n_errors >= 10) {
+      stream << "(more warnings and/or errors reported; stopping here)";
+      break;
+    }
     // one message per line
     switch (it->errorLevel()) {
     case InformationEngineError:
@@ -239,11 +243,6 @@ void CQdoasEngineController::notifyErrorMessages(int highestErrorLevel, const QL
     }
     stream << it->tag() << ") " << it->message() << ".\n";
     ++n_errors;
-    if (n_errors >= 10) {
-      stream << "(further errors suppressed)";
-      break;
-    }
-
   }
   emit signalErrorMessages(highestErrorLevel, msg);
 }

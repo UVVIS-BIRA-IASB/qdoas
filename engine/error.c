@@ -168,7 +168,7 @@ ERROR_TABLE errorTable[]=
   { ERROR_ID_GAPS                      , "Invalid window for calibration (%g,%g)"                                                                             },
   { ERROR_ID_ANALYSIS                  , "Analysis aborted (rec=%d,%s)"                                                                                       },
   { ERROR_ID_MSGBOX_FIELDEMPTY         , "The field '%s' is empty or invalid"                                                                                 },
-  { ERROR_ID_NFREE                     , "Number of degree of freedom <= 0 : reduce the number of parameters or increase the width of the analysis window or reduce the width of filter" },
+  { ERROR_ID_NFREE                     , "Number of degrees of freedom <= 0 : reduce the number of parameters or increase the width of the analysis window or reduce the width of filter" },
   { ERROR_ID_ORTHOGONAL_BASE           , "%s cross section forced to be orthogonalized to base because of %s cross section"                                   },
   { ERROR_ID_ORTHOGONAL_CASCADE        , "Orthogonalization in cascade not authorized. Orthogonalization of %s cross section ignored"                         },
   { ERROR_ID_FWHM                      , "Wrong value for the FWHM %g"                                                                                        },
