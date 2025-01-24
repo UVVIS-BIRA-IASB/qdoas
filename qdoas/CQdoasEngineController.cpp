@@ -222,6 +222,7 @@ void CQdoasEngineController::notifyErrorMessages(int highestErrorLevel, const QL
     emit signalSessionRunning(false);
   }
 
+  size_t n_errors=0;
   for (QList<CEngineError>::const_iterator it = errorMessages.begin();
        it != errorMessages.end(); ++it) {
     // one message per line
@@ -237,6 +238,12 @@ void CQdoasEngineController::notifyErrorMessages(int highestErrorLevel, const QL
       break;
     }
     stream << it->tag() << ") " << it->message() << ".\n";
+    ++n_errors;
+    if (n_errors >= 10) {
+      stream << "(further errors suppressed)";
+      break;
+    }
+
   }
   emit signalErrorMessages(highestErrorLevel, msg);
 }
