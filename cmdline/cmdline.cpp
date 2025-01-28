@@ -471,27 +471,27 @@ double GetFiles(const string &triggerPath,vector<string> &filenames,double lastT
 
        // Update the last timestamp
 
-       if (fileTm>newTm)
-        newTm=fileTm;
+       if (fileTm>newTm) {
+         newTm=fileTm;
+       }
 
-        // change the trigger list file extension from .list to .ok
+       // change the trigger list file extension from .list to .ok
 
-        #ifdef _WIN32
-        sprintf(renameCmd,"move %s %s",newFileName,newFileName);
-        for (ptr=strchr(renameCmd,'/');ptr!=NULL;ptr=strchr(ptr,'/'))
+#ifdef _WIN32
+       sprintf(renameCmd,"move %s %s",newFileName,newFileName);
+       for (ptr=strchr(renameCmd,'/');ptr!=NULL;ptr=strchr(ptr,'/'))
          {
-          *ptr='\\';
-          *ptr++;
+           *ptr='\\';
+           *ptr++;
          }
-        #else
-        sprintf(renameCmd,"mv %s %s",newFileName,newFileName);
-        #endif
-        ptr=strrchr(renameCmd,'.');                                            // we know that the extension is .list
-        sprintf(ptr,".ok");
-        std::cout << renameCmd << std::endl;
-        system(renameCmd);
+#else
+       sprintf(renameCmd,"mv %s %s",newFileName,newFileName);
+#endif
+       ptr=strrchr(renameCmd,'.');                                            // we know that the extension is .list
+       sprintf(ptr,".ok");
+       std::cout << renameCmd << std::endl;
+       system(renameCmd);
       }
-
    }
 
   if (hDir != NULL)
@@ -774,7 +774,7 @@ enum RunMode parseCommandLine(int argc, char **argv, commands_t *cmd)
 int batchProcess(commands_t *cmd)
 {
   try {
-  // determine the tool to use based on the config file ...
+    // determine the tool to use based on the config file ...
     enum BatchTool batchTool = requiredBatchTool(cmd->configFile);
 
     switch (batchTool) {
@@ -790,11 +790,14 @@ int batchProcess(commands_t *cmd)
     case Usamp:
       return batchProcessUsamp(cmd);
       break;
+    default:
+      break;
     }
   } catch (std::exception& e) {
-    std::cerr << "Failed to parse configuration file \""
-              << cmd->configFile  << "\"" << std::endl;
+    // catch all, report error below
   }
+  std::cerr << "Failed to parse configuration file \""
+            << cmd->configFile  << "\"" << std::endl;
   return 1;
 }
 
