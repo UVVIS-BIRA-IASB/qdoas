@@ -68,10 +68,9 @@ static int get_dimid(const string& dim_name) {
   return output_group.defDim(dim_name, dimensions[dim_name]);
 }
 
-static void getDims(NetCDFGroup &group,const struct output_field& thefield, vector<int>& dimids, vector<size_t>& chunksizes) {
+static void getDims(const struct output_field& thefield, vector<int>& dimids, vector<size_t>& chunksizes) {
   // for dimensions simply numbered "2, 3, ... 9"
   const array<const char*, 8> dim_names { { "2", "3", "4", "5", "6", "7", "8", "9" } };
-
 
   if ((thefield.data_cols > 1) && (thefield.memory_type!=OUTPUT_RESIDUAL)) {
     // not suitable for residuals assert(thefield.data_cols < 10);
@@ -79,7 +78,6 @@ static void getDims(NetCDFGroup &group,const struct output_field& thefield, vect
     chunksizes.push_back(thefield.data_cols);
   }
   switch (thefield.memory_type) {
-  break;  
   case OUTPUT_DATE:
     dimids.push_back(get_dimid("date"));
     chunksizes.push_back(3);
@@ -167,7 +165,7 @@ static void define_variable(NetCDFGroup &group, const struct output_field& thefi
     
   }
   
-  getDims(group,thefield, dimids, chunksizes);
+  getDims(thefield, dimids, chunksizes);
 
   const int varid = group.defVar(varname, dimids, getNCType(thefield.memory_type));
 
@@ -559,42 +557,11 @@ size_t vardimension<struct datetime>() {
   return 7;
 }
 
-static void write_data_field(const struct output_field& datafield, NetCDFGroup &group, const string& varname,
-                                    const vector<size_t> start, const vector<size_t> count) {
-  switch (datafield.memory_type) {
-  case OUTPUT_INT:
-    group.putVar(varname, start.data(), count.data(), static_cast<const int *>(datafield.data));
-    break;
-  case OUTPUT_SHORT:
-    group.putVar(varname, start.data(), count.data(), static_cast<const short *>(datafield.data));
-    break;
-  case OUTPUT_USHORT:
-    group.putVar(varname, start.data(), count.data(), static_cast<const unsigned short *>(datafield.data));
-    break;
-  case OUTPUT_STRING:
-    group.putVar(varname, start.data(), count.data(), static_cast<const char **>(datafield.data));
-    break;
-  case OUTPUT_FLOAT:
-    group.putVar(varname, start.data(), count.data(), static_cast<const float *>(datafield.data));
-    break;
-  case OUTPUT_RESIDUAL:    
-  case OUTPUT_DOUBLE:
-    group.putVar(varname, start.data(), count.data(), static_cast<const double *>(datafield.data));
-    break;
-  case OUTPUT_DATE:
-  case OUTPUT_TIME:
-  case OUTPUT_DATETIME:
-    assert(false && "date, time or datetime output for calibration not supported");
-    break;
-  }
-}
-
 template<typename T, typename U = T>
 static void write_buffer(const struct output_field *thefield, const bool selected[], int num_records, const OUTPUT_INFO *recordinfo) {
 
   size_t ncols = thefield->data_cols;
   size_t dimension = vardimension<U>();
-  size_t nrecs = (n_crosstrack>1)?n_alongtrack:num_records;
 
   // variables that depend on the analysis window go the the
   // appropriate subgroup for their analysis window:
