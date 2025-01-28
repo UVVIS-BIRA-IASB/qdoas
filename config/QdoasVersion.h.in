@@ -4,12 +4,9 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 */
 
-
 #ifndef _QDOASVERSION_H_GUARD
 #define _QDOASVERSION_H_GUARD
 
-#define QDOAS_VERSION "@qdoas_VERSION@"
-
-static const char cQdoasVersionString[] = "Qdoas version " QDOAS_VERSION " - " QDOAS_DATE;
+static const char cQdoasVersionString[] = "Qdoas version @qdoas_VERSION@ - @QDOAS_DATE@";
 
 #endif

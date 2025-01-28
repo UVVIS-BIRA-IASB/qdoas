@@ -71,14 +71,11 @@ endif()
 SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB_PREFIX}" CACHE STRING "") 
 
 if(MSVC)
+  add_compile_options(/W4)
   # Suppress warnings from VC on deprecated POSIX names and unsafe functions
   add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS)
   # Add dirent.h implementation for windows
   include_directories(dirent)
-endif(MSVC)
-
-if(MSVC)
-  add_compile_options(/W4)
 else()
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
@@ -103,8 +100,6 @@ if(netCDF_FOUND EQUAL 0)
   set(netCDF_LIBRARIES ${netCDF_LINK_LIBRARIES})
 endif()
 set(netCDF_INCLUDE_DIR  "${netCDF_INCLUDE_DIRS}")
-
-add_definitions(-DQDOAS_DATE="${QDOAS_DATE}")
 
 add_definitions(-DQWT_DLL)
 
