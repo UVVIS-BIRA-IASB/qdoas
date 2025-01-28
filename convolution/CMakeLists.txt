@@ -1,5 +1,4 @@
 add_executable(convolution
-  ../common/QdoasVersion.h
   ../common/CPreferences.cpp
   ../common/CPreferences.h
   ../resources/convolution.qrc

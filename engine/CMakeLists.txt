@@ -121,7 +121,9 @@ add_library(engine STATIC
   zenithal.c
   zenithal.h
 )
+
 target_link_libraries(engine PRIVATE nelmin Boost::boost Eigen3::Eigen
+  config
   ${HDF5_CXX_LIBRARIES}
   ${CODA_LIBRARY}
   ${NETCDF_LIBRARIES})

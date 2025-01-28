@@ -1,5 +1,4 @@
 add_executable(qdoas MACOSX_BUNDLE
-  ../common/QdoasVersion.h
   ../common/CPreferences.cpp
   ../common/CPreferences.h
   ../resources/qdoas.icns

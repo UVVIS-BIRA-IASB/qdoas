@@ -4,10 +4,8 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
     cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 endif()
 
-project(qdoas)
+project(qdoas VERSION 3.6.11)
 
-set(VERSION 3.6.11)
-set(QDOAS_VERSION "3.6.11" CACHE STRING "")
 set(QDOAS_DATE "3 October 2024" CACHE STRING "")
 
 
@@ -100,11 +98,11 @@ if(netCDF_FOUND EQUAL 0)
 endif()
 set(netCDF_INCLUDE_DIR  "${netCDF_INCLUDE_DIRS}")
 
-
-add_definitions(-DQDOAS_VERSION="${QDOAS_VERSION}" -DQDOAS_DATE="${QDOAS_DATE}")
+add_definitions(-DQDOAS_DATE="${QDOAS_DATE}")
 
 add_definitions(-DQWT_DLL)
 
+add_subdirectory(config)
 add_subdirectory(common)
 add_subdirectory(engine)
 add_subdirectory(mediator)

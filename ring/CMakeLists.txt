@@ -1,5 +1,4 @@
 add_executable(ring
-  ../common/QdoasVersion.h
   ../common/CPreferences.cpp
   ../common/CPreferences.h
   ../resources/ring.qrc

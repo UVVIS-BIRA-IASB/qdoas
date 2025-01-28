@@ -1,5 +1,4 @@
 add_executable(usamp
-  ../common/QdoasVersion.h
   ../common/CPreferences.cpp
   ../common/CPreferences.h
   ../resources/usamp.qrc
