@@ -695,7 +695,7 @@ static inline void get_residual_spectrum(struct output_field *this_field, double
   if (pTabFeno->residualSpectrum!=NULL)
    memcpy(residualSpectrum,pTabFeno->residualSpectrum,sizeof(double)*this_field->data_cols);
   else
-   for (int i=0;i<this_field->data_cols;i++)
+   for (size_t i=0; i!=this_field->data_cols; ++i)
      residualSpectrum[i]=QDOAS_FILL_DOUBLE;
 }
 
@@ -757,7 +757,7 @@ static inline void get_rc_analysis(struct output_field *this_field, int *rc, con
   rc[1] = pTabFeno->rc;
 }
 
-static inline void get_rc_calib(struct output_field *this_field, int *rc, const ENGINE_CONTEXT *pEngineContext UNUSED, int indexFenoColumn, int index_calib) {
+static inline void get_rc_calib(struct output_field *this_field, int *rc, const ENGINE_CONTEXT *pEngineContext UNUSED, int indexFenoColumn, int index_calib UNUSED) {
   *rc = KURUCZ_buffers[indexFenoColumn].KuruczFeno[this_field->index_feno].rc;
 }
 
