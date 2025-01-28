@@ -27,8 +27,6 @@ class CEngineController
   virtual ~CEngineController() {};
 
   // notify interface is for use by response classes
-  virtual void notifyNumberOfFiles(int nFiles) {};
-  virtual void notifyCurrentFile(int fileNumber) {};
   virtual void notifyReadyToNavigateRecords(const std::string &filename, int numberOfRecords) {};
   virtual void notifyCurrentRecord(int recordNumber) {};
   virtual void notifyEndOfRecords(void) {};
