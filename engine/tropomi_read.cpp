@@ -296,9 +296,8 @@ int tropomi_read(ENGINE_CONTEXT *pEngineContext,int record) {
           assert(obsGroup.hasVar("radiance_scaling"));
           obsGroup.getVar("radiance_int16", start, count, rad_int16.data() );
           obsGroup.getVar("radiance_scaling",start_scale,onecount,scale.data() ) ;
-          const int fill_rad_int16 = obsGroup.getFillValue<int>("radiance_int16");
           tempfill = obsGroup.getFillValue<double>("radiance_scaling");
-          for(int i = 0; i < size_spectral ;i++){
+          for(size_t i = 0; i < size_spectral ;i++){
               rad[i] = scale[0]*rad_int16[i];
               if(rad_int16[i]==65535){
                   rad[i]=tempfill;
@@ -473,7 +472,6 @@ int tropomi_init_irradiances(const mediate_analysis_window_t* analysis_windows, 
 // Return radiance reference spectral dimension; check if "col_dim" matches swath size for all radiance reference files.
 int tropomi_init_radref(const mediate_analysis_window_t* analysis_windows, int num_windows, int *n_wavel) {
   try {
-    bool have_n_wavel;
     for (int i=0; i!=num_windows; ++i) {
       const char *radref_file = analysis_windows[i].refTwoFile;
       NetCDFFile nc_rad(radref_file);
@@ -481,7 +479,7 @@ int tropomi_init_radref(const mediate_analysis_window_t* analysis_windows, int n
         throw std::runtime_error("col_dim for radiance reference '" + string(radref_file) +
                                  "' does not match number of rows from irradiance reference");
       }
-      if (!have_n_wavel) {
+      if (*n_wavel == 0) {
         *n_wavel = nc_rad.dimLen("spectral_dim");
       } else if (nc_rad.dimLen("spectral_dim") != *n_wavel) {
         // currently, QDOAS assumes the same spectral dimension for all analysis windows.
@@ -679,8 +677,7 @@ std::pair<size_t,size_t> get_window_limits(const FENO *pTabFeno, const vector<fl
 // and keep a list of references to the data in this cache for every
 // analysis window.  We use std::set to store the cache, because
 // references to elements of a std::set stay valid as the set grows.
-static vector<std::array<vector<earth_ref>, MAX_GROUNDPIXEL>> find_matching_spectra(ENGINE_CONTEXT *pEngineContext,const int nfiles,
-                                                                             set<vector<float>>& cache) {
+static vector<std::array<vector<earth_ref>, MAX_GROUNDPIXEL>> find_matching_spectra(ENGINE_CONTEXT *pEngineContext, set<vector<float>>& cache) {
   assert(size_groundpixel <= MAX_GROUNDPIXEL);
   vector<std::array<vector<earth_ref>, MAX_GROUNDPIXEL>> result(NFeno);
 
@@ -754,8 +751,6 @@ static vector<std::array<vector<earth_ref>, MAX_GROUNDPIXEL>> find_matching_spec
       }
     }
 
-    int found=0;
-
     // 3. read radiance & error for matching spectra
     vector<unsigned char> spec_quality(size_spectral); // Temporary buffer for spectral_channel_quality flags
     for (size_t scan=0; scan != orbit_scanline; ++scan) {
@@ -827,9 +822,8 @@ static vector<std::array<vector<earth_ref>, MAX_GROUNDPIXEL>> find_matching_spec
                       assert(obsGroup.hasVar("radiance_scaling"));
                       obsGroup.getVar("radiance_int16", start, count, rad_int16.data() );
                       obsGroup.getVar("radiance_scaling",start_scale,onecount,scale.data() ) ;
-                      const int fill_rad_int16 = obsGroup.getFillValue<int>("radiance_int16");
                       tempfill = obsGroup.getFillValue<double>("radiance_scaling");
-                      for(int i = 0; i < size_spectral ;i++){
+                      for(size_t i = 0; i < size_spectral ;i++){
                           spec[i] = scale[0]*rad_int16[i];
                           if(rad_int16[i]==65535){
                               spec[i]=tempfill;
@@ -858,7 +852,6 @@ static vector<std::array<vector<earth_ref>, MAX_GROUNDPIXEL>> find_matching_spec
               assert(i_spec != cache.end() && i_err != cache.end());
               result[win][row].push_back(earth_ref( *(nominal_wavelengths[row]), *i_spec, *i_err,
                                                   orbit_fill_wavelengths, orbit_fill_spectra, orbit_fill_errors));
-              found=1;
             }
 
           }
@@ -948,10 +941,11 @@ int tropomi_prepare_automatic_reference(ENGINE_CONTEXT *pEngineContext, void *re
   // If we reach this point, we must create a new reference spectrum
   try {
     set<vector<float>> cache;
-    auto earth_spectra = find_matching_spectra(pEngineContext,get_reference_orbits(pEngineContext->project.instrumental.use_row,
-                                                                                   pEngineContext->fileInfo.fileName,
-                                                                                   pEngineContext->project.instrumental.tropomi.spectralBand,
-                                                                                   pEngineContext->project.instrumental.tropomi.reference_orbit_dir), cache);
+    get_reference_orbits(pEngineContext->project.instrumental.use_row,
+                         pEngineContext->fileInfo.fileName,
+                         pEngineContext->project.instrumental.tropomi.spectralBand,
+                         pEngineContext->project.instrumental.tropomi.reference_orbit_dir);
+    auto earth_spectra = find_matching_spectra(pEngineContext,cache);
 
     vector<double> wavelength_grid, sum, variance;
     for (size_t row = 0; row!=size_groundpixel; ++row) {
@@ -1018,7 +1012,7 @@ int tropomi_prepare_automatic_reference(ENGINE_CONTEXT *pEngineContext, void *re
       }
     }
 
-  } catch (std::runtime_error e) {
+  } catch (std::runtime_error& e) {
     return ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_TROPOMI_REF, pEngineContext->fileInfo.fileName, 0, e.what()); // TODO: more specific error message
   }
   for (size_t row = 0; row!= size_groundpixel; ++row) {
@@ -1039,7 +1033,7 @@ int tropomi_get_reference_irrad(const char *filename, int pixel, double *lambda,
     if (!r.irradiance.size() )
       return ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_REF_DATA, pixel);
 
-    for (size_t i = 0; i < n_wavel; ++i) {
+    for (int i = 0; i < n_wavel; ++i) {
       lambda[i] = r.lambda[i];
       spectrum[i] = r.irradiance[i];
       sigma[i] = r.sigma[i];
