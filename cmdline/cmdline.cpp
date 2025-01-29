@@ -1115,7 +1115,7 @@ int QdoasBatch::analyse_project(const vector<string> &filenames)  {
     } else {  // not an existing file or directory -> assume a filename pattern was provided
               // and recursively search for matching files:
       auto path = fs::path(*it);
-      retCode = analyse_directory(path.parent_path(), path.filename(), 1);
+      retCode = analyse_directory(path.parent_path().string(), path.filename().string(), 1);
       if (files_processed == 0) {
         std::cerr << "ERROR: No files matching pattern " << path.filename()
                   << " in directory " << path.parent_path() << " or subdirectories." << std::endl;
@@ -1221,7 +1221,7 @@ int QdoasBatch::analyse_directory(const string &dir, const string &filter, bool 
   if (recursive) {
     for (auto& p : fs::directory_iterator(dir)) {
       if (fs::is_directory(p)) {
-        int dir_result = analyse_directory(p.path(), filter, true);
+        int dir_result = analyse_directory(p.path().string(), filter, true);
         if (dir_result == 0) {  // got positive result from at least one subdir
           result = 0;
         }
@@ -1231,8 +1231,8 @@ int QdoasBatch::analyse_directory(const string &dir, const string &filter, bool 
 
   for (auto &p : fs::directory_iterator(dir)) {
     if (fs::is_regular_file(p) &&
-        (filter.empty() || glob_match(filter, string(p.path().filename())))) {
-      int file_result = analyse_file(p.path());
+        (filter.empty() || glob_match(filter, p.path().filename().string()))) {
+      int file_result = analyse_file(p.path().string());
       if (file_result == 0) {
         result = 0;
       }
