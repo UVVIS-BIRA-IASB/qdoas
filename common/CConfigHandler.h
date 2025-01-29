@@ -23,11 +23,10 @@ class CConfigSubHandler
   CConfigSubHandler(CConfigHandler *master) : m_master(master) {};
   virtual ~CConfigSubHandler() {};
 
-  virtual void start(const Glib::ustring& name, const AttributeList& atts) {};
-  virtual void start(const std::map<Glib::ustring, std::string>& atts) {};
-  virtual void start(const Glib::ustring& element, const std::map<Glib::ustring, std::string>& atts) {};
-  virtual void character(const std::string &ch) {};
-  virtual void end(const Glib::ustring &element) {};
+  virtual void start([[maybe_unused]] const std::map<Glib::ustring, std::string>& atts) {};
+  virtual void start([[maybe_unused]] const Glib::ustring& element, [[maybe_unused]] const std::map<Glib::ustring, std::string>& atts) {};
+  virtual void character([[maybe_unused]] const std::string &ch) {};
+  virtual void end([[maybe_unused]] const Glib::ustring &element) {};
   virtual void end() {};
 
   virtual CConfigHandler* master() { return m_master; };
