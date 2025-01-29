@@ -67,16 +67,22 @@ else()
   set(PKGDATA_PREFIX share/qdoas)
 endif()
 
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB_PREFIX}" CACHE STRING "") 
+SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB_PREFIX}" CACHE STRING "")
+
+option(PEDANTIC "Enable pedantic compiler warnings." OFF)
 
 if(MSVC)
-  add_compile_options(/W4)
+  if(PEDANTIC)
+    add_compile_options(/W4)
+  endif()
   # Suppress warnings from VC on deprecated POSIX names and unsafe functions
   add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS)
   # Add dirent.h implementation for windows
   include_directories(dirent)
 else()
-  add_compile_options(-Wall -Wextra -Wpedantic)
+  if(PEDANTIC)
+    add_compile_options(-Wall -Wextra -Wpedantic)
+  endif()
 endif()
 
 find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport)
