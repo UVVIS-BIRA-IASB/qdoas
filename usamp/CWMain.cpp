@@ -132,14 +132,11 @@ CWMain::CWMain(QWidget *parent) :
 
   // About
   helpMenu->addAction("Qdoas Help ", this, SLOT(slotQdoasHelp()));
-  // dual help systems ...
-  QSettings &settings = CPreferences::instance()->settings();
 
+  // dual help systems ...
   helpMenu->addAction("About Qdoas", this, SLOT(slotAboutQdoas()));
   helpMenu->addSeparator();
   helpMenu->addAction("About Qt", this, SLOT(slotAboutQt()));
-
-  // NOT NEEDED ANYMORE connect(helpCheck, SIGNAL(triggered(bool)), this, SLOT(slotHelpBrowserPreference(bool)));
 
   m_menuBar->addMenu(helpMenu);
 

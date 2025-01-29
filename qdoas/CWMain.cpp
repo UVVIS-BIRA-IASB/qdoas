@@ -444,13 +444,13 @@ void CWMain::openFile(const QString &fileName) {
       }
 
       // sites
-      for (const auto item : handler.siteItems()) {
+      for (const auto& item : handler.siteItems()) {
         ws->createSite(item.siteName(), item.abbreviation(),
                        item.longitude(), item.latitude(), item.altitude());
       }
 
       // symbols
-      for (const auto item : handler.symbolItems()) {
+      for (const auto& item : handler.symbolItems()) {
         ws->createSymbol(item.symbolName(), item.symbolDescription());
       }
 
