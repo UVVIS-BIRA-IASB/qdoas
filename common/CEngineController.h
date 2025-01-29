@@ -27,13 +27,13 @@ class CEngineController
   virtual ~CEngineController() {};
 
   // notify interface is for use by response classes
-  virtual void notifyReadyToNavigateRecords(const std::string &filename, int numberOfRecords) {};
-  virtual void notifyCurrentRecord(int recordNumber) {};
+  virtual void notifyReadyToNavigateRecords([[maybe_unused]] const std::string &filename, [[maybe_unused]] int numberOfRecords) {};
+  virtual void notifyCurrentRecord([[maybe_unused]] int recordNumber) {};
   virtual void notifyEndOfRecords(void) {};
-  virtual void notifyPlotData(std::map<int, CPlotPageData> pageData) {};
-  virtual void notifyTableData(std::vector<SCell> &cellList) {};
+  virtual void notifyPlotData([[maybe_unused]] std::map<int, CPlotPageData> pageData) {};
+  virtual void notifyTableData([[maybe_unused]] std::vector<SCell> &cellList) {};
 
-  virtual void notifyErrorMessages(int highestErrorLevel, const std::vector<CEngineError> &errorMessages) {};
+  virtual void notifyErrorMessages(int highestErrorLevel, const std::vector<CEngineError> &errorMessages) =0;
 };
 
 #endif
