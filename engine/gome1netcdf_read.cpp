@@ -580,68 +580,6 @@ void GOME1NETCDF_Get_Irradiance(GOME1NETCDF_ORBIT_FILE *pOrbitFile,int channel_i
  }
 
 // -----------------------------------------------------------------------------
-// FUNCTION get_ref_info
-// -----------------------------------------------------------------------------
-//!
-//! \fn      RC get_ref_info(GOME1NETCDF_ORBIT_FILE *pOrbitFile,GOME1NETCDF_REF *ref_list)
-//! \details Browse spectra of the current orbit file and collect information for the automatic reference selection
-//! \param   [out] ref_list  the information on spectra useful for the automatic reference selection\n
-//! \param   [in]  pOrbitFile : pointer to the current orbit file\n
-//!
-// -----------------------------------------------------------------------------
-
-static void get_ref_info(GOME1NETCDF_ORBIT_FILE *pOrbitFile)
- {
-  // Global declarations
-
-  GOME1NETCDF_REF *refList,*pRef;
-  int pixelSize;
-
-  // Declare substition variables for ground pixels
-
-  const auto& sza_gr = pOrbitFile->ground_geodata.sza;
-  const auto& lat_gr = pOrbitFile->ground_geodata.lat;
-  const auto& lon_gr = pOrbitFile->ground_geodata.lon;
-  const auto& cloud_gr = pOrbitFile->ground_clouddata.cloud_frac;
-
-  // Declare substition variables for backscan pixels
-
-  const auto& sza_bs = pOrbitFile->backscan_geodata.sza;
-  const auto& lat_bs = pOrbitFile->backscan_geodata.lat;
-  const auto& lon_bs = pOrbitFile->backscan_geodata.lon;
-
-  const auto& cloud_bs = pOrbitFile->backscan_clouddata.cloud_frac;
-
-  for (int i=0;i<pOrbitFile->specNumber;i++)
-   {
-    // Declarations
-
-    size_t scanIndex=pOrbitFile->scanline_indexes[i];                           // index in the ground pixel scanlines or backscan scanlines
-    int    pixelType=pOrbitFile->scanline_pixtype[i];                           // pixel type
-    size_t pixelIndex=(pixelType==3)?0:pixelType;                               // index of the pixel in the scan : should be 0,1,2 for ground pixels and 0 for backscans
-
-    // Get useful information for automatic reference selection
-
-    if (pOrbitFile->refInfo[pixelType]!=NULL)
-     {
-      refList=pOrbitFile->refInfo[pixelType];
-      pRef=&refList[pOrbitFile->refNum[pixelType]];
-
-      pRef->pixelType=pixelType;
-      pRef->sza=(pixelType==3)?sza_bs[scanIndex][pixelIndex][1]:sza_gr[scanIndex][pixelIndex][1];
-      pRef->latitude=(pixelType==3)?lat_bs[scanIndex][pixelIndex]:lat_gr[scanIndex][pixelIndex];
-      pRef->longitude=(pixelType==3)?lon_bs[scanIndex][pixelIndex]:lon_gr[scanIndex][pixelIndex];
-      pRef->cloudFraction=(pixelType==3)?cloud_bs[scanIndex][pixelIndex]:cloud_gr[scanIndex][pixelIndex];
-
-      pOrbitFile->refNum[pixelType]=pOrbitFile->refNum[pixelType]+1;
-
-     }
-   }
-
-
- }
-
-// -----------------------------------------------------------------------------
 // FUNCTION GOME1NETCDF_Set
 // -----------------------------------------------------------------------------
 //!
@@ -1096,7 +1034,6 @@ RC GOME1NETCDF_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,INDEX fileIndex)
     size_t scanIndex=pOrbitFile->scanline_indexes[recordNo-1];                  // index in the ground pixel scanlines or backscan scanlines
     int    pixelType=pOrbitFile->scanline_pixtype[recordNo-1];                  // pixel type
     size_t pixelIndex=(pixelType==3)?0:pixelType;                               // index of the pixel in the scan : should be 0,1,2 for ground pixels and 0 for backscans
-    int    pixelSize=(pixelType==3)?1:3;                                        // pixel size : should be 3 for ground pixels and 1 for backscans
     size_t start[] = {0,scanIndex,((int)pixelType==3)?0:(size_t)pixelType,0};
     size_t count[] = {1,1,1,pOrbitFile->det_size};                              // only one record to load
 
@@ -1302,7 +1239,6 @@ static void get_ref_info2(GOME1NETCDF_ORBIT_FILE *pOrbitFile,GOME1NETCDF_REF *re
   // Global declarations
 
   GOME1NETCDF_REF *pRef;
-  int pixelSize;
 
   // Declare substition variables for ground pixels
 
@@ -1471,8 +1407,11 @@ static int show_ref_info(int i_row, const FENO *pTabFeno, const struct reference
     ++i_row;
     string labelfmt("Reference ");
     labelfmt += pixeltype[i];
-    MEDIATE_PLOT_CURVES(plotPageRef,Spectrum,forceAutoScale, labelfmt.c_str(), "Wavelength (nm)", "Intensity", responseHandle,
-                        (struct curve_data) {.x=pTabFeno->LambdaRef, .y=refs[i].spectrum, .length=refs[i].n_wavel});
+    curve_data spec;
+    spec.x = pTabFeno->LambdaRef;
+    spec.y = refs[i].spectrum;
+    spec.length = refs[i].n_wavel;
+    MEDIATE_PLOT_CURVES(plotPageRef,Spectrum,forceAutoScale, labelfmt.c_str(), "Wavelength (nm)", "Intensity", responseHandle, spec);
   }
   return ++i_row;
 }
@@ -1488,7 +1427,7 @@ static int show_ref_info(int i_row, const FENO *pTabFeno, const struct reference
 //               ERROR_ID_NO otherwise.
 // -----------------------------------------------------------------------------
 
-RC GOME1NETCDF_NewRef(ENGINE_CONTEXT *pEngineContext,void *responseHandle) {
+RC GOME1NETCDF_NewRef(ENGINE_CONTEXT *pEngineContext) {
 
   // make a copy of the EngineContext structure to read reference data
   RC rc=EngineCopyContext(&ENGINE_contextRef,pEngineContext);
@@ -1761,7 +1700,7 @@ RC GOME1NETCDF_LoadAnalysis(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
   // Automatic reference selection
 
    if ((THRD_id!=THREAD_TYPE_KURUCZ) &&
-      ( (gome1netCDF_loadReferenceFlag && !(rc=GOME1NETCDF_NewRef(pEngineContext,responseHandle))) || useRef2))
+      ( (gome1netCDF_loadReferenceFlag && !(rc=GOME1NETCDF_NewRef(pEngineContext))) || useRef2))
     for (int indexFenoColumn=0;(indexFenoColumn<ANALYSE_swathSize) && !rc;indexFenoColumn++)
       rc=ANALYSE_AlignReference(pEngineContext,2,responseHandle,indexFenoColumn); // 2 is for automatic mode
 
