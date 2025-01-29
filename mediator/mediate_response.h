@@ -54,10 +54,10 @@ void mediateResponsePlotData(int page, const struct curve_data *plotDataArray, i
                              const char *title, const char *xLabel,
                              const char *yLabel, void *responseHandle);
 
-#define MEDIATE_PLOT_CURVES(page, type, forceAutoScaling, title, xLabel, yLabel, responseHandle, curve_args...) ({ \
-      struct curve_data _curves[] = {curve_args};                                \
+#define MEDIATE_PLOT_CURVES(page, type, forceAutoScaling, title, xLabel, yLabel, responseHandle, ...) { \
+      struct curve_data _curves[] = {__VA_ARGS__};                                \
       mediateResponsePlotData(page, _curves, sizeof(_curves) / sizeof(*_curves), type, forceAutoScaling, title, xLabel, yLabel, responseHandle); \
-    })
+    }
 
 void mediateResponsePlotImage(int page,const char *imageFile,const char *title,void *responseHandle);
 
