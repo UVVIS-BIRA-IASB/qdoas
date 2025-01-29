@@ -28,18 +28,18 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 
 CWProjectExportEditor::CWProjectExportEditor(CWProjectTree *projectTree, QTreeWidgetItem *items, QString projectName,mediate_project_export_t *properties, int format,
-                                                   QWidget *parent) :
+                                             QWidget *parent) :
   CWEditor(parent),
   m_projectTree(projectTree),
   m_items(items),
-  m_projectName(projectName),
   m_properties(properties),
-  m_format(format)
+  m_format(format),
+  m_projectName(projectName)
 {
-     m_captionStr = "Export Data/Spectra";
-     m_contextTag = "Export Data/Spectra";
+  m_captionStr = "Export Data/Spectra";
+  m_contextTag = "Export Data/Spectra";
 
-     // main layout: VBox
+  // main layout: VBox
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
   QFrame *pathFrame;
 
