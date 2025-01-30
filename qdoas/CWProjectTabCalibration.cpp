@@ -213,7 +213,7 @@ CWProjectTabCalibration::CWProjectTabCalibration(const mediate_project_calibrati
   // fit paramters tables
   m_tabs = new QTabWidget(this);
 
-  m_moleculesTab = new CWMoleculesDoasTable("Molecules", 120);
+  m_moleculesTab = new CWMoleculesDoasTable("Molecules");
   m_tabs->addTab(m_moleculesTab, "Molecules");
   m_linearTab = new PolynomialTab;
   m_tabs->addTab(m_linearTab, "Linear Parameters");
