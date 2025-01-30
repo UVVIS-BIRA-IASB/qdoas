@@ -353,7 +353,7 @@ CWAnalysisWindowPropertyEditor::CWAnalysisWindowPropertyEditor(const QString &pr
 
   m_tabs = new QTabWidget(this);
 
-  m_moleculesTab = new CWMoleculesDoasTable("Molecules", 120);
+  m_moleculesTab = new CWMoleculesDoasTable("Molecules");
   m_tabs->addTab(m_moleculesTab, "Molecules");
   m_linearTab = new PolynomialTab();
   m_tabs->addTab(m_linearTab, "Polynomials");
@@ -565,9 +565,9 @@ bool CWAnalysisWindowPropertyEditor::actionOk(void)
     m_projectName.clear();
     ws->modifiedProjectProperties(updateBlock.toStdString());
     m_projectName = updateBlock;
+  } else {
+    brc=false;
   }
- else
-  brc=false;
 
 
   // Project not found ... TODO

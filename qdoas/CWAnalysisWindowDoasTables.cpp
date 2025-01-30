@@ -150,7 +150,7 @@ QWidget* CMoleculeDoasTableColumnCorrection::createCellWidget(const QVariant &ce
 
 
 
-CWMoleculesDoasTable::CWMoleculesDoasTable(const QString &label, int columnWidth,
+CWMoleculesDoasTable::CWMoleculesDoasTable(const QString &label,
                        int headerHeight, QWidget *parent) :
   CDoasTable(label, headerHeight, parent),
   m_selectedRow(-1)

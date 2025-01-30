@@ -51,7 +51,7 @@ class CMoleculeDoasTableColumnDiffOrtho : public CDoasTableColumn
   CMoleculeDoasTableColumnDiffOrtho(const QString &label, CDoasTable *owner, int width);
 
   virtual QVariant getCellData(int rowIndex) const;
-  virtual void setCellData(int, const QVariant& v) { }; // do nothing
+  virtual void setCellData(int, const QVariant&) { }; // do nothing
 
  protected:
   virtual QWidget* createCellWidget(const QVariant &cellData);
@@ -86,7 +86,7 @@ class CMoleculeDoasTableColumnCorrection : public CDoasTableColumn
   CMoleculeDoasTableColumnCorrection(const QString &label, CDoasTable *owner, int width);
 
   virtual QVariant getCellData(int rowIndex) const;
-  virtual void setCellData(int, const QVariant& v) { }; // do nothing
+  virtual void setCellData(int, const QVariant&) { }; // do nothing
 
  protected:
   virtual QWidget* createCellWidget(const QVariant &cellData);
@@ -96,7 +96,7 @@ class CWMoleculesDoasTable : public CDoasTable
 {
 Q_OBJECT
  public:
-  CWMoleculesDoasTable(const QString &label, int columnWidth, int headerHeight = 24, QWidget *parent = 0);
+  CWMoleculesDoasTable(const QString &label, int headerHeight = 24, QWidget *parent = 0);
 
   void populate(const cross_section_list_t *d);
   bool apply(cross_section_list_t *d) const;
