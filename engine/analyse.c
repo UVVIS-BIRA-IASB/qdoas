@@ -2408,29 +2408,6 @@ RC ANALYSE_fit_shift_stretch(int indexFeno, int indexFenoColumn, const double *s
   Feno->Shift=Feno->Stretch=Feno->Stretch2=0.;
   NDET[indexFenoColumn]=Feno->NDET;
   
-  //int molecularRingFlag=Feno->molecularCorrection;
-  
-  //Feno->molecularCorrection=0;
-
-  CROSS_REFERENCE *pTabCross;
-
-//   for (int indexTabCross=0;indexTabCross<Feno->NTabCross;indexTabCross++)
-//    {
-//     pTabCross=&Feno->TabCross[indexTabCross];
-// 
-//     if ((pTabCross->crossCorrection==ANLYS_CORRECTION_TYPE_SLOPE) ||
-//         (pTabCross->crossCorrection==ANLYS_CORRECTION_TYPE_PUKITE) ||
-//         (pTabCross->crossCorrection==ANLYS_CORRECTION_TYPE_MOLECULAR_RING_SLOPE))
-//      {
-//       if (pTabCross->indexPukite1!=ITEM_NONE)
-//        Feno->TabCross[pTabCross->indexPukite1].FitConc=0;
-//       if (pTabCross->indexPukite2!=ITEM_NONE)
-//        Feno->TabCross[pTabCross->indexPukite2].FitConc=0;
-//       
-//       pTabCross->crossCorrection=ANLYS_CORRECTION_TYPE_NONE;   // Do not use Pukite or molecular ring for the alignment of reference spectra
-//      }
-//    } 
-
   memcpy(Feno->Lambda,Feno->LambdaK,sizeof(*Feno->Lambda)*Feno->NDET); // CHECK: why this copy?
   LambdaSpec=Feno->Lambda; // now pointer LambdaSpec== pointer Feno->Lambda, and buffer content is Feno->LambdaK
 
