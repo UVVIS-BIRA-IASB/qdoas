@@ -39,7 +39,7 @@ struct curve_data {
 };
 
 // macro to "default-initialize" some fields of a plot_data struct in C
-#define CURVE(...) ((struct curve_data) { .name="", .number=-1, .style=Line, ##__VA_ARGS__ })
+#define CURVE(...) (struct curve_data) { .name="", .number=-1, .style=Line, ##__VA_ARGS__ }
 
 void mediateResponseAddImage(int page,const char *imageFile,void *responseHandle);
 
@@ -54,10 +54,18 @@ void mediateResponsePlotData(int page, const struct curve_data *plotDataArray, i
                              const char *title, const char *xLabel,
                              const char *yLabel, void *responseHandle);
 
+#ifndef __cplusplus
+#define IGNORE_OVERRIDE _Pragma("GCC diagnostic ignored \"-Woverride-init\"")
+#else
+#define IGNORE_OVERRIDE
+#endif
 #define MEDIATE_PLOT_CURVES(page, type, forceAutoScaling, title, xLabel, yLabel, responseHandle, ...) { \
-      struct curve_data _curves[] = {__VA_ARGS__};                                \
-      mediateResponsePlotData(page, _curves, sizeof(_curves) / sizeof(*_curves), type, forceAutoScaling, title, xLabel, yLabel, responseHandle); \
-    }
+    _Pragma("GCC diagnostic push")                                      \
+      IGNORE_OVERRIDE                                                   \
+      struct curve_data _curves[] = {__VA_ARGS__};                      \
+    mediateResponsePlotData(page, _curves, sizeof(_curves) / sizeof(*_curves), type, forceAutoScaling, title, xLabel, yLabel, responseHandle); \
+    _Pragma("GCC diagnostic pop")                                       \
+      }
 
 void mediateResponsePlotImage(int page,const char *imageFile,const char *title,void *responseHandle);
 
