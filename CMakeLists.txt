@@ -86,7 +86,12 @@ else()
 endif()
 
 find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport)
-find_package(Qwt)
+find_package(Qwt)  # Our own FindQwt macro
+if(DEFINED VCPKG_TARGET_TRIPLET)
+  find_package(unofficial-qwt)
+  # the vcpkg qwt port places the headers in a qwt subdirectory:
+  find_path(QWT_INCLUDE_DIR NAMES qwt.h PATH_SUFFIXES qwt)
+endif()
 
 find_package(Boost REQUIRED)
 find_package(CODA REQUIRED)
