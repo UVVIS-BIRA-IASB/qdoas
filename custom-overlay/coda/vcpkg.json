@@ -1,0 +1,23 @@
+{
+  "name": "coda",
+  "version": "2.25.3",
+  "homepage": "https://stcorp.github.io/coda/doc/html",
+  "description": "The Common Data Access toolbox (CODA) provides a set of tools for ingesting, processing, and analyzing remote sensing data.",
+  "license": "BSD-3-Clause",
+  "dependencies": [
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    },
+	"hdf4",
+	"hdf5"
+  ],
+
+  "default-features": [],
+  "features": {
+    "example-feature": {
+      "description": "",
+      "dependencies": []
+    }
+  }
+}
