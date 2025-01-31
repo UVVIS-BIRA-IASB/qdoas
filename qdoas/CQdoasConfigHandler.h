@@ -28,8 +28,8 @@ class CQdoasConfigHandler : public CConfigHandler
   const std::vector<CSymbolConfigItem>& symbolItems() const; // items in returned list have the same lifetime as 'this'
 
 protected:
-  virtual void start_subhandler(const Glib::ustring& name,
-                                const std::map<Glib::ustring, std::string>& attributes) override;
+  virtual void start_subhandler(const xmlstring& name,
+                                const std::map<xmlstring, std::string>& attributes) override;
 
  private:
   std::vector<CProjectConfigItem> m_projectItemList;
@@ -56,8 +56,8 @@ class CSiteSubHandler : public CQdoasConfigSubHandler
  public:
   CSiteSubHandler(CQdoasConfigHandler *master);
 
-  virtual void start(const Glib::ustring&name,
-                     const std::map<Glib::ustring, std::string>& attributes) override;
+  virtual void start(const xmlstring&name,
+                     const std::map<xmlstring, std::string>& attributes) override;
 };
 
 //-------------------------------------------------------------------
@@ -67,8 +67,8 @@ class CSymbolSubHandler : public CQdoasConfigSubHandler
  public:
   CSymbolSubHandler(CQdoasConfigHandler *master);
 
-  virtual void start(const Glib::ustring& name,
-                     const std::map<Glib::ustring, std::string>& attributes) override;
+  virtual void start(const xmlstring& name,
+                     const std::map<xmlstring, std::string>& attributes) override;
 };
 
 //-------------------------------------------------------------------
@@ -78,9 +78,9 @@ class CProjectSubHandler : public CQdoasConfigSubHandler
  public:
   CProjectSubHandler(CQdoasConfigHandler *master);
 
-  virtual void start(const Glib::ustring& element,
-                     const std::map<Glib::ustring, std::string>& atts) override;
-  virtual void start(const std::map<Glib::ustring, std::string>& atts) override;
+  virtual void start(const xmlstring& element,
+                     const std::map<xmlstring, std::string>& atts) override;
+  virtual void start(const std::map<xmlstring, std::string>& atts) override;
   virtual void end(void) override;
 
  private:

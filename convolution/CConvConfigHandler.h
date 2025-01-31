@@ -25,8 +25,8 @@ class CConvConfigHandler : public CConfigHandler
   const mediate_convolution_t* properties(void) const;
 
 protected:
-  virtual void start_subhandler(const Glib::ustring& name,
-                                const std::map<Glib::ustring, std::string>& attributes) override;
+  virtual void start_subhandler(const xmlstring& name,
+                                const std::map<xmlstring, std::string>& attributes) override;
  private:
   mediate_convolution_t m_properties;
 };
@@ -40,7 +40,7 @@ class CConvGeneralSubHandler : public CConfigSubHandler
  public:
   CConvGeneralSubHandler(CConfigHandler *master, mediate_conv_general_t *d);
 
-  virtual void start(const std::map<Glib::ustring, std::string>& attributes) override;
+  virtual void start(const std::map<xmlstring, std::string>& attributes) override;
 
  private:
   mediate_conv_general_t *m_d;
@@ -53,8 +53,8 @@ class CConvSlitSubHandler : public CConfigSubHandler
  public:
   CConvSlitSubHandler(CConfigHandler *master, mediate_slit_function_t *d);
 
-  virtual void start(const Glib::ustring& name,
-                     const std::map<Glib::ustring, std::string>& attributes) override;
+  virtual void start(const xmlstring& name,
+                     const std::map<xmlstring, std::string>& attributes) override;
 
  private:
   mediate_slit_function_t *m_d;

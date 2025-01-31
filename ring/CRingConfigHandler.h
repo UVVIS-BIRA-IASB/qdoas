@@ -22,8 +22,8 @@ class CRingConfigHandler : public CConfigHandler
   const mediate_ring_t* properties(void) const;
 
 protected:
-  virtual void start_subhandler(const Glib::ustring& name,
-                                const std::map<Glib::ustring, std::string>& attributes) override;
+  virtual void start_subhandler(const xmlstring& name,
+                                const std::map<xmlstring, std::string>& attributes) override;
 
  private:
   mediate_ring_t m_properties;
@@ -38,8 +38,8 @@ class CRingGeneralSubHandler : public CConfigSubHandler
  public:
   CRingGeneralSubHandler(CConfigHandler *master, mediate_ring_t *d);
 
-  virtual void start(const std::map<Glib::ustring, std::string>& attributes) override;
-  virtual void start(const Glib::ustring& element, const std::map<Glib::ustring, std::string>& attributes) override;
+  virtual void start(const std::map<xmlstring, std::string>& attributes) override;
+  virtual void start(const xmlstring& element, const std::map<xmlstring, std::string>& attributes) override;
 
  private:
   mediate_ring_t *m_d;

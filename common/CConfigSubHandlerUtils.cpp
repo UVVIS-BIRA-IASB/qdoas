@@ -18,7 +18,7 @@ CFilteringSubHandler::CFilteringSubHandler(CConfigHandler *master,
 {
 }
 
-void CFilteringSubHandler::start(const map<Glib::ustring, string>& atts)
+void CFilteringSubHandler::start(const map<xmlstring, string>& atts)
 {
   // selected filter
 
@@ -44,7 +44,7 @@ void CFilteringSubHandler::start(const map<Glib::ustring, string>& atts)
     throw std::runtime_error("Invalid filter method");
 }
 
-void CFilteringSubHandler::start(const Glib::ustring& element, const map<Glib::ustring, string>& atts)
+void CFilteringSubHandler::start(const xmlstring& element, const map<xmlstring, string>& atts)
 {
   // sub element of lowpass_filter or highpass_filter
 
@@ -110,7 +110,7 @@ CSlitFunctionSubHandler::CSlitFunctionSubHandler(CConfigHandler *master,
 {
 }
 
-void CSlitFunctionSubHandler::start(const map<Glib::ustring, string>& atts)
+void CSlitFunctionSubHandler::start(const map<xmlstring, string>& atts)
 {
   string str = value(atts, "type");
 
@@ -145,7 +145,7 @@ void CSlitFunctionSubHandler::start(const map<Glib::ustring, string>& atts)
 
 }
 
-void CSlitFunctionSubHandler::start(const Glib::ustring& element, const map<Glib::ustring, string>& atts)
+void CSlitFunctionSubHandler::start(const xmlstring& element, const map<xmlstring, string>& atts)
 {
   if (element == "file") {
 

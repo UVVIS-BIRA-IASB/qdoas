@@ -21,7 +21,7 @@ CAnalysisWindowSubHandler::CAnalysisWindowSubHandler(CConfigHandler *master,
 {
 }
 
-void CAnalysisWindowSubHandler::start(const map<Glib::ustring, string> &atts)
+void CAnalysisWindowSubHandler::start(const map<xmlstring, string> &atts)
 {
   mediate_analysis_window_t *d = m_item->properties();
 
@@ -53,7 +53,7 @@ void CAnalysisWindowSubHandler::start(const map<Glib::ustring, string> &atts)
   };
 }
 
-void CAnalysisWindowSubHandler::start(const Glib::ustring &element, const map<Glib::ustring, string> &atts)
+void CAnalysisWindowSubHandler::start(const xmlstring &element, const map<xmlstring, string> &atts)
 {
   mediate_analysis_window_t *d = m_item->properties();
 
@@ -179,7 +179,7 @@ CAnalysisWindowCrossSectionSubHandler::CAnalysisWindowCrossSectionSubHandler(CCo
 {
 }
 
-void CAnalysisWindowCrossSectionSubHandler::start(const map<Glib::ustring, string> &atts)
+void CAnalysisWindowCrossSectionSubHandler::start(const map<xmlstring, string> &atts)
 {
   if (m_d->nCrossSection < MAX_AW_CROSS_SECTION) {
 
@@ -288,7 +288,7 @@ CAnalysisWindowLinearSubHandler::CAnalysisWindowLinearSubHandler(CConfigHandler 
 {
 }
 
-void CAnalysisWindowLinearSubHandler::start(const map<Glib::ustring, string> &atts)
+void CAnalysisWindowLinearSubHandler::start(const map<xmlstring, string> &atts)
 {
   m_d->xPolyOrder = CAnalysisWindowSubHandler::mapToPolyType(value(atts, "xpoly"));
   m_d->xBaseOrder = CAnalysisWindowSubHandler::mapToPolyType(value(atts, "xbase"));
@@ -312,7 +312,7 @@ CAnalysisWindowNonLinearSubHandler::CAnalysisWindowNonLinearSubHandler(CConfigHa
 {
 }
 
-void CAnalysisWindowNonLinearSubHandler::start(const map<Glib::ustring, string> &atts)
+void CAnalysisWindowNonLinearSubHandler::start(const map<xmlstring, string> &atts)
 {
   string str;
 
@@ -426,7 +426,7 @@ CAnalysisWindowShiftStretchSubHandler::CAnalysisWindowShiftStretchSubHandler(CCo
 {
 }
 
-void CAnalysisWindowShiftStretchSubHandler::start(const map<Glib::ustring, string> &atts)
+void CAnalysisWindowShiftStretchSubHandler::start(const map<xmlstring, string> &atts)
 {
   if (m_d->nShiftStretch < MAX_AW_SHIFT_STRETCH) {
 
@@ -465,7 +465,7 @@ void CAnalysisWindowShiftStretchSubHandler::start(const map<Glib::ustring, strin
   throw std::runtime_error("Too many cross sections in analysis window");
 }
 
-void CAnalysisWindowShiftStretchSubHandler::start(const Glib::ustring &element, const map<Glib::ustring, string> &atts)
+void CAnalysisWindowShiftStretchSubHandler::start(const xmlstring &element, const map<xmlstring, string> &atts)
 {
   if (element == "symbol" && m_d->nShiftStretch < MAX_AW_SHIFT_STRETCH) {
 
@@ -499,7 +499,7 @@ CAnalysisWindowGapSubHandler::CAnalysisWindowGapSubHandler(CConfigHandler *maste
 {
 }
 
-void CAnalysisWindowGapSubHandler::start(const map<Glib::ustring, string> &atts)
+void CAnalysisWindowGapSubHandler::start(const map<xmlstring, string> &atts)
 {
   if (m_d->nGap < MAX_AW_GAP) {
     m_d->gap[m_d->nGap].minimum = parse_value<double>(atts, "min");
@@ -524,7 +524,7 @@ CAnalysisWindowOutputSubHandler::CAnalysisWindowOutputSubHandler(CConfigHandler 
 {
 }
 
-void CAnalysisWindowOutputSubHandler::start(const map<Glib::ustring, string> &atts)
+void CAnalysisWindowOutputSubHandler::start(const map<xmlstring, string> &atts)
 {
   if (m_d->nOutput < MAX_AW_CROSS_SECTION) {
 
@@ -564,7 +564,7 @@ CAnalysisWindowSfpSubHandler::CAnalysisWindowSfpSubHandler(CConfigHandler *maste
 {
 }
 
-void CAnalysisWindowSfpSubHandler::start(const map<Glib::ustring, string> &atts)
+void CAnalysisWindowSfpSubHandler::start(const map<xmlstring, string> &atts)
 {
   int index = parse_value<int>(atts, "index");
 

@@ -35,7 +35,7 @@ CSelectorSubHandler::CSelectorSubHandler(CConfigHandler *master, data_select_lis
 {
 }
 
-void CSelectorSubHandler::start(const Glib::ustring &element, const map<Glib::ustring, string> &atts)
+void CSelectorSubHandler::start(const xmlstring &element, const map<xmlstring, string> &atts)
 {
   if (element != "field")
     throw std::runtime_error("Invalid XML element");
@@ -294,7 +294,7 @@ CProjectDisplaySubHandler::CProjectDisplaySubHandler(CConfigHandler *master, med
 {
 }
 
-void CProjectDisplaySubHandler::start(const map<Glib::ustring, string> &atts)
+void CProjectDisplaySubHandler::start(const map<xmlstring, string> &atts)
 {
   m_display->requireSpectra = (value(atts, "spectra") == "true") ? 1 : 0;
   m_display->requireData = (value(atts, "data") == "true") ? 1 : 0;
@@ -312,7 +312,7 @@ CProjectSelectionSubHandler::CProjectSelectionSubHandler(CConfigHandler *master,
 {
 }
 
-void CProjectSelectionSubHandler::start(const Glib::ustring &element, const map<Glib::ustring, string> &atts)
+void CProjectSelectionSubHandler::start(const xmlstring &element, const map<xmlstring, string> &atts)
 {
   if (element == "sza") {
 
@@ -392,7 +392,7 @@ CProjectAnalysisSubHandler::CProjectAnalysisSubHandler(CConfigHandler *master,
 {
 }
 
-void CProjectAnalysisSubHandler::start(const map<Glib::ustring, string> &atts)
+void CProjectAnalysisSubHandler::start(const map<xmlstring, string> &atts)
 {
   // all options are in the attributes of the analysis element itself
 
@@ -441,7 +441,7 @@ CProjectRawSpectraSubHandler::CProjectRawSpectraSubHandler(CConfigHandler *maste
 {
 }
 
-void CProjectRawSpectraSubHandler::start(const Glib::ustring &element, const map<Glib::ustring, string> &atts)
+void CProjectRawSpectraSubHandler::start(const xmlstring &element, const map<xmlstring, string> &atts)
 {
   // <directory>, <file> or <folder>
 
@@ -488,7 +488,7 @@ CProjectCalibrationSubHandler::CProjectCalibrationSubHandler(CConfigHandler *mas
 {
 }
 
-void CProjectCalibrationSubHandler::start(const map<Glib::ustring, string> &atts)
+void CProjectCalibrationSubHandler::start(const map<xmlstring, string> &atts)
 {
   string str;
 
@@ -511,7 +511,7 @@ void CProjectCalibrationSubHandler::start(const map<Glib::ustring, string> &atts
 
 }
 
-void CProjectCalibrationSubHandler::start(const Glib::ustring &element, const map<Glib::ustring, string> &atts)
+void CProjectCalibrationSubHandler::start(const xmlstring &element, const map<xmlstring, string> &atts)
 {
   string str;
   // sub element of calibration
@@ -639,7 +639,7 @@ CProjectUndersamplingSubHandler::CProjectUndersamplingSubHandler(CConfigHandler 
 {
 }
 
-void CProjectUndersamplingSubHandler::start(const map<Glib::ustring, string> &atts)
+void CProjectUndersamplingSubHandler::start(const map<xmlstring, string> &atts)
 {
   string str;
 
@@ -676,7 +676,7 @@ CProjectInstrumentalSubHandler::CProjectInstrumentalSubHandler(CConfigHandler *m
 {
 }
 
-void CProjectInstrumentalSubHandler::start(const map<Glib::ustring, string> &atts)
+void CProjectInstrumentalSubHandler::start(const map<xmlstring, string> &atts)
 {
   // the <instrumental ...> element
 
@@ -767,7 +767,7 @@ void CProjectInstrumentalSubHandler::start(const map<Glib::ustring, string> &att
 
 }
 
-void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const map<Glib::ustring, string> &atts)
+void CProjectInstrumentalSubHandler::start(const xmlstring &element, const map<xmlstring, string> &atts)
 {
   // format specific children of instrumental
 
@@ -1439,7 +1439,7 @@ void CProjectInstrumentalSubHandler::start(const Glib::ustring &element, const m
 
 }
 
-void CProjectInstrumentalSubHandler::helperLoadLogger(const map<Glib::ustring, string> &atts, struct instrumental_logger *d)
+void CProjectInstrumentalSubHandler::helperLoadLogger(const map<xmlstring, string> &atts, struct instrumental_logger *d)
 {
   string str;
 
@@ -1478,7 +1478,7 @@ void CProjectInstrumentalSubHandler::helperLoadLogger(const map<Glib::ustring, s
 
 }
 
-void CProjectInstrumentalSubHandler::helperLoadSaoz(const map<Glib::ustring, string> &atts, struct instrumental_saoz *d)
+void CProjectInstrumentalSubHandler::helperLoadSaoz(const map<xmlstring, string> &atts, struct instrumental_saoz *d)
 {
   string str;
 
@@ -1513,7 +1513,7 @@ void CProjectInstrumentalSubHandler::helperLoadSaoz(const map<Glib::ustring, str
 
 }
 
-void CProjectInstrumentalSubHandler::helperLoadMinimum(const map<Glib::ustring, string> &atts, struct instrumental_minimum *d)
+void CProjectInstrumentalSubHandler::helperLoadMinimum(const map<xmlstring, string> &atts, struct instrumental_minimum *d)
 {
   string str;
 
@@ -1539,7 +1539,7 @@ void CProjectInstrumentalSubHandler::helperLoadMinimum(const map<Glib::ustring, 
 
 }
 
-void CProjectInstrumentalSubHandler::helperLoadCcd(const map<Glib::ustring, string> &atts, struct instrumental_ccd *d)
+void CProjectInstrumentalSubHandler::helperLoadCcd(const map<xmlstring, string> &atts, struct instrumental_ccd *d)
 {
   string str;
 
@@ -1583,7 +1583,7 @@ void CProjectInstrumentalSubHandler::helperLoadCcd(const map<Glib::ustring, stri
 
 }
 
-void CProjectInstrumentalSubHandler::helperLoadGdp(const map<Glib::ustring, string> &atts, struct instrumental_gdp *d)
+void CProjectInstrumentalSubHandler::helperLoadGdp(const map<xmlstring, string> &atts, struct instrumental_gdp *d)
 {
   string str;
 
@@ -1639,7 +1639,7 @@ void CProjectInstrumentalSubHandler::helperLoadGdp(const map<Glib::ustring, stri
 
 }
 
-void CProjectInstrumentalSubHandler::helperLoadGome2(const map<Glib::ustring, string> &atts, struct instrumental_gome2 *d)
+void CProjectInstrumentalSubHandler::helperLoadGome2(const map<xmlstring, string> &atts, struct instrumental_gome2 *d)
 {
   string str;
 
@@ -1681,7 +1681,7 @@ void CProjectInstrumentalSubHandler::helperLoadGome2(const map<Glib::ustring, st
 
 }
 
-void CProjectInstrumentalSubHandler::helperLoadScia(const map<Glib::ustring, string> &atts, struct instrumental_scia *d)
+void CProjectInstrumentalSubHandler::helperLoadScia(const map<xmlstring, string> &atts, struct instrumental_scia *d)
 {
   string str;
 
@@ -1771,7 +1771,7 @@ CProjectSlitSubHandler::CProjectSlitSubHandler(CConfigHandler *master,
 {
 }
 
-void CProjectSlitSubHandler::start(const map<Glib::ustring, string> &atts)
+void CProjectSlitSubHandler::start(const map<xmlstring, string> &atts)
 {
   string str;
 
@@ -1788,7 +1788,7 @@ void CProjectSlitSubHandler::start(const map<Glib::ustring, string> &atts)
 
 }
 
-void CProjectSlitSubHandler::start(const Glib::ustring &element, const map<Glib::ustring, string> &atts)
+void CProjectSlitSubHandler::start(const xmlstring &element, const map<xmlstring, string> &atts)
 {
   if (element == "slit_func") {
 
@@ -1807,7 +1807,7 @@ CProjectOutputSubHandler::CProjectOutputSubHandler(CConfigHandler *master,
 {
 }
 
-void CProjectOutputSubHandler::start(const map<Glib::ustring, string> &atts)
+void CProjectOutputSubHandler::start(const map<xmlstring, string> &atts)
 {
   string str;
 
@@ -1874,7 +1874,7 @@ CProjectExportSubHandler::CProjectExportSubHandler(CConfigHandler *master,
 {
 }
 
-void CProjectExportSubHandler::start(const map<Glib::ustring, string> &atts)
+void CProjectExportSubHandler::start(const map<xmlstring, string> &atts)
 {
   string str;
 
