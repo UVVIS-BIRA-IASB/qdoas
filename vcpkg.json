@@ -1,0 +1,14 @@
+{
+    "dependencies": [
+        "boost-algorithm",
+	"boost-multi-array",
+	"boost-math",
+        "eigen3",
+        "libxmlpp",
+	"netcdf-c",
+        "qtbase",
+        "qwt",
+	"hdf4",
+	{"name": "hdf5", "features": ["cpp"]}
+  ]
+}
