@@ -112,7 +112,14 @@ endif()
 set(netCDF_INCLUDE_DIR  "${netCDF_INCLUDE_DIRS}")
 
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(LIBXMLXX IMPORTED_TARGET libxml++-4.0)
+# We support different ABI versions of libxml++.
+pkg_check_modules(LIBXMLXX IMPORTED_TARGET libxml++-5.0)
+if(LIBXMLXX_FOUND)
+  add_definitions(-DLIBXMLXX_5)  # set a define to handle different API
+endif()
+if(NOT LIBXMLXX_FOUND)
+  pkg_check_modules(LIBXMLXX IMPORTED_TARGET libxml++-4.0)
+endif()
 if(NOT LIBXMLXX_FOUND)
   pkg_check_modules(LIBXMLXX REQUIRED IMPORTED_TARGET libxml++-2.6)
 endif()

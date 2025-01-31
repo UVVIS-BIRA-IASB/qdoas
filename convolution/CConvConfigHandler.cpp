@@ -26,8 +26,8 @@ CConvConfigHandler::~CConvConfigHandler()
 {
 }
 
-void CConvConfigHandler::start_subhandler(const Glib::ustring& name,
-                                          const map<Glib::ustring, string>& atts) {
+void CConvConfigHandler::start_subhandler(const xmlstring& name,
+                                          const map<xmlstring, string>& atts) {
   if (name == "general") {
     // new General handler
     install_subhandler(new CConvGeneralSubHandler(this, &(m_properties.general)), atts);
@@ -60,7 +60,7 @@ CConvGeneralSubHandler::CConvGeneralSubHandler(CConfigHandler *master, mediate_c
 {
 }
 
-void CConvGeneralSubHandler::start(const map<Glib::ustring, string> &atts) {
+void CConvGeneralSubHandler::start(const map<xmlstring, string> &atts) {
    // convolution type
   string str = value(atts, "convol");
   if (str == "std")
@@ -142,7 +142,7 @@ CConvSlitSubHandler::CConvSlitSubHandler(CConfigHandler *master, mediate_slit_fu
 {
 }
 
-void CConvSlitSubHandler::start(const Glib::ustring& element, const map<Glib::ustring, string>& atts)
+void CConvSlitSubHandler::start(const xmlstring& element, const map<xmlstring, string>& atts)
 {
   if (element == "slit_func")
     return m_master->install_subhandler(new CSlitFunctionSubHandler(m_master, m_d), atts);

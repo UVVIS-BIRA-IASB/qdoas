@@ -21,8 +21,8 @@ CUsampConfigHandler::CUsampConfigHandler() :
   initializeMediateUsamp(&m_properties);
 }
 
-void CUsampConfigHandler::start_subhandler(const Glib::ustring& name,
-                                          const map<Glib::ustring, string>& atts)
+void CUsampConfigHandler::start_subhandler(const xmlstring& name,
+                                          const map<xmlstring, string>& atts)
 {
   if (name == "general") {
     // new General handler
@@ -44,7 +44,7 @@ CUsampGeneralSubHandler::CUsampGeneralSubHandler(CConfigHandler *master, mediate
 {
 }
 
-void CUsampGeneralSubHandler::start(const map<Glib::ustring, string> &atts)
+void CUsampGeneralSubHandler::start(const map<xmlstring, string> &atts)
 {
   string str;
 
@@ -96,7 +96,7 @@ void CUsampGeneralSubHandler::start(const map<Glib::ustring, string> &atts)
   }
 }
 
-void CUsampGeneralSubHandler::start(const Glib::ustring &element, const map<Glib::ustring, string> &atts)
+void CUsampGeneralSubHandler::start(const xmlstring &element, const map<xmlstring, string> &atts)
 {
   if (element == "slit_func")
     m_master->install_subhandler(new CSlitFunctionSubHandler(m_master, &(m_d->slit)), atts);

@@ -22,8 +22,8 @@ CRingConfigHandler::CRingConfigHandler() :
   initializeMediateRing(&m_properties);
 }
 
-void CRingConfigHandler::start_subhandler(const Glib::ustring& name,
-                                          const map<Glib::ustring, string>& atts)
+void CRingConfigHandler::start_subhandler(const xmlstring& name,
+                                          const map<xmlstring, string>& atts)
 {
   if (name == "general") {
     // new General handler
@@ -45,7 +45,7 @@ CRingGeneralSubHandler::CRingGeneralSubHandler(CConfigHandler *master, mediate_r
 {
 }
 
-void CRingGeneralSubHandler::start(const map<Glib::ustring, string> &atts)
+void CRingGeneralSubHandler::start(const map<xmlstring, string> &atts)
 {
   string str;
 
@@ -98,7 +98,7 @@ void CRingGeneralSubHandler::start(const map<Glib::ustring, string> &atts)
   }
 }
 
-void CRingGeneralSubHandler::start(const Glib::ustring &element, const map<Glib::ustring, string> &atts)
+void CRingGeneralSubHandler::start(const xmlstring &element, const map<xmlstring, string> &atts)
 {
   if (element == "slit_func")
     m_master->install_subhandler(new CSlitFunctionSubHandler(m_master, &(m_d->slit)), atts);

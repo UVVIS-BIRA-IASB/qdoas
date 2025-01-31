@@ -23,8 +23,8 @@ class CUsampConfigHandler : public CConfigHandler
   const mediate_usamp_t* properties(void) const;
 
 protected:
-  virtual void start_subhandler(const Glib::ustring& name,
-                                const std::map<Glib::ustring, std::string>& attributes) override;
+  virtual void start_subhandler(const xmlstring& name,
+                                const std::map<xmlstring, std::string>& attributes) override;
 
  private:
   mediate_usamp_t m_properties;
@@ -39,8 +39,8 @@ class CUsampGeneralSubHandler : public CConfigSubHandler
  public:
   CUsampGeneralSubHandler(CConfigHandler *master, mediate_usamp_t *d);
 
-  virtual void start(const std::map<Glib::ustring, std::string>& attributes) override;
-  virtual void start(const Glib::ustring& element, const std::map<Glib::ustring, std::string>& attributes) override;
+  virtual void start(const std::map<xmlstring, std::string>& attributes) override;
+  virtual void start(const xmlstring& element, const std::map<xmlstring, std::string>& attributes) override;
 
  private:
   mediate_usamp_t *m_d;

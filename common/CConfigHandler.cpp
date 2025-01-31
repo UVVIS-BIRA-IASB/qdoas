@@ -30,10 +30,10 @@ CConfigHandler::~CConfigHandler()
   }
 }
 
-void CConfigHandler::on_start_element(const Glib::ustring& name,
+void CConfigHandler::on_start_element(const xmlstring& name,
                                       const AttributeList& attributes)
 {
-  map<Glib::ustring, string> atts;
+  map<xmlstring, string> atts;
   for (const auto& att : attributes) {
     atts[att.name] = att.value;
   }
@@ -50,7 +50,7 @@ void CConfigHandler::on_start_element(const Glib::ustring& name,
   }
 }
 
-void CConfigHandler::on_end_element(const Glib::ustring& name)
+void CConfigHandler::on_end_element(const xmlstring& name)
 {
   if (m_activeSubHandler) {
     // delegate to the sub handler
@@ -79,7 +79,7 @@ void CConfigHandler::on_end_element(const Glib::ustring& name)
   element_stack.pop_back();
 }
 
-void CConfigHandler::on_characters(const Glib::ustring& text)
+void CConfigHandler::on_characters(const xmlstring& text)
 {
   if (m_activeSubHandler) {
     collated_str += text;
@@ -97,7 +97,7 @@ string CConfigHandler::errorString() const
 }
 
 void CConfigHandler::install_subhandler(CConfigSubHandler *newHandler,
-                                        const map<Glib::ustring, string>& attributes) {
+                                        const map<xmlstring, string>& attributes) {
   m_subHandlerStack.push_back(SSubHandlerItem(newHandler, element_stack.size()));
   m_activeSubHandler = newHandler;
 

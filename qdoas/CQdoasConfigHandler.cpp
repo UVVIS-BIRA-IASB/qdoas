@@ -18,8 +18,8 @@ using std::map;
 using std::string;
 using std::vector;
 
-void CQdoasConfigHandler::start_subhandler(const Glib::ustring& name,
-                                           const map<Glib::ustring, string>& atts) {
+void CQdoasConfigHandler::start_subhandler(const xmlstring& name,
+                                           const map<xmlstring, string>& atts) {
 
   if (name == "project") {
     // new Project handler
@@ -78,7 +78,7 @@ CSiteSubHandler::CSiteSubHandler(CQdoasConfigHandler *master) :
 {
 }
 
-void CSiteSubHandler::start(const Glib::ustring& element, const map<Glib::ustring, string> &atts)
+void CSiteSubHandler::start(const xmlstring& element, const map<xmlstring, string> &atts)
 {
   if (element == "site") {
     // create a new config item for the site
@@ -117,7 +117,7 @@ CSymbolSubHandler::CSymbolSubHandler(CQdoasConfigHandler *master) :
 {
 }
 
-void CSymbolSubHandler::start(const Glib::ustring &element, const map<Glib::ustring, string> &atts)
+void CSymbolSubHandler::start(const xmlstring &element, const map<xmlstring, string> &atts)
 {
   if (element == "symbol") {
     string name;
@@ -145,7 +145,7 @@ CProjectSubHandler::CProjectSubHandler(CQdoasConfigHandler *master) :
 {
 }
 
-void CProjectSubHandler::start(const map<Glib::ustring, string> &atts)
+void CProjectSubHandler::start(const map<xmlstring, string> &atts)
 {
   // the project element - must have a name
 
@@ -157,7 +157,7 @@ void CProjectSubHandler::start(const map<Glib::ustring, string> &atts)
   }
 }
 
-void CProjectSubHandler::start(const Glib::ustring &element, const map<Glib::ustring, string> &atts)
+void CProjectSubHandler::start(const xmlstring &element, const map<xmlstring, string> &atts)
 {
   // a sub element of project ... create a specialized handler and delegate
   mediate_project_t *prop = m_project.properties();
