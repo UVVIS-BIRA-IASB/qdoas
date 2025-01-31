@@ -148,3 +148,8 @@ compile_commands.json
 
 # QtCreator local machine specific files for imported projects
 *creator.user*
+/vcpkg_installed
+/out/**
+/CMakeUserPresets.json
+/build_release
+/build_debug

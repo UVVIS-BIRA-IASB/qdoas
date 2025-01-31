@@ -1,0 +1,27 @@
+﻿{
+    "version": 2,
+    "configurePresets": [
+        {
+            "name": "vcpkgDebug",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build_debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+                "CODA_LIBRARY_DIR": "C:/Program Files/CODA/lib",
+                "CODA_INCLUDE_DIR": "C:/Program Files/CODA/include"
+            }
+        },
+        {
+            "name": "vcpkgRelease",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build_release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+                "CODA_LIBRARY_DIR": "C:/Program Files/CODA/lib",
+                "CODA_INCLUDE_DIR": "C:/Program Files/CODA/include"
+            }
+        }
+    ]
+}
