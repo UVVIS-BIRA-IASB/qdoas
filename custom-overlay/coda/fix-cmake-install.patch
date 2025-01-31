@@ -1,0 +1,13 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8e6ff63..850b920 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -721,7 +721,7 @@ if(NOT CODA_BUILD_SUBPACKAGE_MODE)
+   set(CPACK_PACKAGE_VENDOR "S[&]T")
+   if(WIN32)
+     install(FILES ${HDF4_DLLS} ${HDF5_DLLS} DESTINATION ${BIN_PREFIX})
+-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/Release/coda.exp DESTINATION ${LIB_PREFIX})
++    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/coda.exp DESTINATION ${LIB_PREFIX})
+     set(CPACK_GENERATOR "WIX")
+     configure_file(COPYING copying.txt @ONLY NEWLINE_STYLE WIN32)
+     configure_file(FAQ faq.txt @ONLY NEWLINE_STYLE WIN32)

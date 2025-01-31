@@ -9,6 +9,7 @@
         "qtbase",
         "qwt",
 	"hdf4",
-	{"name": "hdf5", "features": ["cpp"]}
+	{"name": "hdf5", "features": ["cpp"]},
+	"coda"
   ]
 }
