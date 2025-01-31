@@ -111,6 +111,14 @@ target_include_directories(qdoas PRIVATE
   ${QWT_INCLUDE_DIR}
   ${LIBXMLXX_INCLUDE_DIRS})
 
+if(DEFINED VCPKG_TARGET_TRIPLET)
+  target_link_libraries(qdoas unofficial::qwt::qwt)
+  add_custom_command(TARGET qdoas POST_BUILD
+    COMMAND Qt6::windeployqt
+    ARGS $<TARGET_FILE:qdoas>
+  )
+endif()
+
 set_target_properties(qdoas PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/resources/qdoas.plist)
 set_source_files_properties(../resources/qdoas.icns PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 

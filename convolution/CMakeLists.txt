@@ -32,6 +32,14 @@ target_include_directories(convolution PRIVATE
   ${QWT_INCLUDE_DIR}
   ${LIBXMLXX_INCLUDE_DIRS})
 
+if(DEFINED VCPKG_TARGET_TRIPLET)
+  target_link_libraries(convolution unofficial::qwt::qwt)
+  add_custom_command(TARGET convolution POST_BUILD
+    COMMAND Qt6::windeployqt
+    ARGS $<TARGET_FILE:convolution>
+  )
+endif()
+
 if(APPLE)
   install(TARGETS convolution DESTINATION qdoas.app/Contents/MacOS)
 else()

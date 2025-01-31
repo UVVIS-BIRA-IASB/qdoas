@@ -29,6 +29,14 @@ target_include_directories(usamp PRIVATE
   ${QWT_INCLUDE_DIR}
   ${LIBXMLXX_INCLUDE_DIRS})
 
+if(DEFINED VCPKG_TARGET_TRIPLET)
+  target_link_libraries(usamp unofficial::qwt::qwt)
+  add_custom_command(TARGET usamp POST_BUILD
+    COMMAND Qt6::windeployqt
+    ARGS $<TARGET_FILE:usamp>
+  )
+endif()
+
 if(APPLE)
   install(TARGETS usamp DESTINATION qdoas.app/Contents/MacOS)
 else()

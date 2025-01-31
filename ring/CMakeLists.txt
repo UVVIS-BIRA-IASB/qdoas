@@ -29,6 +29,14 @@ target_include_directories(ring PRIVATE
   ${QWT_INCLUDE_DIR}
   ${LIBXMLXX_INCLUDE_DIRS})
 
+if(DEFINED VCPKG_TARGET_TRIPLET)
+  target_link_libraries(ring unofficial::qwt::qwt)
+  add_custom_command(TARGET ring POST_BUILD
+    COMMAND Qt6::windeployqt
+    ARGS $<TARGET_FILE:ring>
+  )
+endif()
+
 if(APPLE)
   install(TARGETS ring DESTINATION qdoas.app/Contents/MacOS)
 else()
