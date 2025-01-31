@@ -1,4 +1,8 @@
 /*
+  g++ -Wall -Werror -std=c++11 glob_match_test.cpp glob_match.cpp && ./a.out
+*/
+
+/*
  This software is distributed under the "Simplified BSD license":
 
  Copyright Michael Cook <michael@waxrat.com>. All rights reserved.
@@ -65,6 +69,5 @@ int main()
   EXPECT(glob_match_caseless("h*L?", "hello"));
   EXPECT(!glob_match("h*L?", "hello"));
 
-  std::cout << (pass ? "pass" : "fail") << '\n';
   return pass ? EXIT_SUCCESS : EXIT_FAILURE;
 }

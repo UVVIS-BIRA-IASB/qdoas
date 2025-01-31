@@ -26,56 +26,52 @@
 */
 
 #include "glob_match.hpp"
+#include <cstring>
 #include <cctype>
 
-using std::string_view;
-
-namespace
+bool glob_match(char const* n, char const* ne,
+                char const* h, char const* he)
 {
-
-template<typename EQUAL>
-bool glob_match(string_view pattern, string_view target, EQUAL&& equal)
-{
-  auto p = pattern.begin();
-  auto pe = pattern.end();
-  auto q = target.begin();
-  auto qe = target.end();
-  for (;;) {
-    if (p == pe)
-      return q == qe;
-    if (*p == '*') {
-      ++p;
-      for (auto backtracker = qe; backtracker >= q; --backtracker)
-        if (glob_match(string_view(p, pe - p),
-                       string_view(backtracker, qe - backtracker),
-                       std::forward<EQUAL>(equal)))
-          return true;
-      break;
-    }
-    if (q == qe)
-      break;
-    if (*p != '?' && !equal(*p, *q))
-      break;
-    ++p, ++q;
-  }
-  return false;
-}
-
-} // namespace
-
-bool glob_match(string_view pattern, string_view target)
-{
-  return glob_match(pattern, target,
+  return glob_match(n, ne, h, he, '*', '?',
                     [](char a, char b) {
                       return a == b;
                     });
 }
 
-bool glob_match_caseless(string_view pattern, string_view target)
+bool glob_match(char const* needle, char const* haystack)
 {
-  return glob_match(pattern, target,
+  return glob_match(needle, needle + strlen(needle),
+                    haystack, haystack + strlen(haystack));
+}
+
+bool glob_match(std::string const& needle, std::string const& haystack)
+{
+  auto n = needle.data();
+  auto h = haystack.data();
+  return glob_match(n, n + needle.size(),
+                    h, h + haystack.size());
+}
+
+bool glob_match_caseless(char const* n, char const* ne,
+                         char const* h, char const* he)
+{
+  return glob_match(n, ne, h, he, '*', '?',
                     [](char a, char b) {
-                      return tolower(static_cast<unsigned char>(a)) ==
-                             tolower(static_cast<unsigned char>(b));
+                      return tolower((unsigned char) a) ==
+                             tolower((unsigned char) b);
                     });
+}
+
+bool glob_match_caseless(char const* needle, char const* haystack)
+{
+  return glob_match_caseless(needle, needle + strlen(needle),
+                             haystack, haystack + strlen(haystack));
+}
+
+bool glob_match_caseless(std::string const& needle, std::string const& haystack)
+{
+  auto n = needle.data();
+  auto h = haystack.data();
+  return glob_match_caseless(n, n + needle.size(),
+                             h, h + haystack.size());
 }
