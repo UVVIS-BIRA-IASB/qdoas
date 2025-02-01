@@ -1,6 +1,8 @@
 add_executable(ring
   ../common/CPreferences.cpp
   ../common/CPreferences.h
+  ../common/CHelpSystem.cpp
+  ../common/CHelpSystem.h
   ../resources/ring.qrc
   ../resources/qdoas.icns
   CRingConfigHandler.cpp

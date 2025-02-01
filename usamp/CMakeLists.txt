@@ -1,6 +1,8 @@
 add_executable(usamp
   ../common/CPreferences.cpp
   ../common/CPreferences.h
+  ../common/CHelpSystem.cpp
+  ../common/CHelpSystem.h
   ../resources/usamp.qrc
   ../resources/qdoas.icns
   CUsampConfigHandler.cpp

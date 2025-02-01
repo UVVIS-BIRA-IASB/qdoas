@@ -1,6 +1,8 @@
 add_executable(convolution
   ../common/CPreferences.cpp
   ../common/CPreferences.h
+  ../common/CHelpSystem.cpp
+  ../common/CHelpSystem.h
   ../resources/convolution.qrc
   ../resources/qdoas.icns
   CConvConfigHandler.cpp

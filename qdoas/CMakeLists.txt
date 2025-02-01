@@ -1,6 +1,8 @@
 add_executable(qdoas MACOSX_BUNDLE
   ../common/CPreferences.cpp
   ../common/CPreferences.h
+  ../common/CHelpSystem.cpp
+  ../common/CHelpSystem.h
   ../resources/qdoas.icns
   ../resources/qdoas.qrc
   CConfigStateMonitor.cpp
