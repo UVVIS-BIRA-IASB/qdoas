@@ -85,7 +85,12 @@ else()
   endif()
 endif()
 
-find_package(Qt6 COMPONENTS Core Gui Widgets PrintSupport)
+# We can build with Qt6 or Qt5:
+find_package(Qt6 COMPONENTS Core Gui Widgets PrintSupport QUIET)
+if (NOT Qt6_FOUND)
+  find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport)
+endif()
+
 # first try to find the qwt target provided the vcpkg port
 find_package(unofficial-qwt QUIET)
 if (unofficial-qwt_FOUND)
