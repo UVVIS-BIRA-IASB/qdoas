@@ -49,12 +49,14 @@ add_library(common STATIC
 )
 
 target_compile_features(common PUBLIC cxx_std_17)
-target_link_libraries(common config Qt::Widgets Qt::PrintSupport)
+target_link_libraries(common config Qt::Widgets Qt::PrintSupport PkgConfig::LIBXMLXX)
+if (unofficial-qwt_FOUND)
+  target_link_libraries(common unofficial::qwt::qwt)
+else()
+  target_link_libraries(common ${QWT_LIBRARY})
+endif()
 target_include_directories(common PRIVATE ${QWT_INCLUDE_DIR})
 target_include_directories(common PUBLIC ../common ../engine ../mediator)
-
-target_link_libraries(common ${LIBXMLXX_LIBRARIES})
-target_include_directories(common PUBLIC ${LIBXMLXX_INCLUDE_DIRS})
 
 if(APPLE)
   add_definitions(-DQDOAS_HELP_PATH="../Resources/Help")

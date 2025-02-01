@@ -33,4 +33,3 @@ target_link_libraries(mediate PRIVATE
 )
 target_include_directories(mediate PRIVATE ${netCDF_INCLUDE_DIR})
 target_include_directories(mediate PUBLIC ../common ../engine)
-

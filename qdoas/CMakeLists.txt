@@ -104,15 +104,19 @@ target_compile_features(qdoas PUBLIC cxx_std_11)
 target_link_libraries(qdoas
   engine mediate common
   Qt::Widgets Qt::PrintSupport
-  ${QWT_LIBRARY}
-  ${LIBXMLXX_LIBRARIES}
+  PkgConfig::LIBXMLXX
 )
 target_include_directories(qdoas PRIVATE
   ${QWT_INCLUDE_DIR}
-  ${LIBXMLXX_INCLUDE_DIRS})
+)
+
+if (unofficial-qt_FOUND)
+  target_link_libraries(qdoas unofficial::qwt::qwt)
+else()
+  target_link_libraries(qdoas ${QWT_LIBRARY})
+endif()
 
 if(DEFINED VCPKG_TARGET_TRIPLET)
-  target_link_libraries(qdoas unofficial::qwt::qwt)
   add_custom_command(TARGET qdoas POST_BUILD
     COMMAND Qt6::windeployqt
     ARGS $<TARGET_FILE:qdoas>

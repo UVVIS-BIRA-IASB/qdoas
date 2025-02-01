@@ -85,12 +85,14 @@ else()
   endif()
 endif()
 
-find_package(Qt5 COMPONENTS Core Gui Widgets PrintSupport)
-find_package(Qwt)  # Our own FindQwt macro
-if(DEFINED VCPKG_TARGET_TRIPLET)
-  find_package(unofficial-qwt)
+find_package(Qt6 COMPONENTS Core Gui Widgets PrintSupport)
+# first try to find the qwt target provided the vcpkg port
+find_package(unofficial-qwt QUIET)
+if (unofficial-qwt_FOUND)
   # the vcpkg qwt port places the headers in a qwt subdirectory:
   find_path(QWT_INCLUDE_DIR NAMES qwt.h PATH_SUFFIXES qwt)
+else() # Not using vcpkg, try our own FindQwt macro
+  find_package(Qwt)
 endif()
 
 find_package(Boost REQUIRED)
@@ -127,15 +129,15 @@ endif()
 add_definitions(-DQWT_DLL)
 
 add_subdirectory(config)
-add_subdirectory(common)
 add_subdirectory(engine)
 add_subdirectory(nelmin)
 add_subdirectory(mediator)
 add_subdirectory(cmdline)
 
-if(Qt5Widgets_FOUND AND QWT_FOUND)
+if((TARGET Qt::Widgets) AND (unofficial-qwt_FOUND OR QWT_FOUND))
   add_subdirectory(qdoas)
   add_subdirectory(convolution)
+  add_subdirectory(common)
   add_subdirectory(ring)
   add_subdirectory(usamp)
 else()

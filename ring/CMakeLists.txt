@@ -22,15 +22,19 @@ target_compile_features(ring PUBLIC cxx_std_11)
 target_link_libraries(ring
   engine mediate common
   Qt::Widgets Qt::PrintSupport
-  ${QWT_LIBRARY}
-  ${LIBXMLXX_LIBRARIES}
+  PkgConfig::LIBXMLXX
   )
 target_include_directories(ring PRIVATE
   ${QWT_INCLUDE_DIR}
-  ${LIBXMLXX_INCLUDE_DIRS})
+)
+
+if(unofficial-qwt_FOUND)
+  target_link_libraries(ring unofficial::qwt::qwt)
+else()
+  target_link_libraries(ring ${QWT_LIBRARY})
+endif()
 
 if(DEFINED VCPKG_TARGET_TRIPLET)
-  target_link_libraries(ring unofficial::qwt::qwt)
   add_custom_command(TARGET ring POST_BUILD
     COMMAND Qt6::windeployqt
     ARGS $<TARGET_FILE:ring>
