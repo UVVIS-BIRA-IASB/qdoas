@@ -91,7 +91,7 @@ CWRingTabGeneral::CWRingTabGeneral(const mediate_ring_t *properties, QWidget *pa
   m_tempEdit->setFixedWidth(cStandardEditWidth);
   m_tempEdit->setValidator(new CDoubleFixedFmtValidator(0, 999, 1, m_tempEdit));
   tempLayout->addWidget(m_tempEdit,0,1);
-  tempLayout->rowStretch(1);
+  tempLayout->rowStretch(0);
 
   mainLayout->addLayout(tempLayout);
 
