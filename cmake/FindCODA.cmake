@@ -22,6 +22,7 @@ check_include_file(coda.h HAVE_CODA_H)
 
 find_library(CODA_LIBRARY NAMES coda libcoda PATHS ${CODA_LIBRARY_DIR})
 if(CODA_LIBRARY)
+  set(CMAKE_REQUIRED_LIBRARIES m)
   check_library_exists(${CODA_LIBRARY} coda_init "" HAVE_CODA_LIBRARY)
 endif(CODA_LIBRARY)
 if(HAVE_CODA_LIBRARY)
