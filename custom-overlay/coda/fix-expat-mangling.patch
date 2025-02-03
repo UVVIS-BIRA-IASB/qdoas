@@ -1,0 +1,13 @@
+diff --git a/libcoda/expat/coda_expat_mangle.h b/libcoda/expat/coda_expat_mangle.h
+index 6c7632e..5cf5c03 100644
+--- a/libcoda/expat/coda_expat_mangle.h
++++ b/libcoda/expat/coda_expat_mangle.h
+@@ -75,6 +75,8 @@
+ #define XML_SetNotationDeclHandler coda_XML_SetNotationDeclHandler
+ #define XML_SetParamEntityParsing coda_XML_SetParamEntityParsing
+ #define XML_SetProcessingInstructionHandler coda_XML_SetProcessingInstructionHandler
++#define g_reparseDeferralEnabledDefault coda_g_reparseDeferralEnabledDefault
++#define XML_SetReparseDeferralEnabled coda_XML_SetReparseDeferralEnabled
+ #define XML_SetReturnNSTriplet coda_XML_SetReturnNSTriplet
+ #define XML_SetSkippedEntityHandler coda_XML_SetSkippedEntityHandler
+ #define XML_SetStartCdataSectionHandler coda_XML_SetStartCdataSectionHandler

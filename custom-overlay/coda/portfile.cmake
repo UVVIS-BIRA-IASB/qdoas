@@ -49,6 +49,7 @@ vcpkg_extract_source_archive_ex(
     # https://github.com/microsoft/vcpkg-docs/blob/main/vcpkg/examples/patching.md
     PATCHES 
       "fix-cmake-install.patch"
+      "fix-expat-mangling.patch"
 )
 
 # # Check if one or more features are a part of a package installation.
