@@ -127,7 +127,10 @@ target_link_libraries(engine PRIVATE nelmin Boost::boost Eigen3::Eigen
   ${HDF5_CXX_LIBRARIES}
   ${CODA_LIBRARY}
   ${NETCDF_LIBRARIES})
-target_include_directories(engine PRIVATE ../nelmin/include ${netCDF_INCLUDE_DIR} ${CODA_INCLUDE_DIR} ${HDF5_INCLUDE_DIRS})
+if (TARGET hdf-static)
+  target_link_libraries(engine PRIVATE hdf-static mfhdf-static)
+endif()
+target_include_directories(engine PRIVATE ${netCDF_INCLUDE_DIR} ${CODA_INCLUDE_DIR} ${HDF5_INCLUDE_DIRS})
 target_include_directories(engine PUBLIC ../common ../mediator)
 
 find_library(HDF4_MFHDF mfhdf)
