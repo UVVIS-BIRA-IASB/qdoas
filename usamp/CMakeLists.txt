@@ -36,7 +36,7 @@ else()
   target_link_libraries(usamp ${QWT_LIBRARY})
 endif()
 
-if(DEFINED VCPKG_TARGET_TRIPLET)
+if((DEFINED VCPKG_TARGET_TRIPLET) AND MSVC)
   add_custom_command(TARGET usamp POST_BUILD
     COMMAND Qt6::windeployqt
     ARGS $<TARGET_FILE:usamp>
