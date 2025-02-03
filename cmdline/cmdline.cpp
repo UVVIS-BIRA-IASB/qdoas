@@ -216,10 +216,11 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include "dirent.h"
+
 #ifdef _WIN32
 #include <Windows.h>
 #include <conio.h>
-#include "dirent.h"
 #else
 #include <unistd.h>
 #include <sys/ioctl.h>

@@ -3,11 +3,11 @@ Qdoas is a cross-platform application for spectral analysis with the DOAS
 algorithm.  Copyright (C) 2007  S[&]T and BIRA
 */
 
+#include <cstring>
 
 #include "CUsampConfigHandler.h"
 #include "CPathSubHandler.h"
 #include "CConfigSubHandlerUtils.h"
-
 #include "constants.h"
 
 #include "debugutil.h"

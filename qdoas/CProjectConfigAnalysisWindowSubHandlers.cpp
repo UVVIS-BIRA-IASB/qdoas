@@ -4,8 +4,9 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 */
 
-
+#include <cstring>
 #include <math.h>
+
 #include "CProjectConfigAnalysisWindowSubHandlers.h"
 #include "CProjectConfigItem.h"
 

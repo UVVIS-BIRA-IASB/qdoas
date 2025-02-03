@@ -4,6 +4,7 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 */
 
+#include <cstring>
 
 #include "CRingConfigHandler.h"
 #include "CPathSubHandler.h"

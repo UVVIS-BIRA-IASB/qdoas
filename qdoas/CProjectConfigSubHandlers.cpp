@@ -1,3 +1,5 @@
+#include <cstring>
+
 #include "CProjectConfigSubHandlers.h"
 #include "CProjectConfigAnalysisWindowSubHandlers.h"
 #include "CConfigSubHandlerUtils.h"
