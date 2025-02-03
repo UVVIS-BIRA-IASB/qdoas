@@ -69,6 +69,7 @@ message("Have bison/flex prefix " "${BISON_FLEX_PREFIX}")
 vcpkg_cmake_configure(
     SOURCE_PATH "${SOURCE_PATH}"
 	OPTIONS -DCMAKE_PREFIX_PATH="${BISON_FLEX_PREFIX}"
+        OPTIONS -DCODA_WITH_HDF4=ON -DHDF4_INCLUDE_DIR=${VCPKG_ROOT_DIR}/packages/hdf4_${TARGET_TRIPLET}/include
 )
 
 vcpkg_cmake_install()
