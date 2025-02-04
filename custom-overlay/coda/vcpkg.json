@@ -9,8 +9,7 @@
       "name": "vcpkg-cmake",
       "host": true
     },
-	"hdf4",
-	"hdf5"
+	"hdf4"
   ],
 
   "default-features": [],

@@ -8,6 +8,9 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
                 "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+            },
+            "environment": {
+                "VCPKG_KEEP_ENV_VARS": "BISON_FLEX_PREFIX"
             }
         },
         {
