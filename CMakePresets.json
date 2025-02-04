@@ -2,23 +2,19 @@
     "version": 2,
     "configurePresets": [
         {
-            "name": "vcpkgDebug",
+            "name": "vcpkgRelease",
             "generator": "Ninja",
-            "binaryDir": "${sourceDir}/vcpkg_debug",
+            "binaryDir": "${sourceDir}/out/${presetName}",
             "cacheVariables": {
-                "CODA_INCLUDE_DIR": "${sourceDir}/vcpkg_release/vcpkg_installed/x64-linux/include",
-                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_BUILD_TYPE": "Release",
                 "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
             }
         },
         {
-            "name": "vcpkgRelease",
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/vcpkg_release",
+            "name": "vcpkgDebug",
+            "inherits": "vcpkgRelease",
             "cacheVariables": {
-                "CODA_INCLUDE_DIR": "${sourceDir}/vcpkg_release/vcpkg_installed/x64-linux/include",
-                "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+                "CMAKE_BUILD_TYPE": "Debug"
             }
         }
     ]
