@@ -10,6 +10,7 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 #define MAX_PLOT_SEGMENTS
 
+#include <stddef.h>
 #include "mediate_types.h"
 
 #if defined(_cplusplus) || defined(__cplusplus)
