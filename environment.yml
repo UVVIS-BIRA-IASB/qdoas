@@ -10,6 +10,7 @@ dependencies:
   - hdf4
   - hdf5
   - libnetcdf
+  - libxmlpp
   - qt-main
   - qwt
 
