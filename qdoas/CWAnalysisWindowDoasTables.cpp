@@ -78,7 +78,7 @@ QWidget* CMoleculeDoasTableColumnDiffOrtho::createCellWidget(const QVariant &cel
 
   tmp->initialSelection(cellData.toString());
 
-  connect(tmp, SIGNAL(currentIndexChanged(const QString&)), tmp, SLOT(slotTextChanged(const QString&)));
+  connect(tmp, SIGNAL(currentTextChanged(const QString&)), tmp, SLOT(slotTextChanged(const QString&)));
   connect(tmp, SIGNAL(signalTextChanged(const QWidget*,const QVariant&)),
       this, SLOT(slotCellDataChanged(const QWidget*,const QVariant&)));
   connect(p, SIGNAL(signalSymbolListChanged(const QStringList &)),
@@ -138,7 +138,7 @@ QWidget* CMoleculeDoasTableColumnCorrection::createCellWidget(const QVariant &ce
 
   tmp->initialSelection(cellData.toString());
 
-  connect(tmp, SIGNAL(currentIndexChanged(const QString&)), tmp, SLOT(slotTextChanged(const QString&)));
+  connect(tmp, SIGNAL(currentTextChanged(const QString&)), tmp, SLOT(slotTextChanged(const QString&)));
   connect(tmp, SIGNAL(signalTextChanged(const QWidget*,const QVariant&)),
       this, SLOT(slotCellDataChanged(const QWidget*,const QVariant&)));
   connect(p, SIGNAL(signalSymbolListChanged(const QStringList &)),

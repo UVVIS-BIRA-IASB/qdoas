@@ -1056,7 +1056,7 @@ QWidget* CDoasTableColumnCombo::createCellWidget(const QVariant &cellData)
   if (index != -1)
     tmp->setCurrentIndex(index);
 
-  connect(tmp, SIGNAL(currentIndexChanged(const QString&)), tmp, SLOT(slotTextChanged(const QString&)));
+  connect(tmp, SIGNAL(currentTextChanged(const QString&)), tmp, SLOT(slotTextChanged(const QString&)));
   connect(tmp, SIGNAL(signalTextChanged(const QWidget*,const QVariant&)),
       this, SLOT(slotCellDataChanged(const QWidget*,const QVariant&)));
 
