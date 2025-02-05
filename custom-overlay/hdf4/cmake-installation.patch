@@ -1,0 +1,11 @@
+--- a/CMakeInstallation.cmake
++++ b/CMakeInstallation.cmake
+@@ -72,7 +72,7 @@ configure_package_config_file (
+ # Configure the hdf4-config.cmake file for the install directory
+ #-----------------------------------------------------------------------------
+ set (INCLUDE_INSTALL_DIR ${HDF4_INSTALL_INCLUDE_DIR})
+-set (SHARE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/${HDF4_INSTALL_CMAKE_DIR}" )
++set (SHARE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/hdf4" )
+ set (CURRENT_BUILD_DIR "${CMAKE_INSTALL_PREFIX}" )
+ configure_package_config_file (
+     ${HDF_RESOURCES_DIR}/hdf4-config.cmake.in

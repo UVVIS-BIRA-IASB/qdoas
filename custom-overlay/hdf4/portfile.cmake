@@ -45,11 +45,8 @@ vcpkg_extract_source_archive_ex(
     ARCHIVE "${ARCHIVE}"
     # (Optional) A friendly name to use instead of the filename of the archive (e.g.: a version number or tag).
     # REF 1.0.0
-    # (Optional) Read the docs for how to generate patches at:
-    # https://github.com/microsoft/vcpkg-docs/blob/main/vcpkg/examples/patching.md
-    # PATCHES
-    #   001_port_fixes.patch
-    #   002_more_port_fixes.patch
+    PATCHES
+    cmake-installation.patch
 )
 
 # # Check if one or more features are a part of a package installation.
@@ -73,12 +70,9 @@ vcpkg_cmake_install()
 
 # # Moves all .cmake files from /debug/share/hdf4/ to /share/hdf4/
 # # See /docs/maintainers/ports/vcpkg-cmake-config/vcpkg_cmake_config_fixup.md for more details
-# When you uncomment "vcpkg_cmake_config_fixup()", you need to add the following to "dependencies" vcpkg.json:
-#{
-#    "name": "vcpkg-cmake-config",
-#    "host": true
-#}
-# vcpkg_cmake_config_fixup()
+vcpkg_cmake_config_fixup(CONFIG_PATH "cmake")
+
+vcpkg_fixup_pkgconfig()
 
 # Uncomment the line below if necessary to install the license file for the port
 # as a file named `copyright` to the directory `${CURRENT_PACKAGES_DIR}/share/${PORT}`

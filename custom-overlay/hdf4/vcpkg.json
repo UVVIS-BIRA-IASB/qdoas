@@ -1,23 +1,27 @@
 {
-  "name": "hdf4",
-  "version": "4.3.0",
-  "homepage": "https://hdfgroup.org",
-  "description": "HDF4 is a library and multi-object file format for storing and managing data between machines.",
-  "license": "BSD-3-Clause",
-  "dependencies": [
-    {
-      "name": "vcpkg-cmake",
-      "host": true
-    },
+    "name": "hdf4",
+    "version": "4.3.0",
+    "homepage": "https://hdfgroup.org",
+    "description": "HDF4 is a library and multi-object file format for storing and managing data between machines.",
+    "license": "BSD-3-Clause",
+    "dependencies": [
+        {
+            "name": "vcpkg-cmake",
+            "host": true
+        },
+        {
+            "name": "vcpkg-cmake-config",
+            "host": true
+        },
 	"libjpeg-turbo",
 	"zlib"
-  ],
+    ],
 
-  "default-features": [],
-  "features": {
-    "example-feature": {
-      "description": "",
-      "dependencies": []
+    "default-features": [],
+    "features": {
+        "example-feature": {
+            "description": "",
+            "dependencies": []
+        }
     }
-  }
 }
