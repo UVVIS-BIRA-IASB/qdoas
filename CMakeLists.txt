@@ -4,7 +4,7 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
     cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 endif()
 
-project(qdoas VERSION 3.6.12)
+project(qdoas VERSION 3.7.0)
 
 set(QDOAS_DATE "6 February 2025")
 
@@ -56,15 +56,18 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_MACOSX_RPATH ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+option(BIN_VERSION "Append version to BIN_PREFIX" OFF)
+
+set(BIN_PREFIX bin)
+set(LIB_PREFIX lib)
+set(PKGDATA_PREFIX share/qdoas)
 if(WIN32 AND DEFINED ENV{CONDA_PREFIX})
   # all non-python components need to be installed in a Library sub-directory for Conda on Windows
   set(BIN_PREFIX Library/bin)
   set(LIB_PREFIX Library/lib)
   set(PKGDATA_PREFIX Library/share/qdoas)
-else()
-  set(BIN_PREFIX bin CACHE STRING "") 
-  set(LIB_PREFIX lib)
-  set(PKGDATA_PREFIX share/qdoas)
+elseif(BIN_VERSION)
+  set(BIN_PREFIX "bin_${CMAKE_PROJECT_VERSION}")
 endif()
 
 SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${LIB_PREFIX}" CACHE STRING "")
