@@ -233,7 +233,7 @@ void CPreferences::setPlotColour(const QString &key, const QColor &colour)
   m_settings->endGroup();
 }
 
-CScaleControl CPreferences::plotScale(const QString &key, const CScaleControl &fallback) const
+CScaleControl CPreferences::plotScale(const QString &key, const CScaleControl&) const
 {
   CScaleControl retValue;
 

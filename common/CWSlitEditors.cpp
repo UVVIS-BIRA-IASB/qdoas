@@ -84,16 +84,16 @@ void CWSlitFileBase::slotToggleWavelength(int state)
    toggleVisible(state);
  }
 
-CWSlitNoneEdit::CWSlitNoneEdit(const struct slit_file *d, QWidget *parent) :
+CWSlitNoneEdit::CWSlitNoneEdit(const struct slit_file *, QWidget *parent) :
   CWSlitFileBase(parent)
 {
 }
 
-void CWSlitNoneEdit::reset(const struct slit_file *d)
+void CWSlitNoneEdit::reset(const struct slit_file *)
 {
 }
 
-void CWSlitNoneEdit::apply(struct slit_file *d) const
+void CWSlitNoneEdit::apply(struct slit_file *) const
 {
 }
 

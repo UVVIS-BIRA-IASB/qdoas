@@ -322,7 +322,7 @@ void CNavigationPanel::changeBackground(QWidget *widget, const QColor &c)
   widget->setPalette(palette);
 }
 
-void CNavigationPanel::slotRecordTextEdited(const QString &text)
+void CNavigationPanel::slotRecordTextEdited(const QString&)
 {
   if (!m_recordTextTouched) {
     changeBackground(m_recordEdit, 0xFFFFE08E);
@@ -353,7 +353,7 @@ void CNavigationPanel::slotRecordEditChanged()
   }
 }
 
-void CNavigationPanel::slotDelayTextEdited(const QString &text)
+void CNavigationPanel::slotDelayTextEdited(const QString&)
 {
   if (!m_delayTextTouched) {
     changeBackground(m_delayEdit, 0xFFFFE08E);

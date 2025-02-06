@@ -735,7 +735,6 @@ char *FILES_BuildFileName(char *new_fileName,const char *fileName,MASK fileType)
  {
   // Declarations
 
-  SZ_LEN fileNameLength;
   char *ptr,*ptrxs;
 
   // Replace file extension by the correct one

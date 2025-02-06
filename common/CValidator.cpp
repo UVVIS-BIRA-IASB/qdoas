@@ -15,7 +15,7 @@ CSzaValidator::CSzaValidator(QObject *obj) :
 {
 }
 
-QValidator::State CSzaValidator::validate(QString &input, int &pos) const
+QValidator::State CSzaValidator::validate(QString &input, int &) const
 {
   if (input.isEmpty()) return QValidator::Intermediate;
 

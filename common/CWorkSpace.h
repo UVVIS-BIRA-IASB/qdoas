@@ -154,9 +154,9 @@ class CSitesObserver {
   CSitesObserver();   // attaches and detaches to the singleton during construction/destruction
   virtual ~CSitesObserver();
 
-  virtual void updateNewSite(const std::string &newSiteName);
-  virtual void updateModifySite(const std::string &siteName);
-  virtual void updateDeleteSite(const std::string &siteName);
+  virtual void updateNewSite(const std::string &newSiteName) = 0;
+  virtual void updateModifySite(const std::string &/*siteName*/) {};
+  virtual void updateDeleteSite(const std::string &siteName) = 0;
 };
 
 class CSymbolObserver {
@@ -164,9 +164,9 @@ class CSymbolObserver {
   CSymbolObserver();   // attaches and detaches to the singleton during construction/destruction
   virtual ~CSymbolObserver();
 
-  virtual void updateNewSymbol(const std::string &newSymbolName);
-  virtual void updateModifySymbol(const std::string &symbolName);
-  virtual void updateDeleteSymbol(const std::string &symbolName);
+  virtual void updateNewSymbol(const std::string &newSymbolName) = 0;
+  virtual void updateModifySymbol(const std::string &symbolName) = 0;
+  virtual void updateDeleteSymbol(const std::string &symbolName) = 0;
 };
 
 class CProjectObserver {
@@ -174,9 +174,9 @@ class CProjectObserver {
   CProjectObserver();   // attaches and detaches to the singleton during construction/destruction
   virtual ~CProjectObserver();
 
-  virtual void updateNewProject(const std::string &newProjectName);
-  virtual void updateModifyProject(const std::string &projectName);
-  virtual void updateDeleteProject(const std::string &projectName);
+  virtual void updateNewProject(const std::string & /*newProjectName*/) {};
+  virtual void updateModifyProject(const std::string &projectName) = 0;
+  virtual void updateDeleteProject(const std::string & /*projectName*/) {};
 };
 
 #endif

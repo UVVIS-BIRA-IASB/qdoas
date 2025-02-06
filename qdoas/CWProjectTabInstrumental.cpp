@@ -63,7 +63,7 @@ static void setDouble(QLineEdit &lineEdit, double lambda) {
 
 void StrayLightConfig::setLambdaMin(double lambda) {
   setDouble(*m_lambdaMinEdit, lambda);
-};
+}
 
 void StrayLightConfig::setLambdaMax(double lambda) {
   setDouble(*m_lambdaMaxEdit, lambda);
@@ -2039,7 +2039,7 @@ void CWInstrOmiEdit::apply(struct instrumental_omi *d) const
   d->pixelQFRejectionFlag= m_pixelQFGroup->isChecked() ? 1 : 0;
   d->pixelQFMaxGaps=m_pixelQFMaxGapsEdit->text().toInt();
 
-  sscanf(m_pixelQFMaskEdit->text().toLocal8Bit().data(),"%02X",&d->pixelQFMask);
+  sscanf(m_pixelQFMaskEdit->text().toLocal8Bit().data(),"%02d",&d->pixelQFMask);
 
   strcpy(d->trackSelection, m_trackSelection->text().toLocal8Bit().data());
 

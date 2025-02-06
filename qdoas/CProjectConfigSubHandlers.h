@@ -37,6 +37,7 @@ class CProjectDisplaySubHandler : public CSelectorSubHandler
   virtual void start(const std::map<xmlstring, std::string> &atts);
 
  private:
+  using CSelectorSubHandler::start;
   mediate_project_display_t *m_display;
 };
 
@@ -161,6 +162,7 @@ class CProjectOutputSubHandler : public CSelectorSubHandler
   virtual void start(const std::map<xmlstring, std::string> &atts);
 
  private:
+  using CSelectorSubHandler::start;
   mediate_project_output_t *m_output;
 };
 
@@ -175,6 +177,7 @@ class CProjectExportSubHandler : public CSelectorSubHandler
   virtual void start(const std::map<xmlstring, std::string> &atts);
 
  private:
+  using CSelectorSubHandler::start;
   mediate_project_export_t *m_export;
 };
 

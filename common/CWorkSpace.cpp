@@ -763,18 +763,6 @@ CSitesObserver::~CSitesObserver()
   CWorkSpace::instance()->detach(this);
 }
 
-void CSitesObserver::updateNewSite(const string &newSiteName)
-{
-}
-
-void CSitesObserver::updateModifySite(const string &siteName)
-{
-}
-
-void CSitesObserver::updateDeleteSite(const string &siteName)
-{
-}
-
 //-----------------------------------------------------------------------
 
 CSymbolObserver::CSymbolObserver()
@@ -787,18 +775,6 @@ CSymbolObserver::~CSymbolObserver()
   CWorkSpace::instance()->detach(this);
 }
 
-void CSymbolObserver::updateNewSymbol(const string &newSymbolName)
-{
-}
-
-void CSymbolObserver::updateModifySymbol(const string &symbolName)
-{
-}
-
-void CSymbolObserver::updateDeleteSymbol(const string &symbolName)
-{
-}
-
 //-----------------------------------------------------------------------
 
 CProjectObserver::CProjectObserver()
@@ -809,17 +785,5 @@ CProjectObserver::CProjectObserver()
 CProjectObserver::~CProjectObserver()
 {
   CWorkSpace::instance()->detach(this);
-}
-
-void CProjectObserver::updateNewProject(const string &newProjectName)
-{
-}
-
-void CProjectObserver::updateModifyProject(const string &projectName)
-{
-}
-
-void CProjectObserver::updateDeleteProject(const string &projectName)
-{
 }
 

@@ -20,7 +20,7 @@ CBatchEngineController::CBatchEngineController() :
 {
 }
 
-void CBatchEngineController::notifyReadyToNavigateRecords(const std::string &filename, int numberOfRecords)
+void CBatchEngineController::notifyReadyToNavigateRecords(const std::string&, int numberOfRecords)
 {
   m_active = (numberOfRecords > 0);
 }

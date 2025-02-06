@@ -299,7 +299,7 @@ void CDoasTable::headerChanged(void) {
   // headers have changed width.
 }
 
-void CDoasTable::cellDataChanged(int row, int column, const QVariant &cellData)
+void CDoasTable::cellDataChanged(int, int, const QVariant&)
 {
   // do nothing ... default
 
@@ -847,7 +847,7 @@ QVariant CDoasTableColumnDoubleEdit::getCellData(int rowIndex) const
 
 //-------------------------------------
 
-bool CDoasTableColumnComboBox::eventFilter(QObject *o, QEvent *e) {
+bool CDoasTableColumnComboBox::eventFilter(QObject *, QEvent *e) {
   if (e->type() == QEvent::MouseButtonRelease) {
     if (static_cast<QMouseEvent*>(e)->button() == Qt::RightButton) {
       return true;

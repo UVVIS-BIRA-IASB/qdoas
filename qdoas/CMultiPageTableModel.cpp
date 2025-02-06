@@ -12,7 +12,7 @@ using std::shared_ptr;
 
 class data_visitor {
 public:
-  QVariant operator()(void *p) const {
+  QVariant operator()(void *) const {
     return QVariant();
   }
 
@@ -31,11 +31,11 @@ public:
 
 class alignment_visitor {
 public:
-  QVariant operator()(int i) const {
+  QVariant operator()(int) const {
     return QVariant(Qt::AlignRight);
   }
 
-  QVariant operator()(double d) const {
+  QVariant operator()(double) const {
     return QVariant(Qt::AlignRight);
   }
 
