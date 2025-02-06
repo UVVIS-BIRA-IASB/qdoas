@@ -136,7 +136,6 @@ add_definitions(-DQWT_DLL)
 
 add_subdirectory(config)
 add_subdirectory(engine)
-add_subdirectory(nelmin)
 add_subdirectory(mediator)
 add_subdirectory(cmdline)
 
