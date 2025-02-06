@@ -473,18 +473,21 @@ int tropomi_init_irradiances(const mediate_analysis_window_t* analysis_windows, 
 int tropomi_init_radref(const mediate_analysis_window_t* analysis_windows, int num_windows, int *n_wavel) {
   try {
     for (int i=0; i!=num_windows; ++i) {
-      const char *radref_file = analysis_windows[i].refTwoFile;
+      const string radref_file{analysis_windows[i].refTwoFile};
+      if (!radref_file.size()) { // empty filename -> no radref for this analysis window.
+        continue;
+      }
       NetCDFFile nc_rad(radref_file);
       if (nc_rad.dimLen("col_dim") != ANALYSE_swathSize) {
-        throw std::runtime_error("col_dim for radiance reference '" + string(radref_file) +
+        throw std::runtime_error("col_dim for radiance reference '" + radref_file +
                                  "' does not match number of rows from irradiance reference");
       }
       if (*n_wavel == 0) {
         *n_wavel = nc_rad.dimLen("spectral_dim");
       } else if (nc_rad.dimLen("spectral_dim") != *n_wavel) {
         // currently, QDOAS assumes the same spectral dimension for all analysis windows.
-        throw std::runtime_error("spectral_dim for radiance reference '" + string(radref_file) +
-                                 "' does not match spectral dim of radiance references.");
+        throw std::runtime_error("spectral_dim for radiance reference '" + radref_file +
+                                 "' does not match spectral dim of other radiance references.");
       }
     }
   } catch(std::runtime_error& e) {
