@@ -1,0 +1,13 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8e6ff63..ad30db5 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -482,8 +482,6 @@ if(NOT CODA_BUILD_SUBPACKAGE_MODE)
+       set_target_properties(coda PROPERTIES COMPILE_FLAGS "-DXML_BUILDING_EXPAT -DLIBCODADLL -DLIBCODADLL_EXPORTS -DYY_NO_UNISTD_H")
+     endif(CODA_WITH_HDF5)
+     install(TARGETS coda RUNTIME DESTINATION ${BIN_PREFIX} ARCHIVE DESTINATION ${LIB_PREFIX})
+-  else(WIN32)
+-    install(TARGETS coda DESTINATION ${LIB_PREFIX})
+   endif(WIN32)
+   install(TARGETS coda_static DESTINATION ${LIB_PREFIX})
+ 

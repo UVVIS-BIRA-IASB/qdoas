@@ -51,6 +51,7 @@ vcpkg_extract_source_archive_ex(
       "fix-cmake-install.patch"
       "fix-expat-mangling.patch"
       "drop-xdr-dll.patch"
+      "only-static-on-linux.patch"
 )
 
 # # Check if one or more features are a part of a package installation.
@@ -67,10 +68,16 @@ if(DEFINED ENV{BISON_FLEX_PREFIX})
 else()
   message("You may have to set the BISON_FLEX_PREFIX environment var so CODA build can find external bison and flex.")
 endif()
+if(VCPKG_TARGET_IS_LINUX)
+  set(CODA_SUBPACKAGE "ON")  # we only want the static library 
+else()
+  set(CODA_SUBPACKAGE "OFF")
+endif()
 vcpkg_cmake_configure(
     SOURCE_PATH "${SOURCE_PATH}"
 	OPTIONS -DCMAKE_PREFIX_PATH="$ENV{BISON_FLEX_PREFIX}"
-        OPTIONS -DCODA_WITH_HDF4=ON -DHDF4_INCLUDE_DIR=${VCPKG_ROOT_DIR}/packages/hdf4_${TARGET_TRIPLET}/include
+        OPTIONS
+          -DCODA_WITH_HDF4=ON -DHDF4_INCLUDE_DIR=${VCPKG_ROOT_DIR}/packages/hdf4_${TARGET_TRIPLET}/include
 )
 
 vcpkg_cmake_install()

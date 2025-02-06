@@ -20,7 +20,7 @@ endif(CODA_INCLUDE_DIR)
 
 check_include_file(coda.h HAVE_CODA_H)
 
-find_library(CODA_LIBRARY NAMES libcoda.a coda libcoda PATHS ${CODA_LIBRARY_DIR})
+find_library(CODA_LIBRARY NAMES coda libcoda PATHS ${CODA_LIBRARY_DIR})
 if(CODA_LIBRARY)
   set(CODA_LIBRARIES ${CODA_LIBRARY})
 endif(CODA_LIBRARY)
