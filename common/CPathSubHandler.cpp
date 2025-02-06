@@ -39,7 +39,7 @@ void CPathSubHandler::character(const string &ch)
   m_path += ch;
 }
 
-void CPathSubHandler::end(const xmlstring &element)
+void CPathSubHandler::end(const xmlstring &)
 {
   if (m_index != -1)
     m_master->setPath(m_index, m_path);

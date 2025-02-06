@@ -46,9 +46,9 @@ class CConfigSubHandler
 struct SSubHandlerItem
 {
   CConfigSubHandler *handler;
-  int depth;
+  size_t depth;
 
-  SSubHandlerItem(CConfigSubHandler *h, int d) : handler(h), depth(d) {}
+  SSubHandlerItem(CConfigSubHandler *h, size_t d) : handler(h), depth(d) {}
 };
 
 class CConfigHandler : public xmlpp::SaxParser
@@ -100,7 +100,7 @@ inline std::string value(const std::map<xmlstring, std::string>& attributes, con
   } else {
     return "";
   }
-};
+}
 
 template<typename T>
 inline T parse_str(const std::string& val);
