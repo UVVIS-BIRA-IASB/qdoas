@@ -4,7 +4,7 @@
         {
             "name": "vcpkgRelease",
             "generator": "Ninja",
-            "binaryDir": "${sourceDir}/out/${presetName}",
+            "binaryDir": "${sourceDir}/build_${presetName}",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
                 "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
