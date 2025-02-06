@@ -16,7 +16,7 @@ This readme.md file summarizes the main features and provides prerequisites and 
 * The application is based on a tree structure;
 * Large amount of files can be processed in one shot;
 * Support a large number of spectra file formats (for ground-based and satellites applications);
-* On line help in HTML format
+* On-line help in HTML format
 
 ### Plot
 
@@ -73,20 +73,21 @@ This readme.md file summarizes the main features and provides prerequisites and 
 
 ### Prerequisites
 
-The GUI is built on the Open-Source version of the Qt-5 toolkit. As a result, QDOAS is portable to Windows, Unix/Linux and Mac, and the user interface is effectively the same on all platforms.
+The GUI is built on the Open-Source version of the Qt toolkit. As a result, QDOAS is portable to Windows, Unix/Linux and Mac, and the user interface is effectively the same on all platforms.
 
 Building QDOAS from sources requires :
 
 * [CMake](https://cmake.org)
-* C++ compiler (g++ version 4.8.1 or higher is recommended),
-* [Qt5](https://qt.io)
+* C++ and C compilers which support the C++17 and (part of) C99 standards (e.g. GCC 10.2.0 or above, Visual Studio 2019 or above).
+* [Qt](https://qt.io)
 * [Qwt](https://sourceforge.net/projects/qwt)
-* [CODA](https://atmospherictoolbox.org/coda/)
-* [HDF4](https://support.hdfgroup.org/products/hdf4/)
-* [HDF5](https://www.hdfgroup.org/downloads/hdf5/)
-* [NetCDF](https://www.unidata.ucar.edu/software/netcdf/)
+* [CODA](https://atmospherictoolbox.org/coda)
+* [HDF4](https://support.hdfgroup.org/products/hdf4)
+* [HDF5](https://www.hdfgroup.org/downloads/hdf5)
+* [NetCDF](https://www.unidata.ucar.edu/software/netcdf)
 * [Boost](https://www.boost.org)
 * [Eigen](https://eigen.tuxfamily.org)
+* [libxml++](https://libxmlplusplus.github.io/libxmlplusplus)
 
 ### Compilation
 
@@ -104,10 +105,9 @@ QDOAS comes in five independent executables or modules :
 * **convolution** : the convolution tool;
 * **ring** : the Ring calculation tool;
 * **usamp** : the undersampling calculation tool;
-* **doas_cl** : a powerful command line tool that applies on qdoas, convolution, Ring and usamp configuration files.
+* **doas_cl** : a powerful command line tool that can work with qdoas, convolution, Ring and usamp configuration files.
 
 Convolution, Ring and usamp tools manage their own configuration files and can be called either from the QDOAS user interface or from the system command line.
-
 
 ### Starting with QDOAS
 

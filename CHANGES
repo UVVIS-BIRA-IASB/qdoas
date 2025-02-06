@@ -1,3 +1,29 @@
+3.6.12 2025-02-06
+~~~~~~~~~~~~~~~~~
+
+* OMI collection 4:
+
+  - Improve reading performance by using  a larger netCDF cache size.
+
+  - Read "xtrack_quality" flags.
+
+* QDOAS can now read the calibration solar reference from a netCDF file.
+
+* Implement a simpler netCDF matrix input format.
+
+* Increase interface maximum filename length to 512 characters.
+
+* By default, netCDF output will use the current QDOAS project name as a group name.
+
+* Improve command line error message reporting.
+
+* Various small bug fixes.
+
+* QDOAS is now compatible with Qt6 or Qt5.
+
+* The command-line utility doas_cl no longer depends on Qt and can be
+  compiled in an environment without Qt libraries.
+
 3.6.11 2024-10-03
 ~~~~~~~~~~~~~~~~~
 
