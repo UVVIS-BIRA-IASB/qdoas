@@ -44,7 +44,9 @@ if((DEFINED VCPKG_TARGET_TRIPLET) AND MSVC)
 endif()
 
 if(APPLE)
-  install(TARGETS ring DESTINATION qdoas.app/Contents/MacOS)
+  set(INSTALL_DEST qdoas.app/Contents/MacOS)
 else()
-  install(TARGETS ring DESTINATION ${BIN_PREFIX})
+  set(INSTALL_DEST ${BIN_PREFIX})
 endif()
+
+install(TARGETS ring DESTINATION ${INSTALL_DEST} COMPONENT gui-tools)

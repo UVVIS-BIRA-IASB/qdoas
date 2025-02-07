@@ -129,9 +129,9 @@ set_target_properties(qdoas PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_D
 set_source_files_properties(../resources/qdoas.icns PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
 if(APPLE)
-  install(TARGETS qdoas DESTINATION .)
-  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Help DESTINATION qdoas.app/Contents/Resources)
+  install(TARGETS qdoas DESTINATION qdoas.app/Contents/MacOS COMPONENT gui-tools)
+  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Help DESTINATION qdoas.app/Contents/Resources COMPONENT gui-tools)
 else()
-  install(TARGETS qdoas DESTINATION ${BIN_PREFIX})
-  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Help DESTINATION ${PKGDATA_PREFIX})
+  install(TARGETS qdoas DESTINATION ${BIN_PREFIX} COMPONENT gui-tools)
+  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Help DESTINATION ${PKGDATA_PREFIX} COMPONENT gui-tools)
 endif()

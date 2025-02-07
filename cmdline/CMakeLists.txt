@@ -52,4 +52,5 @@ target_include_directories(doas_cl PRIVATE
   ../qdoas ../convolution ../usamp ../ring
   ${LIBXMLXX_INCLUDE_DIRS})
 
-install(TARGETS doas_cl DESTINATION ${BIN_PREFIX})
+install(TARGETS doas_cl DESTINATION ${BIN_PREFIX}
+        COMPONENT doas_cl)
