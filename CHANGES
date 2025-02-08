@@ -1,3 +1,12 @@
+3.7.1 2025-02-08
+~~~~~~~~~~~~~~~~
+
+* Define CMake install components 'gui-tools' and 'doas_cl'.
+
+* Fix macOS installation destination for qdoas GUI.
+
+* Fix some compiler warnings.
+
 3.7.0 2025-02-06
 ~~~~~~~~~~~~~~~~
 
