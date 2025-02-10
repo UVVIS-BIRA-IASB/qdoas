@@ -1,9 +1,11 @@
-3.7.1 2025-02-08
+3.7.2 2025-02-10
 ~~~~~~~~~~~~~~~~
 
-* Define CMake install components 'gui-tools' and 'doas_cl'.
+* Fix: fit original polynomial terms in the linear system instead of
+  orthogonolized terms, so it's easier to interpret the fitted
+  coefficients.
 
-* Fix macOS installation destination for qdoas GUI.
+* Define CMake install components 'gui-tools' and 'doas_cl'.
 
 * Fix some compiler warnings.
 
