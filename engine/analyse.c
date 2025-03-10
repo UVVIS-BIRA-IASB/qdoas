@@ -2851,8 +2851,21 @@ RC ANALYSE_Function(double *spectrum_orig, double *reference, const double *Sigm
                  -pTabCross->vector[l] : pTabCross->vector[l];
            }
            else if (i==Feno->indexResol) {
-
-             double resolDelta=0.05;                                                   // small increment to calculate the derivative
+             // For the resol correction, we add a linear term proportional to the derivative of the convolved irradiance w.r.t the slit function width
+             //
+             //   d(S(fwhm) * irradiance)/d(fwhm),
+             //
+             // where the slit function S is treated as a Gaussian.
+             //
+             // We compute the derivative using a finite difference approximation:  (S(fwhm + delta) * irradiance - S(fhwm) * irradiance) / delta.
+             // For the convolved irradiance S(fwhm) * irradiance, we use the current reference.  To compute S(fhwm + delta) *  irradiance, we apply a
+             // further convolution to the current reference.  Using the fact that the convolution of 2 Guassians
+             //
+             //  S(x) * S(fhwm) * irradiance = S(sqrt(x^2 + fwhm^2)),
+             //
+             // we need a Gaussian width x = sqrt(delta^2 + 2*delta * fwhm), or x = delta * sqrt(1 + 2 * fhwm/delta).  The cross section is then normalized
+             // such that the linear coefficient gets us the resol correction as a ratio of fwhm.
+             double resolDelta=0.05;
              double resolCoeff=Feno->resolFwhm/resolDelta;
              double resolX=resolDelta*sqrt((double)1.+2.*resolCoeff);
 
