@@ -1690,7 +1690,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
    KURUCZ_indexLine=1;
    rc=ANALYSE_SetInit(pEngineContext);
 
-   if (numberOfWindows == 0) { // We need at least one active analysis window.
+   if ((numberOfWindows == 0)  && (THRD_id==THREAD_TYPE_ANALYSIS)) { // We need at least one active analysis window.
      rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NOANALYSIS);
      goto handle_errors;
    }
