@@ -633,6 +633,7 @@ RC EngineSetFile(ENGINE_CONTEXT *pEngineContext,const char *fileName,void *respo
 
    pFile=&pEngineContext->fileInfo;
    pEngineContext->recordInfo.oldZm=(double)-1;
+   pEngineContext->n_alongtrack=0;
 
    rc=ERROR_ID_NO;
 
@@ -845,12 +846,8 @@ RC EngineSetFile(ENGINE_CONTEXT *pEngineContext,const char *fileName,void *respo
        // ---------------------------------------------------------------------------
      }
 
-   if (!pEngineContext->n_alongtrack && ANALYSE_swathSize) {
-     pEngineContext->n_alongtrack=pEngineContext->recordNumber/ANALYSE_swathSize;
-   }
-   if (pEngineContext->project.instrumental.readOutFormat == PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF) {
-     pEngineContext->n_alongtrack=(ANALYSE_swathSize>0)?pEngineContext->recordNumber/ANALYSE_swathSize:pEngineContext->recordNumber;
-   }
+   if (!pEngineContext->n_alongtrack || !ANALYSE_swathSize)
+    pEngineContext->n_alongtrack=(ANALYSE_swathSize>0)?pEngineContext->recordNumber/ANALYSE_swathSize:pEngineContext->recordNumber;
 
    // Return
 
@@ -1080,9 +1077,9 @@ RC EngineReadFile(ENGINE_CONTEXT *pEngineContext,int indexRecord,int dateFlag,in
                       pEngineContext->recordInfo.gome.pixelType;
 
    const int n_wavel = NDET[i_crosstrack];
-   
+
    pRecord->rc=THRD_SpectrumCorrection(pEngineContext,pEngineContext->buffers.spectrum,n_wavel);
-   
+
    if (pRecord->rc)
      return pRecord->rc;
 
