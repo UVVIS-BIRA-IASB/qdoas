@@ -78,6 +78,7 @@ static struct netcdf_data_fields sempas_data_fields[SEMPAS_FIELD_MAX]=
  };
 
 static struct netcdf_data_fields *radiance_file_data=NULL;
+static string root_name;                                                         //!< \details The name of the root (should be the basename of the file)
 int useSempas=0;
 
 static double radiance_fillvalue;
@@ -140,7 +141,7 @@ int apex_set(ENGINE_CONTEXT *pEngineContext) {
     row_dim = radiance_file.dimLen("row_dim");                                  // number of records
     size_t file_spectral_dim = radiance_file.dimLen("spectral_dim");            // spectral dimension
     size_t file_col_dim = radiance_file.dimLen("col_dim");                      // spatial dimension
-
+    
     if (!spectral_dim) { // e.g. in browsing mode
       spectral_dim = file_spectral_dim;
     } else if (file_spectral_dim != spectral_dim) {

@@ -2484,6 +2484,7 @@ RC ANALYSE_AlignReference(ENGINE_CONTEXT *pEngineContext,int refFlag,void *respo
     if (((pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_GOME1_NETCDF) ||
          (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_TROPOMI) ||
          (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_APEX) ||
+        ((pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF) && pEngineContext->project.instrumental.frm4doas.imagerFlag) ||
          (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_GEMS) ||
          (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_TROPOMI))
      &&
@@ -3851,6 +3852,7 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
              (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_OMI) ||
              (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_OMIV4) ||
              (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_APEX) ||
+            ((pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF) && pEngineContext->project.instrumental.frm4doas.imagerFlag) || 
              (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_GEMS))
          &&
             !Feno->useRefRow) continue;
@@ -6009,6 +6011,7 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
                        (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_OMI) &&
                        (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_OMIV4) &&
                        (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_APEX) &&
+                      ((pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF) || !pEngineContext->project.instrumental.frm4doas.imagerFlag) && 
                        (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_GEMS) &&
                        (pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_TROPOMI))?1:pEngineContext->project.instrumental.use_row[indexFenoColumn];
 
@@ -6026,7 +6029,7 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
 
   memset(pTabFeno->refFile,0,MAX_ITEM_TEXT_LEN);
   rc=0;
-
+  
   // Allocate memory for reference spectra
 
   if (((Sref=pTabFeno->Sref=(double *)MEMORY_AllocDVector(__func__,"Sref",0,n_wavel-1))==NULL) ||
@@ -6088,6 +6091,13 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
       case PRJCT_INSTR_FORMAT_APEX:
         rc=apex_get_reference(pTabFeno->ref1,indexFenoColumn,lambdaRefEtalon,SrefEtalon,&n_wavel_ref);
         break;
+      case PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF:
+        if (pEngineContext->project.instrumental.frm4doas.imagerFlag)
+         rc=apex_get_reference(pTabFeno->ref1,indexFenoColumn,lambdaRefEtalon,SrefEtalon,&n_wavel_ref);
+        else if (!(rc=AnalyseLoadVector("ANALYSE_LoadRef (SrefEtalon) ",pTabFeno->ref1,lambdaRefEtalon,SrefEtalon,n_wavel,indexFenoColumn)) &&
+             (pTabFeno->SrefSigma!=NULL) && !is_satellite(pEngineContext->project.instrumental.readOutFormat))
+         rc=AnalyseLoadVector("ANALYSE_LoadRef (SrefEtalon) ",pTabFeno->ref1,lambdaRefEtalon,pTabFeno->SrefSigma,n_wavel,1);  
+        break;
       case PRJCT_INSTR_FORMAT_TROPOMI:
         rc=tropomi_get_reference_irrad(pTabFeno->ref1,indexFenoColumn,
                                        lambdaRefEtalon,SrefEtalon,pTabFeno->SrefSigma,pTabFeno->n_wavel_ref1);
@@ -6110,7 +6120,7 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
 
       default:
         // rc=AnalyseLoadVector("ANALYSE_LoadRef (SrefEtalon) ",pTabFeno->ref1,lambdaRefEtalon,SrefEtalon,n_wavel,indexFenoColumn);
-
+       
         if (!(rc=AnalyseLoadVector("ANALYSE_LoadRef (SrefEtalon) ",pTabFeno->ref1,lambdaRefEtalon,SrefEtalon,n_wavel,indexFenoColumn)) &&
              (pTabFeno->SrefSigma!=NULL) && !is_satellite(pEngineContext->project.instrumental.readOutFormat))
          rc=AnalyseLoadVector("ANALYSE_LoadRef (SrefEtalon) ",pTabFeno->ref1,lambdaRefEtalon,pTabFeno->SrefSigma,n_wavel,1);
@@ -6173,6 +6183,12 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
                               pTabFeno->LambdaRef,pTabFeno->Sref,n_wavel_ref,SPLINE_CUBIC);
            }
            break;
+        case PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF:
+           if (pEngineContext->project.instrumental.frm4doas.imagerFlag)
+              rc=apex_get_reference(pTabFeno->ref2,indexFenoColumn,lambdaRef,Sref,&n_wavel_ref);
+           else 
+              rc=AnalyseLoadVector("ANALYSE_LoadRef (Sref) ",pTabFeno->ref2,lambdaRef,Sref,n_wavel,indexFenoColumn);
+        break;           
         case PRJCT_INSTR_FORMAT_APEX:
            rc=apex_get_reference(pTabFeno->ref2,indexFenoColumn,lambdaRef,Sref,&n_wavel_ref);
            break;
@@ -6183,7 +6199,8 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
       if (!rc &&
           !(rc=THRD_SpectrumCorrection(pEngineContext,Sref,n_wavel)) &&
           !(rc=VECTOR_NormalizeVector(Sref-1,n_wavel_ref,&pTabFeno->refNormFact,"ANALYSE_LoadRef (Sref) "))) {
-         if (!pTabFeno->useEtalon && (!is_satellite(pEngineContext->project.instrumental.readOutFormat) ||
+         if (!pTabFeno->useEtalon && (!is_satellite(pEngineContext->project.instrumental.readOutFormat) || 
+               
              ((pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_OMI) ||
               (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_GEMS) ||
               (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_TROPOMI) ||
@@ -6205,8 +6222,9 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
 
     if (!rc)
      memcpy(pTabFeno->LambdaRef,(pTabFeno->useEtalon)?lambdaRefEtalon:lambdaRef,sizeof(double)*n_wavel);
+    
    }
-
+   
   // Return
 
   if (lambdaRef!=NULL)

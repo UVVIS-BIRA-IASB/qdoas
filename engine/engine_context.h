@@ -169,7 +169,9 @@ PRJCT_GEMS;
 
 typedef struct _prjctFrm4doasFormat
  {
-  int averageRows;
+  int imagerFlag;
+  int spatialDim;
+  int spectralDim;
  }
 PRJCT_FRM4DOAS;
 

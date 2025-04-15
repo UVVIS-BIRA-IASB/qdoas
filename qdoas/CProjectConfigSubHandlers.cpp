@@ -1106,7 +1106,7 @@ void CProjectInstrumentalSubHandler::start(const xmlstring &element, const map<x
       else if (str == "almucantar")
         m_instrumental->ccdeev.spectralType = PRJCT_INSTR_MAXDOAS_TYPE_ALMUCANTAR;
       else if (str == "zenith-only")
-        m_instrumental->ccdeev.spectralType = PRJCT_INSTR_MAXDOAS_TYPE_ZENITH;      
+        m_instrumental->ccdeev.spectralType = PRJCT_INSTR_MAXDOAS_TYPE_ZENITH;
       else
         throw std::runtime_error("Invalid ccdeev Type");
      }
@@ -1388,14 +1388,23 @@ void CProjectInstrumentalSubHandler::start(const xmlstring &element, const map<x
   else if (element == "frm4doas") { // FRM4DOAS netCDF
     string str;
 
-    str = value(atts, "average_rows");
+    str = value(atts, "used_as_imager");
 
     if (!str.empty())
-     m_instrumental->frm4doas.averageRows = (value(atts, "average_rows") == "true") ? 1 : 0;
+     m_instrumental->frm4doas.imagerFlag = (value(atts, "used_as_imager") == "true") ? 1 : 0;
     else
-     m_instrumental->frm4doas.averageRows=1;
+     m_instrumental->frm4doas.imagerFlag=0;
 
     m_instrumental->frm4doas.detectorSize = parse_value<int>(atts, "size");
+    m_instrumental->frm4doas.spectralDim = parse_value<int>(atts, "spectral_dim");
+    m_instrumental->frm4doas.spatialDim = parse_value<int>(atts, "spatial_dim");
+    
+    if ((m_instrumental->frm4doas.spectralDim<=0) && (m_instrumental->frm4doas.detectorSize>0))
+      m_instrumental->frm4doas.spectralDim=m_instrumental->frm4doas.detectorSize;
+    
+    if (m_instrumental->frm4doas.spatialDim<=0)
+      m_instrumental->frm4doas.spatialDim=1;
+    
     m_instrumental->frm4doas.straylight = (value(atts, "straylight") == "true") ? 1 : 0;
     m_instrumental->frm4doas.lambdaMin = parse_value<double>(atts, "lambda_min");
     m_instrumental->frm4doas.lambdaMax = parse_value<double>(atts, "lambda_max");

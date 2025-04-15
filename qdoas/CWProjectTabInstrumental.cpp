@@ -84,7 +84,7 @@ CWProjectTabInstrumental::CWProjectTabInstrumental(const mediate_project_instrum
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
   mainLayout->addSpacing(25);
-  
+
   // QGridLayout *topLayout = new QGridLayout;
 
   m_formatStack = new QStackedWidget(this);
@@ -255,7 +255,7 @@ CWProjectTabInstrumental::CWProjectTabInstrumental(const mediate_project_instrum
   m_frm4doasEdit = new CWInstrFrm4doasEdit(&(instr->frm4doas));
   index = m_formatStack->addWidget(m_frm4doasEdit);
   m_instrumentToStackIndexMap.insert(std::map<int,int>::value_type(PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF, index));
-  
+
   // Site
 
   m_siteFrame = new QFrame(this);
@@ -1256,26 +1256,38 @@ CWInstrFrm4doasEdit::CWInstrFrm4doasEdit(const struct instrumental_frm4doas *d, 
   QGridLayout *gridLayout = new QGridLayout;
 
   m_imagersGroup=new QGroupBox("Imagers", this);
-  m_imagersGroup->setCheckable(false);
-  
+  m_imagersGroup->setCheckable(true);
+
   QHBoxLayout *imagersLayout=new QHBoxLayout(m_imagersGroup);
-  m_imagersAverageCheck=new QCheckBox("Average rows", m_imagersGroup);
-  imagersLayout->addWidget(m_imagersAverageCheck);
+  
+  imagersLayout->addWidget(new QLabel("Spectral dim", this), Qt::AlignRight);             // detector size label
+  m_spectralDimEdit = new QLineEdit(this);
+  m_spectralDimEdit->setFixedWidth(100);
+  m_spectralDimEdit->setValidator(new QIntValidator(0, 8192, m_spectralDimEdit));
+  imagersLayout->addWidget(m_spectralDimEdit, Qt::AlignRight);
+  
+  imagersLayout->addWidget(new QLabel("Spatial dim", this), Qt::AlignRight);             // detector size label
+  m_spatialDimEdit = new QLineEdit(this);
+  m_spatialDimEdit->setFixedWidth(100);
+  m_spatialDimEdit->setValidator(new QIntValidator(1, 2048, m_spatialDimEdit));
+  imagersLayout->addWidget(m_spatialDimEdit, Qt::AlignRight);  
+  imagersLayout->addStretch(3);
   
   groupLayout->addWidget(m_strayLightConfig);
   groupLayout->addWidget(m_imagersGroup);
   groupLayout->addStretch(1);
-  
+
   mainLayout->addLayout(groupLayout);
-  
-  gridLayout->addWidget(new QLabel("Detector Size", this), row, 0, Qt::AlignRight);             // detector size label
+
+  m_detSizeLabel=new QLabel("Detector Size", this);
+  gridLayout->addWidget(m_detSizeLabel, row, 0, Qt::AlignRight);             // detector size label
   m_detSizeEdit = new QLineEdit(this);
   m_detSizeEdit->setFixedWidth(cStandardEditWidth);
   m_detSizeEdit->setValidator(new QIntValidator(0, 8192, m_detSizeEdit));
   gridLayout->addWidget(m_detSizeEdit, row, 1, Qt::AlignLeft);
-  
+
   ++row;
-  
+
   // Spectral Type
   gridLayout->addWidget(new QLabel("Spectral Type", this), row, 0);
   m_spectralTypeCombo = new QComboBox(this);
@@ -1292,17 +1304,35 @@ CWInstrFrm4doasEdit::CWInstrFrm4doasEdit(const struct instrumental_frm4doas *d, 
                    d->calibrationFile, sizeof(d->calibrationFile),
                    d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
 
+  
   mainLayout->addLayout(gridLayout);
   mainLayout->addStretch(1);
 
   // initialise the values
 
-  m_imagersAverageCheck->setChecked(d->averageRows);
+  m_imagersGroup->setChecked(d->imagerFlag);
+  
+  if (d->imagerFlag)
+  {
+   m_detSizeLabel->setEnabled(false);
+   m_detSizeEdit->setEnabled(false);
+  }
 
   // detector size
   tmpStr.setNum(d->detectorSize);
   m_detSizeEdit->validator()->fixup(tmpStr);
   m_detSizeEdit->setText(tmpStr);
+  
+  // spectral dim
+  tmpStr.setNum(d->spectralDim);
+  m_spectralDimEdit->validator()->fixup(tmpStr);
+  m_spectralDimEdit->setText(tmpStr); 
+  
+  
+  // spatial dim
+  tmpStr.setNum(d->spatialDim);
+  m_spatialDimEdit->validator()->fixup(tmpStr);
+  m_spatialDimEdit->setText(tmpStr);  
 
   // spectral type
 
@@ -1314,14 +1344,28 @@ CWInstrFrm4doasEdit::CWInstrFrm4doasEdit(const struct instrumental_frm4doas *d, 
   m_strayLightConfig->setChecked(d->straylight ? true : false);
   m_strayLightConfig->setLambdaMin(d->lambdaMin);
   m_strayLightConfig->setLambdaMax(d->lambdaMax);
+  
+  connect(m_imagersGroup, SIGNAL(toggled(bool)), this, SLOT(slotFrm4doasImagers(bool)));
+}
+
+void CWInstrFrm4doasEdit::slotFrm4doasImagers(bool state)
+{
+ m_detSizeLabel->setEnabled(!state);
+ m_detSizeEdit->setEnabled(!state);
 }
 
 void CWInstrFrm4doasEdit::apply(struct instrumental_frm4doas *d) const
 {
-  d->averageRows=m_imagersAverageCheck->isChecked() ? 1 : 0;
+  d->imagerFlag=m_imagersGroup->isChecked() ? 1 : 0;
 
   // detector size
   d->detectorSize = m_detSizeEdit->text().toInt();
+  
+  // spectral dim
+  d->spectralDim = m_spectralDimEdit->text().toInt();  
+  
+  // spatial dim
+  d->spatialDim = m_spatialDimEdit->text().toInt();  
 
   // spectral type
   d->spectralType = m_spectralTypeCombo->itemData(m_spectralTypeCombo->currentIndex()).toInt();

@@ -730,7 +730,7 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
     break;
   case PRJCT_INSTR_MAXDOAS_TYPE_ZENITH:
     fprintf(fp, "\"zenith-only\"");
-    break;    
+    break;
   default:
     fprintf(fp, "\"invalid\"");
   }
@@ -1059,8 +1059,8 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
 
   // frm4doas
 
-  fprintf(fp, "      <frm4doas size=\"%d\" straylight=\"%s\" lambda_min=\"%g\" lambda_max=\"%g\" average_rows=\"%s\"",d->frm4doas.detectorSize,
-  (d->frm4doas.straylight ? sTrue : sFalse),d->frm4doas.lambdaMin,d->frm4doas.lambdaMax,(d->frm4doas.averageRows ? sTrue : sFalse));
+  fprintf(fp, "      <frm4doas size=\"%d\" straylight=\"%s\" lambda_min=\"%g\" lambda_max=\"%g\" used_as_imager=\"%s\" spectral_dim=\"%d\" spatial_dim=\"%d\"",d->frm4doas.detectorSize,
+  (d->frm4doas.straylight ? sTrue : sFalse),d->frm4doas.lambdaMin,d->frm4doas.lambdaMax,(d->frm4doas.imagerFlag ? sTrue : sFalse),d->frm4doas.spectralDim,d->frm4doas.spatialDim);
   tmpStr = pathMgr->simplifyPath(QString(d->frm4doas.calibrationFile));
 
   fprintf(fp, " type=");

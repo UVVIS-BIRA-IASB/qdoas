@@ -1241,11 +1241,22 @@ void setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const
       break;
       // ----------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF:
+     
+      int detectorSize=(pMediateInstrumental->frm4doas.imagerFlag)?pMediateInstrumental->frm4doas.spectralDim:pMediateInstrumental->frm4doas.detectorSize;
+      
+      for (int i=0; i<MAX_SWATHSIZE; ++i) {
+        NDET[i] = detectorSize;
+        pEngineInstrumental->use_row[i]=false;
+      }     
+      
+      ANALYSE_swathSize=pMediateInstrumental->frm4doas.spatialDim; // for plots
+      
+      pEngineInstrumental->detectorSize=detectorSize;
 
-      NDET[0]=pMediateInstrumental->frm4doas.detectorSize;
       pEngineInstrumental->user=pMediateInstrumental->frm4doas.spectralType;
-
-      pEngineInstrumental->frm4doas.averageRows=pMediateInstrumental->frm4doas.averageRows;
+      pEngineInstrumental->frm4doas.imagerFlag=pMediateInstrumental->frm4doas.imagerFlag;
+      pEngineInstrumental->frm4doas.spatialDim=pMediateInstrumental->frm4doas.spatialDim;
+      pEngineInstrumental->frm4doas.spectralDim=pMediateInstrumental->frm4doas.spectralDim;
 
       pEngineInstrumental->offsetFlag=pMediateInstrumental->frm4doas.straylight;
       pEngineInstrumental->lambdaMin=pMediateInstrumental->frm4doas.lambdaMin;
@@ -1742,6 +1753,14 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
      break;
      // TO SEE LATER WHAT IS NECESSARY FOR THIS FORMAT rc = gems_init(analysisWindows[0].refOneFile,pEngineContext);              // !!! GEMS : if fixed format, just initialize the ANALYSE_swathSize
      break;
+   case PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF:
+     if (pEngineContext->project.instrumental.frm4doas.imagerFlag) {
+       rc = apex_init(analysisWindows[0].refOneFile,pEngineContext);
+     }
+     else
+       pInstrumental->use_row[0]=true;
+     break;      
+      
    case PRJCT_INSTR_FORMAT_APEX:
      // TODO: generalize for different analysis windows APEX
      rc = apex_init(analysisWindows[0].refOneFile,pEngineContext);
@@ -2067,7 +2086,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
     rc=ANALYSE_UsampBuild(0,1,0);   // !!! ACCOUNT FOR UNDERSAMPLING ???
 
  handle_errors:
-
+ 
    GEMS_CloseReferences();
    radiance_ref_clear_cache();
    MATRIX_Free(&hr_solar_temp, __func__);

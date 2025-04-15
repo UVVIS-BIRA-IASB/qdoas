@@ -503,19 +503,25 @@ class CWInstrOceanOpticsEdit : public CWCalibInstrEdit
 
 class CWInstrFrm4doasEdit : public CWAllFilesEdit
 {
+ Q_OBJECT
  public:
 
   CWInstrFrm4doasEdit(const struct instrumental_frm4doas *d, QWidget *parent = 0);
 
   void apply(struct instrumental_frm4doas *d) const;
 
+ public slots:  
+  void slotFrm4doasImagers(bool state);
+
  private:
+  QLabel    *m_detSizeLabel;
   QLineEdit *m_detSizeEdit;
+  QLineEdit *m_spectralDimEdit;
+  QLineEdit *m_spatialDimEdit;
   QComboBox *m_spectralTypeCombo;
   StrayLightConfig *m_strayLightConfig;
 
   QGroupBox *m_imagersGroup;
-  QCheckBox *m_imagersAverageCheck;
 };
 
 //--------------------------------------------------------------------------

@@ -26,6 +26,7 @@
 extern "C" {
 #endif
 
+  int  FRM4DOAS_init(const char *reference_filename, ENGINE_CONTEXT *pEngineContext);
   RC   FRM4DOAS_Set(ENGINE_CONTEXT *pEngineContext);
   RC   FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int localDay);
   void FRM4DOAS_Cleanup(void);
