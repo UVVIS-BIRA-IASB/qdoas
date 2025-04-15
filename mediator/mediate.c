@@ -1241,30 +1241,30 @@ void setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const
       break;
       // ----------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF:
-     
-      int detectorSize=(pMediateInstrumental->frm4doas.imagerFlag)?pMediateInstrumental->frm4doas.spectralDim:pMediateInstrumental->frm4doas.detectorSize;
-      
-      for (int i=0; i<MAX_SWATHSIZE; ++i) {
-        NDET[i] = detectorSize;
-        pEngineInstrumental->use_row[i]=false;
-      }     
-      
-      ANALYSE_swathSize=pMediateInstrumental->frm4doas.spatialDim; // for plots
-      
-      pEngineInstrumental->detectorSize=detectorSize;
+      {
+        int detectorSize=(pMediateInstrumental->frm4doas.imagerFlag)?pMediateInstrumental->frm4doas.spectralDim:pMediateInstrumental->frm4doas.detectorSize;
 
-      pEngineInstrumental->user=pMediateInstrumental->frm4doas.spectralType;
-      pEngineInstrumental->frm4doas.imagerFlag=pMediateInstrumental->frm4doas.imagerFlag;
-      pEngineInstrumental->frm4doas.spatialDim=pMediateInstrumental->frm4doas.spatialDim;
-      pEngineInstrumental->frm4doas.spectralDim=pMediateInstrumental->frm4doas.spectralDim;
+        for (int i=0; i<MAX_SWATHSIZE; ++i) {
+          NDET[i] = detectorSize;
+          pEngineInstrumental->use_row[i]=false;
+        }
 
-      pEngineInstrumental->offsetFlag=pMediateInstrumental->frm4doas.straylight;
-      pEngineInstrumental->lambdaMin=pMediateInstrumental->frm4doas.lambdaMin;
-      pEngineInstrumental->lambdaMax=pMediateInstrumental->frm4doas.lambdaMax;
+        ANALYSE_swathSize=pMediateInstrumental->frm4doas.spatialDim; // for plots
 
-      strcpy(pEngineInstrumental->calibrationFile,pMediateInstrumental->frm4doas.calibrationFile); // calibration file
-      strcpy(pEngineInstrumental->instrFunction,pMediateInstrumental->frm4doas.transmissionFunctionFile); // instrumental function file
+        pEngineInstrumental->detectorSize=detectorSize;
 
+        pEngineInstrumental->user=pMediateInstrumental->frm4doas.spectralType;
+        pEngineInstrumental->frm4doas.imagerFlag=pMediateInstrumental->frm4doas.imagerFlag;
+        pEngineInstrumental->frm4doas.spatialDim=pMediateInstrumental->frm4doas.spatialDim;
+        pEngineInstrumental->frm4doas.spectralDim=pMediateInstrumental->frm4doas.spectralDim;
+
+        pEngineInstrumental->offsetFlag=pMediateInstrumental->frm4doas.straylight;
+        pEngineInstrumental->lambdaMin=pMediateInstrumental->frm4doas.lambdaMin;
+        pEngineInstrumental->lambdaMax=pMediateInstrumental->frm4doas.lambdaMax;
+
+        strcpy(pEngineInstrumental->calibrationFile,pMediateInstrumental->frm4doas.calibrationFile); // calibration file
+        strcpy(pEngineInstrumental->instrFunction,pMediateInstrumental->frm4doas.transmissionFunctionFile); // instrumental function file
+      }
       break;      
       // ----------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_GEMS :
