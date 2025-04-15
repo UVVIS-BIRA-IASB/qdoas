@@ -155,7 +155,9 @@ RC THRD_SpectrumCorrection(ENGINE_CONTEXT *pEngineContext,double *spectrum, cons
 
   // Straylight bias correction
 
-  if (pEngineContext->project.instrumental.offsetFlag)
+  if (pEngineContext->project.instrumental.offsetFlag && 
+     (pEngineContext->project.instrumental.lambdaMin>=pEngineContext->buffers.lambda[0]) &&
+     (pEngineContext->project.instrumental.lambdaMax<=pEngineContext->buffers.lambda[n_wavel-1]))
    {
        int i;
        int imin,imax;

@@ -151,16 +151,10 @@ int mediateRequestDisplaySpecInfo(void *engineContext,int page,void *responseHan
    }
 
   if (ANALYSE_swathSize>1)
-    {
-      if (pInstrumental->averageFlag)
-        mediateResponseCellInfo(page,indexLine++,indexColumn,responseHandle,"Record","%d/%d (%d spectra averaged)",
-                                pEngineContext->indexRecord,pEngineContext->recordNumber,pEngineContext->n_alongtrack);
-      else
-       mediateResponseCellInfo(page,indexLine++,indexColumn,responseHandle,"Record","%d/%d (measurement %d/%d, row %d/%d)",
-                               pEngineContext->indexRecord,pEngineContext->recordNumber,
-                               1+pRecord->i_alongtrack,pEngineContext->n_alongtrack,
-                               1+pRecord->i_crosstrack,pEngineContext->n_crosstrack);
-    }
+   mediateResponseCellInfo(page,indexLine++,indexColumn,responseHandle,"Record","%d/%d (measurement %d/%d, row %d/%d)",
+                           pEngineContext->indexRecord,pEngineContext->recordNumber,
+                           1+pRecord->i_alongtrack,pEngineContext->n_alongtrack,
+                           1+pRecord->i_crosstrack,pEngineContext->n_crosstrack);
   else
    mediateResponseCellInfo(page,indexLine++,indexColumn,responseHandle,"Record","%d/%d",pEngineContext->indexRecord,pEngineContext->recordNumber);
 
@@ -1249,7 +1243,7 @@ void setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const
           pEngineInstrumental->use_row[i]=false;
         }
 
-        ANALYSE_swathSize=pMediateInstrumental->frm4doas.spatialDim; // for plots
+        ANALYSE_swathSize=(pMediateInstrumental->frm4doas.imagerFlag)?pMediateInstrumental->frm4doas.spatialDim:1; // for plots
 
         pEngineInstrumental->detectorSize=detectorSize;
 
@@ -1755,7 +1749,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
      break;
    case PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF:
      if (pEngineContext->project.instrumental.frm4doas.imagerFlag) {
-       rc = apex_init(analysisWindows[0].refOneFile,pEngineContext);
+       rc = FRM4DOAS_init(analysisWindows[0].refOneFile,pEngineContext);
      }
      else
        pInstrumental->use_row[0]=true;
