@@ -78,7 +78,6 @@ static struct netcdf_data_fields sempas_data_fields[SEMPAS_FIELD_MAX]=
  };
 
 static struct netcdf_data_fields *radiance_file_data=NULL;
-static string root_name;                                                         //!< \details The name of the root (should be the basename of the file)
 int useSempas=0;
 
 static double radiance_fillvalue;
@@ -336,44 +335,3 @@ void apex_clean() {
   reference_radiances.clear();
   spectral_dim = col_dim = row_dim = 0;
 }
-
-RC apex_load_file(char *filename,double *lambda, double *spectrum, int *n_wavel)
- {
-   // Declarations
-
-   RC rc;
-
-   // Initializations
-
-   rc=ERROR_ID_NO;
-
-   try
-    {
-      NetCDFFile reference_file(filename);
-
-      col_dim = reference_file.dimLen("col_dim");
-      spectral_dim = reference_file.dimLen("spectral_dim");
-
-      const size_t start[] = {0, 0, 0};
-      const size_t count[] = {1, 1, spectral_dim};
-
-  vector<vector<double> > radiances(reference_file.dimLen("col_dim"));
-  const size_t reference_spectral_dim = reference_file.dimLen("spectral_dim");
-  for (size_t i=0; i<radiances.size(); ++i) {
-    vector<double>& rad = radiances[i];
-    rad.resize(reference_spectral_dim);
-    const size_t start[] = {i, 0};
-    const size_t count[] = {1, reference_spectral_dim};
-    reference_file.getVar("reference_radiance", start, count, rad.data());
-    }
-   }
-   catch(std::runtime_error& e)
-    {
-     rc=ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF,
-                         (string { "Can not open reference file " } + filename ).c_str());
-    }
-
-   // Return
-
-   return rc;
- }

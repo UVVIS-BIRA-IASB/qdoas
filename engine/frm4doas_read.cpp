@@ -168,7 +168,6 @@ static int det_size;                                                            
 
 static string init_filename;
 static size_t spectral_dim; // number of wavelengths
-static size_t row_dim; // along track
 static size_t col_dim; // cross-track
 
 
@@ -309,16 +308,12 @@ RC FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
 
          // TODO : account for binning
 
-    int ndims=(pEngineContext->n_crosstrack==1)?2:3,
-        nwvedims;
-        
-    nwvedims=ndims;    
+    int ndims=(pEngineContext->n_crosstrack==1)?2:3;
 
     // Spectra
 
     if (!dateFlag)
      {
-      int rcvar;
       measurements_group=current_file.getGroup(root_name+"/RADIANCE/OBSERVATIONS");
 
       if (pFrm4doas->imagerFlag && (measurements_group.hasVar("radiance_full_image")))
