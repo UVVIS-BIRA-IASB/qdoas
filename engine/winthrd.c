@@ -155,10 +155,11 @@ RC THRD_SpectrumCorrection(ENGINE_CONTEXT *pEngineContext,double *spectrum, cons
 
   // Straylight bias correction
 
-  if (pEngineContext->project.instrumental.offsetFlag && 
-     (pEngineContext->project.instrumental.lambdaMin>=pEngineContext->buffers.lambda[0]) &&
-     (pEngineContext->project.instrumental.lambdaMax<=pEngineContext->buffers.lambda[n_wavel-1]))
-   {
+  else if (pEngineContext->project.instrumental.offsetFlag) {
+   
+    if ((pEngineContext->project.instrumental.lambdaMin>=pEngineContext->buffers.lambda[0]) &&
+        (pEngineContext->project.instrumental.lambdaMax<=pEngineContext->buffers.lambda[n_wavel-1])){
+     
        int i;
        int imin,imax;
        double offset;
@@ -171,17 +172,20 @@ RC THRD_SpectrumCorrection(ENGINE_CONTEXT *pEngineContext,double *spectrum, cons
        imin=FNPixel(pEngineContext->buffers.lambda,pEngineContext->project.instrumental.lambdaMin,n_wavel,PIXEL_CLOSEST);
        imax=FNPixel(pEngineContext->buffers.lambda,pEngineContext->project.instrumental.lambdaMax,n_wavel,PIXEL_CLOSEST);
 
-    if ((imin<=imax) && (imin>=0) && (imax<n_wavel))
-     {
-         for (i=imin;i<imax;i++)
-       offset+=spe[i];
+       if ((imin<=imax) && (imin>=0) && (imax<n_wavel))
+        {
+            for (i=imin;i<imax;i++)
+          offset+=spe[i];
 
-      offset/=(double)(imax-imin);
+         offset/=(double)(imax-imin);
 
-      for (i=0;i<n_wavel;i++)
-       spe[i]-=offset;
-     }
-   }
+         for (i=0;i<n_wavel;i++)
+          spe[i]-=offset;
+        }
+    }
+    else 
+     rc=ERROR_SetLast(__func__,ERROR_TYPE_WARNING,ERROR_ID_STRAYLIGHT_CORRECTION);
+  }   
 
   // Return
 

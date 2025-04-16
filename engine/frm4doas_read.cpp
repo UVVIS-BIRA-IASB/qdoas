@@ -225,8 +225,8 @@ RC FRM4DOAS_Set(ENGINE_CONTEXT *pEngineContext)
 
     pEngineContext->n_alongtrack=root_group.dimLen("number_of_records");
     pEngineContext->n_crosstrack=(!pFrm4doas->imagerFlag)?1:pFrm4doas->spatialDim;
-    det_size=(!pFrm4doas->imagerFlag)?pEngineContext->project.instrumental.detectorSize:pFrm4doas->spectralDim;
     
+    det_size=(!pFrm4doas->imagerFlag)?pEngineContext->project.instrumental.detectorSize:pFrm4doas->spectralDim;
 
     for (int i=0; i<det_size; i++)
      pEngineContext->buffers.irrad[i]=(double)0.;

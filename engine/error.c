@@ -204,6 +204,7 @@ ERROR_TABLE errorTable[]=
   { ERROR_ID_HDFEOS5_GETFILL           , "HDF-EOS5: error setting fill value for field %s"},
   { ERROR_ID_NETCDF                    , "%s"},
   { ERROR_ID_TROPOMI_REF               , "Could not find Tropomi reference spectrum from file %s, row %d: %s"},
+  { ERROR_ID_STRAYLIGHT_CORRECTION     , "Wavelength interval defined for straylight bias is not covered by the L1 wavelength calibration" },
   // End of the table
 
   { ITEM_NONE                          , "Unknown error (%d)"                                                                                           }

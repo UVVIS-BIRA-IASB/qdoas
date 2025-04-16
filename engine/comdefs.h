@@ -236,6 +236,7 @@ SHORT_DATE;
 
 #define ERROR_ID_SVD_ILLCONDITIONED           1101                              // ill-conditionned matrix
 #define ERROR_ID_SVD_ARG                       1102                             // bad arguments
+#define ERROR_ID_STRAYLIGHT_CORRECTION         1103                             // straylight correction error
 #define ERROR_ID_SPLINE                        1110                             // spline interpolation requests increasing absissae
 #define ERROR_ID_VOIGT                         1111                             // Voigt function failed
 #define ERROR_ID_ERF                           1112                             // error with the calculation of the erf function
@@ -266,6 +267,7 @@ SHORT_DATE;
 #define ERROR_ID_IMAGER_CALIB                  1297                             // calibration error for imager row
 #define ERROR_ID_L1WAVELENGTH                  1298                             // L1 wavelength calibration incorrect
 #define ERROR_ID_PUKITE                        1299                             // missing pukite cross section
+
 
 // Specific file format
 
