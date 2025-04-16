@@ -604,14 +604,14 @@ int OMIV4_read(ENGINE_CONTEXT *pEngineContext,int record) {
     }
     // If we have not filled the buffer completely due to fill values, fill up with dummy values at the end:
     double last_lambda = lambda[j-1];
-    for (size_t i=j; j<current_orbit->n_lambda(); ++i) {
+    for (size_t i=j; i<current_orbit->n_lambda(); ++i) {
       last_lambda+=1;
       lambda[i]=last_lambda;
       spectrum[i]=0;
       sigma[i]=1;
     }
   } catch(std::runtime_error& e) {
-    rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, e.what());
+    rc = ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_NETCDF, e.what());
   }
 
   RECORD_INFO *pRecord = &pEngineContext->recordInfo;
