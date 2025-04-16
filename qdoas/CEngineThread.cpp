@@ -42,11 +42,8 @@ CEngineThread::~CEngineThread()
   while (isRunning())
     QThread::msleep(50);
 
-  CEngineResponse *resp = new CEngineResponseMessage;
-
-  int rc = mediateRequestDestroyEngineContext(m_engineContext, resp);
+  int rc = mediateRequestDestroyEngineContext(m_engineContext);
   assert(rc == 0);
-  delete resp;
 }
 
 void CEngineThread::setRunState(bool setRunning)

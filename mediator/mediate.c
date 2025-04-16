@@ -563,7 +563,7 @@ int mediateRequestCreateEngineContext(void **engineContext, void *responseHandle
 // RETURN        Zero is returned on success, -1 otherwise.
 // -----------------------------------------------------------------------------
 
-int mediateRequestDestroyEngineContext(void *engineContext, void *responseHandle)
+int mediateRequestDestroyEngineContext(void *engineContext)
  {
    return (!EngineDestroyContext((ENGINE_CONTEXT *)engineContext))?0:-1;
  }
@@ -1641,7 +1641,6 @@ RC mediateRequestSetAnalysisNonLinearDoas(ENGINE_CONTEXT *pEngineContext, const 
 int mediateRequestSetAnalysisWindows(void *engineContext,
                      int numberOfWindows,
                      const mediate_analysis_window_t *analysisWindows,
-                     int operatingMode,
                      void *responseHandle)
  {
    // Declarations
@@ -2104,10 +2103,9 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
 // TRANSFER OF THE LIST OF SYMBOLS FROM THE MEDIATOR TO THE ENGINE
 // ===============================================================
 
-int mediateRequestSetSymbols(void *engineContext,
-                 int numberOfSymbols,
-                 const mediate_symbol_t *symbols,
-                 void *responseHandle)
+int mediateRequestSetSymbols(int numberOfSymbols,
+                             const mediate_symbol_t *symbols,
+                             void *responseHandle)
  {
    // Declarations
 
@@ -2138,10 +2136,9 @@ int mediateRequestSetSymbols(void *engineContext,
 // TRANSFER OF THE LIST OF OBSERVATION SITES FROM THE MEDIATOR TO THE ENGINE
 // =========================================================================
 
-int mediateRequestSetSites(void *engineContext,
-               int numberOfSites,
-               const mediate_site_t *sites,
-               void *responseHandle)
+int mediateRequestSetSites(int numberOfSites,
+                           const mediate_site_t *sites,
+                           void *responseHandle)
  {
    // Declarations
 
@@ -2173,8 +2170,7 @@ int mediateRequestSetSites(void *engineContext,
 // ==================
 
 int mediateRequestGotoSpectrum(void *engineContext,
-                   int recordNumber,
-                   void *responseHandle)
+                               int recordNumber)
  {
    ENGINE_CONTEXT *pEngineContext = (ENGINE_CONTEXT *)engineContext;
 
@@ -2460,7 +2456,6 @@ int mediateRequestNextMatchingAnalyseSpectrum(void *engineContext,
    // Declarations
 
    ENGINE_CONTEXT *pEngineContext = (ENGINE_CONTEXT *)engineContext;
-   RC rcOutput = ERROR_ID_NO;
 
    int rec = mediateRequestNextMatchingSpectrum(pEngineContext,responseHandle);
 
@@ -2502,12 +2497,6 @@ int mediateRequestNextMatchingAnalyseSpectrum(void *engineContext,
    // next records.
 
    return ((pEngineContext->recordInfo.rc != ERROR_ID_REF_ALIGNMENT) || pEngineContext->analysisRef.refScan) ? rec : -1;
- }
-
-int mediateRequestPrevMatchingAnalyseSpectrum(void *engineContext,
-                          void *responseHandle)
- {
-   return 0;
  }
 
 int mediateRequestBeginCalibrateSpectra(void *engineContext,
@@ -2559,12 +2548,6 @@ int mediateRequestNextMatchingCalibrateSpectrum(void *engineContext,
    // NB if the function returns -1, the problem is that it is not possible to process
    // next records.
    return rec; // (rc == ERROR_ID_NO) ? rec : -1;
- }
-
-int mediateRequestPrevMatchingCalibrateSpectrum(void *engineContext,
-                        void *responseHandle)
- {
-   return 0;
  }
 
 int mediateRequestStop(void *engineContext,

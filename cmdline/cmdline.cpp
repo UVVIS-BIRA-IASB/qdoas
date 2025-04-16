@@ -538,10 +538,8 @@ public:
 
   ~QdoasBatch() {
     if (have_enginecontext) {
-      CEngineResponseMessage msgResp;
 
-      if (mediateRequestDestroyEngineContext(engineContext, &msgResp) != 0) {
-        msgResp.process(&controller);
+      if (mediateRequestDestroyEngineContext(engineContext) != 0) {
         rc = 1;
       }
     }
@@ -1052,7 +1050,7 @@ int analyseProjectQdoasPrepare(void **engineContext, const CProjectConfigItem *p
 
   // set project
   if (!retCode &&
-      ((mediateRequestSetSites(*engineContext,n,siteList.get(),msgResp)!=0) ||
+      ((mediateRequestSetSites(n,siteList.get(),msgResp)!=0) ||
       (mediateRequestSetProject(*engineContext, &projectData, (!calibSwitch)?THREAD_TYPE_ANALYSIS:THREAD_TYPE_KURUCZ, msgResp)!= 0))) {
     msgResp->process(controller);
     delete msgResp;
@@ -1079,7 +1077,7 @@ int analyseProjectQdoasPrepare(void **engineContext, const CProjectConfigItem *p
         nWindows--;
       }
     }
-    int rc = mediateRequestSetAnalysisWindows(*engineContext, nWindows, awDataList, (!calibSwitch)?THREAD_TYPE_ANALYSIS:THREAD_TYPE_KURUCZ, msgResp);
+    int rc = mediateRequestSetAnalysisWindows(*engineContext, nWindows, awDataList, msgResp);
     msgResp->process(controller);
     if (rc != 0) {
       delete msgResp;
@@ -1091,8 +1089,7 @@ int analyseProjectQdoasPrepare(void **engineContext, const CProjectConfigItem *p
 
   if (retCode) {
     // cleanup ... destroy the engine
-    if (mediateRequestDestroyEngineContext(*engineContext, msgResp) != 0) {
-      msgResp->process(controller);
+    if (mediateRequestDestroyEngineContext(*engineContext) != 0) {
       retCode = 1;
     }
 

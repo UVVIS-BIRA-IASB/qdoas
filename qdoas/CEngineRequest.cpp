@@ -101,7 +101,7 @@ bool CEngineRequestSetAnalysisWindows::process(CEngineThread *engineThread)
   CEngineResponse *resp = new CEngineResponseVisual;
 
   int rc = mediateRequestSetAnalysisWindows(engineThread->engineContext(),
-                        m_nWindows, m_windowList, m_opMode, resp);
+                        m_nWindows, m_windowList, resp);
 
   // post the response
   engineThread->respond(resp);
@@ -130,8 +130,7 @@ bool CEngineRequestSetSymbols::process(CEngineThread *engineThread)
 
   CEngineResponse *resp = new CEngineResponseVisual;
 
-  int rc = mediateRequestSetSymbols(engineThread->engineContext(),
-                    m_nSymbols, m_symbolList, resp);
+  int rc = mediateRequestSetSymbols(m_nSymbols, m_symbolList, resp);
 
   // post the response
   engineThread->respond(resp);
@@ -160,8 +159,7 @@ bool CEngineRequestSetSites::process(CEngineThread *engineThread)
 
   CEngineResponse *resp = new CEngineResponseVisual;
 
-  int rc = mediateRequestSetSites(engineThread->engineContext(),
-                  m_nSites, m_siteList, resp);
+  int rc = mediateRequestSetSites(m_nSites, m_siteList, resp);
 
   // post the response
   engineThread->respond(resp);
@@ -215,12 +213,12 @@ bool CEngineRequestBrowseSpecificRecord::process(CEngineThread *engineThread)
   CEngineResponseSpecificRecord *resp = new CEngineResponseSpecificRecord;
 
   int rc = mediateRequestGotoSpectrum(engineThread->engineContext(),
-                      m_recordNumber, resp);
+                                      m_recordNumber);
 
   if (rc > 0) {
     // successfully positioned .. now browse
     rc = mediateRequestNextMatchingBrowseSpectrum(engineThread->engineContext(),
-                          resp);
+                                                  resp);
 
     resp->setRecordNumber(rc); // -1 if an error occurred
   }
@@ -277,12 +275,12 @@ bool CEngineRequestExportSpecificRecord::process(CEngineThread *engineThread)
   CEngineResponseSpecificRecord *resp = new CEngineResponseSpecificRecord;
 
   int rc = mediateRequestGotoSpectrum(engineThread->engineContext(),
-                      m_recordNumber, resp);
+                                      m_recordNumber);
 
   if (rc > 0) {
     // successfully positioned .. now Export
     rc = mediateRequestNextMatchingBrowseSpectrum(engineThread->engineContext(),
-                          resp);
+                                                  resp);
 
     resp->setRecordNumber(rc); // -1 if an error occurred
   }
@@ -339,8 +337,7 @@ bool CEngineRequestAnalyseSpecificRecord::process(CEngineThread *engineThread)
   // create a response as the handle
   CEngineResponseSpecificRecord *resp = new CEngineResponseSpecificRecord;
 
-  int rc = mediateRequestGotoSpectrum(engineThread->engineContext(),
-                      m_recordNumber, resp);
+  int rc = mediateRequestGotoSpectrum(engineThread->engineContext(), m_recordNumber);
 
   if (rc > 0) {
     // successfully positioned .. now analyse
@@ -366,7 +363,7 @@ bool CEngineRequestBeginCalibrateFile::process(CEngineThread *engineThread)
   CEngineResponseBeginAccessFile *resp = new CEngineResponseBeginAccessFile(m_fileName);
 
   int rc = mediateRequestBeginCalibrateSpectra(engineThread->engineContext(),
-                        m_fileName.c_str(), resp);
+                                               m_fileName.c_str(), resp);
 
   resp->setNumberOfRecords(rc); // -1 if an error occurred
 
@@ -383,8 +380,7 @@ bool CEngineRequestCalibrateNextRecord::process(CEngineThread *engineThread)
   // create a response as the handle
   CEngineResponseSpecificRecord *resp = new CEngineResponseSpecificRecord;
 
-  int rc = mediateRequestNextMatchingCalibrateSpectrum(engineThread->engineContext(),
-                            resp);
+  int rc = mediateRequestNextMatchingCalibrateSpectrum(engineThread->engineContext(), resp);
 
   resp->setRecordNumber(rc); // -1 if an error occurred
 
@@ -402,12 +398,11 @@ bool CEngineRequestCalibrateSpecificRecord::process(CEngineThread *engineThread)
   CEngineResponseSpecificRecord *resp = new CEngineResponseSpecificRecord;
 
   int rc = mediateRequestGotoSpectrum(engineThread->engineContext(),
-                      m_recordNumber, resp);
+                                      m_recordNumber);
 
   if (rc > 0) {
     // successfully positioned .. now analyse
-    rc = mediateRequestNextMatchingCalibrateSpectrum(engineThread->engineContext(),
-                           resp);
+    rc = mediateRequestNextMatchingCalibrateSpectrum(engineThread->engineContext(), resp);
 
     resp->setRecordNumber(rc); // -1 if an error occurred
   }

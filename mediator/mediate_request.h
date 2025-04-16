@@ -45,7 +45,7 @@ int mediateRequestCreateEngineContext(void **engineContext, void *responseHandle
 // asks the engine to release any resourse associated with an engineContext.
 // Zero is returned on success, -1 otherwise.
 
-int mediateRequestDestroyEngineContext(void *engineContext, void *responseHandle);
+int mediateRequestDestroyEngineContext(void *engineContext);
 
 
 //----------------------------------------------------------
@@ -85,13 +85,13 @@ int  mediateRequestSetProject(void *engineContext, const mediate_project_t *proj
 //
 // Zero is returned if the operation succeeded, -1 otherwise.
 
-int mediateRequestSetAnalysisWindows(void *engineContext, int numberOfWindows, const mediate_analysis_window_t *analysisWindows, int operatingMode, void *responseHandle);
+int mediateRequestSetAnalysisWindows(void *engineContext, int numberOfWindows, const mediate_analysis_window_t *analysisWindows, void *responseHandle);
 
 // TODO
-int mediateRequestSetSymbols(void *engineContext, int numberOfSymbols, const mediate_symbol_t *symbols, void *responseHandle);
+int mediateRequestSetSymbols(int numberOfSymbols, const mediate_symbol_t *symbols, void *responseHandle);
 
 // TODO
-int mediateRequestSetSites(void *engineContext, int numberOfSites, const mediate_site_t *sites, void *responseHandle);
+int mediateRequestSetSites(int numberOfSites, const mediate_site_t *sites, void *responseHandle);
 
 //----------------------------------------------------------
 // Browsing Spectra Interface
@@ -123,10 +123,8 @@ int mediateRequestBeginBrowseSpectra(void *engineContext, const char *spectraFil
 //
 // On success, recordNumber is returned. If recordNumber is greater than the number of
 // record in the file (or <= 0), 0 is returned. -1 is returned for all other errors
-// and an error message should be posted with
-//    mediateResponseErrorMessage(functionName, messageString, errorLevel, responseHandle);
 
-int mediateRequestGotoSpectrum(void *engineContext, int recordNumber, void *responseHandle);
+int mediateRequestGotoSpectrum(void *engineContext, int recordNumber);
 
 
 // mediateRequestNextMatchingBrowseSpectrum
@@ -251,30 +249,6 @@ int mediateRequestNextMatchingExportSpectrum(void *engineContext, void *response
 
 int mediateRequestNextMatchingAnalyseSpectrum(void *engineContext, void *responseHandle);
 
-
-// mediateRequestPrevMatchingAnalyseSpectrum
-//
-// attempt to locate and analyse the previous spectral record in the current spectra file that
-// matches the filter conditions of the current project. The search begins with the current
-// spectral record. On success the matching spectrum is analysed. This involves pre-processing
-// based on the settings of the current project, followed by analysis of each spectral window.
-// The spectral windows are processed in the order they were defined. Graphical result data is
-// passed to the GUI with calls to mediateResponsePlotData(...). Numerical and String result
-// data can be passed to the GUI in a free-format tabular-based maner with calls to
-// mediateResponseCellDataDouble(page, row, column, doubleValue, responseHandle), and
-// mediateResponseCellDataInteger(page, row, column, integerValue, responseHandle), and
-// mediateResponseCellDataString(page, row, column, stringValue, responseHandle). Note that
-// page, row and column index from 0 and have no formal upper limit (be sensible). Repeat writes to
-// the same cell will overwrite any existing data. The table is initially empty and cells/pages may
-// be left blank (it is the expectation that a separate page be used for each analysis window.
-//
-// On success, the actual record number of the matching spectrum is returned. Zero is returned
-// if a matching spectrum is not found. -1 is returned for all other errors and an error message
-// should be posted with
-//    mediateResponseErrorMessage(functionName, messageString, errorLevel, responseHandle);
-
-int mediateRequestPrevMatchingAnalyseSpectrum(void *engineContext, void *responseHandle);
-
 //----------------------------------------------------------
 // Calibrate Interface
 //----------------------------------------------------------
@@ -321,30 +295,6 @@ int mediateRequestBeginCalibrateSpectra(void *engineContext, const char *spectra
 //    mediateResponseErrorMessage(functionName, messageString, errorLevel, responseHandle);
 
 int mediateRequestNextMatchingCalibrateSpectrum(void *engineContext, void *responseHandle);
-
-
-// mediateRequestPrevMatchingCalibrateSpectrum
-//
-// attempt to locate and analyse the next spectral record in the current spectra file that
-// matches the filter conditions of the current project. The search begins with the current
-// spectral record. On success the matching spectrum is analysed. This involves pre-processing
-// based on the settings of the current project, followed by analysis of each spectral window.
-// The spectral windows are processed in the order they were defined. Graphical result data is
-// passed to the GUI with calls to mediateResponsePlotData(...). Numerical and String result
-// data can be passed to the GUI in a free-format tabular-based maner with calls to
-// mediateResponseCellDataDouble(page, row, column, doubleValue, responseHandle), and
-// mediateResponseCellDataInteger(page, row, column, integerValue, responseHandle), and
-// mediateResponseCellDataString(page, row, column, stringValue, responseHandle). Note that
-// page, row and column index from 0 and have no formal upper limit (be sensible). Repeat writes to
-// the same cell will overwrite any existing data. The table is initially empty and cells/pages may
-// be left blank (it is the expectation that a separate page be used for each analysis window.
-//
-// On success, the actual record number of the matching spectrum is returned. Zero is returned
-// if a matching spectrum is not found. -1 is returned for all other errors and an error message
-// should be posted with
-//    mediateResponseErrorMessage(functionName, messageString, errorLevel, responseHandle);
-
-int mediateRequestPrevMatchingCalibrateSpectrum(void *engineContext, void *responseHandle);
 
 
 // mediateRequestStop
