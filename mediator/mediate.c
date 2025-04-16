@@ -31,6 +31,7 @@
 #include "apex_read.h"
 #include "gems_read.h"
 #include "mfc-read.h"
+#include "frm4doas_read.h"
 
 #include "matrix_netcdf_read.h"
 
