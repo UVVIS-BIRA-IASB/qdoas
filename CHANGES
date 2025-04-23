@@ -1,3 +1,14 @@
+3.7.3 2025-04-16
+~~~~~~~~~~~~~~~~
+
+ * Extend FRM4DOAS format for imagers.
+
+ * Ground-based instruments: Only perform correction if the wavelength interval is covered by the wavelength calibration.
+
+ * Fix: fill values in OMI collection 4 spectra no longer end the processing.
+
+ * Fix: allow "run calibration" for a configuration without analysis windows.
+
 3.7.2 2025-02-10
 ~~~~~~~~~~~~~~~~
 
