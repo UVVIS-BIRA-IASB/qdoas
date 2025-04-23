@@ -171,27 +171,27 @@ static size_t spectral_dim; // number of wavelengths
 static size_t col_dim; // cross-track
 
 
-int FRM4DOAS_init(const char *reference_filename, ENGINE_CONTEXT *pEngineContext) {
-  try {
-    NetCDFFile reference_file(reference_filename);
-    col_dim = reference_file.dimLen("col_dim");
-    spectral_dim = reference_file.dimLen("spectral_dim");
-    ANALYSE_swathSize = col_dim;
-
-    for (size_t i=0; i< col_dim; ++i) {
-      pEngineContext->project.instrumental.use_row[i] = true;
-      if (spectral_dim > NDET[i])
-        return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF,
-                             "spectral_dim too large. This version supports spectra of maximum length "
-                             TOSTRING(APEX_INIT_LENGTH));
-      NDET[i] = spectral_dim;
-    }
-    init_filename = reference_filename;
-  } catch(std::runtime_error& e) {
-    return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, e.what());
-  }
-  return ERROR_ID_NO;
-}
+// int FRM4DOAS_init(const char *reference_filename, ENGINE_CONTEXT *pEngineContext) {
+//   try {
+//     NetCDFFile reference_file(reference_filename);
+//     col_dim = reference_file.dimLen("col_dim");
+//     spectral_dim = reference_file.dimLen("spectral_dim");
+//     ANALYSE_swathSize = col_dim;
+// 
+//     for (size_t i=0; i< col_dim; ++i) {
+//       pEngineContext->project.instrumental.use_row[i] = true;
+//       if (spectral_dim > NDET[i])
+//         return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF,
+//                              "spectral_dim too large. This version supports spectra of maximum length "
+//                              TOSTRING(APEX_INIT_LENGTH));
+//       NDET[i] = spectral_dim;
+//     }
+//     init_filename = reference_filename;
+//   } catch(std::runtime_error& e) {
+//     return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, e.what());
+//   }
+//   return ERROR_ID_NO;
+// }
 
 // -----------------------------------------------------------------------------
 // FUNCTION FRM4DOAS_Set

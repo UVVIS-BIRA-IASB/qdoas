@@ -1749,7 +1749,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
      break;
    case PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF:
      if (pEngineContext->project.instrumental.frm4doas.imagerFlag) {
-       rc = FRM4DOAS_init(analysisWindows[0].refOneFile,pEngineContext);
+       rc = apex_init(analysisWindows[0].refOneFile,pEngineContext);
      }
      else
        pInstrumental->use_row[0]=true;
