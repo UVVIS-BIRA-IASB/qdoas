@@ -675,7 +675,9 @@ int Gome2ReadMDRInfo(GOME2_ORBIT_FILE *pOrbitFile,GOME2_MDR *pMdr,int indexBand)
 
   // Generic record header
 
-  coda_cursor_goto_available_union_field(&pOrbitFile->gome2Cursor);
+  int status = coda_cursor_goto_available_union_field(&pOrbitFile->gome2Cursor);
+  if (status)
+    return 0;
   coda_cursor_goto_record_field_by_name(&pOrbitFile->gome2Cursor,"RECORD_HEADER");          // MDR.GOME2_MDR_L1B_EARTHSHINE_V1.RECORD_HEADER
 
   // Subclass (determined by the instrument group - earthshine is expected)
@@ -977,11 +979,17 @@ RC Gome2BrowseMDR(GOME2_ORBIT_FILE *pOrbitFile,INDEX indexBand) {
   GOME2_INFO *pGome2Info=&pOrbitFile->gome2Info;
   RC rc=ERROR_ID_NO;
 
-  coda_cursor_goto_root(&pOrbitFile->gome2Cursor);
-  coda_cursor_goto_record_field_by_name(&pOrbitFile->gome2Cursor,"MDR");
+  int status = coda_cursor_goto_root(&pOrbitFile->gome2Cursor);
+  if (status) goto error;
+  status = coda_cursor_goto_record_field_by_name(&pOrbitFile->gome2Cursor,"MDR");
+  if(status) goto error;
 
-  for (unsigned int i=0; i<pGome2Info->total_mdr; i++) {
-    coda_cursor_goto_array_element_by_index(&pOrbitFile->gome2Cursor,i);
+  for (unsigned int i=0; i != pGome2Info->total_mdr; ++i) {
+    status = coda_cursor_goto_array_element_by_index(&pOrbitFile->gome2Cursor,i);
+    if (status) {
+      continue;
+    }
+
     GOME2_MDR *pMdr=&pGome2Info->mdr[pGome2Info->total_nadir_mdr];
 
     if (!(rc=Gome2ReadMDRInfo(pOrbitFile,pMdr,indexBand))) {
@@ -990,8 +998,12 @@ RC Gome2BrowseMDR(GOME2_ORBIT_FILE *pOrbitFile,INDEX indexBand) {
 
       pGome2Info->total_nadir_mdr++;
     }
+    status = coda_cursor_goto_parent(&pOrbitFile->gome2Cursor);
+  }
 
-    coda_cursor_goto_parent(&pOrbitFile->gome2Cursor);
+ error:
+  if (status) {
+    return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_FILE_BAD_FORMAT, pOrbitFile->gome2FileName);
   }
 
   // Return
