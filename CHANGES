@@ -1,3 +1,8 @@
+3.7.5 2025-06-27
+~~~~~~~~~~~~~~~~
+
+ * Fix read errors for certain GOME-2 v13 L1B input files.
+
 3.7.4 2025-04-23
 ~~~~~~~~~~~~~~~~
 
