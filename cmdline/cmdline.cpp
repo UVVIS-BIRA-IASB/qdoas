@@ -609,8 +609,19 @@ int main(int argc, char **argv)
   return retCode;
 }
 
-
 //-------------------------------------------------------------------
+
+// Replace '\' path separators by '/' in filenames:
+//
+// On windows, we may end up with a mixt of '\' and '/' in paths, but
+// the QDOAS engine assumes all path separators are '/'.  Therefore,
+// we replace '\' by '/' on windows:
+string make_pathsep_forward(string path) {
+#ifdef _WIN32
+  boost::replace_all(path, "\\", "/");
+#endif
+  return path;
+}
 
 enum RunMode parseCommandLine(int argc, char **argv, commands_t *cmd)
 {
@@ -731,7 +742,7 @@ enum RunMode parseCommandLine(int argc, char **argv, commands_t *cmd)
       else if (!strcmp(argv[i], "-o")) {
         if (++i < argc && argv[i][0] != '-') {
           fileSwitch=0;
-          cmd->outputDir = argv[i];
+          cmd->outputDir = make_pathsep_forward(argv[i]);
         }
         else {
           runMode = Error;
@@ -1129,6 +1140,7 @@ int QdoasBatch::analyse_file(const string &filename) {
   if (verboseMode)
     std::cout << "Processing file " << filename << std::endl;
 
+  auto filename_fwd = make_pathsep_forward(filename);
   ++files_processed;
   int retCode = 0;
   // If this is the first file we process, we still have to run analyseProjectQdoasPrepare()
@@ -1141,13 +1153,13 @@ int QdoasBatch::analyse_file(const string &filename) {
     have_enginecontext = true;
   }
 
-  CEngineResponseBeginAccessFile beginFileResp(filename);
+  CEngineResponseBeginAccessFile beginFileResp(filename_fwd);
 
   int result = (!calibSwitch)
     ? mediateRequestBeginAnalyseSpectra(engineContext,
                                         CWorkSpace::instance()->getConfigFile().c_str(),
-                                        filename.c_str(), &beginFileResp)
-    : mediateRequestBeginCalibrateSpectra(engineContext, filename.c_str(), &beginFileResp);
+                                        filename_fwd.c_str(), &beginFileResp)
+    : mediateRequestBeginCalibrateSpectra(engineContext, filename_fwd.c_str(), &beginFileResp);
 
   beginFileResp.setNumberOfRecords(result);
   beginFileResp.process(&controller);
