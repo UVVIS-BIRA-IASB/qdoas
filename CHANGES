@@ -1,3 +1,14 @@
+3.7.6 2025-08-28
+~~~~~~~~~~~~~~~~
+
+ * Support for TEMPO data.
+
+ * output pixel quality flags for OMI collection 4, Tropomi and TEMPO data.
+
+ * Fix: avoid mixing '/' and '\' when using filename globbing patterns on Windows.
+
+ * Fix issue reading old binned files for the FRM4DOAS format.
+
 3.7.5 2025-06-27
 ~~~~~~~~~~~~~~~~
 
