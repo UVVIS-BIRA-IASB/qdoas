@@ -250,7 +250,7 @@ RC FRM4DOAS_Set(ENGINE_CONTEXT *pEngineContext)
    {
     rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, e.what());   // in case of error, capture the message
    }
-
+   
   // Return
 
   return rc;
@@ -309,7 +309,7 @@ RC FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
          // TODO : account for binning
 
     int ndims=(pEngineContext->n_crosstrack==1)?2:3;
-
+    
     // Spectra
 
     if (!dateFlag)
@@ -322,6 +322,8 @@ RC FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
        measurements_group.getVar("radiance",start,count,ndims,(float)0.,spe);
       else if (measurements_group.hasVar("radiance_averaged_along_spectral_dim"))
        measurements_group.getVar("radiance_averaged_along_spectral_dim",start,count,ndims,(float)0.,spe);
+      else if (measurements_group.hasVar("radiance_full_image"))
+       measurements_group.getVar("radiance_full_image",start,count,ndims,(float)0.,spe);   
 
 
       if (pEngineContext->buffers.sigmaSpec!=NULL)

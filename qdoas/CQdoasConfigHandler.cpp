@@ -4,6 +4,7 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 */
 
+#include <cstdio>
 
 #include "CProjectConfigItem.h"
 #include "CQdoasConfigHandler.h"
@@ -17,6 +18,7 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 using std::map;
 using std::string;
 using std::vector;
+using std::fprintf;
 
 void CQdoasConfigHandler::start_subhandler(const xmlstring& name,
                                            const map<xmlstring, string>& atts) {
@@ -143,11 +145,14 @@ void CSymbolSubHandler::start(const xmlstring &element, const map<xmlstring, str
 CProjectSubHandler::CProjectSubHandler(CQdoasConfigHandler *master) :
   CQdoasConfigSubHandler(master)
 {
+  // std::fprintf(stdout,"CProjectSubHandler\n");
 }
 
 void CProjectSubHandler::start(const map<xmlstring, string> &atts)
 {
   // the project element - must have a name
+  
+  // std::fprintf(stdout,"name\n");
 
   m_project.setName(value(atts, "name"));
   m_project.setEnabled(value(atts, "disable") != "true");
@@ -161,6 +166,8 @@ void CProjectSubHandler::start(const xmlstring &element, const map<xmlstring, st
 {
   // a sub element of project ... create a specialized handler and delegate
   mediate_project_t *prop = m_project.properties();
+  
+  // std::fprintf(stdout,"element %s\n",element.c_str());
 
   if (element == "display") {
     return m_master->install_subhandler(new CProjectDisplaySubHandler(m_master, &(prop->display)), atts);
@@ -204,6 +211,7 @@ void CProjectSubHandler::start(const xmlstring &element, const map<xmlstring, st
     if (awItem)
       return m_master->install_subhandler(new CAnalysisWindowSubHandler(m_master, awItem), atts);
   }
+  // std::fprintf(stdout,"OK\n");
 }
 
 void CProjectSubHandler::end()
