@@ -874,7 +874,14 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
     for (i=0;i<n_wavel;i++) {
       shiftPoly[i]=Pcalib[pKurucz->shiftDegree+1];
       for (j=pKurucz->shiftDegree;j>=1;j--) {
-        shiftPoly[i]=shiftPoly[i]*(double)i+Pcalib[j];
+        double i_pixel = i;
+        // To avoid blowup of the polynomial fit, extrapolate shiftPoly as a constant outside calibration range: 
+        if (i_pixel < SvdPDeb) {
+          i_pixel = SvdPDeb;
+        } else if (i_pixel > SvdPFin) {
+          i_pixel = SvdPFin;
+        }
+        shiftPoly[i]=shiftPoly[i] * i_pixel+Pcalib[j];
       }
       Lambda[i]=oldLambda[i]-shiftSign*shiftPoly[i];
     }
