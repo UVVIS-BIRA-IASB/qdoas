@@ -909,8 +909,8 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
 
      if (pKuruczOptions->divisionMode==PRJCT_CALIB_WINDOWS_CONTIGUOUS) {
        MEDIATE_PLOT_CURVES(plotPageCalib, Spectrum, forceAutoScale, string, "Wavelength (nm)", "Intensity", responseHandle,
-                           CURVE(.name="Spectrum", .x=Lambda, .y=spectrum, .length=n_wavel),
-                           CURVE(.name="Adjusted Kurucz", .x=Lambda, .y=ANALYSE_secX, .length=n_wavel));
+                           CURVE(.name="Spectrum", .x=&Lambda[SvdPDeb], .y=&spectrum[SvdPDeb], .length=(SvdPFin-SvdPDeb)),
+                           CURVE(.name="Adjusted Kurucz", .x=&Lambda[SvdPDeb], .y=&ANALYSE_secX[SvdPDeb], .length=(SvdPFin-SvdPDeb)));
       }
      else
       {
@@ -937,7 +937,7 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
 
       if (pKuruczOptions->divisionMode==PRJCT_CALIB_WINDOWS_CONTIGUOUS) {
         MEDIATE_PLOT_CURVES(plotPageCalib,Spectrum,forceAutoScale,string,"Wavelength (nm)","", responseHandle,
-                            CURVE(.name="Residual", .x=&Lambda[0], .y=&ANALYSE_absolu[0], .length=n_wavel));
+                            CURVE(.name="Residual", .x=&Lambda[SvdPDeb], .y=&ANALYSE_absolu[SvdPDeb], .length=(SvdPFin-SvdPDeb)));
       } else {
         for (indexWindow=0;indexWindow<Nb_Win;indexWindow++) {
           pixMin=spectrum_start(subwindow_fit[indexWindow].specrange);
@@ -1049,7 +1049,7 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
         sprintf(string,"Shift (%d/%d)",indexFenoColumn+1,ANALYSE_swathSize);
 
       MEDIATE_PLOT_CURVES(plotPageCalib,Spectrum,forceAutoScale,string,"Wavelength (nm)","Shift (nm)", responseHandle,
-                          CURVE(.name="Polynomial fitting individual shift points", .x=Lambda, .y=shiftPoly, .length=n_wavel),
+                          CURVE(.name="Polynomial fitting individual shift points", .x=&Lambda[SvdPDeb], .y=&shiftPoly[SvdPDeb], .length=(SvdPFin-SvdPDeb)),
                           CURVE(.name="Shift calculated in the individual small windows", .x=VLambda+1, .y=VShift+1, .length=Nb_Win, .style=Point));
     }
 
@@ -1075,7 +1075,7 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
 
         if (pKurucz->displayShift) {
           MEDIATE_PLOT_CURVES(plotPageCalib,Spectrum,forceAutoScale,string,"Wavelength (nm)",(pKuruczOptions->fwhmType==SLIT_TYPE_FILE)?"":"SFP (nm)", responseHandle,
-                              CURVE(.name="Polynomial fitting individual FWHM points", .x=Lambda, .y=fwhmVector[indexParam], .length=n_wavel),
+                              CURVE(.name="Polynomial fitting individual FWHM points", .x=&Lambda[SvdPDeb], .y=&fwhmVector[indexParam][SvdPDeb], .length=(SvdPFin-SvdPDeb)),
                               CURVE(.name="FWHM calculated in the individual small windows", .x=VLambda+1, .y=fwhm[indexParam], .length=Nb_Win, .style=Point));
         }
       }
