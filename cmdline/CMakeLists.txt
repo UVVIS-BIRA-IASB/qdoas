@@ -45,12 +45,14 @@ add_executable(doas_cl
 target_compile_features(doas_cl PUBLIC cxx_std_11)
 target_link_libraries(doas_cl
   config engine mediate
-  PkgConfig::LIBXMLXX)
+  PkgConfig::LIBXMLXX
+  Boost::boost
+)
 
 target_include_directories(doas_cl PRIVATE
   ./glob_match
   ../qdoas ../convolution ../usamp ../ring
-  ${LIBXMLXX_INCLUDE_DIRS})
+)
 
 install(TARGETS doas_cl DESTINATION ${BIN_PREFIX}
         COMPONENT doas_cl)
