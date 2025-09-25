@@ -250,75 +250,52 @@ RC ERROR_DisplayMessage(void *responseHandle)
 // RETURN        the errorId
 // -----------------------------------------------------------------------------
 
-RC ERROR_SetLast(const char *callingFunction,int errorType,RC errorId,...)
- {
+RC ERROR_SetLast(const char *callingFunction,int errorType,RC errorId,...) {
   // Declarations
 
   ERROR_DESCRIPTION *pError;                                                    // pointer to the current error
   va_list argList;                                                              // pointer to the variable argument list
   INDEX i;
 
-  if (errorId!=ERROR_ID_NO)
-   {
-    // Browse already registered errors
+  if ((errorStackN > ERROR_MAX_ERRORS) || (errorId==ERROR_ID_NO)) {
+    return errorId;
+  }
 
-    for (i=0;i<errorStackN;i++)
-     if (errorStack[i].errorId==errorId
-         && errorStack[i].errorType == errorType)
-      break;
+  // if we get here, the stack is not full
+  pError=&errorStack[errorStackN];
 
-    if ((i==errorStackN) &&                                                     // if this error code and type is already in the stack, do not repeat it
-        (errorStackN<=ERROR_MAX_ERRORS))                                        // the stack is not full
-     {
-      pError=&errorStack[errorStackN];
+  // Initializations
+  memset(pError,0,sizeof(ERROR_DESCRIPTION));
+  strncpy(pError->errorFunction,callingFunction,MAX_FCT_LEN);
 
-      // Initializations
+  if (errorStackN == ERROR_MAX_ERRORS) {  // Keep the last item in the stack for full stack warning
+      pError->errorType=ERROR_TYPE_WARNING;
+      pError->errorId=ERROR_ID_BUFFER_FULL;
 
-      memset(pError,0,sizeof(ERROR_DESCRIPTION));
-      strncpy(pError->errorFunction,callingFunction,MAX_FCT_LEN);
+      strcpy(pError->errorString,"the stack of errors is full - can not register errors anymore");
+      return errorId;
+  }
 
-      // Save the information on the last error
+  // We still have room on the stack -> save the information on the last error
 
-      if (errorStackN<ERROR_MAX_ERRORS)
-       {
-        // Browse the table of errors to retrieve the message
+  // Browse the table of errors to retrieve the message
+  for (i=0;(errorTable[i].errorId!=ITEM_NONE) && (errorTable[i].errorId!=errorId);i++);
 
-        for (i=0;(errorTable[i].errorId!=ITEM_NONE) && (errorTable[i].errorId!=errorId);i++);
+  // Error type and id number
+  pError->errorType=errorType;
+  pError->errorId=errorId;
 
-        // Error type and id number
-
-        pError->errorType=errorType;
-        pError->errorId=errorTable[i].errorId;
-
-        // Build the error message
-
-        if (pError->errorId==ITEM_NONE)
-         sprintf(pError->errorString,"unknown error or error id out of range (%d)",errorId);
-        else
-         {
-          va_start(argList,errorId);
-          vsprintf(pError->errorString,errorTable[i].errorMessage,argList);
-          va_end(argList);
-         }
-       }
-
-      // Keep the last item in the stack for full stack warning
-
-      else
-       {
-        pError->errorType=ERROR_TYPE_WARNING;                                   // type of error (warning, fatal error, ...)
-        pError->errorId=ERROR_ID_BUFFER_FULL;                                   // id number of the error
-
-        strcpy(pError->errorString,"the stack of errors is full - can not register errors anymore");
-       }
-
-      errorStackN++;
-     }
-   }
-  // Return
-
+  // Build the error message
+  if (pError->errorId==ITEM_NONE)
+    sprintf(pError->errorString,"unknown error or error id out of range (%d)",errorId);
+  else {
+    va_start(argList,errorId);
+    vsprintf(pError->errorString,errorTable[i].errorMessage,argList);
+    va_end(argList);
+  }
+  errorStackN++;
   return errorId;
- }
+}
 
 // -----------------------------------------------------------------------------
 // FUNCTION      ERROR_GetLast
