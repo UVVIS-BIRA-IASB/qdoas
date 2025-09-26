@@ -310,9 +310,7 @@ extern double *x,*Lambda,*LambdaSpec,
                     *ANALYSE_tc,                   // residual transmission in Marquadt-Levenberg not linear method
                     *ANALYSE_xsTrav,
                     *ANALYSE_shift,
-                    *ANALYSE_zeros,
-                    *ANALYSE_ones,
-  ANALYSE_nFree;
+                     ANALYSE_nFree;
 
 // ----------
 // PROTOTYPES

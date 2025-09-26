@@ -232,8 +232,8 @@ RC KuruczConvolveSolarSpectrum(MATRIX_OBJECT *pSolar,double *newlambda,int n_wav
 
   memset(slitMatrix,0,sizeof(MATRIX_OBJECT)*NSFP);
 
-  memcpy(pSolar->matrix[0],newlambda,sizeof(double)*n_wavel);
-  memcpy(pSolar->matrix[1],ANALYSE_zeros,sizeof(double)*n_wavel);
+  VECTOR_Copy(pSolar->matrix[0],newlambda,n_wavel);
+  VECTOR_Init(pSolar->matrix[1],(double)0.,n_wavel);
 
   for (i=0;i<NSFP;i++)
    slitParam[i]=(double)0.;
@@ -258,7 +258,7 @@ RC KuruczConvolveSolarSpectrum(MATRIX_OBJECT *pSolar,double *newlambda,int n_wav
     else {
       // make a backup of the matrix
       for (i=0;i<nc;i++)
-        memcpy(pSlitMatrix->matrix[i],KURUCZ_buffers[indexFenoColumn].slitFunction.matrix[i],sizeof(double)*nl);
+        VECTOR_Copy(pSlitMatrix->matrix[i],KURUCZ_buffers[indexFenoColumn].slitFunction.matrix[i],nl);
 
       // determine slit center wavelength, defined as wavelength
       // corresponding to the maximum value
@@ -569,7 +569,7 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
   shiftSign=(Feno->indexSpectrum!=ITEM_NONE)?(double)-1.:(double)1.;            // very important !!!
   TabCross=Feno->TabCross;
 
-  memcpy(Feno->LambdaK,oldLambda,sizeof(double)*oldNDET);
+  VECTOR_Copy(Feno->LambdaK,oldLambda,oldNDET);
   rc=ANALYSE_XsInterpolation(Feno,oldLambda,indexFenoColumn);
 
   Results=Feno->TabCrossResults;
@@ -600,8 +600,8 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
 
   // Instrumental correction
 
-  memcpy(ANALYSE_absolu,ANALYSE_zeros,sizeof(double)*n_wavel);
-  memcpy(offset,ANALYSE_zeros,sizeof(double)*n_wavel);
+  VECTOR_Init(ANALYSE_absolu,(double)0.,n_wavel);
+  VECTOR_Init(offset,(double)0.,n_wavel);
 
   if (instrFunction!=NULL)
     for (i=0;i<n_wavel;i++)
@@ -611,8 +611,8 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
 
   Lambda=newLambda;
   LambdaSpec=newLambda;
-  memcpy(Lambda,oldLambda,sizeof(double)*n_wavel);
-  memcpy(ANALYSE_secX,spectrum,sizeof(double)*n_wavel);
+  VECTOR_Copy(Lambda,oldLambda,n_wavel);
+  VECTOR_Copy(ANALYSE_secX,spectrum,n_wavel);
 
   // Set solar spectrum
 
@@ -623,7 +623,7 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
     if (pSlitOptions->slitFunction.slitType==SLIT_TYPE_NONE) 
      {
       if ((pKurucz->hrSolar.nl==n_wavel) && VECTOR_Equal(pKurucz->hrSolar.matrix[0],oldLambda,n_wavel,(double)1.e-7))
-        memcpy(solar,pKurucz->hrSolar.matrix[1],sizeof(double)*n_wavel);
+        VECTOR_Copy(solar,pKurucz->hrSolar.matrix[1],n_wavel);
       else if (!(rc=SPLINE_Vector(pKurucz->hrSolar.matrix[0],pKurucz->hrSolar.matrix[1],pKurucz->hrSolar.deriv2[1],pKurucz->hrSolar.nl,
                                   pKurucz->hrSolarGridded.matrix[0],pKurucz->hrSolarGridded.matrix[1],pKurucz->hrSolarGridded.nl,pAnalysisOptions->interpol)))
        rc=SPLINE_Deriv2(pKurucz->hrSolarGridded.matrix[0],pKurucz->hrSolarGridded.matrix[1],pKurucz->hrSolarGridded.deriv2[1],pKurucz->hrSolarGridded.nl,__func__);
@@ -646,7 +646,7 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
    }  
   else 
    {
-    memcpy(solar,reference,sizeof(double)*n_wavel);
+    VECTOR_Copy(solar,reference,n_wavel);
    }
 
   if (rc!=ERROR_ID_NO)
@@ -656,10 +656,10 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
 
   if (pKurucz->crossFits.matrix!=NULL)
     for (indexTabCross=0;indexTabCross<pKurucz->crossFits.nc;indexTabCross++)
-      memcpy(pKurucz->crossFits.matrix[indexTabCross],ANALYSE_zeros,sizeof(double)*n_wavel);
+      VECTOR_Init(pKurucz->crossFits.matrix[indexTabCross],(double)0.,n_wavel);
 
-  memcpy(ANALYSE_t,ANALYSE_zeros,sizeof(double)*n_wavel);
-  memcpy(ANALYSE_tc,ANALYSE_zeros,sizeof(double)*n_wavel);
+  VECTOR_Init(ANALYSE_t,(double)0.,n_wavel);
+  VECTOR_Init(ANALYSE_tc,(double)0.,n_wavel);
 
   ANALYSE_plotKurucz=(pKurucz->displaySpectra || pKurucz->displayResidual || pKurucz->displayFit || pKurucz->displayShift)?1:0;
 
@@ -859,8 +859,8 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
   if (pKuruczOptions->fwhmFit) {
     for (indexParam=0;indexParam<maxParam;indexParam++)
       if (TabCross[Feno->indexFwhmParam[indexParam]].FitParam!=ITEM_NONE) {
-        memcpy(coeff[indexParam],ANALYSE_zeros,sizeof(double)*(pKurucz->fwhmDegree+1));
-        memcpy(fwhmVector[indexParam],ANALYSE_zeros,sizeof(double)*n_wavel);
+        VECTOR_Init(coeff[indexParam],(double)0.,(pKurucz->fwhmDegree+1));
+        VECTOR_Init(fwhmVector[indexParam],(double)0.,n_wavel);
 
         if ((rc=LINEAR_fit_poly(Nb_Win, pKurucz->fwhmDegree,VLambda,NULL,fwhm[indexParam]-1,coeff[indexParam]-1))!=ERROR_ID_NO)
           goto EndKuruczSpectrum;
@@ -948,7 +948,7 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
       }
     }
 
-    memcpy(ANALYSE_secX,ANALYSE_zeros,sizeof(double)*n_wavel);
+    VECTOR_Init(ANALYSE_secX,(double)0.,n_wavel);
 
     // Display Offset
 
@@ -1212,9 +1212,9 @@ RC KURUCZ_ApplyCalibration(FENO *pTabFeno,double *newLambda,INDEX indexFenoColum
             if (!(rc=MATRIX_Copy(&slitMatrix[0],&KURUCZ_buffers[indexFenoColumn].slitFunction,__func__)) &&
                 !(rc=MATRIX_Allocate(&slitMatrix[1],n_wavel,3,0,0,1,__func__)))
              {
-        memcpy(slitMatrix[1].matrix[0],newLambda,sizeof(double)*n_wavel);
-        memcpy(slitMatrix[1].matrix[1],pTabFeno->fwhmVector[0],sizeof(double)*n_wavel);
-        memcpy(slitMatrix[1].matrix[2],pTabFeno->fwhmVector[1],sizeof(double)*n_wavel);
+        VECTOR_Copy(slitMatrix[1].matrix[0],newLambda,n_wavel);
+        VECTOR_Copy(slitMatrix[1].matrix[1],pTabFeno->fwhmVector[0],n_wavel);
+        VECTOR_Copy(slitMatrix[1].matrix[2],pTabFeno->fwhmVector[1],n_wavel);
 
         if (!(rc=SPLINE_Deriv2(slitMatrix[1].matrix[0],slitMatrix[1].matrix[1],slitMatrix[1].deriv2[1],slitMatrix[1].nl,__func__)))
           rc=SPLINE_Deriv2(slitMatrix[1].matrix[0],slitMatrix[1].matrix[2],slitMatrix[1].deriv2[2],slitMatrix[1].nl,__func__);
@@ -1229,8 +1229,8 @@ RC KURUCZ_ApplyCalibration(FENO *pTabFeno,double *newLambda,INDEX indexFenoColum
           rc=ERROR_ID_ALLOC;
          else
           {
-           memcpy(slitMatrix[i].matrix[0],newLambda,sizeof(double)*n_wavel);
-           memcpy(slitMatrix[i].matrix[1],pTabFeno->fwhmVector[i],sizeof(double)*n_wavel);
+           VECTOR_Copy(slitMatrix[i].matrix[0],newLambda,n_wavel);
+           VECTOR_Copy(slitMatrix[i].matrix[1],pTabFeno->fwhmVector[i],n_wavel);
 
            rc=SPLINE_Deriv2(slitMatrix[i].matrix[0],slitMatrix[i].matrix[1],slitMatrix[i].deriv2[1],slitMatrix[i].nl,__func__);
           }
@@ -1317,7 +1317,6 @@ RC KURUCZ_Reference(double *instrFunction,INDEX refFlag,int saveFlag,int gomeFla
   msgCount=0;
 
   memset(&calibratedMatrix,0,sizeof(MATRIX_OBJECT));
-  VECTOR_Init(ANALYSE_zeros,(double)0.,n_wavel);                                // To check later : sometimes, the last component of the vector is different from 0. and that causes a problem with the plot of "absolu"
 
   // Allocate buffers
 
@@ -1344,7 +1343,7 @@ RC KURUCZ_Reference(double *instrFunction,INDEX refFlag,int saveFlag,int gomeFla
         (pTabFeno->gomeRefFlag==gomeFlag) && (pTabFeno->useRefRow) &&
         ((!refFlag && (pTabFeno->useEtalon || (pTabFeno->refSpectrumSelectionMode==ANLYS_REF_SELECTION_MODE_FILE))) ||
          ((refFlag==1) && !pTabFeno->useEtalon))) {
-      memcpy(reference,(pTabFeno->useEtalon)?pTabFeno->SrefEtalon:pTabFeno->Sref,sizeof(double)*pTabFeno->NDET);
+      VECTOR_Copy(reference,(pTabFeno->useEtalon)?pTabFeno->SrefEtalon:pTabFeno->Sref,pTabFeno->NDET);
 
       if ((pTabFeno->NDET==pKurucz->hrSolar.nl) &&
           VECTOR_Equal(pKurucz->hrSolar.matrix[0],pTabFeno->LambdaRef,pTabFeno->NDET,(double)1.e-7) &&
@@ -1365,13 +1364,13 @@ RC KURUCZ_Reference(double *instrFunction,INDEX refFlag,int saveFlag,int gomeFla
           pTabRef=&TabFeno[indexFenoColumn][indexRef];
           pTabFeno->rcKurucz=pTabRef->rcKurucz;
 
-          memcpy(pTabFeno->LambdaK,pTabRef->LambdaK,sizeof(double)*pTabFeno->NDET);
-          memcpy(pKurucz->KuruczFeno[indexFeno].rms,pKurucz->KuruczFeno[indexRef].rms,sizeof(double)*Nb_Win);
-          memcpy(pKurucz->KuruczFeno[indexFeno].chiSquare,pKurucz->KuruczFeno[indexRef].chiSquare,sizeof(double)*Nb_Win);
-          memcpy(pKurucz->KuruczFeno[indexFeno].wve,pKurucz->KuruczFeno[indexRef].wve,sizeof(double)*Nb_Win);
+          VECTOR_Copy(pTabFeno->LambdaK,pTabRef->LambdaK,pTabFeno->NDET);
+          VECTOR_Copy(pKurucz->KuruczFeno[indexFeno].rms,pKurucz->KuruczFeno[indexRef].rms,Nb_Win);
+          VECTOR_Copy(pKurucz->KuruczFeno[indexFeno].chiSquare,pKurucz->KuruczFeno[indexRef].chiSquare,Nb_Win);
+          VECTOR_Copy(pKurucz->KuruczFeno[indexFeno].wve,pKurucz->KuruczFeno[indexRef].wve,Nb_Win);
+          VECTOR_Copy(pKurucz->KuruczFeno[indexFeno].chiSquare,pKurucz->KuruczFeno[indexRef].chiSquare,Nb_Win);
+          
           memcpy(pKurucz->KuruczFeno[indexFeno].nIter,pKurucz->KuruczFeno[indexRef].nIter,sizeof(int)*Nb_Win);
-
-          memcpy(pKurucz->KuruczFeno[indexFeno].chiSquare,pKurucz->KuruczFeno[indexRef].chiSquare,sizeof(double)*Nb_Win);
 
           if (TabFeno[indexFenoColumn][pKurucz->indexKurucz].NTabCross)
             for (indexWindow=0;indexWindow<Nb_Win;indexWindow++)
@@ -1380,10 +1379,10 @@ RC KURUCZ_Reference(double *instrFunction,INDEX refFlag,int saveFlag,int gomeFla
           if (pKuruczOptions->fwhmFit) {
             for (maxParam=0;maxParam<MAX_KURUCZ_FWHM_PARAM;maxParam++)
               if (pTabFeno->fwhmVector[maxParam]!=NULL) {
-                memcpy(pTabFeno->fwhmPolyRef[maxParam],pTabRef->fwhmPolyRef[maxParam],sizeof(double)*(pKuruczOptions->fwhmPolynomial+1));
-                memcpy(pTabFeno->fwhmVector[maxParam],pTabRef->fwhmVector[maxParam],sizeof(double)*n_wavel);
+                VECTOR_Copy(pTabFeno->fwhmPolyRef[maxParam],pTabRef->fwhmPolyRef[maxParam],(pKuruczOptions->fwhmPolynomial+1));
+                VECTOR_Copy(pTabFeno->fwhmVector[maxParam],pTabRef->fwhmVector[maxParam],n_wavel);
                 if (pTabFeno->fwhmDeriv2[maxParam]!=NULL)
-                  memcpy(pTabFeno->fwhmDeriv2[maxParam],pTabRef->fwhmDeriv2[maxParam],sizeof(double)*n_wavel);
+                  VECTOR_Copy(pTabFeno->fwhmDeriv2[maxParam],pTabRef->fwhmDeriv2[maxParam],n_wavel);
               }
               else
                 break;
@@ -1394,7 +1393,7 @@ RC KURUCZ_Reference(double *instrFunction,INDEX refFlag,int saveFlag,int gomeFla
           if (pKuruczOptions->preshiftFlag && !(rc=MATRIX_Allocate(&calibratedMatrix,n_wavel,2,0,0,0,__func__))) {
             // Get solar spectrum
 
-            memcpy(calibratedMatrix.matrix[0],pTabFeno->LambdaRef,n_wavel*sizeof(double));
+            VECTOR_Copy(calibratedMatrix.matrix[0],pTabFeno->LambdaRef,n_wavel);
 
             // For tests  --- MATRIX_Load("D:/My_GroundBased_Activities/GB_Stations/Bruxelles/miniDOAS_Uccle/BX_SPE_20131108_285.REF",&calibratedMatrix,pTabFeno->NDET,2,0.,0.,0,0,__func__);   // FOR TESTS
 
@@ -1444,8 +1443,8 @@ RC KURUCZ_Reference(double *instrFunction,INDEX refFlag,int saveFlag,int gomeFla
       }
 
       if (pTabFeno->longPathFlag) { // !!! Anoop
-        memcpy(pTabFeno->SrefEtalon,ANALYSE_ones,sizeof(double)*n_wavel);
-        memcpy(pTabFeno->Sref,ANALYSE_ones,sizeof(double)*n_wavel);
+        VECTOR_Init(pTabFeno->SrefEtalon,(double)1.,n_wavel);
+        VECTOR_Init(pTabFeno->Sref,(double)1.,n_wavel);
       }
     }
   }
@@ -1693,7 +1692,7 @@ RC KURUCZ_Alloc(const PROJECT *pProject, const double *lambda,INDEX indexKurucz,
      }
     else
      {
-      memcpy(&pKurucz->lambdaF[pKurucz->solarFGap],lambda,sizeof(double)*n_wavel);
+      VECTOR_Copy(&pKurucz->lambdaF[pKurucz->solarFGap],lambda,n_wavel);
 
       step=(lambda[n_wavel-1]-lambda[0])/n_wavel;
 
@@ -1740,7 +1739,7 @@ RC KURUCZ_Alloc(const PROJECT *pProject, const double *lambda,INDEX indexKurucz,
        }
      }    
 
-    memcpy(pKurucz->solar,ANALYSE_zeros,sizeof(double)*n_wavel);
+    VECTOR_Init(pKurucz->solar,(double)0.,n_wavel);
 
     // Initialize other fields of global structure
 
@@ -1843,14 +1842,14 @@ RC KURUCZ_Alloc(const PROJECT *pProject, const double *lambda,INDEX indexKurucz,
              goto EndKuruczAlloc;
             }
 
-           memcpy(fftIn+1,pKurucz->hrSolar.matrix[1]+hrDeb,sizeof(double)*hrN);   // When the slit function is fitted, we use a high resolution solar spectrum (2 columns only)
+           VECTOR_Copy(fftIn+1,pKurucz->hrSolar.matrix[1]+hrDeb,hrN);   // When the slit function is fitted, we use a high resolution solar spectrum (2 columns only)
 
            for (i=hrN+1;i<=fftSize;i++)
             fftIn[i]=fftIn[2*hrN-i];
 
            realft(pfft->fftIn,pfft->fftOut,fftSize,1);
 
-           memcpy(fftIn+1,pKurucz->hrSolar.matrix[0]+hrDeb,sizeof(double)*hrN);  // Reuse fftIn for high resolution wavelength safe keeping
+           VECTOR_Copy(fftIn+1,pKurucz->hrSolar.matrix[0]+hrDeb,hrN);  // Reuse fftIn for high resolution wavelength safe keeping
           }
         }
       }
@@ -1889,7 +1888,7 @@ RC KURUCZ_Alloc(const PROJECT *pProject, const double *lambda,INDEX indexKurucz,
 
         else
          {
-          memcpy(pKurucz->fwhmVector[indexParam],ANALYSE_zeros,sizeof(double)*n_wavel);
+          VECTOR_Init(pKurucz->fwhmVector[indexParam],(double)0.,n_wavel);
 
           for (indexFeno=0;(indexFeno<NFeno) && !rc;indexFeno++)
            {

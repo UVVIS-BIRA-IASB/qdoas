@@ -187,9 +187,7 @@ double *x,*Lambda,*LambdaSpec,
   *ANALYSE_tc,                   // residual transmission in Marquardt-Levenberg not linear method
   *ANALYSE_xsTrav,               // temporary buffer for processing on cross sections
   *ANALYSE_xsTrav2,              // cross sections second derivatives
-  *ANALYSE_shift,
-  *ANALYSE_zeros,
-  *ANALYSE_ones;
+  *ANALYSE_shift;
 double   ANALYSE_nFree;                // number of free degrees
 
 MATRIX_OBJECT ANALYSIS_slitMatrix[NSFP],ANALYSIS_slitK;
@@ -341,7 +339,7 @@ int reinit_analysis(FENO *pFeno, const int n_wavel) {
   pFeno->fit_properties.DimL = spectrum_length(pFeno->fit_properties.specrange);
   pFeno->Decomp = 1;
 
-  memcpy(ANALYSE_absolu, ANALYSE_zeros, sizeof(double) * n_wavel);
+  VECTOR_Init(ANALYSE_absolu,(double)0.,n_wavel);
 
   return ANALYSE_SvdInit(pFeno,&pFeno->fit_properties, n_wavel, Lambda);
  }
@@ -605,7 +603,7 @@ RC AnalysePukiteConvoluteI0(const FENO *pTabFeno,double conc,double lambda0,
 
   if (outputPukite1!=NULL)  // if outputPukite1==NULL, nothing to do
    {
-    memcpy(outputPukite1,ANALYSE_zeros,sizeof(double)*n_wavel);
+    VECTOR_Init(outputPukite1,(double)0.,n_wavel);
 
     // Get high resolution Solar spectrum
 
@@ -629,21 +627,21 @@ RC AnalysePukiteConvoluteI0(const FENO *pTabFeno,double conc,double lambda0,
      {
       // copy of the solar wavelength calibration
 
-      memcpy(xshr.matrix[0],hrSolar.matrix[0],xshr.nl*sizeof(double));
-      memcpy(xshr0.matrix[0],hrSolar.matrix[0],xshr.nl*sizeof(double));
-      memcpy(xshr1.matrix[0],hrSolar.matrix[0],xshr.nl*sizeof(double));
+      VECTOR_Copy(xshr.matrix[0],hrSolar.matrix[0],xshr.nl);
+      VECTOR_Copy(xshr0.matrix[0],hrSolar.matrix[0],xshr.nl);
+      VECTOR_Copy(xshr1.matrix[0],hrSolar.matrix[0],xshr.nl);
 
       // Copy of the new wavelength calibration
 
-      memcpy(xsNew0.matrix[0],newlambda,sizeof(double)*n_wavel);
-      memcpy(xsNewI0.matrix[0],newlambda,sizeof(double)*n_wavel);
-      memcpy(xsNew1.matrix[0],newlambda,sizeof(double)*n_wavel);
+      VECTOR_Copy(xsNew0.matrix[0],newlambda,n_wavel);
+      VECTOR_Copy(xsNewI0.matrix[0],newlambda,n_wavel);
+      VECTOR_Copy(xsNew1.matrix[0],newlambda,n_wavel);
 
       // Initialize output of the convolution
 
-      memcpy(xsNew0.matrix[1],ANALYSE_zeros,sizeof(double)*n_wavel);
-      memcpy(xsNewI0.matrix[1],ANALYSE_zeros,sizeof(double)*n_wavel);
-      memcpy(xsNew1.matrix[1],ANALYSE_zeros,sizeof(double)*n_wavel);
+      VECTOR_Init(xsNew0.matrix[1],(double)0.,n_wavel);
+      VECTOR_Init(xsNewI0.matrix[1],(double)0.,n_wavel);
+      VECTOR_Init(xsNew1.matrix[1],(double)0.,n_wavel);
 
       // Calculate all the synthetic cross sections to convolve
 
@@ -686,14 +684,14 @@ RC AnalysePukiteConvoluteI0(const FENO *pTabFeno,double conc,double lambda0,
 
         if ((outputPukite2!=NULL) && !rc)
          {
-          memcpy(outputPukite2,ANALYSE_zeros,sizeof(double)*n_wavel);
+          VECTOR_Init(outputPukite2,(double)0.,n_wavel);
 
           if (!(rc=MATRIX_Allocate(&xshr2,hrSolar.nl,2,0,0,1,"AnalysePukiteConvoluteI0 (xshr2)")) &&
               !(rc=MATRIX_Allocate(&xsNew2,n_wavel,2,0,0,1,"AnalysePukiteConvoluteI0 (xsNew2)")))
            {
-            memcpy(xshr2.matrix[0],hrSolar.matrix[0],xshr.nl*sizeof(double));
-            memcpy(xsNew2.matrix[0],newlambda,sizeof(double)*n_wavel);
-            memcpy(xsNew2.matrix[1],ANALYSE_zeros,sizeof(double)*n_wavel);
+            VECTOR_Copy(xshr2.matrix[0],hrSolar.matrix[0],xshr.nl);
+            VECTOR_Copy(xsNew2.matrix[0],newlambda,n_wavel);
+            VECTOR_Init(xsNew2.matrix[1],(double)0.,n_wavel);
 
             for (i=0;(i<xshr.nl) && !rc;i++)
              xshr2.matrix[1][i]=(double)xshr0.matrix[1][i]*xshr.matrix[1][i]*xshr.matrix[1][i];     // Pukite second term : I0 exp(-xs*conc) * xs ^ 2
@@ -855,8 +853,8 @@ RC AnalyseAddPukiteTerm(ENGINE_CONTEXT *pEngineContext, CROSS_REFERENCE *pCross,
 
     else
      {
-      memcpy(pPukiteCross->vector, ANALYSE_zeros, sizeof(double) * n_wavel);
-      memcpy(pPukiteCross->Deriv2, ANALYSE_zeros, sizeof(double) * n_wavel);
+      VECTOR_Init(pPukiteCross->vector,(double)0.,n_wavel);
+      VECTOR_Init(pPukiteCross->Deriv2,(double)0.,n_wavel);
 
       pPukiteCross->crossAction=pCross->crossAction;
       pPukiteCross->crossCorrection=ANLYS_CORRECTION_TYPE_NONE;
@@ -943,8 +941,8 @@ RC Analyse_Molecular_Ring_Init(FENO *pFeno,double *lambda,int n_wavel)
          (pTabCross->Deriv2Backup!=NULL) &&
          (pTabCross->molecularCrossIndex!=ITEM_NONE))
      {
-      memcpy(pTabCross->vectorBackup,pTabCross->vector,sizeof(double)*n_wavel);
-      memcpy(pTabCross->Deriv2Backup,pTabCross->Deriv2,sizeof(double)*n_wavel);
+      VECTOR_Copy(pTabCross->vectorBackup,pTabCross->vector,n_wavel);
+      VECTOR_Copy(pTabCross->Deriv2Backup,pTabCross->Deriv2,n_wavel);
 
       if (!(rc=SPLINE_Deriv2(lambda,pTabCross->vector,pTabCross->Deriv2,n_wavel,__func__)) &&
            (pTabCross->crossCorrection==ANLYS_CORRECTION_TYPE_MOLECULAR_RING_SLOPE) && (pTabCross->indexPukite1!=ITEM_NONE))
@@ -1029,8 +1027,8 @@ void Analyse_Molecular_Ring_End(FENO *pFeno,int n_wavel)
          (pTabCross->Deriv2Backup!=NULL) &&
          (pTabCross->molecularCrossIndex!=ITEM_NONE))
      {
-      memcpy(pTabCross->vector,pTabCross->vectorBackup,sizeof(double)*n_wavel);
-      memcpy(pTabCross->Deriv2,pTabCross->Deriv2Backup,sizeof(double)*n_wavel);
+      VECTOR_Copy(pTabCross->vector,pTabCross->vectorBackup,n_wavel);
+      VECTOR_Copy(pTabCross->Deriv2,pTabCross->Deriv2Backup,n_wavel);
      }
    }
  }
@@ -1133,7 +1131,7 @@ static void Orthogonalization(double **A, int DimL) {
     for (int i=1;i<NOrtho;++i) {
 
       // Keep original vectors or the polynomial entering the basis
-      memcpy(polyBase[i]+1,A[Feno->TabCross[OrthoSet[i]].IndSvdA]+1,DimL*sizeof(double));
+      VECTOR_Copy(polyBase[i]+1,A[Feno->TabCross[OrthoSet[i]].IndSvdA]+1,DimL);
 
       // orthogonalize vector i w.r.t. vectors 0..i-1:
       OrthogonalizeVector(OrthoSet,NormSet,i,Feno->TabCross[OrthoSet[i]].IndSvdA,A,DimL);
@@ -1166,7 +1164,7 @@ static void Orthogonalization(double **A, int DimL) {
     // Restore polynomial of the orthogonal basis (shouldn't be orthogonalized)
 
     for (int i=1;i<NOrtho;++i)
-      memcpy(A[Feno->TabCross[OrthoSet[i]].IndSvdA]+1,polyBase[i]+1,DimL*sizeof(double));
+      VECTOR_Copy(A[Feno->TabCross[OrthoSet[i]].IndSvdA]+1,polyBase[i]+1,DimL);
 
     MEMORY_ReleaseDMatrix(__func__,"polyBase",polyBase,1,1);
     free(NormSet);
@@ -1186,7 +1184,7 @@ RC TemperatureCorrection(double *xs,double *A,double *B,double *C,double *newXs,
   DEBUG_FunctionBegin(__func__,DEBUG_FCTTYPE_UTIL);
 #endif
 
-  memcpy(newXs,ANALYSE_zeros,sizeof(double)*n_wavel);
+  VECTOR_Init(newXs,(double)0.,n_wavel);
 
   for (int j=LimMin;j<=LimMax;j++)
     newXs[j]=xs[j]+(T-241)*A[j]+(T-241)*(T-241)*B[j]+(T-241)*(T-241)*(T-241)*C[j];
@@ -1212,7 +1210,7 @@ RC ShiftVector(const double *lambda, double *source, const double *deriv, double
 #endif
 
   double lambda0 = (!Feno->hidden)?Feno->lambda0: center_pixel_wavelength(SvdPDeb, SvdPFin);
-  memcpy(ANALYSE_shift,ANALYSE_zeros,sizeof(double)*n_wavel);
+  VECTOR_Init(ANALYSE_shift,(double)0.,n_wavel);
   int fwhmFlag=((Feno->analysisType==ANALYSIS_TYPE_FWHM_NLFIT) && (fwhmDir!=0) && (Param!=NULL))?1:0;
   CROSS_REFERENCE *TabCross=Feno->TabCross;
 
@@ -1333,7 +1331,7 @@ RC ShiftVector(const double *lambda, double *source, const double *deriv, double
 
         SPLINE_Deriv2(pKURUCZ_fft->fftIn+1,pKURUCZ_fft->invFftOut+1,pKURUCZ_fft->invFftIn+1,pKURUCZ_fft->oldSize,__func__);
 
-        memcpy(&source[LimMin],&ANALYSE_shift[LimMin],sizeof(double)*LimN);
+        VECTOR_Copy(&source[LimMin],&ANALYSE_shift[LimMin],LimN);
 
         SPLINE_Vector(pKURUCZ_fft->fftIn+1,pKURUCZ_fft->invFftOut+1,pKURUCZ_fft->invFftIn+1,pKURUCZ_fft->oldSize,
                       &ANALYSE_shift[LimMin],&target[LimMin],LimN,pAnalysisOptions->interpol);
@@ -1357,8 +1355,8 @@ RC ShiftVector(const double *lambda, double *source, const double *deriv, double
          }
         else
          {
-          memcpy(xsNew.matrix[0],ANALYSE_shift,sizeof(double)*n_wavel);
-          memcpy(xsNew.matrix[1],target,sizeof(double)*n_wavel);
+          VECTOR_Copy(xsNew.matrix[0],ANALYSE_shift,n_wavel);
+          VECTOR_Copy(xsNew.matrix[1],target,n_wavel);
 
           slitType=pKuruczOptions->fwhmType;
 
@@ -1386,7 +1384,7 @@ RC ShiftVector(const double *lambda, double *source, const double *deriv, double
               // make a backup of the matrix
 
               for (int i=0;i<nc;i++)
-                memcpy(slitMatrix[0].matrix[i],KURUCZ_buffers[indexFenoColumn].slitFunction.matrix[i],sizeof(double)*nl);
+                VECTOR_Copy(slitMatrix[0].matrix[i],KURUCZ_buffers[indexFenoColumn].slitFunction.matrix[i],nl);
 
               // determine slit center wavelength, defined as wavelength
               // corresponding to the maximum value
@@ -1429,7 +1427,7 @@ RC ShiftVector(const double *lambda, double *source, const double *deriv, double
             slitOptions.slitParam2=slitParam2;
             slitOptions.slitParam3=slitParam3;
 
-            memcpy(&source[LimMin],&ANALYSE_shift[LimMin],sizeof(double)*LimN);
+            VECTOR_Copy(&source[LimMin],&ANALYSE_shift[LimMin],LimN);
             rc=XSCONV_LoadSlitFunction(slitMatrix,&slitOptions,NULL,&slitType);
            }
 
@@ -1437,7 +1435,7 @@ RC ShiftVector(const double *lambda, double *source, const double *deriv, double
                !(rc=XSCONV_TypeStandard(&xsNew,LimMin,LimMax+1,&KURUCZ_buffers[indexFenoColumn].hrSolar,
                                         &KURUCZ_buffers[indexFenoColumn].hrSolar,NULL,slitType,slitMatrix,slitParamVector,0)))
 
-            memcpy(target,xsNew.matrix[1],sizeof(double)*n_wavel);
+            VECTOR_Copy(target,xsNew.matrix[1],n_wavel);
          }
 
         for (int i=0;i<NSFP;i++)
@@ -1560,7 +1558,7 @@ RC ANALYSE_XsInterpolation(FENO *pTabFeno, const double *newLambda,INDEX indexFe
       // Interpolate cross section
 
       if ((pTabCross->crossAction==ANLYS_CROSS_ACTION_NOTHING) || ((pXs->nl==pTabFeno->NDET) && VECTOR_Equal(pXs->matrix[0],newLambda,pTabFeno->NDET,(double)1.e-7)))          // wavelength scale is the same as new one
-       memcpy(filtCross,pXs->matrix[icolumn],sizeof(double)*pTabFeno->NDET);
+       VECTOR_Copy(filtCross,pXs->matrix[icolumn],pTabFeno->NDET);
       else
        if ((rc=SPLINE_Vector(pXs->matrix[0],pXs->matrix[icolumn],pXs->deriv2[icolumn],pXs->nl,newLambda,filtCross,pTabFeno->NDET,pAnalysisOptions->interpol))!=0)           // interpolation processing
         break;
@@ -1593,7 +1591,7 @@ RC ANALYSE_XsInterpolation(FENO *pTabFeno, const double *newLambda,INDEX indexFe
 
       // Reuse original cross section
 
-      memcpy(pTabCross->vector,filtCross,sizeof(double)*pTabFeno->NDET);
+      VECTOR_Copy(pTabCross->vector,filtCross,pTabFeno->NDET);
 
       // Second derivatives computation
 
@@ -1613,7 +1611,7 @@ RC ANALYSE_XsInterpolation(FENO *pTabFeno, const double *newLambda,INDEX indexFe
 // !!!      if ((WorkSpace[pTabCross->Comp].type==WRK_SYMBOL_CROSS) &&   // take only cross sections into account
 // !!!          (pTabCross->molecularCrossSection!=NULL) && !pTabCross->isPukite)
 // !!!       {
-// !!!        memcpy(pTabCross->molecularCrossSection,ANALYSE_zeros,sizeof(double)*pTabFeno->NDET);
+// !!!        VECTOR_Init(pTabCross->molecularCrossSection,(double)0.,pTabFeno->NDET);
 // !!!
 // !!!        if (!(rc=raman_convolution(newLambda,
 // !!!                                   pTabCross->vector,
@@ -1669,7 +1667,7 @@ RC ANALYSE_ConvoluteXs(const FENO *pTabFeno,int action,double conc,
 
   rc=ERROR_ID_NO;
 
-  memcpy(output,ANALYSE_zeros,sizeof(double)*n_wavel);
+  VECTOR_Init(output,(double)0.,n_wavel);
 
   if (action==ANLYS_CROSS_ACTION_CONVOLUTE_I0)
    {
@@ -1689,8 +1687,8 @@ RC ANALYSE_ConvoluteXs(const FENO *pTabFeno,int action,double conc,
           !(rc=SPLINE_Vector(pXs->matrix[0],pXs->matrix[icolumn],pXs->deriv2[icolumn],pXs->nl,           // interpolation of XS on the grid of the high resolution solar spectrum
                              hrSolar.matrix[0],xshr.matrix[1],xshr.nl,pAnalysisOptions->interpol)))
        {
-        memcpy(xsI0.matrix[0],hrSolar.matrix[0],xshr.nl*sizeof(double));               // copy of the solar wavelength calibration
-        memcpy(xshr.matrix[0],hrSolar.matrix[0],xshr.nl*sizeof(double));               // copy of the solar wavelength calibration
+        VECTOR_Copy(xsI0.matrix[0],hrSolar.matrix[0],xshr.nl);               // copy of the solar wavelength calibration
+        VECTOR_Copy(xshr.matrix[0],hrSolar.matrix[0],xshr.nl);               // copy of the solar wavelength calibration
 
         for (i=0;(i<xshr.nl) && !rc;i++)
          {
@@ -1708,11 +1706,11 @@ RC ANALYSE_ConvoluteXs(const FENO *pTabFeno,int action,double conc,
 
   if (!rc && !(rc=MATRIX_Allocate(&xsNew,n_wavel,2,0,0,1,__func__)))
    {
-        memcpy(xsNew.matrix[0],newlambda,sizeof(double)*n_wavel);
-    memcpy(xsNew.matrix[1],ANALYSE_zeros,sizeof(double)*n_wavel);
+        VECTOR_Copy(xsNew.matrix[0],newlambda,n_wavel);
+    VECTOR_Init(xsNew.matrix[1],(double)0.,n_wavel);
 
     if (action==ANLYS_CROSS_ACTION_CONVOLUTE_I0)
-     memcpy(IcVector,ANALYSE_zeros,sizeof(double)*n_wavel);
+     VECTOR_Init(IcVector,(double)0.,n_wavel);
 
     if (!(rc=XSCONV_TypeStandard(&xsNew,indexlambdaMin,indexlambdaMax,&xshr,(action==ANLYS_CROSS_ACTION_CONVOLUTE_I0)?&xsI0:&xshr,IcVector,slitType,slitMatrix,(double *)slitParam,wveDptFlag)))
      {
@@ -1801,8 +1799,8 @@ RC ANALYSE_XsConvolution(FENO *pTabFeno,double *newlambda,
        {
 //         for (int i=0;i<n_wavel;i++)
 //          pTabCross->vector[i]=pTabCross->Deriv2[i]=(double)0.;
-        memcpy(pTabCross->vector,ANALYSE_zeros,sizeof(double)*n_wavel);
-        memcpy(pTabCross->Deriv2,ANALYSE_zeros,sizeof(double)*n_wavel);
+        VECTOR_Init(pTabCross->vector,(double)0.,n_wavel);
+        VECTOR_Init(pTabCross->Deriv2,(double)0.,n_wavel);
 
         // Convolution standard or I0
 
@@ -1850,9 +1848,9 @@ RC ANALYSE_XsConvolution(FENO *pTabFeno,double *newlambda,
            {
             // Raman spectrum
 
-            memcpy(matrix.matrix[0],pXs->matrix[0],sizeof(double)*pXs->nl);   // lambda
-            memcpy(matrix.matrix[1],pXs->matrix[2],sizeof(double)*pXs->nl);   // Raman spectrum
-            memcpy(matrix.deriv2[1],pXs->deriv2[2],sizeof(double)*pXs->nl);     // Second derivative of the Ramanspectrum
+            VECTOR_Copy(matrix.matrix[0],pXs->matrix[0],pXs->nl);   // lambda
+            VECTOR_Copy(matrix.matrix[1],pXs->matrix[2],pXs->nl);   // Raman spectrum
+            VECTOR_Copy(matrix.deriv2[1],pXs->deriv2[2],pXs->nl);     // Second derivative of the Ramanspectrum
 
             if ((rc=ANALYSE_ConvoluteXs(pTabFeno,ANLYS_CROSS_ACTION_CONVOLUTE,(double)0.,&matrix,slitMatrix,slitParam,slitType,
                                         newlambda,raman,indexlambdaMin,indexlambdaMax,n_wavel,indexFenoColumn,wveDptFlag))!=ERROR_ID_NO)
@@ -1860,8 +1858,8 @@ RC ANALYSE_XsConvolution(FENO *pTabFeno,double *newlambda,
 
             // Solar spectrum
 
-            memcpy(matrix.matrix[1],pXs->matrix[3],sizeof(double)*pXs->nl);   // Raman spectrum
-            memcpy(matrix.deriv2[1],pXs->deriv2[3],sizeof(double)*pXs->nl);     // Second derivative of the Ramanspectrum
+            VECTOR_Copy(matrix.matrix[1],pXs->matrix[3],pXs->nl);   // Raman spectrum
+            VECTOR_Copy(matrix.deriv2[1],pXs->deriv2[3],pXs->nl);     // Second derivative of the Ramanspectrum
 
             if ((rc=ANALYSE_ConvoluteXs(pTabFeno,ANLYS_CROSS_ACTION_CONVOLUTE,(double)0.,&matrix,slitMatrix,slitParam,slitType,
                                         newlambda,solar,indexlambdaMin,indexlambdaMax,n_wavel,indexFenoColumn,wveDptFlag))!=ERROR_ID_NO)
@@ -1869,7 +1867,7 @@ RC ANALYSE_XsConvolution(FENO *pTabFeno,double *newlambda,
 
             // Calculate Raman/Solar
 
-            memcpy(pTabCross->vector,ANALYSE_zeros,sizeof(double)*n_wavel);
+            VECTOR_Init(pTabCross->vector,(double)0.,n_wavel);
 
             for (j=indexlambdaMin;j<indexlambdaMax;j++)
              pTabCross->vector[j]=(solar[j]!=(double)0.)?(double)raman[j]/solar[j]:(double)0.;   // log added on 2011 October 7 - test for GOME2 (ISA) : not concluding
@@ -1929,7 +1927,7 @@ RC ANALYSE_XsConvolution(FENO *pTabFeno,double *newlambda,
           !pTabCross->isPukite &&
           (pTabCross->molecularCrossSection!=NULL))
        {
-        memcpy(pTabCross->molecularCrossSection,ANALYSE_zeros,sizeof(double)*n_wavel);
+        VECTOR_Init(pTabCross->molecularCrossSection,(double)0.,n_wavel);
 
         if (!(rc=raman_convolution(newlambda,
                                    pTabCross->vector,
@@ -2092,7 +2090,7 @@ RC AnalyseFwhmCorrectionK(const double *Spectre, const double *Sref,double *Spec
   else if (!(rc=SPLINE_Deriv2(LambdaSpec,Spectre,SplineSpec,n_wavel,"AnalyseFwhmCorrectionK (Lambda) ")) &&  // !!! Lambda -> LambdaSpec
            !(rc=SPLINE_Deriv2(Lambda,Sref,SplineRef,n_wavel,"AnalyseFwhmCorrectionK (Lambda) ")))
    {
-    memcpy(xsTrav,ANALYSE_zeros,sizeof(double)*n_wavel);
+    VECTOR_Init(xsTrav,(double)0.,n_wavel);
 
     // Fwhm ajustment between spectrum and reference
 
@@ -2518,7 +2516,7 @@ RC ANALYSE_AlignReference(ENGINE_CONTEXT *pEngineContext,int refFlag,void *respo
 
       // Display fit
       if (pFeno->displayRefEtalon && pEngineContext->project.spectra.displaySpectraFlag) {
-        memcpy(ANALYSE_secX,ANALYSE_zeros,sizeof(*ANALYSE_secX)*pFeno->NDET);
+        VECTOR_Init(ANALYSE_secX,(double)0.,pFeno->NDET);
 
         for (int i=SvdPDeb;i<=SvdPFin;i++)
           ANALYSE_secX[i]=exp(log(pFeno->SrefEtalon[i])+ANALYSE_absolu[i]);
@@ -2697,8 +2695,8 @@ RC ANALYSE_Function(double *spectrum_orig, double *reference, const double *Sigm
    rc=ERROR_ID_ALLOC;
 
   else {
-    memcpy(newXsTrav,ANALYSE_zeros,sizeof(double)*n_wavel);
-    memcpy(spectrum_interpolated,ANALYSE_zeros,sizeof(double)*n_wavel);
+    VECTOR_Init(newXsTrav,(double)0.,n_wavel);
+    VECTOR_Init(spectrum_interpolated,(double)0.,n_wavel);
 
    // ========
    // SPECTRUM
@@ -2942,8 +2940,8 @@ RC ANALYSE_Function(double *spectrum_orig, double *reference, const double *Sigm
           {
            // Use substitution vectors for cross sections because of AMF correction or Pukite terms
 
-           memcpy(ANALYSE_xsTrav,pTabCross->vector,sizeof(double)*n_wavel);
-           memcpy(ANALYSE_xsTrav2,pTabCross->Deriv2,sizeof(double)*n_wavel);
+           VECTOR_Copy(ANALYSE_xsTrav,pTabCross->vector,n_wavel);
+           VECTOR_Copy(ANALYSE_xsTrav2,pTabCross->Deriv2,n_wavel);
 
            // --------------
            // AMF correction
@@ -3363,16 +3361,16 @@ RC ANALYSE_CurFitMethod(INDEX indexFenoColumn,          // for imagers as OMI, T
    {
     // Initializations
 
-    memcpy(SpecTrav,Spectre,sizeof(double)*n_wavel);
+    VECTOR_Copy(SpecTrav,Spectre,n_wavel);
     if (SigmaY!=NULL)
-     memcpy(SigmaY,ANALYSE_zeros,sizeof(double)*fit->DimL);
-    memcpy(RefTrav,Sref,sizeof(double)*n_wavel);
+     VECTOR_Init(SigmaY,(double)0.,fit->DimL);
+    VECTOR_Copy(RefTrav,Sref,n_wavel);
 
-    memcpy(Yfit,ANALYSE_zeros,sizeof(double)*fit->DimL);
-    memcpy(Y0,ANALYSE_zeros,sizeof(double)*fit->DimL);
+    VECTOR_Init(Yfit,(double)0.,fit->DimL);
+    VECTOR_Init(Y0,(double)0.,fit->DimL);
 
     if (fit->NF)
-     memcpy(Sigmaa,ANALYSE_ones,sizeof(double)*(fit->NF-1));
+     VECTOR_Init(Sigmaa,(double)1.,(fit->NF-1));
 
     // ----------------------------------------------
     // Fwhm adjustment between spectrum and reference
@@ -3756,8 +3754,8 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
 
   const int n_wavel = NDET[pRecord->i_crosstrack];
 
-  memcpy(ANALYSE_t,ANALYSE_zeros,sizeof(double)*n_wavel);
-  memcpy(ANALYSE_tc,ANALYSE_zeros,sizeof(double)*n_wavel);
+  VECTOR_Init(ANALYSE_t,(double)0.,n_wavel);
+  VECTOR_Init(ANALYSE_tc,(double)0.,n_wavel);
 
   speNormFact=1.;
   ZM=pRecord->Zm;
@@ -3787,7 +3785,7 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
    {
     // Spectrum normalization
 
-    memcpy(Spectre,pBuffers->spectrum,sizeof(double)*n_wavel);
+    VECTOR_Copy(Spectre,pBuffers->spectrum,n_wavel);
 
     if ( (pRecord->rc=rc=VECTOR_NormalizeVector(Spectre-1,n_wavel,&speNormFact,"ANALYSE_Spectrum (Spectrum) "))!=ERROR_ID_NO ) {
      goto EndAnalysis;
@@ -3809,7 +3807,7 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
        rc=ERROR_ID_ALLOC;
 
       } else {
-        memcpy(SpectreK,Spectre,sizeof(double)*n_wavel);
+        VECTOR_Copy(SpectreK,Spectre,n_wavel);
 
         if (((pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_GEMS) || !(rc=GEMS_LoadCalib(pEngineContext,indexFenoColumn,responseHandle))) &&
             !(rc=KURUCZ_Spectrum(pBuffers->lambda,LambdaK,SpectreK,KURUCZ_buffers[indexFenoColumn].solar,pBuffers->instrFunction,
@@ -3819,8 +3817,8 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
           for (int WrkFeno=0;WrkFeno<NFeno;++WrkFeno) {
             FENO *pTabFeno=&TabFeno[indexFenoColumn][WrkFeno];
             if (!pTabFeno->hidden) {
-              memcpy(pTabFeno->LambdaK,LambdaK,sizeof(double)*n_wavel);
-              memcpy(pTabFeno->Lambda,LambdaK,sizeof(double)*n_wavel);
+              VECTOR_Copy(pTabFeno->LambdaK,LambdaK,n_wavel);
+              VECTOR_Copy(pTabFeno->Lambda,LambdaK,n_wavel);
 
               if ((pTabFeno->useKurucz==ANLYS_KURUCZ_SPEC) &&
                  ((pRecord->rc=rc=KURUCZ_ApplyCalibration(pTabFeno,LambdaK,indexFenoColumn))!=ERROR_ID_NO))
@@ -3832,7 +3830,7 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
           rc=netcdf_save_calib(LambdaK,pBuffers->spectrum,indexFenoColumn,n_wavel);
         }
 
-        memcpy(SpectreK,Spectre,sizeof(double)*n_wavel); // !!!
+        VECTOR_Copy(SpectreK,Spectre,n_wavel); // !!!
        }
 
       if (rc>=THREAD_EVENT_STOP)
@@ -3886,10 +3884,10 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
            case PRJCT_INSTR_FORMAT_OMIV4:
            case PRJCT_INSTR_FORMAT_OMPS:
            case PRJCT_INSTR_FORMAT_TROPOMI:
-             memcpy(Feno->Lambda,pBuffers->lambda,sizeof(double)*n_wavel);
+             VECTOR_Copy(Feno->Lambda,pBuffers->lambda,n_wavel);
              break;
            default:
-             memcpy(Feno->Lambda,Feno->LambdaK,sizeof(double)*n_wavel);
+             VECTOR_Copy(Feno->Lambda,Feno->LambdaK,n_wavel);
              break;
         }
 
@@ -3915,7 +3913,7 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
 
         if (!Feno->hidden && (Feno->rcKurucz==ERROR_ID_NO) &&
             ((Feno->useKurucz==ANLYS_KURUCZ_SPEC) || !Feno->rc)) {
-          memcpy(ANALYSE_absolu,ANALYSE_zeros,sizeof(double)*n_wavel);
+          VECTOR_Init(ANALYSE_absolu,(double)0.,n_wavel);
 
           if (Feno->amfFlag ||
               ((Feno->useKurucz==ANLYS_KURUCZ_REF_AND_SPEC) && Feno->xsToConvolute) ||
@@ -3954,7 +3952,7 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
           if (rc)
             goto EndAnalysis;
 
-          memcpy(Sref,Feno->Sref,sizeof(double)*n_wavel);
+          VECTOR_Copy(Sref,Feno->Sref,n_wavel);
           Lambda=Feno->LambdaK;
           LambdaSpec=Feno->Lambda;
 
@@ -4070,7 +4068,7 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
 #endif
 
           double *residuals = malloc(n_wavel * sizeof(*residuals));
-          memcpy(residuals, ANALYSE_zeros, n_wavel * sizeof(*residuals));
+          VECTOR_Init(residuals,(double)0.,n_wavel);
 
           for(i = 0; i<n_wavel;i++)
            Feno->spikes[i] = 0;
@@ -4149,7 +4147,7 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
              ANALYSE_absolu[j]= (ANALYSE_t[j]>0.) ? log(ANALYSE_t[j]) : 0.;
 
           if (Feno->saveResidualsFlag && (Feno->residualSpectrum!=NULL))
-           memcpy(Feno->residualSpectrum,&ANALYSE_absolu[SvdPDeb],sizeof(double)*Feno->fit_properties.DimL);
+           VECTOR_Copy(Feno->residualSpectrum,&ANALYSE_absolu[SvdPDeb],Feno->fit_properties.DimL);
           else if (strlen(Feno->residualsFile))
            rc=AnalyseSaveResiduals(Feno->residualsFile,pEngineContext,n_wavel);
 
@@ -4164,9 +4162,9 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
 
           // Store fits
 
-          memcpy(ANALYSE_secX,ANALYSE_zeros,sizeof(double)*n_wavel);
-          memcpy(Trend,ANALYSE_zeros,sizeof(double)*n_wavel);
-          memcpy(offset,ANALYSE_zeros,sizeof(double)*n_wavel);
+          VECTOR_Init(ANALYSE_secX,(double)0.,n_wavel);
+          VECTOR_Init(Trend,(double)0.,n_wavel);
+          VECTOR_Init(offset,(double)0.,n_wavel);
           maxOffset=(double)0.;
 
           // if analysis has failed, don't try to plot results (some
@@ -4674,10 +4672,6 @@ void ANALYSE_ResetData(void)
    MEMORY_ReleaseDVector(__func__,"SplineSpec",SplineSpec,0);
   if (SplineRef!=NULL)
    MEMORY_ReleaseDVector(__func__,"SplineRef",SplineRef,0);
-  if (ANALYSE_zeros!=NULL)
-   MEMORY_ReleaseDVector(__func__,"ANALYSE_zeros",ANALYSE_zeros,0);
-  if (ANALYSE_ones!=NULL)
-   MEMORY_ReleaseDVector(__func__,"ANALYSE_ones",ANALYSE_ones,0);
 
   Fitp=
     FitDeltap=
@@ -4697,9 +4691,7 @@ void ANALYSE_ResetData(void)
     ANALYSE_xsTrav=
     ANALYSE_xsTrav2=
     SplineSpec=
-    SplineRef=
-    ANALYSE_zeros=
-    ANALYSE_ones=NULL;
+    SplineRef=NULL;
 
   for (int i=0;i<NSFP;i++)
    {
@@ -5277,7 +5269,7 @@ RC ANALYSE_LoadLinear(ANALYSE_LINEAR_PARAMETERS *linearList,int nLinear,INDEX in
 
         else
          {
-          memcpy(pTabCross->vector,ANALYSE_ones,sizeof(double)*n_wavel);
+          VECTOR_Init(pTabCross->vector,(double)1.,n_wavel);
 
           if (polyFlag && (baseOrder>=indexOrder))
             pTabFeno->OrthoSet[pTabFeno->NOrtho++]=pTabFeno->NTabCross;
@@ -5707,9 +5699,9 @@ RC ANALYSE_LoadNonLinear(ENGINE_CONTEXT *pEngineContext,ANALYSE_NON_LINEAR_PARAM
                     (((pTabFeno->indexUsamp1==pTabFeno->NTabCross) ||                  // undersampling phase 1
                       (pTabFeno->indexUsamp2==pTabFeno->NTabCross)) &&                 // undersampling phase 2
                      (pUsamp->method==PRJCT_USAMP_FILE)))
-                  memcpy(pTabCross->vector,pWrkSymbol->xs.matrix[1],sizeof(double)*n_wavel);
+                  VECTOR_Copy(pTabCross->vector,pWrkSymbol->xs.matrix[1],n_wavel);
                 else
-                  memcpy(pTabCross->vector,ANALYSE_zeros,sizeof(double)*n_wavel);
+                  VECTOR_Init(pTabCross->vector,(double)0.,n_wavel);
 
                 if (((pTabFeno->analysisMethod!=INTENSITY_FIT) || (pTabCross->FitParam==ITEM_NONE)))
                   pTabCross->IndSvdA=++pTabFeno->fit_properties.DimC;
@@ -6068,14 +6060,14 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
   else
    {
     if (pTabFeno->SrefSigma!=NULL)
-     memcpy(pTabFeno->SrefSigma,ANALYSE_ones,sizeof(double)*n_wavel);
+     VECTOR_Init(pTabFeno->SrefSigma,(double)1.,n_wavel);
 
     // ====
     // Ref1
     // ====
 
-    memcpy(lambdaRefEtalon,pTabFeno->LambdaRef,sizeof(double)*n_wavel);
-    memcpy(SrefEtalon,ANALYSE_ones,sizeof(double)*n_wavel);
+    VECTOR_Copy(lambdaRefEtalon,pTabFeno->LambdaRef,n_wavel);
+    VECTOR_Init(SrefEtalon,(double)1.,n_wavel);
 
     int n_wavel_ref = n_wavel; // for OMI, Tropomi, APEX: n_wavel is determined after reading the input file
     if ((pTabFeno->useKurucz!=ANLYS_KURUCZ_SPEC) &&                             // if the wavelength calibration procedure is applied on the measured
@@ -6152,8 +6144,8 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
     // Ref2
     // ====
 
-    memcpy(lambdaRef,lambdaRefEtalon,sizeof(double)*n_wavel_ref);
-    memcpy(Sref,SrefEtalon,sizeof(double)*n_wavel_ref);
+    VECTOR_Copy(lambdaRef,lambdaRefEtalon,n_wavel_ref);
+    VECTOR_Copy(Sref,SrefEtalon,n_wavel_ref);
 
     if (!rc &&
         (pTabFeno->useKurucz!=ANLYS_KURUCZ_SPEC) &&
@@ -6184,7 +6176,7 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
                pTabFeno->useRefRow = false;
                break;
              }
-             memcpy(pTabFeno->LambdaRef,lambdaRefEtalon,sizeof(double)*n_wavel_ref);
+             VECTOR_Copy(pTabFeno->LambdaRef,lambdaRefEtalon,n_wavel_ref);
              rc=SPLINE_Deriv2(pTabFeno->LambdaRadAsRef2,pTabFeno->SrefRadAsRef2,pTabFeno->Deriv2RadAsRef2,pTabFeno->n_wavel_ref2,__func__);
              if(rc) break;
              rc=SPLINE_Vector(pTabFeno->LambdaRadAsRef2,pTabFeno->SrefRadAsRef2,pTabFeno->Deriv2RadAsRef2,pTabFeno->n_wavel_ref2,
@@ -6214,8 +6206,8 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
               (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_TROPOMI) ||
               (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_APEX))))
           {
-            memcpy(SrefEtalon,Sref,sizeof(double)*n_wavel);
-            memcpy(lambdaRefEtalon,lambdaRef,sizeof(double)*n_wavel);
+            VECTOR_Copy(SrefEtalon,Sref,n_wavel);
+            VECTOR_Copy(lambdaRefEtalon,lambdaRef,n_wavel);
           }
       }
       strcpy(pTabFeno->refFile,pTabFeno->ref2);
@@ -6229,7 +6221,7 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
      }
 
     if (!rc)
-     memcpy(pTabFeno->LambdaRef,(pTabFeno->useEtalon)?lambdaRefEtalon:lambdaRef,sizeof(double)*n_wavel);
+     VECTOR_Copy(pTabFeno->LambdaRef,(pTabFeno->useEtalon)?lambdaRefEtalon:lambdaRef,n_wavel);
     
    }
    
@@ -6342,20 +6334,9 @@ RC ANALYSE_SetInit(ENGINE_CONTEXT *pEngineContext)
   if (pSlitOptions->fwhmCorrectionFlag && pKuruczOptions->fwhmFit)
    rc=ERROR_SetLast("ANALYSE_LoadData",ERROR_TYPE_FATAL,ERROR_ID_FWHM_INCOMPATIBLE_OPTIONS);
   else if (!(rc=FILTER_LoadFilter(&pEngineContext->project.lfilter)) &&   // low pass filtering
-           !(rc=FILTER_LoadFilter(&pEngineContext->project.hfilter)) &&   // high pass filtering
-           !(rc=AnalyseSvdGlobalAlloc()))
-   {
-    if (((ANALYSE_zeros=(double *)MEMORY_AllocDVector("ANALYSE_LoadData ","ANALYSE_zeros",0,max_ndet-1))==NULL) ||
-        ((ANALYSE_ones=(double *)MEMORY_AllocDVector("ANALYSE_LoadData ","ANALYSE_ones",0,max_ndet-1))==NULL))
-
-     rc=ERROR_ID_ALLOC;
-
-    else
-     {
-      VECTOR_Init(ANALYSE_zeros,(double)0.,max_ndet);
-      VECTOR_Init(ANALYSE_ones,(double)1.,max_ndet);
-     }
-   }
+           !(rc=FILTER_LoadFilter(&pEngineContext->project.hfilter)))     // high pass filtering
+           
+   rc=AnalyseSvdGlobalAlloc();
 
   // Return
 
@@ -6562,7 +6543,7 @@ RC ANALYSE_UsampBuild(int analysisFlag,int gomeFlag,int indexFenoColumn)
       {
        // Build lambda for second phase
 
-       memcpy(lambda,pTabFeno->LambdaK,sizeof(double)*n_wavel);
+       VECTOR_Copy(lambda,pTabFeno->LambdaK,n_wavel);
 
        if ((analysisFlag==2) && (pUsamp->method==PRJCT_USAMP_FIXED))
         {
@@ -6574,7 +6555,7 @@ RC ANALYSE_UsampBuild(int analysisFlag,int gomeFlag,int indexFenoColumn)
           }
         }
 
-       memcpy(lambda2,ANALYSE_zeros,sizeof(double)*n_wavel);
+       VECTOR_Init(lambda2,(double)0.,n_wavel);
 
        indexPixMin=0;
        indexPixMax=n_wavel;
@@ -6583,7 +6564,7 @@ RC ANALYSE_UsampBuild(int analysisFlag,int gomeFlag,int indexFenoColumn)
         for (i=indexPixMin+1,lambda2[indexPixMin]=lambda[indexPixMin]-pUsamp->phase;i<indexPixMax;i++)
          lambda2[i]=lambda[i]-pUsamp->phase; //  (double)(1.-pUsamp->phase)*lambda[i-1]+pUsamp->phase*lambda[i];
        else
-        memcpy(lambda2,ANALYSE_shift,sizeof(double)*pTabFeno->NDET);
+        VECTOR_Copy(lambda2,ANALYSE_shift,pTabFeno->NDET);
 
        // Not allowed combinations :
        //
@@ -6606,7 +6587,7 @@ RC ANALYSE_UsampBuild(int analysisFlag,int gomeFlag,int indexFenoColumn)
        else if (!pTabFeno->useKurucz ||                                         // don't apply calibration
              !pKuruczOptions->fwhmFit)                                          // apply calibration but don't fit the slit function
         {
-         memcpy(khrConvoluted.matrix[0],&ANALYSE_usampBuffers.hrSolar.matrix[0][ANALYSE_usampBuffers.lambdaRange[0][indexFeno]],sizeof(double)*khrConvoluted.nl);
+         VECTOR_Copy(khrConvoluted.matrix[0],&ANALYSE_usampBuffers.hrSolar.matrix[0][ANALYSE_usampBuffers.lambdaRange[0][indexFeno]],khrConvoluted.nl);
 
          // Convolution with slit function from slit tab page of project properties
 
@@ -6619,32 +6600,32 @@ RC ANALYSE_UsampBuild(int analysisFlag,int gomeFlag,int indexFenoColumn)
         {
          // Local initializations
 
-         memcpy(khrConvoluted.matrix[0],&ANALYSE_usampBuffers.hrSolar.matrix[0][ANALYSE_usampBuffers.lambdaRange[0][indexFeno]],sizeof(double)*khrConvoluted.nl);
+         VECTOR_Copy(khrConvoluted.matrix[0],&ANALYSE_usampBuffers.hrSolar.matrix[0][ANALYSE_usampBuffers.lambdaRange[0][indexFeno]],khrConvoluted.nl);
 
-         memcpy(slitMatrix[0].matrix[0],pTabFeno->LambdaK,sizeof(double)*pTabFeno->NDET);
-         memcpy(slitMatrix[0].matrix[1],pTabFeno->fwhmVector[0],sizeof(double)*pTabFeno->NDET);
-         memcpy(slitMatrix[0].deriv2[1],pTabFeno->fwhmDeriv2[0],sizeof(double)*pTabFeno->NDET);
+         VECTOR_Copy(slitMatrix[0].matrix[0],pTabFeno->LambdaK,pTabFeno->NDET);
+         VECTOR_Copy(slitMatrix[0].matrix[1],pTabFeno->fwhmVector[0],pTabFeno->NDET);
+         VECTOR_Copy(slitMatrix[0].deriv2[1],pTabFeno->fwhmDeriv2[0],pTabFeno->NDET);
          slitMatrix[0].nl=pTabFeno->NDET;
 
          if (pKuruczOptions->fwhmType==SLIT_TYPE_FILE)
           {
-           memcpy(slitMatrix[0].matrix[2],pTabFeno->fwhmVector[1],sizeof(double)*pTabFeno->NDET);
-           memcpy(slitMatrix[0].deriv2[2],pTabFeno->fwhmDeriv2[1],sizeof(double)*pTabFeno->NDET);
+           VECTOR_Copy(slitMatrix[0].matrix[2],pTabFeno->fwhmVector[1],pTabFeno->NDET);
+           VECTOR_Copy(slitMatrix[0].deriv2[2],pTabFeno->fwhmDeriv2[1],pTabFeno->NDET);
           }
 
          if ((pKuruczOptions->fwhmType!=SLIT_TYPE_FILE) && (pTabFeno->fwhmVector[1]!=NULL))
           {
-           memcpy(slitMatrix[1].matrix[0],pTabFeno->LambdaK,sizeof(double)*pTabFeno->NDET);
-           memcpy(slitMatrix[1].matrix[1],pTabFeno->fwhmVector[1],sizeof(double)*pTabFeno->NDET);
-           memcpy(slitMatrix[1].deriv2[1],pTabFeno->fwhmDeriv2[1],sizeof(double)*pTabFeno->NDET);
+           VECTOR_Copy(slitMatrix[1].matrix[0],pTabFeno->LambdaK,pTabFeno->NDET);
+           VECTOR_Copy(slitMatrix[1].matrix[1],pTabFeno->fwhmVector[1],pTabFeno->NDET);
+           VECTOR_Copy(slitMatrix[1].deriv2[1],pTabFeno->fwhmDeriv2[1],pTabFeno->NDET);
            slitMatrix[1].nl=pTabFeno->NDET;
           }
 
          if ((pKuruczOptions->fwhmType==SLIT_TYPE_SUPERGAUSS) && (pTabFeno->fwhmVector[2]!=NULL))
           {
-           memcpy(slitMatrix[2].matrix[0],pTabFeno->LambdaK,sizeof(double)*pTabFeno->NDET);
-           memcpy(slitMatrix[2].matrix[1],pTabFeno->fwhmVector[2],sizeof(double)*pTabFeno->NDET);
-           memcpy(slitMatrix[2].deriv2[1],pTabFeno->fwhmDeriv2[2],sizeof(double)*pTabFeno->NDET);
+           VECTOR_Copy(slitMatrix[2].matrix[0],pTabFeno->LambdaK,pTabFeno->NDET);
+           VECTOR_Copy(slitMatrix[2].matrix[1],pTabFeno->fwhmVector[2],pTabFeno->NDET);
+           VECTOR_Copy(slitMatrix[2].deriv2[1],pTabFeno->fwhmDeriv2[2],pTabFeno->NDET);
            slitMatrix[2].nl=pTabFeno->NDET;
           }
 
@@ -6659,8 +6640,8 @@ RC ANALYSE_UsampBuild(int analysisFlag,int gomeFlag,int indexFenoColumn)
        if (!rc &&
            !(rc=SPLINE_Deriv2(khrConvoluted.matrix[0],khrConvoluted.matrix[1],khrConvoluted.deriv2[1],khrConvoluted.nl,"ANALYSE_UsampBuild (1) ")))
         {
-         memcpy(ANALYSE_usampBuffers.kuruczInterpolated[indexFeno],ANALYSE_zeros,sizeof(double)*pTabFeno->NDET);
-         memcpy(ANALYSE_usampBuffers.kuruczInterpolated2[indexFeno],ANALYSE_zeros,sizeof(double)*pTabFeno->NDET);
+         VECTOR_Init(ANALYSE_usampBuffers.kuruczInterpolated[indexFeno],(double)0.,pTabFeno->NDET);
+         VECTOR_Init(ANALYSE_usampBuffers.kuruczInterpolated2[indexFeno],(double)0.,pTabFeno->NDET);
 
          indexPixMin=ANALYSE_usampBuffers.lambdaRange[2][indexFeno]=FNPixel(lambda,khrConvoluted.matrix[0][0],pTabFeno->NDET,PIXEL_AFTER);
          indexPixMax=FNPixel(lambda,khrConvoluted.matrix[0][khrConvoluted.nl-1],pTabFeno->NDET,PIXEL_BEFORE);
@@ -6755,9 +6736,9 @@ RC ANALYSE_UsampGlobalAlloc(double lambdaMin,double lambdaMax,int size)
      rc=ERROR_ID_ALLOC;
     else
      {
-      memcpy(ANALYSE_usampBuffers.hrSolar.matrix[0],KURUCZ_buffers[0].hrSolar.matrix[0],sizeof(double)*KURUCZ_buffers[0].hrSolar.nl);
-      memcpy(ANALYSE_usampBuffers.hrSolar.matrix[1],KURUCZ_buffers[0].hrSolar.matrix[1],sizeof(double)*KURUCZ_buffers[0].hrSolar.nl);
-      memcpy(ANALYSE_usampBuffers.hrSolar.deriv2[1],KURUCZ_buffers[0].hrSolar.deriv2[1],sizeof(double)*KURUCZ_buffers[0].hrSolar.nl);
+      VECTOR_Copy(ANALYSE_usampBuffers.hrSolar.matrix[0],KURUCZ_buffers[0].hrSolar.matrix[0],KURUCZ_buffers[0].hrSolar.nl);
+      VECTOR_Copy(ANALYSE_usampBuffers.hrSolar.matrix[1],KURUCZ_buffers[0].hrSolar.matrix[1],KURUCZ_buffers[0].hrSolar.nl);
+      VECTOR_Copy(ANALYSE_usampBuffers.hrSolar.deriv2[1],KURUCZ_buffers[0].hrSolar.deriv2[1],KURUCZ_buffers[0].hrSolar.nl);
      }
    }
   else

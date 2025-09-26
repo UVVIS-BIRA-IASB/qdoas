@@ -69,6 +69,23 @@
     void VECTOR_Init ( double *vector, double value, int dim )
     { int i;
       for ( i=0; i<dim; vector[i++]=value ); }
+      
+// -----------------------------------------------------------------------------
+// FUNCTION      VECTOR_Copy
+// -----------------------------------------------------------------------------
+// PURPOSE       Copy the content of a vector of double to another vector
+//
+// INPUT         target : the target vector
+//               source : the source vector
+//               dim    : the dimension of vectors to copy;
+//
+// OUTPUT        target : the content of this vector is modified by the function.
+// -----------------------------------------------------------------------------
+
+    void VECTOR_Copy (double *target, double *source, int dim )
+    { 
+      memcpy(target,source,sizeof(double)*dim);
+    }      
 
 // -----------------------------------------------------------------------------
 // FUNCTION      VECTOR_Equal

@@ -62,7 +62,7 @@
 #include "doas.h"
 #include "winthrd.h"
 #include "analyse.h"
-
+#include "vector.h"
 #include "curfit.h"
 
 #define CURFIT_MAX_ITER 100
@@ -414,7 +414,7 @@ static RC CurfitNumDeriv(double *specX, double *srefX, const double *sigmaY, int
     rc = ERROR_ID_ALLOC;
   } else {
 
-    memcpy(Yfit2,ANALYSE_zeros,sizeof(double)*nY);
+    VECTOR_Init(Yfit2,(double)0.,nY);
     
     // Get the selected non linear parameter & increment
 
@@ -422,7 +422,7 @@ static RC CurfitNumDeriv(double *specX, double *srefX, const double *sigmaY, int
     double Dj = deltaA[indexA];        
     
     if (nP)
-     memcpy(Pj,P,sizeof(double)*nP);    // make a backup of P because in ANALYSE_function, b=fitprops->A*fitParamsC
+     VECTOR_Copy(Pj,P,nP);    // make a backup of P because in ANALYSE_function, b=fitprops->A*fitParamsC
 
     // Evaluate function for Aj+Dj
 
@@ -442,7 +442,7 @@ static RC CurfitNumDeriv(double *specX, double *srefX, const double *sigmaY, int
     A[indexA]=(double)Aj;                         // restore non linear parameter A
     
     if (nP)
-     memcpy(P,Pj,sizeof(double)*nP);              // restore the vector of linear parameters
+     VECTOR_Copy(P,Pj,nP);              // restore the vector of linear parameters
    }
 
   EndNumDeriv:
@@ -662,7 +662,7 @@ RC Curfit(int     mode,                                                         
    // break;                                                                    // should be the same
    // -------------------------------------------------------------------------
       case PRJCT_ANLYS_FIT_WEIGHTING_NONE :
-       memcpy(weight,ANALYSE_ones,sizeof(double)*nY);
+       VECTOR_Init(weight,(double)1.,nY);
       break;
    // -------------------------------------------------------------------------
       case PRJCT_ANLYS_FIT_WEIGHTING_INSTRUMENTAL :

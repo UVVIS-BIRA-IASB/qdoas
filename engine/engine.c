@@ -524,11 +524,11 @@ RC EngineSetProject(ENGINE_CONTEXT *pEngineContext)
        // Initialize buffers
 
        if (pBuffers->darkCurrent!=NULL)
-        VECTOR_Init(pBuffers->darkCurrent,(double)0.,max_ndet);                  // To check the initialization of the ANALYSE_zeros vector ...
+        VECTOR_Init(pBuffers->darkCurrent,(double)0.,max_ndet);                 
        if (pBuffers->offset!=NULL)
-        VECTOR_Init(pBuffers->offset,(double)0.,max_ndet);                       // To check the initialization of the ANALYSE_zeros vector ...
+        VECTOR_Init(pBuffers->offset,(double)0.,max_ndet);                      
        if (pBuffers->scanRef!=NULL)
-        VECTOR_Init(pBuffers->scanRef,(double)0.,max_ndet);                      // To check the initialization of the ANALYSE_zeros vector ...
+        VECTOR_Init(pBuffers->scanRef,(double)0.,max_ndet);                     
 
        // Load the instrumental function                                           // QDOAS !!! LOAD vip + dnl
 
