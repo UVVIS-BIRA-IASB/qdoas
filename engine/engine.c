@@ -261,23 +261,23 @@ RC EngineCopyContext(ENGINE_CONTEXT *pEngineContextTarget,ENGINE_CONTEXT *pEngin
    else
     {
      if ((pBuffersTarget->lambda!=NULL) && (pBuffersSource->lambda!=NULL))
-      memcpy(pBuffersTarget->lambda,pBuffersSource->lambda,sizeof(double)*max_ndet);
+      VECTOR_Copy(pBuffersTarget->lambda,pBuffersSource->lambda,max_ndet);
      if ((pBuffersTarget->lambda_irrad!=NULL) && (pBuffersSource->lambda_irrad!=NULL))
-      memcpy(pBuffersTarget->lambda_irrad,pBuffersSource->lambda_irrad,sizeof(double)*max_ndet);
+      VECTOR_Copy(pBuffersTarget->lambda_irrad,pBuffersSource->lambda_irrad,max_ndet);
      if ((pBuffersTarget->instrFunction!=NULL) && (pBuffersSource->instrFunction!=NULL))
-      memcpy(pBuffersTarget->instrFunction,pBuffersSource->instrFunction,sizeof(double)*max_ndet);
+      VECTOR_Copy(pBuffersTarget->instrFunction,pBuffersSource->instrFunction,max_ndet);
      if ((pBuffersTarget->spectrum!=NULL) && (pBuffersSource->spectrum!=NULL))
-      memcpy(pBuffersTarget->spectrum,pBuffersSource->spectrum,sizeof(double)*max_ndet);
+      VECTOR_Copy(pBuffersTarget->spectrum,pBuffersSource->spectrum,max_ndet);
      if ((pBuffersTarget->sigmaSpec!=NULL) && (pBuffersSource->sigmaSpec!=NULL))
-      memcpy(pBuffersTarget->sigmaSpec,pBuffersSource->sigmaSpec,sizeof(double)*max_ndet);
+      VECTOR_Copy(pBuffersTarget->sigmaSpec,pBuffersSource->sigmaSpec,max_ndet);
      if ((pBuffersTarget->irrad!=NULL) && (pBuffersSource->irrad!=NULL))
-      memcpy(pBuffersTarget->irrad,pBuffersSource->irrad,sizeof(double)*max_ndet);
+      VECTOR_Copy(pBuffersTarget->irrad,pBuffersSource->irrad,max_ndet);
      if ((pBuffersTarget->darkCurrent!=NULL) && (pBuffersSource->darkCurrent!=NULL))
-      memcpy(pBuffersTarget->darkCurrent,pBuffersSource->darkCurrent,sizeof(double)*max_ndet);
+      VECTOR_Copy(pBuffersTarget->darkCurrent,pBuffersSource->darkCurrent,max_ndet);
      if ((pBuffersTarget->offset!=NULL) && (pBuffersSource->offset!=NULL))
-      memcpy(pBuffersTarget->offset,pBuffersSource->offset,sizeof(double)*max_ndet);
+      VECTOR_Copy(pBuffersTarget->offset,pBuffersSource->offset,max_ndet);
      if ((pBuffersTarget->scanRef!=NULL) && (pBuffersSource->scanRef!=NULL))
-      memcpy(pBuffersTarget->scanRef,pBuffersSource->scanRef,sizeof(double)*max_ndet);
+      VECTOR_Copy(pBuffersTarget->scanRef,pBuffersSource->scanRef,max_ndet);
      if ((pBuffersTarget->scanIndexes!=NULL) && (pBuffersSource->scanIndexes!=NULL))
       memcpy(pBuffersTarget->scanIndexes,pBuffersSource->scanIndexes,sizeof(INDEX)*pEngineContextSource->recordNumber);
      if ((pBuffersTarget->zenithBeforeIndexes!=NULL) && (pBuffersSource->zenithBeforeIndexes!=NULL))
@@ -285,11 +285,11 @@ RC EngineCopyContext(ENGINE_CONTEXT *pEngineContextTarget,ENGINE_CONTEXT *pEngin
      if ((pBuffersTarget->zenithAfterIndexes!=NULL) && (pBuffersSource->zenithAfterIndexes!=NULL))
       memcpy(pBuffersTarget->zenithAfterIndexes,pBuffersSource->zenithAfterIndexes,sizeof(INDEX)*pEngineContextSource->recordNumber);
      if ((pBuffersTarget->varPix!=NULL) && (pBuffersSource->varPix!=NULL))
-      memcpy(pBuffersTarget->varPix,pBuffersSource->varPix,sizeof(double)*max_ndet);
+      VECTOR_Copy(pBuffersTarget->varPix,pBuffersSource->varPix,max_ndet);
      if ((pBuffersTarget->specMaxx!=NULL) && (pBuffersSource->specMaxx!=NULL))
-      memcpy(pBuffersTarget->specMaxx,pBuffersSource->specMaxx,sizeof(double)*MAX_SPECMAX);
+      VECTOR_Copy(pBuffersTarget->specMaxx,pBuffersSource->specMaxx,MAX_SPECMAX);
      if ((pBuffersTarget->specMax!=NULL) && (pBuffersSource->specMax!=NULL))
-      memcpy(pBuffersTarget->specMax,pBuffersSource->specMax,sizeof(double)*MAX_SPECMAX);
+      VECTOR_Copy(pBuffersTarget->specMax,pBuffersSource->specMax,MAX_SPECMAX);
      if ((pBuffersTarget->pixel_QF!=NULL) && (pBuffersSource->pixel_QF!=NULL))
       memcpy(pBuffersTarget->pixel_QF,pBuffersSource->pixel_QF,sizeof(unsigned short)*max_ndet);
      if ((pBuffersTarget->recordIndexes!=NULL) && (pBuffersSource->recordIndexes!=NULL))
@@ -2105,7 +2105,7 @@ RC EngineNewRef(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
            alignRef++;
 
            if (indexRefRecord!=ITEM_NONE)
-            memcpy(pTabFeno->Sref,ENGINE_contextRef.buffers.spectrum,sizeof(double)*pTabFeno->NDET);
+            VECTOR_Copy(pTabFeno->Sref,ENGINE_contextRef.buffers.spectrum,pTabFeno->NDET);
            else
             {
                 double *sref1,*sref2;
@@ -2131,8 +2131,8 @@ RC EngineNewRef(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
 
            if (!pTabFeno->useEtalon)
             {
-             memcpy(pTabFeno->LambdaK,ENGINE_contextRef.buffers.lambda,sizeof(double)*pTabFeno->NDET);
-             memcpy(pTabFeno->LambdaRef,ENGINE_contextRef.buffers.lambda,sizeof(double)*pTabFeno->NDET);
+             VECTOR_Copy(pTabFeno->LambdaK,ENGINE_contextRef.buffers.lambda,pTabFeno->NDET);
+             VECTOR_Copy(pTabFeno->LambdaRef,ENGINE_contextRef.buffers.lambda,pTabFeno->NDET);
 
              doas_spectrum *new_range = spectrum_new();
              for (indexWindow = 0, newDimL=0; indexWindow < pTabFeno->fit_properties.Z; indexWindow++)

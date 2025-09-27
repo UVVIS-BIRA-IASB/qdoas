@@ -106,8 +106,8 @@ RC FILTER_OddEvenCorrection(double *lambdaData,double *specData,double *output,i
     if (!(rc=SPLINE_Deriv2(lambda,spectrum,spectrum2,vectorSize/2,"PDA_OddEvenCorrection ")) &&
         !(rc=SPLINE_Deriv2(lambda+(vectorSize/2),spectrum+(vectorSize/2),spectrum2+(vectorSize/2),vectorSize/2,"PDA_OddEvenCorrection (2) ")))
      {
-      memcpy(spec1,specData,sizeof(double)*vectorSize);
-      memcpy(spec2,specData,sizeof(double)*vectorSize);
+      VECTOR_Copy(spec1,specData,vectorSize);
+      VECTOR_Copy(spec2,specData,vectorSize);
 
       for (i=0;i<vectorSize/2;i++)
 
@@ -244,7 +244,7 @@ void realft(double *source,double *buffer,int nn,int is)
 
   // Make a copy of the original data
 
-  memcpy(buffer+1,source+1,nn*sizeof(double));
+  VECTOR_Copy(buffer+1,source+1,nn);
 
   // Initializations
 
@@ -650,7 +650,7 @@ RC FILTER_Build(PRJCT_FILTER *pFilter,double fa1,double fa2,double fa3)
        {
            if (!(rc=FilterPascalTriangle(pFilter->filterFunction,pFilter->filterSize-1)))
             {
-          memcpy(pFilter->filterFunction+1,pFilter->filterFunction+(pFilter->filterSize>>1)+1,sizeof(double)*((pFilter->filterSize+1)>>1));
+          VECTOR_Copy(pFilter->filterFunction+1,pFilter->filterFunction+(pFilter->filterSize>>1)+1,((pFilter->filterSize+1)>>1));
           sum=(double)pow(2.,pFilter->filterSize-1);
          }
 
@@ -747,7 +747,7 @@ RC FilterConv(PRJCT_FILTER *pFilter,double *Input,double *Output,int Size)
          }
       }
 
-    memcpy(Output,ftemp,Size*sizeof(double));
+    VECTOR_Copy(Output,ftemp,Size);
 
     // Release allocated buffer
 
@@ -800,17 +800,17 @@ RC FILTER_Vector(PRJCT_FILTER *pFilter,double *Input,double *Output,double *tmpV
      rc=ERROR_ID_ALLOC;
     else
      {
-      memcpy(tempVector,Input,sizeof(double)*Size);
+      VECTOR_Copy(tempVector,Input,Size);
       for (i=0;(i<pFilter->filterNTimes) && !rc;i++)
        rc=FilterConv(pFilter,tempVector,tempVector,Size);
 
       if (i==pFilter->filterNTimes)
        {
         if (tmpVector!=NULL)
-         memcpy(tmpVector,tempVector,sizeof(double)*Size);
+         VECTOR_Copy(tmpVector,tempVector,Size);
 
         if (outputType==PRJCT_FILTER_OUTPUT_LOW)
-         memcpy(Output,tempVector,sizeof(double)*Size);
+         VECTOR_Copy(Output,tempVector,Size);
         else if (outputType==PRJCT_FILTER_OUTPUT_HIGH_SUB)
          for (j=0;j<Size;j++)
           Output[j]=Input[j]-tempVector[j];

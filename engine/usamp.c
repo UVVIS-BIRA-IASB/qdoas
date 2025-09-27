@@ -219,7 +219,7 @@ RC USAMP_Build(double *phase1,                                                  
 
   else
    {
-    memcpy(xsnew.matrix[0],kuruczLambda,nKurucz*sizeof(double));
+    VECTOR_Copy(xsnew.matrix[0],kuruczLambda,nKurucz);
 
     VECTOR_Init(xsnew.matrix[1],(double)0.,nKurucz);
 

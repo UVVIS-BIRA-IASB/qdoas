@@ -1169,9 +1169,9 @@ RC XSCONV_TypeStandard(MATRIX_OBJECT *pXsnew,INDEX indexLambdaMin,INDEX indexLam
           slitDeriv2[0]=slitTmp.deriv2[1];
           slitNDET[0]=slitTmp.nl;
 
-          memcpy(slitTmp.matrix[0],(double *)slitMatrix[0].matrix[0],sizeof(double)*(slitMatrix[0].nl));
-          memcpy(slitTmp.matrix[1],(double *)slitMatrix[0].matrix[1],sizeof(double)*(slitMatrix[0].nl));
-          memcpy(slitTmp.deriv2[1],(double *)slitMatrix[0].deriv2[1],sizeof(double)*(slitMatrix[0].nl));
+          VECTOR_Copy(slitTmp.matrix[0],(double *)slitMatrix[0].matrix[0],(slitMatrix[0].nl));
+          VECTOR_Copy(slitTmp.matrix[1],(double *)slitMatrix[0].matrix[1],(slitMatrix[0].nl));
+          VECTOR_Copy(slitTmp.deriv2[1],(double *)slitMatrix[0].deriv2[1],(slitMatrix[0].nl));
          }
        }
 
@@ -1190,7 +1190,7 @@ RC XSCONV_TypeStandard(MATRIX_OBJECT *pXsnew,INDEX indexLambdaMin,INDEX indexLam
       slitDeriv2[0]=slitTmp.deriv2[1];
       slitNDET[0]=slitTmp.nl;
 
-      memcpy(slitTmp.matrix[0],(double *)slitMatrix[0].matrix[0]+1,sizeof(double)*(slitMatrix[0].nl-1));
+      VECTOR_Copy(slitTmp.matrix[0],(double *)slitMatrix[0].matrix[0]+1,(slitMatrix[0].nl-1));
      }
    }
   else
@@ -1245,7 +1245,7 @@ RC XSCONV_TypeStandard(MATRIX_OBJECT *pXsnew,INDEX indexLambdaMin,INDEX indexLam
       for (i=0;i<slitTmp.nl;i++)
        slitVector[0][i]=(double)VECTOR_Table2((double **)slitMatrix[0].matrix,slitMatrix[0].nl,slitMatrix[0].nc,slitMatrix[0].matrix[0][i+1],lambda);
 
-      // memcpy(slitLambda[0],(double *)slitMatrix[0].matrix[0]+1,sizeof(double)*(slitMatrix[0].nl-1));
+      // VECTOR_Copy(slitLambda[0],(double *)slitMatrix[0].matrix[0]+1,(slitMatrix[0].nl-1));
       if (!(rc=SPLINE_Deriv2(slitLambda[0],slitVector[0],slitDeriv2[0],slitNDET[0],"XSCONV_TypeStandard")))
        rc=XSCONV_GetFwhm(slitLambda[0],slitVector[0],slitDeriv2[0],slitNDET[0],SLIT_TYPE_FILE,&fwhm);
      }
@@ -1545,7 +1545,7 @@ RC XSCONV_TypeI0Correction(MATRIX_OBJECT *pXsnew,MATRIX_OBJECT *pXshr,MATRIX_OBJ
 
   else
    {
-    memcpy(I0c.matrix[0],xsnewLambda,sizeof(double)*xsnewNDET);
+    VECTOR_Copy(I0c.matrix[0],xsnewLambda,xsnewNDET);
 
     // Use substitution variables
 
@@ -1557,7 +1557,7 @@ RC XSCONV_TypeI0Correction(MATRIX_OBJECT *pXsnew,MATRIX_OBJECT *pXshr,MATRIX_OBJ
 
     // Build I from I0 (solar spectrum) with the specified cross section absorption
 
-    memcpy(ILambda,I0Lambda,sizeof(double)*INDET);
+    VECTOR_Copy(ILambda,I0Lambda,INDET);
 
     VECTOR_Init(I0cVector,(double)0.,sizeof(double));
     VECTOR_Init(IcVector,(double)0.,sizeof(double));
@@ -1986,8 +1986,8 @@ RC XSCONV_NewSlitFunction(SLIT *pSlitOptions,MATRIX_OBJECT *pSlit,double slitPar
    rc=ERROR_ID_ALLOC;
   else
    {
-    memcpy(pSlit->matrix[0],lambda,sizeof(double)*nslit);
-    memcpy(pSlit->matrix[1],newSlit,sizeof(double)*nslit);
+    VECTOR_Copy(pSlit->matrix[0],lambda,nslit);
+    VECTOR_Copy(pSlit->matrix[1],newSlit,nslit);
 
     rc=SPLINE_Deriv2(pSlit->matrix[0],pSlit->matrix[1],pSlit->deriv2[1],nslit,"XSCONV_NewSlitFunction ");
    }

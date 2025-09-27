@@ -1159,7 +1159,7 @@ RC GDP_BIN_LoadAnalysis(ENGINE_CONTEXT *pEngineContext,void *responseHandle) {
        // Load calibration and reference spectra
 
        if (!pTabFeno->gomeRefFlag) {
-         memcpy(pTabFeno->LambdaRef,pEngineContext->buffers.lambda,sizeof(double)*n_wavel);
+         VECTOR_Copy(pTabFeno->LambdaRef,pEngineContext->buffers.lambda,n_wavel);
 
          for (i=0,j=pOrbitFile->gdpBinStartPixel[pOrbitFile->gdpBinBandIndex];
               j<pOrbitFile->gdpBinStartPixel[pOrbitFile->gdpBinBandIndex]+pOrbitFile->gdpBinBandInfo[pOrbitFile->gdpBinBandIndex].bandSize;i++,j++) {
@@ -1171,7 +1171,7 @@ RC GDP_BIN_LoadAnalysis(ENGINE_CONTEXT *pEngineContext,void *responseHandle) {
          if (!TabFeno[0][indexFeno].hidden) {
            if (!(rc=VECTOR_NormalizeVector(pTabFeno->Sref-1,pTabFeno->NDET,&pTabFeno->refNormFact,"GDP_BIN_LoadAnalysis (Reference) ")) &&
               (!pRecord->useErrors || !(rc=VECTOR_NormalizeVector(pTabFeno->SrefSigma-1,pTabFeno->NDET,&factTemp,"GDP_BIN_LoadAnalysis (RefError) ")))) {
-             memcpy(pTabFeno->SrefEtalon,pTabFeno->Sref,sizeof(double)*pTabFeno->NDET);
+             VECTOR_Copy(pTabFeno->SrefEtalon,pTabFeno->Sref,pTabFeno->NDET);
              pTabFeno->useEtalon=pTabFeno->displayRef=1;
 
              // Browse symbols
@@ -1220,8 +1220,8 @@ RC GDP_BIN_LoadAnalysis(ENGINE_CONTEXT *pEngineContext,void *responseHandle) {
             }
          }
 
-         memcpy(pTabFeno->LambdaK,pTabFeno->LambdaRef,sizeof(double)*n_wavel);
-         memcpy(pTabFeno->Lambda,pTabFeno->LambdaRef,sizeof(double)*n_wavel);
+         VECTOR_Copy(pTabFeno->LambdaK,pTabFeno->LambdaRef,n_wavel);
+         VECTOR_Copy(pTabFeno->Lambda,pTabFeno->LambdaRef,n_wavel);
 
          useUsamp+=pTabFeno->useUsamp;
          useKurucz+=pTabFeno->useKurucz;

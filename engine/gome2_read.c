@@ -1364,9 +1364,9 @@ RC GOME2_Set(ENGINE_CONTEXT *pEngineContext) {
   if (!rc) {
     coda_cursor_set_product(&pOrbitFile->gome2Cursor,pOrbitFile->gome2Pf);
     const int n_wavel = pOrbitFile->gome2Info.no_of_pixels;
-    memcpy(pEngineContext->buffers.lambda,pOrbitFile->gome2SunWve,sizeof(double) *n_wavel);
-    memcpy(pEngineContext->buffers.lambda_irrad,pOrbitFile->gome2SunWve,sizeof(double) *n_wavel);
-    memcpy(pEngineContext->buffers.irrad,pOrbitFile->gome2SunRef,sizeof(double) *n_wavel);
+    VECTOR_Copy(pEngineContext->buffers.lambda,pOrbitFile->gome2SunWve,n_wavel);
+    VECTOR_Copy(pEngineContext->buffers.lambda_irrad,pOrbitFile->gome2SunWve,n_wavel);
+    VECTOR_Copy(pEngineContext->buffers.irrad,pOrbitFile->gome2SunRef,n_wavel);
   }
 
   return rc;
@@ -1879,15 +1879,15 @@ RC GOME2_LoadAnalysis(ENGINE_CONTEXT *pEngineContext,void *responseHandle) {
     // Load calibration and reference spectra
 
     if (!pTabFeno->gomeRefFlag) { // use irradiance from L1B file
-      memcpy(pTabFeno->LambdaRef,pOrbitFile->gome2SunWve,sizeof(double) *n_wavel);
-      memcpy(pTabFeno->Sref,pOrbitFile->gome2SunRef,sizeof(double) *n_wavel);
+      VECTOR_Copy(pTabFeno->LambdaRef,pOrbitFile->gome2SunWve,n_wavel);
+      VECTOR_Copy(pTabFeno->Sref,pOrbitFile->gome2SunRef,n_wavel);
 
       if (!TabFeno[0][indexFeno].hidden) {
         rc = VECTOR_NormalizeVector(pTabFeno->Sref-1,pTabFeno->NDET,&pTabFeno->refNormFact,"GOME2_LoadAnalysis (Reference) ");
         if (rc)
           goto EndGOME2_LoadAnalysis;
 
-        memcpy(pTabFeno->SrefEtalon,pTabFeno->Sref,sizeof(double) *pTabFeno->NDET);
+        VECTOR_Copy(pTabFeno->SrefEtalon,pTabFeno->Sref,pTabFeno->NDET);
         pTabFeno->useEtalon=pTabFeno->displayRef=1;
 
         // Browse symbols
@@ -1936,8 +1936,8 @@ RC GOME2_LoadAnalysis(ENGINE_CONTEXT *pEngineContext,void *responseHandle) {
       }
     }
 
-    memcpy(pTabFeno->LambdaK,pTabFeno->LambdaRef,sizeof(double) *pTabFeno->NDET);
-    memcpy(pTabFeno->Lambda,pTabFeno->LambdaRef,sizeof(double) *pTabFeno->NDET);
+    VECTOR_Copy(pTabFeno->LambdaK,pTabFeno->LambdaRef,pTabFeno->NDET);
+    VECTOR_Copy(pTabFeno->Lambda,pTabFeno->LambdaRef,pTabFeno->NDET);
 
     useUsamp+=pTabFeno->useUsamp;
     useKurucz+=pTabFeno->useKurucz;

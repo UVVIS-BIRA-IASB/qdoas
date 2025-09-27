@@ -1411,9 +1411,9 @@ RC OMI_GetReference(int spectralType, const char *refFile, INDEX indexColumn, do
   }
 
   if ((pRef != NULL) && (indexColumn>=0) && (indexColumn< pRef->nXtrack)) {
-    memcpy(lambda,pRef->omiRefLambda[indexColumn],sizeof(double)*pRef->nWavel);
-    memcpy(ref,pRef->omiRefSpectrum[indexColumn],sizeof(double)*pRef->nWavel);
-    memcpy(refSigma,pRef->omiRefSigma[indexColumn],sizeof(double)*pRef->nWavel);
+    VECTOR_Copy(lambda,pRef->omiRefLambda[indexColumn],pRef->nWavel);
+    VECTOR_Copy(ref,pRef->omiRefSpectrum[indexColumn],pRef->nWavel);
+    VECTOR_Copy(refSigma,pRef->omiRefSigma[indexColumn],pRef->nWavel);
     *n_wavel_ref = pRef->nWavel;
   } else {
     rc=ERROR_SetLast(__func__,ERROR_TYPE_FATAL,ERROR_ID_OMI_REF,__func__);
@@ -1612,8 +1612,8 @@ RC  OMI_read_earth(ENGINE_CONTEXT *pEngineContext,int recordNo)
       KURUCZ_indexLine=1;
       omiSwathOld=i_alongtrack;
     }
-    memcpy(pEngineContext->buffers.lambda_irrad,OMI_ref[0].omiRefLambda[i_crosstrack],sizeof(double)*pOrbitFile->nWavel);
-    memcpy(pEngineContext->buffers.irrad,OMI_ref[0].omiRefSpectrum[i_crosstrack],sizeof(double)*pOrbitFile->nWavel);
+    VECTOR_Copy(pEngineContext->buffers.lambda_irrad,OMI_ref[0].omiRefLambda[i_crosstrack],pOrbitFile->nWavel);
+    VECTOR_Copy(pEngineContext->buffers.irrad,OMI_ref[0].omiRefSpectrum[i_crosstrack],pOrbitFile->nWavel);
   }
 
   return ERROR_ID_NO;

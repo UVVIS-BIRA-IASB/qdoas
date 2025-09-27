@@ -44,6 +44,7 @@
 #include "spline.h"
 #include "winfiles.h"
 #include "stdfunc.h"
+#include "vector.h"
 
 #include <math.h>
 #include <string.h>
@@ -198,13 +199,13 @@ RC MATRIX_Copy(MATRIX_OBJECT *pTarget, const MATRIX_OBJECT *pSource, const char 
     // Make a copy of the input matrix into the new allocated one
 
     for (indexC=pSource->basec;indexC<pSource->basec+pSource->nc;indexC++)
-     memcpy(pTarget->matrix[indexC]+pSource->basel,pSource->matrix[indexC]+pSource->basel,sizeof(double)*pSource->nl);
+     VECTOR_Copy(pTarget->matrix[indexC]+pSource->basel,pSource->matrix[indexC]+pSource->basel,pSource->nl);
 
     // Make a copy of the second derivatives
 
     if (pSource->deriv2!=NULL)
      for (indexC=pSource->basec+1;indexC<pSource->basec+pSource->nc;indexC++)
-      memcpy(pTarget->deriv2[indexC]+pSource->basel,pSource->deriv2[indexC]+pSource->basel,sizeof(double)*pSource->nl);
+      VECTOR_Copy(pTarget->deriv2[indexC]+pSource->basel,pSource->deriv2[indexC]+pSource->basel,pSource->nl);
    }
 
   // Return

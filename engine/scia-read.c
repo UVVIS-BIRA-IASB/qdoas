@@ -1247,8 +1247,8 @@ RC SCIA_ReadPDS(ENGINE_CONTEXT *pEngineContext,int recordNo)
 
       pSciaData=&pOrbitFile->sciaGeolocations[recordNo-1];
 
-      memcpy(pRecord->satellite.cornerlats,pSciaData->latCorners,sizeof(double)*4);
-      memcpy(pRecord->satellite.cornerlons,pSciaData->lonCorners,sizeof(double)*4);
+      VECTOR_Copy(pRecord->satellite.cornerlats,pSciaData->latCorners,4);
+      VECTOR_Copy(pRecord->satellite.cornerlons,pSciaData->lonCorners,4);
       memcpy(pRecord->scia.solZen,pSciaData->solZen,sizeof(float)*3);
       memcpy(pRecord->scia.solAzi,pSciaData->solAzi,sizeof(float)*3);
       memcpy(pRecord->scia.losZen,pSciaData->losZen,sizeof(float)*3);
@@ -1650,7 +1650,7 @@ RC SCIA_LoadAnalysis(ENGINE_CONTEXT *pEngineContext,void *responseHandle) {
 
             if (!(rc=VECTOR_NormalizeVector(pTabFeno->Sref-1,pTabFeno->NDET,&pTabFeno->refNormFact,"SCIA_LoadAnalysis (Reference) ")))
             {
-             memcpy(pTabFeno->SrefEtalon,pTabFeno->Sref,sizeof(double)*pTabFeno->NDET);
+             VECTOR_Copy(pTabFeno->SrefEtalon,pTabFeno->Sref,pTabFeno->NDET);
              pTabFeno->useEtalon=pTabFeno->displayRef=1;
 
              // Browse symbols
@@ -1701,8 +1701,8 @@ RC SCIA_LoadAnalysis(ENGINE_CONTEXT *pEngineContext,void *responseHandle) {
             }
           }
 
-         memcpy(pTabFeno->LambdaK,pTabFeno->LambdaRef,sizeof(double)*pTabFeno->NDET);
-         memcpy(pTabFeno->Lambda,pTabFeno->LambdaRef,sizeof(double)*pTabFeno->NDET);
+         VECTOR_Copy(pTabFeno->LambdaK,pTabFeno->LambdaRef,pTabFeno->NDET);
+         VECTOR_Copy(pTabFeno->Lambda,pTabFeno->LambdaRef,pTabFeno->NDET);
 
          useUsamp+=pTabFeno->useUsamp;
          useKurucz+=pTabFeno->useKurucz;

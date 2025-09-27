@@ -470,9 +470,9 @@ RC ASCII_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int local
         pRecordInfo->TimeDec=asciiMatrix.matrix[ndataRecord][count++];
 
       if (lambdaFlag)
-        memcpy(lambda,asciiMatrix.matrix[0]+count,sizeof(double)*n_wavel);
+        VECTOR_Copy(lambda,asciiMatrix.matrix[0]+count,n_wavel);
 
-      memcpy(spectrum,asciiMatrix.matrix[ndataRecord]+count,sizeof(double)*n_wavel);
+      VECTOR_Copy(spectrum,asciiMatrix.matrix[ndataRecord]+count,n_wavel);
     } else {
       // Read the solar zenith angle
 

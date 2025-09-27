@@ -1519,7 +1519,7 @@ RC MFC_LoadAnalysis(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
 
        if (!rc && !(rc=VECTOR_NormalizeVector(pTabFeno->Sref-1,pTabFeno->NDET,&pTabFeno->refNormFact,"MFC_LoadAnalysis (Reference) ")))
         {
-         memcpy(pTabFeno->SrefEtalon,pTabFeno->Sref,sizeof(double)*pTabFeno->NDET);
+         VECTOR_Copy(pTabFeno->SrefEtalon,pTabFeno->Sref,pTabFeno->NDET);
          pTabFeno->useEtalon=pTabFeno->displayRef=1;
 
          // Browse symbols

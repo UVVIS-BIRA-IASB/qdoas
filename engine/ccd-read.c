@@ -537,7 +537,7 @@ RC ReliCCD_EEV(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int loca
          else if (!header.saveTracks)
           {
               if (header.doubleFlag==(char)1)
-               memcpy(dspectrum,tmpSpectrum,sizeof(double)*spSize);
+               VECTOR_Copy(dspectrum,tmpSpectrum,spSize);
               else
             for (i=0;i<spSize;i++)
              dspectrum[i]=(double)spectrum[i];
@@ -803,7 +803,7 @@ RC ReliCCD_EEV(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int loca
 
   if (!rc && (pRecord->ccd.vip.matrix!=NULL) && (THRD_browseType==THREAD_BROWSE_SPECTRA))
    {
-       memcpy(tmpSpectrum,dspectrum,sizeof(double)*n_wavel);
+       VECTOR_Copy(tmpSpectrum,dspectrum,n_wavel);
 
        for (i=0;i<n_wavel;i++)
         {

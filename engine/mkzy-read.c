@@ -532,7 +532,7 @@ RC MKZY_SearchForOffset(ENGINE_CONTEXT *pEngineContext,FILE *specFp) {
       // Dark current
 
       if ((darkCurrent!=NULL) && !strncasecmp(pEngineContext->recordInfo.Nom,"dark",4)) {
-        memcpy(darkCurrent,pEngineContext->buffers.spectrum,sizeof(double)*n_wavel);
+        VECTOR_Copy(darkCurrent,pEngineContext->buffers.spectrum,n_wavel);
         pEngineContext->recordInfo.mkzy.darkFlag=1;
         pEngineContext->recordInfo.mkzy.darkScans=pEngineContext->recordInfo.NSomme;
         pEngineContext->recordInfo.mkzy.darkTint=pEngineContext->recordInfo.Tint;
@@ -541,7 +541,7 @@ RC MKZY_SearchForOffset(ENGINE_CONTEXT *pEngineContext,FILE *specFp) {
      // Offset
 
      if ((offset!=NULL) && !strncasecmp(pEngineContext->recordInfo.Nom,"offset",6)) {
-       memcpy(offset,pEngineContext->buffers.spectrum,sizeof(double)*n_wavel);
+       VECTOR_Copy(offset,pEngineContext->buffers.spectrum,n_wavel);
        pEngineContext->recordInfo.mkzy.offsetFlag=1;
        pEngineContext->recordInfo.mkzy.offsetScans=pEngineContext->recordInfo.NSomme;
      }
@@ -589,7 +589,7 @@ RC MKZY_SearchForSky(ENGINE_CONTEXT *pEngineContext,FILE *specFp) {
 
   for (indexRecord=1;indexRecord<=pEngineContext->recordInfo.mkzy.recordNumber;indexRecord++)
     if (!(rc=MKZY_ReadRecord(pEngineContext,indexRecord,specFp)) && !strncasecmp(pEngineContext->recordInfo.Nom,"sky",3)) {
-      memcpy(pEngineContext->buffers.scanRef,pEngineContext->buffers.spectrum,sizeof(double)*n_wavel);
+      VECTOR_Copy(pEngineContext->buffers.scanRef,pEngineContext->buffers.spectrum,n_wavel);
       pEngineContext->recordInfo.mkzy.skyFlag=1;
 
       // Correct by offset and dark current
@@ -748,9 +748,9 @@ RC MKZY_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int localD
          rc=ERROR_ID_FILE_RECORD;
 
         else if (!strncasecmp(pEngineContext->recordInfo.Nom,"dark",4))
-         memcpy(spectrum,dark,sizeof(double)*n_wavel);
+         VECTOR_Copy(spectrum,dark,n_wavel);
         else if (!strncasecmp(pEngineContext->recordInfo.Nom,"offset",4))
-         memcpy(spectrum,offset,sizeof(double)*n_wavel);
+         VECTOR_Copy(spectrum,offset,n_wavel);
 
               // Correct by offset and dark current
 
@@ -840,11 +840,11 @@ RC MKZY_LoadAnalysis(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
         pTabFeno=&TabFeno[0][indexFeno];
         pTabFeno->NDET=n_wavel;
 
-        memcpy(pTabFeno->Sref,pBuffers->scanRef,sizeof(double)*n_wavel);
+        VECTOR_Copy(pTabFeno->Sref,pBuffers->scanRef,n_wavel);
 
         if (!rc && !(rc=VECTOR_NormalizeVector(pTabFeno->Sref-1,pTabFeno->NDET,&pTabFeno->refNormFact,"MKZY_LoadAnalysis (Reference) ")))
          {
-          memcpy(pTabFeno->SrefEtalon,pTabFeno->Sref,sizeof(double)*pTabFeno->NDET);
+          VECTOR_Copy(pTabFeno->SrefEtalon,pTabFeno->Sref,pTabFeno->NDET);
           pTabFeno->useEtalon=pTabFeno->displayRef=1;
 
           // Browse symbols
