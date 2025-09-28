@@ -389,10 +389,10 @@ RC FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
     pRecordInfo->latitude=(frm4doas_data_fields[FRM4DOAS_FIELD_LAT].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_LAT].varData)[(ilat==pEngineContext->n_alongtrack)?i_alongtrack:0]:0.;
     pRecordInfo->altitude=(frm4doas_data_fields[FRM4DOAS_FIELD_ALT].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_ALT].varData)[(ilat==pEngineContext->n_alongtrack)?i_alongtrack:0]:0.;
 
-    pRecordInfo->azimuthViewAngle=(frm4doas_data_fields[FRM4DOAS_FIELD_VAA].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_VAA].varData)[idata] : (float)-1.;
-    pRecordInfo->elevationViewAngle=(frm4doas_data_fields[FRM4DOAS_FIELD_VEA].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_VEA].varData)[idata] : (float)-1.;
-    pRecordInfo->Zm=(frm4doas_data_fields[FRM4DOAS_FIELD_SZA].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_SZA].varData)[idata] : (float)-1.;
-    pRecordInfo->Azimuth=(frm4doas_data_fields[FRM4DOAS_FIELD_SAA].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_SAA].varData)[idata] : (float)-1.;
+    pRecordInfo->azimuthViewAngle=(frm4doas_data_fields[FRM4DOAS_FIELD_VAA].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_VAA].varData)[idata] : (float)NAN;
+    pRecordInfo->elevationViewAngle=(frm4doas_data_fields[FRM4DOAS_FIELD_VEA].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_VEA].varData)[idata] : (float)NAN;
+    pRecordInfo->Zm=(frm4doas_data_fields[FRM4DOAS_FIELD_SZA].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_SZA].varData)[idata] : (float)NAN;
+    pRecordInfo->Azimuth=(frm4doas_data_fields[FRM4DOAS_FIELD_SAA].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_SAA].varData)[idata] : (float)NAN;
 
     pRecordInfo->Tint=(frm4doas_data_fields[FRM4DOAS_FIELD_TINT].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_TINT].varData)[idata] : 0.;
     pRecordInfo->TotalAcqTime=(frm4doas_data_fields[FRM4DOAS_FIELD_TAT].varData!=NULL)?(float)((float *)frm4doas_data_fields[FRM4DOAS_FIELD_TAT].varData)[idata] : 0.;
