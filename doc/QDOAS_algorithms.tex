@@ -1,0 +1,1150 @@
+\chapter{Description of Algorithms}\label{cha:descr-algor}
+This chapter summarizes the main features of QDOAS and describes the
+structure of the program and the algorithms.
+
+\section{Differential Optical Absorption Spectroscopy}\label{sec:diff-optic-absorpt}
+\gls{doas} is a widely used inversion method for the retrieval of
+atmospheric trace gas abundances from multi-wavelength light
+measurements.  It uses the structured absorption of many trace gases
+in the UV, visible and near-infrared spectral ranges. The DOAS method
+was originally developed for ground-based measurements
+(\citet{platt1994,platt_2008}) and has been successfully adapted to
+nadir measurements from UV-Vis space-borne spectrometers
+(\citet{sciamachy}). It relies on the application of the Beer-Lambert
+law to the whole atmosphere in a limited range of wavelengths.
+
+The Beer-Lambert law states that the radiant intensity traversing a
+homogeneous medium decreases exponentially with the product of the
+extinction coefficient and the path length.  Applying this law to the
+atmosphere, we obtain
+\begin{equation}\label{eq:beer-lambert}
+  I(\lambda)= I_0(\lambda)\exp \left( -\sum_{j=1}^{n} S^j(\lambda) c_j\right),
+\end{equation}
+where
+\begin{itemize}
+\item[$I_0$] is the spectrum at the top of the atmosphere, without extinction;
+\item[$I$] is the measured spectrum after extinction in the atmosphere;
+\item[$S^j$] is the absorption cross section of the species $j$, with
+  wavelength dependent structures [cm2/molec.];
+\item[$c_j$] is the column density of the species $j$ [molec./cm2].
+\end{itemize}
+The logarithm of the ratio of the spectrum $I_0$ (also called the
+control spectrum) and the measured spectrum $I$ is denoted optical
+density (or optical thickness) $\tau$
+\begin{equation}\label{eq:optical_density}
+\tau  \equiv \ln\left( \frac{I_0(\lambda)}{I(\lambda)}\right)= \sum_{j=1}^n S^j(\lambda) c_j .
+\end{equation}
+% explain here: reference spectrum/differential (s)cd's/doas approximations
+
+The key idea of the DOAS method is to separate broad and narrow band
+spectral structures of the absorption spectra in order to isolate the
+narrow trace gas absorption features. In order to do this, some
+approximations are made:
+\begin{enumerate}
+\item In the case where the photon path is not defined (scattered light
+  measurements), the mean path followed by the photons through the
+ atmosphere up to the instrument is considered;
+\item The absorption cross sections are supposed to be independent of
+  temperature and pressure, which allows us to introduce the concept
+  of \glspl{scd};
+\item Broadband variations, such as loss and gain from scattering and
+  reflections by clouds and/or at the earth surface, are approximated
+  by a common low order polynomial.
+\end{enumerate}
+Molecular absorption cross sections are fitted to the logarithm of the
+ratio of the measured spectrum and the reference spectrum (i.e.\ an
+extraterrestrial irradiance spectrum for satellite measurements, or a
+spectrum measured around the local noon when the light path is minimum
+for ground-based measurements). The resulting fit coefficients are the
+integrated number of molecules per unit area along the atmospheric
+light path for each trace gas, the differential \gls{scd}. The slant column depends
+on the observation geometry, the position of the sun and also on
+parameters such as the presence of clouds, aerosol load and surface
+reflectance.
+
+\section{DOAS retrieval}\label{sec:doas-retrieval}
+\subsection{DOAS fitting}\label{sec:doas-fitting}
+In the DOAS analysis, high frequency spectral structures of the
+various absorbing species are used to resolve the corresponding
+contributions to the measured optical density. This is achieved using
+a least squares fitting procedure for the differential slant column
+densities of the various species.  Large band contributions to the
+atmospheric attenuation (Rayleigh and Mie scattering) are accounted
+for by including a low order polynomial $P(\lambda) = \sum b_k
+\lambda^k$ in the fit. Other effects, such as the Ring effect or
+instrument undersampling can be treated as pseudo-absorbers.
+
+According to eq.\ \eqref{eq:optical_density}, the DOAS retrieval is a
+linear problem. This linearity is unfortunately broken down by the
+need to account for additional effects, namely:
+\begin{enumerate}
+\item small wavelength shifts $\Delta(\lambda)$ between $I$ and $I_0$
+  spectra must be corrected using appropriate shift and stretch
+  parameters;
+\item possible instrumental and/or atmospheric stray light or residual
+  dark current signal require the introduction of an offset parameter.
+\end{enumerate}
+Including these necessary non-linear corrections and the polynomial
+component $P(\lambda)$, we obtain the modified equation
+\begin{equation}\label{eq:doas_non_linear}
+\ln\left(
+  \frac{I(\lambda-\Delta(\lambda))-\mathrm{offset}(\lambda)}{I_0(\lambda)}
+  \right)+\sum_{j=1}^nS^j(\lambda)c_j +P(\lambda) = 0\,.
+\end{equation}
+
+\subsection{Marquardt-Levenberg Algorithm}\label{sec:marq-levenb-algor}
+The \glspl{scd} $c_j$ can be retrieved by performing a least squares
+fit of the measurement data to equation (\ref{eq:doas_non_linear}).
+Due to the shift, stretch and offset parameters, this is a non-linear
+least squares problem, which can typically be solved using a \gls{ml}
+algorithm (see~\citet{Marquardt1963,Bevington1969}).  Starting from
+given initial values, this algorithm searches the parameter space
+using a combination of Gauss-Newton and gradient descent steps.  The
+\gls{ml} algorithm is an efficient minimization algorithm for a wide
+range of non-linear functions, but it may converge to a local minimum
+if the initial values are too far from the global minimum.  In QDOAS,
+this problem can occur during the wavelength calibration, when the
+initial calibration is not accurate enough (see
+\nameref{sec:calibration-problems} in section
+\ref{sec:analysis-problems} of the appendix).
+
+% explain offset modelling?
+In QDOAS, the M-L algorithm is used to find the set of parameters that
+minimizes the weighted\footnote{Weighting the residuals by the
+  instrumental errors $\sigma^i$ is optional in QDOAS.  When no
+  measurement uncertainties are used (or no error estimates are
+  available), all uncertainties in equation~\eqref{eq:sum_of_squares}
+  are set to $\sigma^i=1$, giving all measurement points equal weight
+  in the fit.  See analysis properties in section
+  \ref{sec:projects_analysis_page}} sum of squares
+%\begin{equation}\label{eq:sum_of_squares}
+%  S = \sum_{i=1}^M \left(\frac{Y^i - Y_{\mathrm{fit}}^i}{\sigma^i}\right)^2,
+%\end{equation}
+\begin{align}
+  F(\vec{\alpha}) = & \frac{1}{2} \sum_{i=1}^M\left(
+    \frac{f^i(\vec{\alpha})}{\sigma^i}
+    \right)^2 \nonumber \\
+    = &\frac{1}{2} \sum_{i=1}^M
+  \left(
+    \frac{\ln(I^i(\vec{a}))+\sum_{j=1}^{n}S^{ij} c_j + \sum_{k=0}^d
+      b_k (\lambda_i)^k -\ln(I^i_0)}{\sigma^i}
+  \right)^2,  \label{eq:sum_of_squares}
+\end{align}
+where
+\begin{description}
+\item[$\vec{\alpha}=(\vec{a},\vec{b},\vec{c})$] is the vector
+  containing all fitted parameters;
+\item[$\vec{a}$] is the set of parameters describing the shift,
+  stretch and offset of the measured spectrum;
+\item[$b_k,\, k=1,\ldots,d$] are the fitted polynomial coefficients;
+\item[$c_j,\, j=1,\ldots,n$] are the fitted \glspl{scd};
+\item[$\lambda_i,\, i=1,\ldots,M$] is the wavelength grid of the
+  reference spectrum $I_0$, calibrated with respect to a high
+  resolution solar spectrum (see section \ref{sec:wavel-calibr}).
+\item[$I^i(\vec{a})$] is the measured spectrum, including shift,
+  stretch and offset corrections, interpolated at wavelength
+  $\lambda_i$;
+\item[$S^{ij}$] is the absorption cross section of absorber species
+  $j$, as measured in a laboratory, interpolated at wavelength
+  $\lambda_i$;
+\item[$I^i_0$] is the reference spectrum at wavelength $\lambda_i$ and
+\item[$\sigma^i$] is the standard error on the measurement at
+  wavelength $\lambda_i$.
+\end{description}
+In each iteration, the fitting algorithm will choose new values for
+the parameters using the Marquardt-Levenberg algorithm, and recompute
+the sum of squares $F$.  The algorithm assumes that it has converged
+to a solution when the difference between two succeeding values of $F$
+is smaller than a fixed small number $\epsilon$.  The convergence
+criterion $\epsilon$ can be chosen by the user (see
+\nameref{sec:conv-crit} in section \ref{sec:projects-properties}).
+
+For a given value of the non-linear parameters $\vec{a}$, the
+determination of the parameters $c_j$ and the polynomial coefficients
+$b_k$ is a linear least squares problem.  Explicitly, we can rewrite
+equation~\eqref{eq:sum_of_squares} as
+\begin{equation}
+  \label{eq:doas_linear}
+  F = \frac{1}{2}\sum_{i=1}^M\left(
+    \frac{\ln(I^i(\vec{a})/I^i_0) +  (A \cdot \vec{x})^i}{\sigma^i}
+    \right)^2\,,
+\end{equation}
+where the matrix $A$ contains the polynomial basis $(\lambda_i)^k,
+k=0,\ldots,d$ and the absorption cross sections $S^{ij}, j=1,\ldots,n$
+and $\vec{x}$ represents the combined linear parameters $\vec{b}$ and
+$\vec{c}$:
+\begin{align}
+  \label{eq:doas_linear_matrix}
+  A^{il}  & = \left( (\lambda_i)^d \quad S^{ij} \right)\,,\\
+  \vec{x} & = \left( \begin{array}{c}
+      \vec{b}\\
+      \vec{c}
+    \end{array}\right)\,.
+\end{align}
+% describe linear equation here?
+This fact is exploited in QDOAS to limit the parameter space of the
+\gls{ml} algorithm to the non-linear parameters: once a new set of
+values $\vec{a}'$ for the non-linear parameters is chosen, the linear
+parameters $b_k$ and $c_j$ are updated using a linear least squares
+algorithm, minimizing the sum of squares \eqref{eq:sum_of_squares} for
+the given values of the non-linear parameters.
+
+In QDOAS, the linear least squares problem is solved using the QR
+decomposition of the matrix $A$ defined in equation
+\eqref{eq:doas_linear_matrix}.
+
+QDOAS can include further parameters in the fits
+(\ref{eq:sum_of_squares}), which we omitted from the previous
+description for the purpose of clarity.  Such parameters include the
+width of the instrument's slit function and wavelength shifts in the
+reference absorption cross sections $S^j(\lambda)$.  Mathematically,
+they play the same role as the shift, stretch and offset parameters
+$\vec{a}$.  Section \ref{sec:analysis_config_param} describes the
+available fitting options in QDOAS and their
+\index{configuration}configuration.
+
+\subsection{Intensity fitting}\label{sec:intensity-fitting}
+QDOAS also supports the so-called intensity fitting (or direct
+fitting) method where measured intensities are directly fitted instead
+of their logarithms. The equation used in the least squares fitting
+procedure is then
+\begin{equation}
+  \label{eq:intensity_fitting}
+  \frac{I(\lambda -\Delta(\lambda)) - \mathrm{offset}(\lambda)}{ I_0(\lambda)} - P \exp(-\sum_{j=1}^n S^jc_j) = 0\,,
+\end{equation}
+This method involves a decomposition of equation
+(\ref{eq:intensity_fitting}) in its linear and non-linear parts:
+column densities are fitted non-linearly, but the polynomial, which is
+taken out of the exponential function using a Taylor expansion, and
+offset are linear parameters.
+
+Intensity fitting is sometimes preferred to optical density fitting,
+for example when a poor signal leads to numerical problems when taking
+the logarithms of the intensity ratio.
+
+\subsection{Errors On Slant Column Densities}\label{sec:errors-slant-column}
+% TODO: remark that errors sigma are errors on log(I) in case of
+% optical density fitting, and errors on I in case of intensity
+% fitting?
+Uncertainties on the retrieved slant columns $c_j$ depend on:
+ \begin{itemize}
+ \item the sensitivity of the sum of squares $F$
+   (\ref{eq:sum_of_squares}) with respect to variations of the fitted
+   parameters around the minimum and
+ \item the noise on the measurements.
+ \end{itemize}
+
+ Formally, the covariance matrix of the fitted parameters of a least
+ squares estimate may be estimated by the inverse of the Hessian of
+ the sum of squares $F$, evaluated at the fitted values of the
+ parameters
+\begin{equation}
+  \label{eq:slnterr_general}
+  \Sigma_{\vec{\alpha}} = H^{-1}\,,
+\end{equation}
+where $H$ is given by
+\begin{equation}
+  \label{eq:hessian}
+  H_{kl} = \frac{\partial^2 F}{\partial \alpha_k \partial \alpha_l}\,.
+\end{equation}
+
+The actual approach used to calculate $H$ in QDOAS is different in
+optical density fitting mode and in intensity fitting mode.  In
+optical density fitting mode, the slant column density is fitted
+linearly according to equation~\eqref{eq:doas_linear} and we use the
+following expression for the covariance matrix $\Sigma_{\vec{x}}$ of
+the weighted linear least squares parameter estimate:
+\begin{equation}
+  \label{eq:slnterr_linear}
+  \Sigma_{\vec{x}} = \left(A^T W^2 A\right)^{-1}\,,
+\end{equation}
+where the matrix $A$ contains the linear components of the fit, as
+described in equation~\eqref{eq:doas_linear_matrix} and the $(M \times
+M)$ diagonal matrix $W$ contains the measurement errors
+\begin{equation}
+  \label{eq:weight_matrix}
+  W_{ij} = \frac{1}{\sigma^i}\quad \mathrm{if}\, i=j\,.
+\end{equation}
+Equation \eqref{eq:slnterr_linear} implies that uncertainties on
+estimated values of the non-linear parameters are not taken into
+account in the reported errors on the slant columns.
+
+When the individual measurement errors $\sigma^i$ are not available
+(or the user has chosen not to weight the fit by the instrumental
+errors), the weight matrix $W$ is just the identity matrix.  In this
+case, the mean squared error on the measurements $\sigma^2$ may be
+estimated by the reduced $\chi^2$, e.g.\ the sum of squares of the
+residuals divided by the number of degrees of freedom in the fit
+\begin{equation}
+  \label{eq:chi_square}
+  \chi^2 = \frac{\sum_{i=1}^M (f^i)^2 }{M-N}\,,
+\end{equation}
+where $M$ is the number of wavelengths included in the fit, and $N$ is
+the total number of fitted parameters.
+Equation~\eqref{eq:slnterr_linear} then becomes
+\begin{equation}
+  \label{eq:slnterr_linear_noweighting}
+  \Sigma_{\vec{x}} = \chi^2\left(A^T A\right)^{-1}\,.
+\end{equation}
+
+In intensity fitting mode, the slant column densities are determined
+using non-linear least squares fitting, and the Hessian is
+approximated by the square of the Jacobian of the fitting functions
+$f^i$
+\begin{equation}
+  \label{eq:hessian_approx}
+  H_{kl} \simeq \sum_{j=1}^M \frac{\partial f^j}{\partial \alpha_k}\frac{\partial f^j}{\partial \alpha_l}\frac{1}{(\sigma^j)^2}\,.
+\end{equation}
+This implies that, in intensity fitting mode, uncertainties on the
+linear parameters are not taken in to account in the reported slant
+column errors.  As in the linear case, when the instrumental errors
+are not used or not available, the $\sigma^j$ in equation
+\eqref{eq:hessian_approx} are replaced by 1, and the measurement error
+is approximated using the reduced $\chi^2$ of the fit instead.
+Equation~\eqref{eq:slnterr_general} then becomes
+\begin{equation}
+  \label{eq:slnterr_nonlinear_noweighting}
+  \Sigma_{\vec{\alpha}} = \chi^2 H^{-1}\,.
+\end{equation}
+% in practice, there are even some L-M modifications to this formula.
+
+\subsubsection{Limitations}
+The estimates for the uncertainties of the fitted parameters rely on
+the statistical model used for the DOAS retrieval.  The model assumes
+that the errors on the measurements at each frequency are independent
+and normally distributed.  When measurement errors are correlated
+or contain systematic components, or in case of fitting errors such
+as a wrong fit for shift and stretch parameters, or relevant
+absorbers that are not included in the fit, the uncertainties
+calculated by QDOAS will underestimate the true error on the slant
+column density.  Remaining residual structures after the fit, or a
+value of $\chi^2 \gg 1$ when measurement errors $\sigma^i$ are taken
+into account, are an indication of such a bad fit.  A discussion can
+be found in~\citet{stutz_1996}.
+
+We also note that the errors in QDOAS do not take into account the
+uncertainties on the cross sections. A way to achieve this is given
+in~\citet{Theys2007}.
+
+\section{Wavelength calibration}\label{sec:wavel-calibr}
+The quality of the retrieval fit strongly depends on a perfect
+alignment between the spectrum to analyze, the reference spectrum and
+the cross sections. The wavelength-pixels relation
+(see~\citet{platt_2008}) of the % or just give expression here?
+reference spectrum, previously determined in laboratory using a lamp
+spectrum % what's the laboratory lamp spectrum doing here?
+can be corrected using a procedure based on the alignment of the
+Fraunhofer structures of the reference spectrum $I_0$ with those of an
+accurately calibrated high-resolution solar reference atlas, degraded
+at the resolution of the instrument, i.e. convolved with the
+instrumental slit function. The reference atlas used for this purpose
+is usually the~\citet{Chance2010} spectrum.
+
+During the calibration process, the instrumental slit function can
+also be characterized by repeatedly convolving the highly resolved
+solar atlas with the slit function and adjusting the parameters until
+the best match with the reference spectrum is found.  QDOAS allows
+fitting the parameters of different line shapes, as well as their
+wavelength dependence.  This is useful when the slit function provided
+with the instrument is not described precisely enough in the
+wavelength interval used for the retrieval.  In the same way, to
+account for the moderate resolution of satellite or ground-based
+instruments (about a few tenths of a nanometer), the absorption cross
+sections of the trace gases have to be convolved with the instrumental
+slit function (and interpolated on the final $I_0$ wavelength grid). A
+good knowledge of the instrumental slit function and its potential
+wavelength variation is important to avoid systematic errors in the
+retrieved slant columns due to spectral shape mismatch between the
+reference and atmospheric spectra~\citep{vanroozendael2002}.
+
+\subsection{Fit of shift and stretch}\label{sec:fit-shift-stretch}
+Shift and stretch (see \nameref{sec:shift} on page
+\pageref{sec:shift}) can be taken into account in the wavelength
+calibration scheme. To this end, the spectral interval is divided into
+a number of sub-intervals.  By default, QDOAS will split the complete
+calibration interval into equally sized disjoint sub-intervals, but
+more advanced options are available, too (see
+\nameref{sec:calibration-windows} on page
+\pageref{sec:calibration-windows}).  The fitting algorithm used for
+the DOAS retrieval is then applied in each sub-interval to fit the
+measured intensities to those of the high-resolution solar spectrum,
+according to the equation
+\begin{equation}
+  \label{eq:calibration_shift}
+  I_0(\lambda)= I_S(\lambda - \Delta_i - a_i(\lambda-\lambda_{\mathrm{c},i}))\exp(-\sum_{j=1}^mS^jc_j)\,,
+\end{equation}
+where $I_S$ is the solar spectrum convolved at the resolution of the
+instrument, $\Delta_i$ is a fitted constant shift in sub-interval $i$,
+$\lambda_{\mathrm{c},i}$ the central wavelength of sub-interval $i$,
+$a_i$ the interval's fitted stretch factor, and the $c_j$ are optional
+absorber coefficients accounting for possible light absorption in the
+reference spectrum $I_0$.  Typically, the calibration uses more then
+one sub-interval, and we fit a polynomial through the pairs
+$(\lambda_{\mathrm{c},i}, \Delta_i)$ in order to reconstruct an
+accurate wavelength calibration $\Delta(\lambda)$ for the complete
+analysis interval.  When the calibration is set to use only a single
+interval, the shift and stretch values from this interval are used to
+calculate the optimized wavelength grid for the analysis.
+
+Several tests may be needed to determine the best configuration. One
+has to find the right compromise between using enough sub-intervals to
+represent the wavelength variation of the shift, and having enough
+spectral information in each sub-window.  The interval calibration
+should cover all analysis spectral windows.
+
+The algorithm can take into account molecular absorption and offset
+correction.  In order to help the algorithm to converge to the correct
+solution, it is important to start with a preliminary wavelength grid
+close enough to the real one and to limit the number of fitting
+parameters (for example by fixing the value of some parameters,
+typically the concentration of the fitted molecules after a first
+estimation).  Another option to help the algorithm converge is to
+determine the initial shift by testing for correlation:
+
+\subsection{Calculation of the preshift}
+When the wavelength shift between the high-resolution solar atlas and
+the initial calibration of the reference spectrum is too large, the
+fitting algorithm used in the calibration procedure may not converge
+to the proper value.  If you find that this is the case, you can
+choose to perform an extra ``preshift'' calculation.  With this
+option, QDOAS performs the following extra steps before running the
+wavelength calibration algorithm:
+
+\begin{enumerate}
+\item The high-resolution solar spectrum is degraded to instrument
+  resolution using the chosen slit function settings.  If slit
+  function parameters are also fit during the calibration, their
+  initial values are used for this step.
+\item The convolved solar spectrum and the reference spectrum are
+  smoothed and normalized, with an averaging bandwidth of about 5nm.
+\item Using the Nelder-Mead optimization algorithm, QDOAS determines
+  the shift value resulting in the highest correlation between the
+  reference and high-resolution solar spectrum.
+\end{enumerate}
+
+After this preshift step, QDOAS performs the regular wavelength
+calibration on the original spectra, using the preshift value as the
+initial value for the calibration shift in each sub-interval.
+
+\subsection{Ref2/Ref1 Alignment}\label{sec:ref2ref1-alignment}
+If two reference spectra are given (see section
+\ref{sec:projects-properties} and figure
+\ref{projects_properties_calibration}), the wavelength calibration
+described in the previous section is applied to the first one.  The
+shift between both reference spectra is then determined using a least
+squares fit.  This shift is then applied to the reference absorption
+cross sections in order to align them on the second reference
+spectrum.  The measured spectra are then analyzed with respect to the
+second reference spectrum.
+
+% in detail:
+% pixels are chosen based on pixel/wavelength relationship from corrected reference 1 grid,
+% same pixels are selected from reference 2
+% shift between ref1/ref2 is fitted
+% this shift is applied to the cross sections
+%
+% motivation for all this?
+% possibility to take solar spectrum by instrument & earthshine
+% spectrum, and calibrate in two steps?
+% why don't we correct the wavelength grid of reference 2?
+
+\subsection{Characterization Of The Line
+  Shape}\label{sec:char-line-shape}
+If the slit function varies strongly in the fitting window and is
+symmetric enough to be approached by an analytical function like a
+Gaussian, it can be fitted together with the shift during the
+calibration procedure.  A high resolution solar spectrum is needed.
+The wavelength variation of the line shape can be accounted for in
+order to convolve high-resolution cross sections before the
+analysis. % should describe this more clearly... we mean varying width
+          % across spectral interval?
+The equation \eqref{eq:calibration_shift} used in the calibration is
+then modified as follows:
+\begin{equation}
+  \label{eq:calibration_shift_lineshape}
+  I_0(\lambda) = (L_{a_i}\ast I_S)(\lambda-\Delta_i)
+  \exp\left(-\sum_{j=1}^m c_j S^j\right)\,,
+\end{equation}
+where $L_{a_i}(\lambda)$ is the line shape with \gls{fwhm}
+parametrized by $a_i$.  QDOAS can fit the parameters for a number of
+different analytical line shapes, which we describe in more detail in
+the \nameref{sec:analyt-line-shap} section on page
+\pageref{sec:analyt-line-shap}.
+
+\section{Fit parameters}\label{sec:fit-parameters}
+\subsection{Absorption cross sections}\label{sec:absorpt-cross-sect}
+In principle, DOAS measurements are applicable to all gases with
+suitable narrow absorption bands in the UV, visible or near IR
+regions. However, the generally low concentrations of these compounds
+in the atmosphere and the limited signal-to-noise ratio of the
+spectrometers restrict the number of trace gases that can be detected.
+Figure \ref{fig:doas_cross_sections} shows the absorption cross
+sections of a number of trace gases that are regularly measured using
+the DOAS technique.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.9\textwidth]{Algo_Cross.jpg}
+  \caption{Absorption cross sections of various absorbers retrieved with
+the DOAS method (figure taken from~\citet{platt_2008}).}
+\label{fig:doas_cross_sections}
+\end{figure}
+
+Many spectral regions contain a large number of interfering
+absorbers. In principle, because of their unique spectral structure, a
+separation of the absorption is possible.  However, correlations
+between absorber cross sections sometimes lead to systematic biases in
+the retrieved slant columns.  In general, the correlation between
+cross sections decreases if the wavelength interval is extended, but
+doing so is at odds with the assumption that a single effective light
+path for the entire wavelength interval is defined, leading to
+systematic misfit effects that may also introduce biases in the
+retrieved slant columns.  To optimize DOAS retrieval settings, a
+trade-off has to be found between these effects.  A basic limitation
+of the classical DOAS technique is the assumption that the atmosphere
+is optically thin in the wavelength region of interest.  At shorter
+wavelengths, the usable spectral range of DOAS is limited by rapidly
+increasing Rayleigh scattering and \ozone{} absorption.  In addition,
+‘line-absorbers’ such as \water, \oxygen, CO, \CO2 and \CH4 usually
+cannot be retrieved precisely by standard DOAS algorithms because
+their strong absorption also depends on pressure and temperature.
+
+The selection of the spectral analysis window determines which
+absorbers have to be included in the fitting procedure. The pressure
+dependence of absorption cross sections can be neglected in UV-Visible
+region. However, the temperature dependence of cross sections can be
+significant (for example that of \ozone{} and \NO2). This can be
+corrected in a first approximation by introducing correction factors
+during the \gls{amf} calculation~\citep{Boersma2004} or,
+assuming a linear dependence on temperature, by fitting two absorption
+cross sections at different temperatures as described
+in~\citet{vanroozendael2002}.
+
+\subsubsection{Shift}\label{sec:shift}
+Before analysis, absorption cross sections are interpolated on the
+final grid of the reference spectrum which may be determined by the
+program itself (automatic reference selection mode). Moreover, shift
+and stretch parameters can be fitted during the processing of a
+spectrum in order to obtain the best match of the absorption
+structures.
+
+\subsubsection{Interpolation/Convolution}
+Cross sections can be pre-convolved and interpolated\footnote{By
+  default, QDOAS uses cubic spline interpolation.} on an appropriate
+wavelength grid prior to the analysis. However, the direct use of
+high-resolution cross sections which can be convolved in real-time
+with a predefined slit function or with the slit function determined
+by the wavelength calibration procedure, is more convenient.
+
+\subsubsection{Differential cross sections}
+The aim of calculating differential absorption cross sections is to
+separate narrow spectral features from unstructured absorption not
+useful in the DOAS method.  Figure
+\ref{fig:differential_cross_section} gives an illustration.
+
+\begin{figure}
+  \centering
+  \begin{tabular}{cc}
+    \includegraphics[width=0.45\textwidth]{Algo_Cross_1.jpg}
+    & \includegraphics[width=0.45\textwidth]{Algo_Cross_2.jpg}
+  \end{tabular}
+  \caption{Cross section $\mathrm{O}_3$ and optical thickness $\tau$ are separated into a narrow ($\mathrm{O}_3'$ and $\tau'$)
+and a broad band part ($\mathrm{O}_{3p}$ and $\tau_p$) by
+an adequate filtering procedure.}
+\label{fig:differential_cross_section}
+\end{figure}
+
+Differential cross sections can be calculated by orthonormalization
+with respect to an orthogonal set formed with the low order component
+vectors (usually a base of order 2 or 3) of the polynomial.  The
+vectors are orthogonalized using the Gram-Schmidt
+algorithm.  This method gives also the possibility to separate the
+spectral structures of temperature dependent cross sections by
+mutually orthogonalizing them.  Differential cross sections can
+alternatively be obtained by high-pass filtering: a filter is applied
+iteratively on the cross section and the resulting cross section is
+subtracted from the original one. High-pass filtering is presently
+only supported in optical density fitting mode (DOAS mode).  Note that
+it is not necessary to calculate differential cross sections when the
+baseline is around 0 such as for \water, \tetraox{} or \H2CO.
+
+\subsubsection{Low-pass filtering}
+Low-pass filters can be applied to both spectra and absorption cross
+sections. A large choice of filters is proposed (see `Filtering
+Page', section \ref{sec:projects_filtering_page}).
+
+\subsubsection{Wavelength-dependent AMF}
+Absorption cross sections can be replaced by geometrically corrected
+cross sections that take into account the wavelength dependency of the
+\gls{amf}. The correction is based on the equation
+\begin{equation}
+  \label{eq:wavelength_dep_amf}
+  \ln(I_0)-\ln(I) = S(\lambda) \mathrm{AMF}(\lambda,\mathrm{SZA})\,,
+\end{equation}
+where $\mathrm{AMF}(\lambda,\mathrm{SZA})$ is the AMF calculated for a
+given wavelength $\lambda$ and a given \gls{sza}.
+% fitted density is then already the vertical column density?
+
+\subsection{Polynomial}\label{sec:polynomial}
+In the DOAS technique, absorption cross sections of the considered
+mole\-cules are highly structured, while scattering by molecules and
+particles (Rayleigh and Mie scattering), as well as reflection at the
+surface, have broadband dependencies that can be approximated by a low
+order polynomial. In QDOAS, polynomials up to degree 5 can be
+fitted. The low order components of the polynomial can be used to
+calculate differential cross sections when this is preferred to
+high-pass filtering.
+
+\subsection{Shift and Stretch}\label{sec:shift-stretch}
+Shift and stretch parameters allow to correct possible misalignment
+between the various wavelength-dependent quantities involved in the
+data evaluation (i.e.\ measured and reference spectra as well as
+absorption cross sections).  Shift and stretch parameters may be
+fitted or simply applied to any wavelength-dependent quantity,
+according to the equation
+\begin{equation}
+  \label{eq:shift_stretch}
+  \Delta\lambda = a + b(\lambda-\lambda_0) + c(\lambda-\lambda_0)^2\, ,
+\end{equation}
+where $\lambda$ is the wavelength according to the original
+calibration and $\lambda_0$ is the center wavelength of the current
+spectral range.  The parameters $a$,$b$ and $c$ describe the offset
+and the first and second order stretch applied to $\lambda$.
+
+\subsection{Offset Correction}\label{sec:offset-correction}
+An ideal spectrometer in an ideal atmosphere would measure the part of
+the sunlight that has been elastically scattered by air molecules and
+particles.  In a real experiment, however, a number of possible
+additional sources may contribute to the measured intensity, adding an
+“offset” to the ideal Rayleigh/Mie contribution.  In addition to the
+Ring effect, which is, to a first approximation, a natural source of
+offset, one must also account for instrumental sources of offset, such
+as stray light in the spectrometer and dark current of the detector.
+The offset component in equation~\eqref{eq:doas_non_linear} accounts
+for these effects.  QDOAS models the offset using a polynomial
+\begin{equation}
+  \label{eq:offset}
+  \mathrm{offset}(\lambda) = (a + b(\lambda-\lambda_0) + c(\lambda-\lambda_0)^2) \bar{I}\, ,
+\end{equation}
+where $\lambda_0$ is the center wavelength of the spectral analysis
+window, $\bar{I}$ is the average intensity and $a$, $b$ and $c$ are
+fitted parameters.
+
+Due to the normalization by $\bar{I}$, the offset values can be easily
+interpreted relatively to the absolute intensity of the spectrum
+(percent offset).  In DOAS, the offset is usually fitted as a
+non-linear parameter.  Sometimes, this could lead to numerical errors
+in the evaluation of the logarithm, typically in the near UV region
+where the level of the signal is very low.  In this case, we can fit
+the offset as a linear parameter.  Expanding the left-hand side of
+equation~\eqref{eq:doas_non_linear} to first order, we obtain
+\begin{equation}
+  \label{eq:offset_linear}
+  \ln(I(\lambda -\Delta(\lambda))) = \ln(I_0(\lambda))-\tau(\lambda) + \frac{\mathrm{offset}(\lambda)}{I(\lambda+\Delta\lambda)}\,.
+\end{equation}
+ % why not also normalize with respect to average intensity in this case?
+
+\subsection{Ring Effect}\label{sec:ring-effect}
+Because of \gls{rrs}, a small fraction of the
+incident photons undergo a wavelength change of a few nanometres,
+i.e.\ a part of the scattering is inelastic. This causes an intensity
+loss at their incident wavelength and a gain at the neighbouring
+wavelengths to which they are redistributed.  RRS causes the so-called
+“filling-in” of Fraunhofer lines, which have a slightly different
+shape in the earthshine radiance than in the direct solar light.  This
+effect was first discovered by~\citet{grainger_1962} and is referred
+to as the Ring effect.  The atmospheric absorption lines are also
+broadened by RRS events occurring after absorption (molecular Ring
+effect).  Although RRS accounts for only a few percent of the measured
+intensity, it significantly affects DOAS measurements of scattered
+radiation since typical trace gas absorptions are of the order of a
+percent or less.  If not properly corrected, the Ring effect produces
+strongly structured residuals in the differential optical density, due
+to the fact that Fraunhofer lines do not cancel perfectly between $I$
+and $I_0$. Especially in the UV spectral range, the remaining spectral
+structures can by far exceed the structures of weak atmospheric
+absorbers.
+
+Usually the Ring effect is taken into account by including an
+additional ‘absorber’ in the DOAS fit. Ring cross sections
+$S_{\mathrm{Ring}}(\lambda)$ can be
+measured~\citep{Solomon_Schmeltekopf_Sanders_1987} or
+calculated~\citep{Chance1997}. The Ring effect can be approximated
+using the following development for an optically thin
+atmosphere~\citep{Wagner1999,vanroozendael2002}:
+
+One can consider that in any scattered light observation, the light
+detected by the satellite instrument ($I_\mathrm{meas}$) is the sum of
+elastic and inelastic scattering processes:
+\begin{equation}
+  \label{eq:rrs_i_meas}
+  I_\mathrm{meas} = I_{\mathrm{elastic}} + I_{\mathrm{RRS}} = I_0 e^{-\tau} + I_{\mathrm{RRS}}\,.
+\end{equation}
+To analyze a measured spectrum, the logarithm of $I_{\mathrm{meas}}$
+is taken. Since $I_{\mathrm{RRS}}$ is very small compared to
+$I_{\mathrm{elastic}}$, the logarithm can be approximated by the first
+two terms of the Taylor expansion:
+\begin{equation}
+  \label{eq:rrs_expand_i_meas}
+  \ln(I_\mathrm{meas}) = \ln(I_{\mathrm{elastic}}) + \frac{I_{\mathrm{RRS}}}{I_{\mathrm{elastic}}}
+  = \ln I_0 - \tau + \frac{I_{\mathrm{RRS}}}{I_{\mathrm{elastic}}} \,.
+\end{equation}
+The last term $I_{\mathrm{RRS}}/I_{\mathrm{elastic}}$ is the Ring term
+which can be approximated by the product of a Ring coefficient
+$\alpha_{\mathrm{Ring}}$ and a Ring cross section
+$S_{\mathrm{Ring}}$. $\alpha_{\mathrm{Ring}}$ can be fitted together
+with other absorbers in the DOAS procedure.
+
+A good approximation of the Ring cross section can be obtained from
+calculation of a source term $I_0^{\mathrm{Raman}}$ for Raman
+scattering derived by simple convolution of the solar spectrum with
+Raman cross sections, i.e with calculated \N2 and \oxygen{} RRS cross
+sections. The term $I_{\mathrm{RRS}}/I_{\mathrm{elastic}}$ in
+equation~\eqref{eq:rrs_expand_i_meas} is then substituted by
+$\alpha_{\mathrm{Ring}} S_{\mathrm{Ring}}$ (where $S_{\mathrm{Ring}}
+=I_0^{\mathrm{Raman}}/I_0$), assuming that the molecular Ring effect
+can be neglected~\citep{Chance1997}. The QDOAS Ring tool calculates a
+Ring cross section according to this
+approach~\citep{Wagner1999}. The normalization of the Raman spectrum is optional.
+
+\subsection{Undersampling Correction}\label{sec:unders-corr}
+The undersampling is a well-known problem of
+GOME~\citep{Chance1998}. It arises from the poor sampling ratio of the
+GOME instrument, which results in a loss of spectral information when
+interpolating earthshine spectra during the DOAS fitting
+process. Undersampling is only a major problem when the sampling ratio
+is close to 1.  In the case of GOME, this ratio is estimated at
+0.16/0.112=1.43 at 340 nm.
+
+The undersampling artifacts can be corrected using an ad-hoc cross
+section obtained by simulating the effect based on a high-resolution
+solar reference~\citep{Chance1998}.  This cross section is fitted as a
+linear parameter, in both intensity fitting and in optical density
+fitting modes.  The procedure to calculate the correction differs
+slightly between the two fitting modes:
+
+In intensity fitting mode, oversampled
+and undersampled spectra are calculated as follows:
+\begin{equation}
+  \label{eq:undersampling}
+  U(\lambda+\Delta) = \mathrm{over}(\lambda+\Delta) - \mathrm{under}^{(\Delta)}(\lambda)\,,
+\end{equation}
+where $\mathrm{over}(\lambda + \Delta)$ is a high-resolution solar
+spectrum convolved on its original grid and interpolated on the final
+grid $\lambda + \Delta$ and $\mathrm{under}^{(\Delta)}(\lambda)$ is a
+high-resolution solar spectrum convolved on grid $\lambda$ and
+subsequently interpolated on the final grid $\lambda + \Delta$.
+% does it make a difference if we convolve on one grid or another?
+
+Residuals are improved by adding a “second phase” of undersampling
+\begin{equation}
+  \label{eq:undersampling2}
+  U_2(\lambda) = \mathrm{over}(\lambda) - \mathrm{under}^{(\Delta)}(\lambda)\,.
+\end{equation}
+In optical density fitting, we fit the logarithm of the ratio of the
+measured intensities.  We therefore use the corresponding equations
+\begin{align}
+  \label{eq:undersampling_doas}
+  U(\lambda+\Delta) & = \ln\left(\frac{\mathrm{over}(\lambda+\Delta)}{\mathrm{under}^{(\Delta)}(\lambda)}\right), \\
+  U_2(\lambda) & = \ln\left(\frac{\mathrm{over}(\lambda)}{\mathrm{under}^{(\Delta)}(\lambda)}\right).
+\end{align}
+Undersampling cross sections can be pre-calculated using the QDOAS
+undersampling tool or they can be calculated in real time, just after
+the wavelength calibration procedure using the corrected wavelength
+grid and the characterized slit function.
+
+\subsection{AMF}\label{sec:amf}
+To obtain the \gls{vcd} from the fitted \gls{scd}, we have to divide
+the SCD by the \gls{amf}
+\begin{equation}
+  \label{eq:air_mass_factor}
+  \mathrm{VCD} = \frac{\mathrm{SCD}}{\mathrm{AMF}}\,.
+\end{equation}
+AMF's are not calculated by QDOAS but may be imported from ASCII files
+(for details, refer to appendix \ref{cha:input-files-format}). QDOAS
+supports solar zenith angle-dependent AMF, wavelength-dependent AMF
+and climatological AMF.
+
+\subsection{Graphical Display Of Spectral Fit Results}\label{sec:graph-displ-spectr}
+According to the selected fitting method, different formulas are used
+to display the measured data and the calculated fit results.  Tables
+\ref{tab:display_results_od} and \ref{tab:display_results_intensity}
+explain which quantities are displayed on the fit results page for
+optical density fitting mode and intensity fitting mode.  The
+following quantities are used:
+ \begin{align}
+   R_{\mathrm{od}} & = \ln\left(\frac{I_0 \cdot e^{-\sum S^j c_j - P}}{I-\mathrm{offset}}\right)\,,\label{eq:residual}\\
+   R_{\mathrm{norm}} & = \frac{P\cdot I_0\cdot e^{-\sum S^j c_j}}{I-\mathrm{offset}} -1 \,,\\
+   R_{\mathrm{i}} & = \ln\left(\frac{P\cdot I_0\cdot e^{-\sum S^j c_j}}{I-\mathrm{offset}}\right)\,,\\
+   P_{\mathrm{meas}} &= \frac{I-\mathrm{offset}}{I_0\cdot e^{-\sum S^j c_j}}\,,\\
+   O & = \ln(1-\mathrm{offset}/I)\,,\label{eq:display_offset}
+ \end{align}
+ where $I$ is the measured spectrum, $I_0$ is the reference spectrum,
+ $P$ the fitted polynomial, $S^j$ the absorption cross section for
+ absorber species $j$ and $c_j$ the corresponding fitted
+ concentration.
+
+ \begin{table}
+   \centering
+   \begin{tabular}{lll} \toprule
+     & Calculated & Measured\\
+     \midrule
+     Residual & & $R_\mathrm{od}$  \\
+     Cross sections & $S^j\cdot c_j$ & $ S^j\cdot c_j + R_\mathrm{od}$ \\
+     Polynomial & $P$ & $P + R_\mathrm{od}$\\
+     Offset & $O$ & $O + R_\mathrm{od}$ \\
+     \bottomrule
+   \end{tabular}
+   \caption{Formulas used by QDOAS to display the results of a fit in optical density fitting mode.  $S^j$ is the reference cross section for species $j$ and $c_j$ the corresponding SCD.  $P(\lambda)$ is the polynomial obtained from the fit.  See equations \eqref{eq:residual}-\eqref{eq:display_offset} for the definitions of the quantities $R_\mathrm{od}$ and~$O$.}
+   \label{tab:display_results_od}
+ \end{table}
+
+
+ \begin{table}
+   \centering
+   \begin{tabular}{lll} \toprule
+     & Calculated & Measured\\
+     \midrule
+     Normalized Residual & & $R_\mathrm{norm}$  \\
+     OD Residual & & $R_\mathrm{i}$\\
+     Cross sections & $S^j\cdot c_j$ & $ S^j\cdot c_j + R_\mathrm{i}$ \\
+     Polynomial & $P$ & $P_\mathrm{meas}$\\
+     Offset & $O$ & $O + R_\mathrm{i}$ \\
+    \bottomrule
+   \end{tabular}
+   \caption{Formulas used by QDOAS to display the results of a fit in intensity fitting mode.  $S^j$ is the reference cross section for species $j$ and $c_j$ the corresponding SCD.  $P(\lambda)$ is the polynomial obtained from the fit.  See equations \eqref{eq:residual}-\eqref{eq:display_offset} for the definitions of the quantities $R_\mathrm{norm}, R_\mathrm{i}$ and~$O$.}
+   \label{tab:display_results_intensity}
+ \end{table}
+
+
+\section{Block-diagram structure of the program}
+\label{sec:block-diagr-struct}
+The following figures give an overview of the structure of the
+program. Figure \ref{fig:overal_structure} describes the general
+organization of the processor.  Figures
+\ref{fig:wavelength_calibration} and \ref{fig:slant_column_fitting}
+show the structure of the wavelength calibration and slant column
+fitting modules, while the coupled non-linear least squares fitting
+algorithm is sketched in Figure \ref{fig:least_squares}.
+
+\begin{figure}
+  \centerline{\input{img/overall_structure.pdf_t}}
+  \caption{Overall structure of the spectral analysis program.}
+  \label{fig:overal_structure}
+\end{figure}
+
+\begin{figure}
+  \centerline{\input{img/wavelength_calibration.pdf_t}}
+  \caption{Structure of the wavelength calibration module.}
+  \label{fig:wavelength_calibration}
+\end{figure}
+
+\begin{figure}
+  \centerline{\input{img/slant_column_fitting.pdf_t}}
+  \caption{Structure of the slant column fitting module.  Cross
+    section processing only takes place during the pre-processing
+    phase, unless cross sections must be dynamically modified during
+    the fit (e.g.\ when fitting a cross section shift).  }
+  \label{fig:slant_column_fitting}
+\end{figure}
+
+\begin{figure}
+  \centerline{\input{img/least_squares.pdf_t}}
+  \caption{Structure of the non-linear least squares fitting algorithm
+    used in the slant column fitting module and in the wavelength
+    calibration module.}
+  \label{fig:least_squares}
+\end{figure}
+\FloatBarrier
+
+\section{Convolution}\label{sec:convolution}
+\subsection{Definition}\label{sec:conv_definition}
+The convolution of a spectrum $I$ by an instrumental slit function $F$
+is given by the integral
+\begin{equation}
+  \label{eq:convolution}
+  (F \ast I)(\lambda) = \int I(\lambda') F(\lambda-\lambda') \mathrm{d}\lambda'\,.
+\end{equation}
+In QDOAS, this integral is calculated using the trapezoidal rule. The
+integration interval is defined by the width of the slit function.
+
+The three tools (Convolution, Ring and Usamp) provided in the QDOAS
+package, support convolution with one of the following functions:
+\begin{itemize} \itemsep -6pt
+\item the Gaussian line shape,
+\item the $2n$-Lorentzian line shape,
+\item the Voigt profile,
+\item the error function,
+\item an asymmetrical Gaussian line shape,
+\item the super-Gaussian line shape (\citep{Beirle2017}),
+\item a boxcar (using Fourier Transform) % describe these also in the section on slit functions/line shapes?
+\item Norton-Beer strong (using Fourier Transform)
+\item arbitrary line shapes provided in ASCII files.
+\end{itemize}
+
+\subsection{Analytical line shapes}\label{sec:analyt-line-shap}
+QDOAS can calculate the Gaussian, Lorentzian, Voigt, asymmetrical Gaussian, super-Gaussian and
+error function line shapes for different values of their parameters.
+When one of these analytical line shapes is used, QDOAS can fit its
+parameters during the wavelength calibration procedure (see section
+\ref{sec:char-line-shape}, page \pageref{sec:char-line-shape}).
+
+In order to make the convolution algorithm faster, analytical slit
+functions are pre-calculated on a suitable wavelength grid (determined
+in order to have 18 pixels at
+\gls{fwhm}) % what does this mean?  does it mean that a wavelength interval of FWHM contains 18 pixels?
+and then interpolated on the grid of the spectrum.  For Gaussian and
+error function line shapes, a \gls{fft} algorithm is used whenever possible
+to speed up the calculation (e.g.\ within the wavelength calibration
+procedure).
+
+\begin{figure}
+\centering
+\subfigure[]{
+  \includegraphics[]{gauss}
+  \label{fig:gaussian}}
+\subfigure[]{
+  \includegraphics[]{asym02}
+  \label{fig:asym02}
+}
+\subfigure[]{
+  \includegraphics[]{asym04}
+  \label{fig:asym04}
+}
+\subfigure[]{
+  \includegraphics[]{voigt}
+  \label{fig:voigt}
+}
+\subfigure[]{
+  \includegraphics[]{lorentz1}
+  \label{fig:lorentzian}
+}
+\subfigure[]{
+  \includegraphics[]{lorentz2}
+  \label{fig:lorentzian_flat}
+}
+\caption{QDOAS can use different line shapes to describe the
+  instrumental slit function.  The plots above illustrate the
+  Gaussian~(a), asymmetrical~(b, c), Voigt~(d) and Lorentzian~(e,~f)
+  profile shapes.  The asymmetry factor in (b) is 0.2, that of line
+  shape (c) is 0.4.  The Lorentzian (e) is the standard Lorentzian
+  ($n=1$) and the Lorentzian in (f) has $n=2$.}\label{fig:lineshapes}
+\end{figure}
+
+\textbf{As a convention, QDOAS always requests the full width at half
+  maximum (FWHM) of the line shape in the user interface.  This
+  parameter is represented by $\sigma$ in the formulas below.}
+
+\subsubsection{Gaussian}
+The standard expression used to approximate instrumental slit
+functions is the Gaussian function (see figure
+\ref{fig:gaussian}). The Gaussian is the exact line shape in the
+diffraction limit, i.e. in the case of an infinitely thin entrance
+slit. The normalized Gaussian is given by
+\begin{equation}
+  \label{eq:gaussian}
+  G_\sigma(x) =  \frac{1}{a\sqrt{\pi}}\exp\left(-\frac{x^2}{a^2}\right)\,,
+\end{equation}
+where $a$ depends on the Gaussian full width at half-maximum $\sigma$ as follows:
+\begin{equation}
+  \label{eq:gaussian_fwhm}
+  \sigma = 2\sqrt{\ln 2}a\,.
+\end{equation}
+
+\subsubsection{Error function}
+For a large entrance slit, the slit function can be approximated by
+the convolution of a boxcar and a Gaussian function.  The resulting
+slit function is given by
+\begin{equation}
+  \label{eq:error_function_slit}
+  E_a(x) = \frac{1}{4\Delta}\left(
+    \mathrm{erf}\left(\frac{x+\Delta}{a}\right) - \mathrm{erf}\left(\frac{x-\Delta}{a}\right) \right)\, ,
+\end{equation}
+where $a$ depends on the Gaussian full width at half-maximum $\sigma$ (see \ref{eq:gaussian_fwhm}),
+$\Delta$ is half the boxcar width $b$ and $\mathrm{erf}(x)$ is the
+error function, defined by
+\begin{equation}
+  \label{eq:error_function}
+  \mathrm{erf}(x) = \frac{2}{\sqrt{\pi}}\int_0^x \exp(-t^2)\mathrm{d}t\,.
+\end{equation}
+
+Full width at half maximum of the Gaussian $\sigma$ (see
+\ref{eq:gaussian_fwhm}) and boxcar width $b$ (2*$\Delta$) are the two
+parameters requested by QDOAS for the error function.
+
+\subsubsection{2$n$-Lorentzian}
+This line shape is a generalization of the well-known Lorentzian
+function ($n=1$, see figure \ref{fig:lorentzian}).  It is useful to
+approximate slit functions with a shape significantly different from
+the Gaussian one. Low order 2$n$-Lorentz can mimic line shapes with
+large wings (typically the standard Lorentzian profile), or line
+shapes having a flat top (for higher values of $n$, see figure
+\ref{fig:lorentzian_flat}). The generic expression for this function
+is
+\begin{equation}
+  \label{eq:2nlorentz}
+  L_{2n}(x) = \frac{\tau^{2n}}{x^{2n}+\tau^{2n}}\,,
+\end{equation}
+with $\tau=\sigma/2$ ($\sigma$ is the full width at half maximum).
+
+Parameters requested by QDOAS are the full width at half maximum
+$\sigma$ and the parameter $n$, called ``Order''.
+
+\subsubsection{Voigt profile}
+The Voigt profile function (see figure \ref{fig:voigt}) is the
+convolution of a Gaussian and a Lorentzian function. This function is
+used in a wide range of contexts, and the optimization of its
+computation has received much attention. The Voigt profile is usually
+expressed as
+\begin{equation}
+  \label{eq:voigt_profile}
+  K_(x,y) = \frac{y}{\pi} \int_{-\infty}^{\infty} \frac{\exp(-t^2)}{(x-t)^2+y^2}\mathrm{d}t\,,
+\end{equation}
+where $x$ is the distance from the line center in units of Gaussian
+half-widths and $y$ is the ratio of the Lorentzian width to the
+Gaussion width. Numerous ways have been proposed to compute the Voigt
+function. A rather efficient algorithm is described
+by~\citet{Kuntz_1997}. % is this the algorithm used in QDOAS?
+
+\subsubsection{Asymmetrical Gaussian}
+To handle asymmetrical line shapes, QDOAS can fit an asymmetry factor
+in addition to the \gls{fwhm}.  The line shape used is a modified version of
+the Gaussian line shape (\ref{eq:gaussian})
+\begin{equation}
+  \label{eq:asymmetrical_line}
+  G'(x) = \frac{1}{a\sqrt{\pi}}\exp\left(
+    -\frac{x^2}{a^2(1+\mathrm{sign}(x)b)^2}\right)\,,
+\end{equation}
+where, in addition to the FWHM $\sigma$, the asymmetry factor $b$ is
+now fitted as well.  For a value of $b=0$, it reduces to the ordinary
+Gaussian line shape.  Figure \ref{fig:asym02} illustrates the line
+shape with an asymmetry factor of $b=0.2$ and \ref{fig:asym04} gives
+an illustration for $b=0.4$.
+
+\subsubsection{Super Gaussian}
+This line shape is a generalization of the Gaussian with the introduction of two independent parameters, w and k, determining
+the width and shape of the slit function.  This line shape has been the subject of studies by Steffen Beirle from the Max-Planck Institute in Germany and summarized in a recent paper (\citep{Beirle2017}).
+The current implementation in QDOAS is operational but not optimized in terms of performance.
+
+\subsection{User-defined line shape}\label{sec:userdef-line-shap}
+
+An alternative to fit asymmetrical slit functions is to provide a line shape in an ASCII file and to apply on the grid of the line shape a stretch factor that can be different for each side of the line shape.
+The ``Stretch on wavelength'' file in the \textbf{Convolution tool} is a ASCII file with three columns : the wavelength calibration and the two values of the stretch to apply on the grid of the line shape for each wavelength of the detector.
+
+Lookup tables of slit functions are also accepted.  This means that a
+line shape is provided for different wavelengths.  For a specific
+wavelength, a line shape is first calculated by linear
+2D-interpolation in the lookup table and the fitted stretch factors
+are then applied to the line shape wavelength grid before convolution.
+
+\subsection{Wavelength dependency}
+QDOAS supports convolution with wavelength-dependent slit functions:
+\begin{itemize}
+\item Slit function files provided by the user may contain multiple
+  columns describing the shape of the slit function at various
+  wavelengths.  The first line of the file should list the wavelengths
+  for which the slit function is provided.  QDOAS will then generate a
+  lookup table from the provided slit functions, and calculate the
+  slit function at intermediate wavelength values using linear
+  interpolation.
+  % explain this in more detail (and perhaps move this to the tools or
+  % properties chapters?)
+\item For analytical line shapes, the user can provide a two-column
+  ASCII file containing the wavelengths and corresponding values of
+  the parameters for each requested parameter (for example, the
+  Gaussian width and the boxcar width for the error function).  Files
+  with the correct parameter calibration can be saved from the SFP
+  plots obtained after the wavelength calibration procedure.
+\end{itemize}
+For more details on how to compute such a convolution using QDOAS, see
+section \ref{sec:conv-tool}, page \pageref{sec:slit-function-page}.
+
+\subsection{Correction for the Solar $I_0$-effect}\label{sec:correction-solar-i_0}
+The $I_0$-effect is due to the difference between cross sections
+measured in the laboratory with a smooth light source and the
+atmospheric absorption measured by an instrument of lower resolution
+with a structured solar light source~\citep{aliwell_2002}.  As
+described in equation~\eqref{eq:optical_density}, the DOAS technique
+attempts to isolate the atmospheric absorptions by calculating the
+ratio of a reference spectrum $I_0$ and a measured spectrum $I$.
+However, because the two spectra in this ratio have been filtered by
+the instrument function before the calculation of the ratio, complete
+removal of the Fraunhofer structure from the solar reference spectrum
+is not possible:
+
+If the $I_0$-effect is not accounted for, the cross sections $S$ used
+in the DOAS retrieval are laboratory cross sections $S_0$ convolved
+with the instrumental slit function $F$:
+\begin{equation}
+  \label{eq:cross_section_convolved}
+  S(\lambda) = (F\ast S_0)(\lambda) = \int S_0(\lambda') F(\lambda-\lambda')\mathrm{d}\lambda' \,.
+\end{equation}
+The intensities measured by the spectrometer can be defined as
+\begin{align}
+  \label{eq:incoming_intensity}
+  I_0^{\mathrm{meas}}(\lambda) &= (F\ast I_0)(\lambda)\,,\\
+  I^{\mathrm{meas}}(\lambda) &= (F\ast I)(\lambda) = \left( F \ast I_0 \exp(-S_0 \cdot c)\right)(\lambda)\,.
+\end{align}
+Taking into account the instrumental function $F$,
+equation~\eqref{eq:optical_density} becomes:
+\begin{align}
+  \tau = \ln \frac{I_0^{\mathrm{meas}}(\lambda)}{I^{\mathrm{meas}}(\lambda)}
+  &  = \ln \frac{ (F \ast I_0)(\lambda)}{ (F \ast I_0 \exp(-S_0 \cdot c))(\lambda)}\\
+  & \simeq c \cdot (F * S_0)(\lambda)\,. \label{eq:convolution_approximation}
+\end{align}
+Thus, the fitting of convolved laboratory cross sections to the
+optical depth measured by a low resolving instrument relies on an
+approximation.  The error induced by this approximation depends on the
+absorption strength and the relation between the width of the slit
+function and the width of the spectral structures in the light source
+$I_0$ and the cross section $S_0$.  For most of the atmospheric
+absorbers the $I_0$-effect is negligible but in some cases, the
+approximation (\ref{eq:convolution_approximation}) is not accurate
+enough. This is particularly the case for strong atmospheric absorbers
+such as \ozone{}.
+
+This effect may be dealt with to a good approximation by correcting
+the laboratory cross sections with the solar Fraunhofer spectrum: for
+a particular absorber, a highly resolved solar spectrum $I_0(\lambda)$
+and a simulated absorption spectrum $I^*_c(\lambda)$ with a known slant
+column $c$ are both convolved with the instrument slit function
+\begin{align}
+  I_0^*(\lambda)&= (F \ast I_0) (\lambda)\, ,\\
+  I^*_c (\lambda) &= (F \ast I_0 \exp( -S_0 \cdot c)) (\lambda)\,.
+\end{align}
+The $I_0$-corrected cross section $S*$ is then defined by
+\begin{equation}
+  \label{eq:I0_corrected_cross_section}
+  S^*_c(\lambda) = -\frac{1}{c}\ln \left(
+    \frac{ I^*_c(\lambda) }{I^*_0(\lambda)}
+  \right)\,.
+\end{equation}
+The $I_0$-corrected cross section derived in this manner perfectly
+matches the absorptions in the measured atmospheric spectrum, provided
+that the SCD $c$ used in the calculation is equal to the true
+atmospheric SCD. However, this is not a critical point and the $I_0$
+corrected cross sections can be used for a large range of atmospheric
+slant column densities~\citep{Wagner1999}.
+
+\subsection{Deconvolution}\label{sec:deconvolution}
+The QDOAS convolution tool implements a de-convolution option. In this
+case, the convolution is performed using an effective slit function
+obtained after Fourier transform manipulation of specified convolution
+and de-convolution functions. The effective slit function is
+calculated as follows:
+\begin{equation}
+  \label{eq:deconvolution}
+  S_{\mathrm{eff}} = \mathfrak{I}^{-1} \left[
+    \frac{ \mathfrak{I}(S_1) }{\mathfrak{I}(S_2)}
+    \right]\,,
+\end{equation}
+$\mathfrak{I}$ represents the Fourier transform, and $S_1$ and $S_2$ are
+respectively the convolution and de-convolution slit functions. Great
+care is taken in the algorithm to avoid noise-corruption effects when
+taking the ratio of the Fourier transforms.
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "QDOAS_manual"
+%%% TeX-PDF-mode: t
+%%% End:

@@ -1,0 +1,126 @@
+\documentclass[11pt,a4paper,openright,twoside,enabledeprecatedfontcommands]{scrreprt}
+\usepackage[asymmetric,a4paper,%
+  hmargin={6cm,2.54cm},%
+  vmargin={2.54cm,2.54cm},%
+  %nohead,nofoot
+  ]{geometry}
+\usepackage{titlesec}
+\usepackage[utf8]{inputenc}
+ \usepackage[colorlinks=true,linkcolor=blue, urlcolor=blue, pdfborder={0 0 0}]{hyperref}
+\usepackage[toc,nonumberlist]{glossaries}
+\renewcommand*{\glspostdescription}{}
+\usepackage{graphicx,color}
+\usepackage{subfigure}
+\usepackage{amsmath, amssymb}
+\usepackage{multirow,booktabs}
+\usepackage[square,numbers]{natbib}
+\makeatletter
+\def\NAT@spacechar{~}% NEW
+\makeatother
+\usepackage[nottoc]{tocbibind}
+\usepackage{placeins}
+\usepackage{relsize}
+\usepackage{longtable}
+\usepackage{fancyvrb,shortvrb}
+\usepackage{color}
+\usepackage{nameref}
+\usepackage{fancyhdr}
+
+\makeglossaries
+
+%\pagestyle{fancy}
+%\fancyfoot[LO,RE]{\thepage}
+
+\bibpunct{[}{]}{;}{n}{ }{,}
+
+\titleformat{\section}{\normalfont\sffamily\Large}{\thesection}{1ex}{}
+\titleformat{\chapter}[hang]{\sffamily\normalfont\Large\bf}{\Huge\sffamily\thechapter}{1ex}{\sffamily\Huge}
+\titleformat{\subsection}[leftmargin]{\normalfont\sffamily\filleft\bf}{}{}{\sffamily}[]
+\titleformat{\subsubsection}[leftmargin]{\normalfont\sffamily\filleft\small}{}{}{\sffamily}[]
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1ex plus 0.5ex minus 0.2ex}
+\titlespacing{\subsection}{10pc}{3ex plus 0.1ex minus .2 ex}{1.5pc}
+\titlespacing{\subsubsection}{10pc}{3ex plus 0.1ex minus .2 ex}{1.5pc}
+
+% subsections are not numbered and not listed in toc
+\setcounter{secnumdepth}{1}
+\setcounter{tocdepth}{1}
+
+% no hyphenation and justify on the right
+
+%\tolerance=1
+%\emergencystretch=\maxdimen
+%\hyphenpenalty=10000
+%\hbadness=10000
+
+\renewcommand{\labelitemi}{$\diamond$}
+\renewcommand{\labelitemii}{$\bullet$}
+\newenvironment{qdoasitem}
+{
+\hfill \vspace{-1.4\baselineskip} \begin{itemize}
+}
+{
+\end{itemize}
+}
+
+\newenvironment{definitionlist}[1]%
+  {\begin{list}{}{\settowidth{\labelwidth}{\textbf{#1}}
+   \setlength{\leftmargin}{\labelwidth}
+   \addtolength{\leftmargin}{\labelsep}
+   \renewcommand{\makelabel}[1]{\textbf{\hfill##1}}}}%
+  {\end{list}}
+
+\def\ozone{$\mathrm{O_3}$}
+\def\water{$\mathrm{H_2O}$}
+\def\H2CO{$\mathrm{H_2CO}$}
+\def\oxygen{$\mathrm{O_2}$}
+\def\tetraox{$\mathrm{O_4}$}
+\def\CO2{$\mathrm{CO_2}$}
+\def\CH4{$\mathrm{CH_4}$}
+\def\NO2{$\mathrm{NO_2}$}
+\def\SO2{$\mathrm{SO_2}$}
+\def\N2{$\mathrm{N_2}$}
+\def\BrO{$\mathrm{BrO}$}
+\def\I0{$\mathrm{I_0}$}
+\def\degree{$\mathrm{^{\circ}}$ }
+
+\graphicspath{{./img/}}
+
+\def\TODO{\textbf{TODO}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TODO
+% spell-check (british vs american?)
+\begin{document}
+\include{QDOAS_title}
+\include{QDOAS_glossary}
+\tableofcontents
+\clearpage{\cleardoublepage}
+\include{QDOAS_intro}
+\include{QDOAS_interface}
+\include{QDOAS_algorithms}
+\include{QDOAS_quickstart}
+\include{QDOAS_properties}
+\include{QDOAS_tools}
+\appendix
+\include{QDOAS_inputfiles}
+\include{QDOAS_output}
+\include{QDOAS_troubleshooting}
+
+\printglossaries
+
+%\include{QDOAS_annex}
+%\bibliographystyle{plainnat} % harvard % apalike
+
+\nocite{numericalrecipe_2007,numericalrecipes_1992,Wagner2009a,Wagner2010}
+\nocite{Kuruczsolar,Hermans1999,Burrows1999,Bogumil2003}
+
+\bibliographystyle{apalike}
+\bibliography{QDOAS_biblio}
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% TeX-PDF-mode: t
+%%% End:

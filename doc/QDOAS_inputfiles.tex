@@ -1,0 +1,343 @@
+\chapter{Input file format}\label{cha:input-files-format}
+
+\subsection{Spectra Files}\hfill
+\begin{minipage}[t]{\textwidth}
+\vspace{-0.6\baselineskip}
+\begin{tabular}[h]{l p{8cm}}
+\textbf{Used in} & Projects properties, Instrumental page \\ [6pt]
+\textbf{File name} & no restriction; \\ [6pt]
+\textbf{File extension} & \textbf{spe} by default, but it is not restrictive;  \\ [6pt]
+\textbf{Format} & Specific to the different institutes that developed them. \\  [6pt]
+\textbf{Example} & See below for ASCII format
+\end{tabular}
+\end{minipage}
+
+\subsubsection{ASCII Spectra File Format}
+
+If a format is not supported by QDOAS, it should be possible to convert the files in ASCII.
+When the ASCII format is selected, spectra can be provided in the file one record per line (\textbf{line format}) or one spectral value per line (\textbf{column format} or \textbf{column extended format}).
+Whatever the selected option, the size of the detector has to be specified.
+For the \textbf{line} and the \textbf{colmumn} formats, according to the checked flags in the \textbf{Instrumental page} of \textbf{Projects properties}, the following information are expected strictly in the given order :
+\begin{itemize} \itemsep -6pt
+\item Solar Zenith Angle
+\item Azimuth Viewing Angle
+\item Elevation Viewing Angle
+\item Date in the DD/MM/YYYY (day, month, year) format
+\item Fractional time
+\end{itemize}
+
+Example of records in an ASCII file in \underline{\textbf{line format}} with solar zenith angle, date and fractional time options checked :
+
+\begin{Verbatim}[fontfamily=courier,fontsize=\relsize{-2}]
+   78.417543 29/02/2000 8.181111 5504.343400...  25379.428769
+   77.426307 29/02/2000 8.356389 7568.723923...  25736.597692
+   76.444749 29/02/2000 8.536944 8371.684631...  27477.536662
+                                 <----- spectra values ----->
+\end{Verbatim}
+
+Below, an example of records in \underline{\textbf{column format}} with lambda, solar zenith angle, elevation viewing angle and decimal time options checked :
+
+\begin{Verbatim}[fontfamily=courier,fontsize=\relsize{-2}]
+   59.7336                     <- SZA
+   1                           <- elevation viewing angle
+   16.0452752135897            <- decimal time
+     415.53904  4.1053669e+005
+     415.57920  5.1616777e+005
+     ...                           Wavelength and spectra values
+     456.10521  5.0256531e+005
+     456.14444  4.9851523e+005
+   58.6879                     <- record number 2
+   5
+   15.953346969803
+     415.53904  5.1705925e+005
+     415.57920  6.5113944e+005
+     ...
+     456.10521  6.4016200e+005
+     456.14444  6.3482669e+005
+   60.4205                    <- record number 3
+   10
+   16.1055305555417
+     415.53904  5.2111045e+005
+     415.57920  6.5623468e+005
+     ...
+     456.10521  6.4077000e+005
+     456.14444  6.3549114e+005
+\end{Verbatim}
+Until version 2.106, angles had to be given on the same line.  Now, it is not the case anymore.  Angles had to be given in separate lines and QDOAS accepts matrices of spectra.
+With the same options checked, the file could be :
+
+\begin{Verbatim}[fontfamily=courier,fontsize=\relsize{-2}]
+             0  59.7336           58.6879           60.4205                              <- SZA
+             0  1                 5                 10                                   <- elevation viewing angles
+             0  16.0452752135897  15.953346969803   16.1055305555417                     <- decimal times
+     415.53904  4.1053669e+005    5.1705925e+005    5.2111045e+005
+     415.57920  5.1616777e+005    6.5113944e+005    6.5623468e+005
+     ...
+     456.10521  5.0256531e+005    6.4016200e+005    6.4077000e+005
+     456.14444  4.9851523e+005    6.3482669e+005    6.3549114e+005
+\end{Verbatim}
+The wavelength calibration is always provided in the first column.  The maximum number of characters accepted for one line is 4096.  The file can contain successive data blocks but all data blocks should have the same number of columns.  If present, the wavelength calibration has to be repeated the first column of each block.
+
+From version 3.0, QDOAS proposes a \textbf{Column extended format}, more flexible than the two previous ones.  Spectra (preceeded or not by wavelengths) are provided as column vectors and records can be described by $<$ KEYNAME $> = <$ KEYVALUE $>$ lines
+where KEYNAMES are the name of pre-defined fields to choose in the following list according to the type of measurement :
+
+\begin{Verbatim}[fontfamily=courier,fontsize=\relsize{-2}]
+  Name
+  Date (DD/MM/YYYY)
+  UTC time (hh:mm:ss)
+  Number of scans
+  Exposure Time
+  Solar Zenith Angle
+  Solar Azimuth Angle
+  Longitude
+  Latitude
+  Altitude
+  Viewing elevation angle
+  Viewing azimuth angle
+  Viewing zenith angle
+  Total Measurement Time (sec)
+  Total Acquisition Time (sec)
+  Start Date (dd/mm/yyyy)
+  End Date (dd/mm/yyyy)
+  UTC Start Time (hh:mm:ss)
+  UTC End Time (hh:mm:ss)
+  Measurement Type
+\end{Verbatim}
+
+The file in \textbf{Column extended format} can begin with comment lines starting with a hash (\texttt{\#}) character. Exposure time is also called integration time.  Total acquisition time should be the exact time needed by the device
+to take the acquisition of non rejected scans.  Total measurement time should include the overheads requested by the measurement (for example, reading time, time to calculate the integration time, to move a pointing system...).
+Spectra exported in ASCII by QDOAS are in \textbf{Column extended format}.
+
+Example of file in \textbf{Column extended format} :
+
+\begin{Verbatim}[fontfamily=courier,fontsize=\relsize{-2}]
+# Station = Cabauw (51.97 N,4.93 E)
+# Institute = My institute
+# PI name = my name and or my email
+# Instrument = name of the instrument (or the channel)
+# Size of the detector = 2048 (the size of the detector as indication)
+# Total number of records = 548
+Date(DD/MM/YYYY) = 24/09/2016
+UTC Time (hh:mm:ss) = 10:38:05
+UTC Start Time (hh:mm:ss) = 10:37:34
+UTC End Time (hh:mm:ss) = 10:38:35
+Viewing Elevation Angle (deg) = 5.0
+Viewing Azimuth Angle (deg) = 135.0
+Measurement Type (OFFAXIS/DIRECT SUN/ALMUCANTAR/ZENITH) = OFFAXIS
+Total Measurement Time (sec) = 61
+Total Acquisition Time (sec) = 1.848
+Exposure Time(sec) = 0.033
+Solar Zenith Angle (deg) = 53.9151
+Solar Azimuth Angle (deg) = 163 (North=0, East=90)
+      423.039410      1168041.606061
+      423.159620      1195344.636364
+      423.279810      1189587.060607
+      423.399990      1160496.151516
+      ...
+      539.695430      1187768.878789
+      539.804180      1219738.575758
+      539.912910      1084799.181819
+Date(DD/MM/YYYY) = 24/09/2016
+UTC Time (hh:mm:ss) = 10:39:15
+UTC Start Time (hh:mm:ss) = 10:38:45
+UTC End Time (hh:mm:ss) = 10:39:45
+Viewing Elevation Angle (deg) = 15.0
+Viewing Azimuth Angle (deg) = 135.0
+Measurement Type (OFFAXIS/DIRECT SUN/ALMUCANTAR/ZENITH) = OFFAXIS
+Total Measurement Time (sec) = 60
+Total Acquisition Time (sec) = 1.815
+Exposure Time(sec) = 0.033
+Solar Zenith Angle (deg) = 53.8636
+Solar Azimuth Angle (deg) = 163.4 (North=0, East=90)
+      423.039410      1309890.090910
+      423.159620      1342920.393940
+      423.279810      1336768.878789
+      423.399990      1304920.393940
+      ...
+      539.695430      1076102.212122
+      539.804180      1092465.848486
+      539.912910      1023405.242425
+Date(DD/MM/YYYY) = 24/09/2016
+UTC Time (hh:mm:ss) = 10:40:30
+UTC Start Time (hh:mm:ss) = 10:40:00
+UTC End Time (hh:mm:ss) = 10:41:00
+Viewing Elevation Angle (deg) = 89.9
+Viewing Azimuth Angle (deg) = 135.0
+Measurement Type (OFFAXIS/DIRECT SUN/ALMUCANTAR/ZENITH) = ZENITH
+Total Measurement Time (sec) = 60
+Total Acquisition Time (sec) = 9.353
+Exposure Time(sec) = 0.199
+Solar Zenith Angle (deg) = 53.8099
+Solar Azimuth Angle (deg) = 163.8 (North=0, East=90)
+      423.039410       252900.597990
+      423.159620       258121.703518
+      423.279810       256473.462312
+      423.399990       250413.160805
+      ...
+      539.477900       142795.070352
+      539.586670       142307.633166
+      539.695430       140528.738694
+      539.804180       144910.648242
+      539.912910       125800.095478
+\end{Verbatim}
+
+
+\subsection{Calibration}\hfill
+\begin{minipage}[t]{\textwidth}
+\vspace{-0.6\baselineskip}
+\begin{tabular}[h]{l p{8cm}}
+\textbf{Used in} & Projects properties \\
+                 & Tools \\ [6pt]
+\textbf{File name} & 	no restriction;  \\ [6pt]
+\textbf{File extension} & \textbf{clb} by default, but it is not restrictive;  \\ [6pt]
+\textbf{Format ASCII} & \textbf{Column 1}	: the wavelength calibration; \\ [6pt]
+\textbf{Example} & ANYTHING.CLB
+\end{tabular}
+\end{minipage}
+
+\subsection{Cross sections}\hfill
+\begin{minipage}[t]{\textwidth}
+\vspace{-0.6\baselineskip}
+\begin{tabular}[h]{l p{8cm}}
+\textbf{Used in} & Analysis windows properties \\
+                 & Tools \\ [6pt]
+\textbf{File name} & For cross sections implied in the definition of analysis windows, the file name must start by the user defined relevant symbol followed by an underscore; this restriction does not apply to input cross sections in QDOAS tools. \\ [6pt]
+\textbf{File extension} & \textbf{xs*} by default, but it is not restrictive; \\ [6pt]
+\textbf{Format ASCII} & \textbf{Column 1}	: the wavelength calibration \\
+                      & \textbf{Column 2} :	the cross section \\ [6pt]
+\textbf{Example} & BrO\_W228.XS
+\end{tabular}
+\end{minipage}
+
+\subsection{Solar Spectrum}\hfill
+\begin{minipage}[t]{\textwidth}
+\vspace{-0.6\baselineskip}
+\begin{tabular}[h]{l p{8cm}}
+\textbf{Used in} & Projects properties \\
+                 & Tools \\ [6pt]
+\textbf{File name} & no restriction; \\ [6pt]
+\textbf{File extension} & \textbf{ktz} by default, but it is not restrictive; \\ [6pt]
+\textbf{Format ASCII} & \textbf{Column 1}	: the wavelength calibration \\
+                      & \textbf{Column 2} :	the solar spectrum \\ [6pt]
+\textbf{Example} & KUR\_01.KTZ
+\end{tabular}
+\end{minipage}
+
+\subsection{Reference spectrum}\hfill
+\begin{minipage}[t]{\textwidth}
+\vspace{-0.6\baselineskip}
+\begin{tabular}[h]{l p{8cm}}
+\textbf{Used in} & Analysis windows properties \\ [6pt]
+\textbf{File name} & no restriction;  \\ [6pt]
+\textbf{File extension} & \textbf{ref} by default, but it is not restrictive; \\ [6pt]
+\textbf{Format ASCII} & \textbf{Column 1}	: the wavelength calibration \\
+                      & \textbf{Column 2} :	the reference spectrum \\ [6pt]
+\textbf{Example} & 80302191.REF
+\end{tabular}
+\end{minipage}
+
+\subsection{Instrumental function}\hfill
+\begin{minipage}[t]{\textwidth}
+\vspace{-0.6\baselineskip}
+\begin{tabular}[h]{l p{8cm}}
+\textbf{Used in} & Project properties \\ [6pt]
+\textbf{File name} & no restriction; \\ [6pt]
+\textbf{File extension} & \textbf{ins} by default, but it is not restrictive; \\ [6pt]
+\textbf{Format ASCII} & \textbf{Column 1}	: the wavelength calibration \\
+                      & \textbf{Column 2} :	the transmission function (spectra will be divided by this curve before the wavelength calibration procedure).\\ [6pt]
+\textbf{Example} & Transmission.ins
+\end{tabular}
+\end{minipage}
+
+
+\subsection{Dark current and Offset (ex : MFC)}
+Used in \textbf{Projects properties}.  Dark currents and offset are corrections specific to the selected instrument, so they have to be provided in the original format.
+
+\subsection{AMF}\hfill
+\begin{minipage}[t]{\textwidth}
+\vspace{-0.6\baselineskip}
+\begin{tabular}[h]{l p{8cm}}
+\textbf{Used in} & Analysis windows properties \\ [6pt]
+\textbf{File name} & The name of \gls{amf} file associated to cross sections implied in the definition of analysis windows must start by the user defined relevant symbol followed by an underscore; \\ [6pt]
+\textbf{File extension} & AMF\_SZA  for \gls{sza} dependent AMF; \\
+                        & AMF\_CLI  for climatology dependent AMF; \\
+                        & AMF\_WVE  for wavelength dependent AMF; \\ [6pt]
+\textbf{AMF\_SZA Format} & \textbf{Column 1} :	SZA \\
+                        & \textbf{Column 2} : 	AMF \\ [6pt]
+
+\textbf{AMF\_CLI Format} &\begin{minipage}[t]{\textwidth}
+                          \vspace{-0.6\baselineskip}
+                          \begin{tabular}[h]{|p{2cm}|p{2cm}|}
+                          \hline
+                          0	& (JD-1)/365 \\
+                          \hline
+                          SZA & AMF \\
+                          \hline
+                          \end{tabular}
+                          \end{minipage}
+                          \vskip 12pt
+                          Climatology dependent AMF have to be provided in a matrix whose first column is SZA grid and first line, day number grid. \\ [6pt]
+
+\textbf{AMF\_WVE Format} &\begin{minipage}[t]{\textwidth}
+                          \vspace{-0.6\baselineskip}
+                          \begin{tabular}[h]{|p{2cm}|p{2cm}|}
+                          \hline
+                          0	& $\lambda$ \\
+                          \hline
+                          SZA & AMF \\
+                          \hline
+                          \end{tabular}
+                          \end{minipage}
+                          \vskip 12pt
+                          Interpolation is made in a 2-dimension matrix (first column is SZA grid and first line, some wavelengths). \\ [6pt]
+
+\textbf{Example} &  BrO\_W228.AMF\_SZA
+\end{tabular}
+\end{minipage}
+
+\subsection{Slit functions}\hfill
+\begin{minipage}[t]{\textwidth}
+\vspace{-0.6\baselineskip}
+\begin{tabular}[h]{l p{9cm}}
+\textbf{Used in} & Analysis windows properties	\\ [6pt]
+\textbf{File name} & no restriction; \\ [6pt]
+\textbf{File extension} & \textbf{slf}  by default, but it is not restrictive; \\ [6pt]
+\textbf{Format ASCII} & \textbf{Column 1} :	the wavelength calibration \\
+                      & \textbf{Column 2} :	the line shape \\ [6pt]
+                      & The slit function has to be provided with a wavelength calibration around 0 nm.  \\ [6pt]
+                      & For wavelength dependent slit function types, the second column is the parameter dependent on the wavelength. \\ [6pt]
+                      &	Since QDOAS version 2.00, lookup tables of wavelength dependent slit functions can be provided.  In this case, the number of columns depends on the available slit functions.  Wavelengths are specified in the first line of the file.  \\ [6pt]
+\textbf{Example} &
+\begin{minipage}[t]{\textwidth}
+\vspace{-0.6\baselineskip}
+\begin{Verbatim}[fontfamily=courier,fontsize=\relsize{-2}]
+  0                         340                      380
+ -1.00  2.9802322387695299e-008  7.8886090522101049e-031
+ -0.98  5.9192925419630987e-008  1.2276631396533808e-029
+ -0.96  1.1594950525907111e-007  1.8074887363782194e-028
+ -0.94  2.2399967890119956e-007  2.5176165401687836e-027
+ ...
+ -0.04  9.7265494741228542e-001  8.9502507092797223e-001
+ -0.02  9.9309249543703593e-001  9.7265494741228542e-001
+  0.00  1.0000000000000000e+000  1.0000000000000000e+000
+  0.02  9.9309249543703593e-001  9.7265494741228542e-001
+  0.04  9.7265494741228542e-001  8.9502507092797223e-001
+...
+  0.94  2.2399967890119956e-007  2.5176165401687836e-027
+  0.96  1.1594950525907111e-007  1.8074887363782194e-028
+  0.98  5.9192925419630987e-008  1.2276631396533808e-029
+  1.00  2.9802322387695299e-008  7.8886090522101049e-031
+\end{Verbatim}
+\end{minipage}   \\
+&   \\ [6pt]
+& \textbf{Specific case} : For wavelength dependent arbitrary slit function files (including lookup tables of slit functions), the variation of the two stretch factors to apply on the grid of the line shape is given in a three-columns file. \\ [6pt]
+
+
+\end{tabular}
+\end{minipage}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "QDOAS_manual"
+%%% TeX-PDF-mode: t
+%%% End:

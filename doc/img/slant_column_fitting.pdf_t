@@ -1,0 +1,47 @@
+\begin{picture}(0,0)%
+\includegraphics{slant_column_fitting.pdf}%
+\end{picture}%
+\setlength{\unitlength}{4144sp}%
+%
+\begingroup\makeatletter\ifx\SetFigFont\undefined%
+\gdef\SetFigFont#1#2#3#4#5{%
+  \reset@font\fontsize{#1}{#2pt}%
+  \fontfamily{#3}\fontseries{#4}\fontshape{#5}%
+  \selectfont}%
+\fi\endgroup%
+\begin{picture}(7103,9465)(3589,-9069)
+\put(6256,-781){\makebox(0,0)[b]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}$I$, $I_0$, $S^j$, $\lambda$, $NL$}%
+}}}}
+\put(3871,-3166){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Low-pass filtering (optional)}%
+}}}}
+\put(3871,-3751){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Generate differential $S^j$ (by orthogonalisation or high-pass filtering)}%
+}}}}
+\put(3871,-2581){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Convolve/shift/interpolate $S^i$}%
+}}}}
+\put(3871,-4831){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Shift $I$ (or $I_0$)}%
+}}}}
+\put(3871,-5371){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Apply offset correction to measured spectrum $I$}%
+}}}}
+\put(6211,-8431){\makebox(0,0)[b]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Fitted Parameters,}%
+}}}}
+\put(6211,-8881){\makebox(0,0)[b]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Standard Deviations}%
+}}}}
+\put(6211,-8656){\makebox(0,0)[b]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}including SCD}%
+}}}}
+\put(6211,-8206){\makebox(0,0)[b]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Residual $R$}%
+}}}}
+\put(9901,-2131){\makebox(0,0)[b]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}$\mathrm{AMF}(\lambda, SZA)$}%
+}}}}
+\put(3871,-1996){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}$S^j$ correction with wavelength-dependent AMF (optional)}%
+}}}}
+\put(3781,-1681){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Cross section processing}%
+}}}}
+\put(3781,-4516){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Spectra processing}%
+}}}}
+\put(3781,-6136){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Decompose the fitting function into linear and non-linear components}%
+}}}}
+\put(3781,-6331){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}(depending on the fitting method)}%
+}}}}
+\put(3781,-6901){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}NLLS fit (see figure \ref{fig:least_squares})}%
+}}}}
+\end{picture}%

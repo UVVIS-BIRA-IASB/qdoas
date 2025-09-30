@@ -1,0 +1,45 @@
+\begin{picture}(0,0)%
+\includegraphics{least_squares.pdf}%
+\end{picture}%
+\setlength{\unitlength}{4144sp}%
+%
+\begingroup\makeatletter\ifx\SetFigFont\undefined%
+\gdef\SetFigFont#1#2#3#4#5{%
+  \reset@font\fontsize{#1}{#2pt}%
+  \fontfamily{#3}\fontseries{#4}\fontshape{#5}%
+  \selectfont}%
+\fi\endgroup%
+\begin{picture}(5058,8067)(3454,-7526)
+\put(3781,-1456){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}$I, I_0$ low pass and high pass filtering (optional)}%
+}}}}
+\put(3781,-2041){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Initialization of non-linear parameters }%
+}}}}
+\put(3824,-2626){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}NLLS fit}%
+}}}}
+\put(3913,-2986){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Update non-linear parameters according to Marquardt-}%
+}}}}
+\put(3913,-3181){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Levenberg algorithm}%
+}}}}
+\put(3913,-3751){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}LLS fit}%
+}}}}
+\put(3913,-3946){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Minimize $F$ (eq. (\ref{eq:sum_of_squares})) for current values of non-linear}%
+}}}}
+\put(3913,-4141){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}parameters by solving the linear least squares problem}%
+}}}}
+\put(5806,-6888){\makebox(0,0)[b]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Fitted Parameters,}%
+}}}}
+\put(5806,-7338){\makebox(0,0)[b]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Standard Deviations}%
+}}}}
+\put(5806,-7113){\makebox(0,0)[b]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}including SCD}%
+}}}}
+\put(5806,-6663){\makebox(0,0)[b]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Residual $R$}%
+}}}}
+\put(5806,-4966){\makebox(0,0)[b]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}$\Delta F < \epsilon$}%
+}}}}
+\put(5806,-646){\makebox(0,0)[b]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}$I, I_0, S^j, \lambda$}%
+}}}}
+\put(5986,-5641){\makebox(0,0)[b]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}y}%
+}}}}
+\put(5266,-4786){\makebox(0,0)[b]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}n}%
+}}}}
+\end{picture}%

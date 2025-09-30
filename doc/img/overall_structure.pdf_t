@@ -1,0 +1,57 @@
+\begin{picture}(0,0)%
+\includegraphics{overall_structure.pdf}%
+\end{picture}%
+\setlength{\unitlength}{4144sp}%
+%
+\begingroup\makeatletter\ifx\SetFigFont\undefined%
+\gdef\SetFigFont#1#2#3#4#5{%
+  \reset@font\fontsize{#1}{#2pt}%
+  \fontfamily{#3}\fontseries{#4}\fontshape{#5}%
+  \selectfont}%
+\fi\endgroup%
+\begin{picture}(7671,9375)(1924,-8574)
+\put(2746,-4606){\makebox(0,0)[b]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Spectra}%
+}}}}
+\put(2656,-5956){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}AMF}%
+}}}}
+\put(4411,-5821){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Interpolation of AMF on the spectra SZA}%
+}}}}
+\put(4411,-5281){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Apply a NLLS fit to deduce slant column densities}%
+}}}}
+\put(4411,-5056){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Slant columns fitting}%
+}}}}
+\put(4411,-4516){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Load Spectra}%
+}}}}
+\put(4411,-6361){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Conversion of slant columns to vertical columns}%
+}}}}
+\put(4411,-2716){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Apply wavelength calibration}%
+}}}}
+\put(4411,-3166){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}calibration and SFP}%
+}}}}
+\put(4411,-2941){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Convolve and/or interpolate sigma using wavelength}%
+}}}}
+\put(4411,-2221){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}spectrum (see figure \ref{fig:wavelength_calibration})}%
+}}}}
+\put(4411,-1996){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Apply NLLS fit to high resolution Fraunhofer reference}%
+}}}}
+\put(4411,-1771){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Wavelength calibration and slit function parametrisation}%
+}}}}
+\put(5491,-3776){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Select fitting method}%
+}}}}
+\put(6436,-376){\makebox(0,0)[b]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Initial wavelength calibration $\lambda$}%
+}}}}
+\put(6436,-646){\makebox(0,0)[b]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Control spectrum $I_0(\lambda)$}%
+}}}}
+\put(6436,-916){\makebox(0,0)[b]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Cross sections $S^j$}%
+}}}}
+\put(6481,-7846){\makebox(0,0)[b]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}All fitted parameters}%
+}}}}
+\put(6481,-8071){\makebox(0,0)[b]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}SCD and VCD}%
+}}}}
+\put(6481,-8296){\makebox(0,0)[b]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Standard Deviations}%
+}}}}
+\put(4321,-4201){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Processing}%
+}}}}
+\put(4366,-1501){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Pre-processing}%
+}}}}
+\end{picture}%

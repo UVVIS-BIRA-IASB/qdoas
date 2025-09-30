@@ -1,0 +1,51 @@
+\begin{picture}(0,0)%
+\includegraphics{wavelength_calibration.pdf}%
+\end{picture}%
+\setlength{\unitlength}{4144sp}%
+%
+\begingroup\makeatletter\ifx\SetFigFont\undefined%
+\gdef\SetFigFont#1#2#3#4#5{%
+  \reset@font\fontsize{#1}{#2pt}%
+  \fontfamily{#3}\fontseries{#4}\fontshape{#5}%
+  \selectfont}%
+\fi\endgroup%
+\begin{picture}(5607,8610)(4174,-7966)
+\put(4321,-5731){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Display calibration results (optional)}%
+}}}}
+\put(6571,-7531){\makebox(0,0)[b]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}$\mathrm{SFP}(\lambda)$}%
+}}}}
+\put(6571,-7261){\makebox(0,0)[b]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Wavelength calibration}%
+}}}}
+\put(4321,-1861){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Select calibration interval and split into $N$ sub-windows}%
+}}}}
+\put(4321,-2356){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Select fitting mode (DOAS/Intensity fitting)}%
+}}}}
+\put(4321,-3076){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}In each fitting window $n$, derive:}%
+}}}}
+\put(4591,-3256){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}- The shift $\Delta_n$ between $I_{\mathrm{sol},n}$ and $I_{0,n}$}%
+}}}}
+\put(4591,-3451){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}- The slit function parameters $\mathrm{SFP}_n$}%
+}}}}
+\put(4591,-3646){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}- SCD of correcting absorbers ($\mathrm{O}_3$, Ring, ...)}%
+}}}}
+\put(4321,-4201){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Determine the new wavelength calibration by polynomial}%
+}}}}
+\put(4321,-4396){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}fitting through the $N$ individual shift values $\Delta_n$}%
+}}}}
+\put(4321,-4876){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Determine wavelength dependence of slit function parameters}%
+}}}}
+\put(4321,-5056){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}$\mathrm{SFP}(\lambda)$ by polynomial fitting through the $N$ individual}%
+}}}}
+\put(4321,-2851){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Slant column fitting (see figure \ref{fig:slant_column_fitting})}%
+}}}}
+\put(4321,-5236){\makebox(0,0)[lb]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}$\mathrm{SFP}_n$ values}%
+}}}}
+\put(6571,-421){\makebox(0,0)[b]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Initial wavelength calibration $\lambda$}%
+}}}}
+\put(6571,-646){\makebox(0,0)[b]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}Control Spectrum $I_0$}%
+}}}}
+\put(6571,-871){\makebox(0,0)[b]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}High-resolution solar spectrum $I_{\mathrm{sol}}$}%
+}}}}
+\put(6571,-1096){\makebox(0,0)[b]{\smash{{\SetFigFont{11}{13.2}{\sfdefault}{\mddefault}{\updefault}{\color[rgb]{0,0,0}cross sections $S^j$}%
+}}}}
+\end{picture}%
