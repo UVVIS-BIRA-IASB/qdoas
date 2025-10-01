@@ -47,6 +47,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "doas.h"
 
@@ -66,10 +67,10 @@
 // OUTPUT        vector : the content of this vector is modified by the function.
 // -----------------------------------------------------------------------------
 
-    void VECTOR_Init ( double *vector, double value, int dim )
-    { int i;
-      for ( i=0; i<dim; vector[i++]=value ); }
-      
+void VECTOR_Init (double *vector, double value, int dim ) {
+  for (int i=0; i<dim; vector[i++]=value );
+}
+
 // -----------------------------------------------------------------------------
 // FUNCTION      VECTOR_Copy
 // -----------------------------------------------------------------------------
@@ -82,10 +83,9 @@
 // OUTPUT        target : the content of this vector is modified by the function.
 // -----------------------------------------------------------------------------
 
-    void VECTOR_Copy (double *target, double *source, int dim )
-    { 
-      memcpy(target,source,sizeof(double)*dim);
-    }      
+void VECTOR_Copy (double *target, const double *source, int dim ) {
+  memcpy(target, source, sizeof(double)*dim);
+}
 
 // -----------------------------------------------------------------------------
 // FUNCTION      VECTOR_Equal
