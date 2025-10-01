@@ -155,3 +155,9 @@ compile_commands.json
 /build_release
 /build_debug
 /custom-overlay/coda/BISON_FLEX_PREFIX.txt
+
+doc/auto
+doc/*.aux
+doc/QDOAS_manual.*
+!doc/QDOAS_manual.tex
+

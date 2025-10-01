@@ -96,20 +96,21 @@ component $P(\lambda)$, we obtain the modified equation
 The \glspl{scd} $c_j$ can be retrieved by performing a least squares
 fit of the measurement data to equation (\ref{eq:doas_non_linear}).
 Due to the shift, stretch and offset parameters, this is a non-linear
-least squares problem, which can typically be solved using a \gls{ml}
-algorithm (see~\citet{Marquardt1963,Bevington1969}).  Starting from
-given initial values, this algorithm searches the parameter space
-using a combination of Gauss-Newton and gradient descent steps.  The
-\gls{ml} algorithm is an efficient minimization algorithm for a wide
-range of non-linear functions, but it may converge to a local minimum
-if the initial values are too far from the global minimum.  In QDOAS,
-this problem can occur during the wavelength calibration, when the
-initial calibration is not accurate enough (see
+least squares problem, which can typically be solved using a
+Marquardt-Levenberg algorithm
+(see~\citet{Marquardt1963,Bevington1969}).  Starting from given
+initial values, this algorithm searches the parameter space using a
+combination of Gauss-Newton and gradient descent steps.  The
+Marquardt-Levenberg algorithm is an efficient minimization algorithm
+for a wide range of non-linear functions, but it may converge to a
+local minimum if the initial values are too far from the global
+minimum.  In QDOAS, this problem can occur during the wavelength
+calibration, when the initial calibration is not accurate enough (see
 \nameref{sec:calibration-problems} in section
 \ref{sec:analysis-problems} of the appendix).
 
 % explain offset modelling?
-In QDOAS, the M-L algorithm is used to find the set of parameters that
+In QDOAS, the non-linear least squares fit is used to find the set of parameters that
 minimizes the weighted\footnote{Weighting the residuals by the
   instrumental errors $\sigma^i$ is optional in QDOAS.  When no
   measurement uncertainties are used (or no error estimates are
@@ -183,8 +184,8 @@ $\vec{c}$:
 \end{align}
 % describe linear equation here?
 This fact is exploited in QDOAS to limit the parameter space of the
-\gls{ml} algorithm to the non-linear parameters: once a new set of
-values $\vec{a}'$ for the non-linear parameters is chosen, the linear
+algorithm to the non-linear parameters: once a new set of values
+$\vec{a}'$ for the non-linear parameters is chosen, the linear
 parameters $b_k$ and $c_j$ are updated using a linear least squares
 algorithm, minimizing the sum of squares \eqref{eq:sum_of_squares} for
 the given values of the non-linear parameters.
@@ -998,7 +999,7 @@ computation has received much attention. The Voigt profile is usually
 expressed as
 \begin{equation}
   \label{eq:voigt_profile}
-  K_(x,y) = \frac{y}{\pi} \int_{-\infty}^{\infty} \frac{\exp(-t^2)}{(x-t)^2+y^2}\mathrm{d}t\,,
+  K(x,y) = \frac{y}{\pi} \int_{-\infty}^{\infty} \frac{\exp(-t^2)}{(x-t)^2+y^2}\mathrm{d}t\,,
 \end{equation}
 where $x$ is the distance from the line center in units of Gaussian
 half-widths and $y$ is the ratio of the Lorentzian width to the

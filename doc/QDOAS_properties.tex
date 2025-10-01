@@ -376,33 +376,24 @@ This is the recommended setting for users who wish to use a binary
 output format.  In contrast to ASCII mode, results from different
 processing runs cannot be appended to the same file in netCDF mode,
 unless the user chooses a different group name for both runs (the
-default group name is ``QDOAS Results'').  When using QDOAS with a
-single output file, the program will check if the file already exists
-and report an error if the chosen output file cannot be used.
-However, when writing files in ``automatic'' mode (see
-\nameref{sec:autom-creat-outp}), QDOAS doesn't check in advance which
-output file(-s) it will have to write, and it is left to the user to
-make sure that there are no existing files in the output path which
-will prevent QDOAS from saving the results of a processing run.
-
-When the user selects the file format ``.he5'', QDOAS produces
-HDF-EOS5\footnote{HDF-EOS5 is a binary output format based on the HDF5
-  format see \url{http://www.hdfeos.org}.} output files.  In HDF-EOS5
-output mode, QDOAS saves data either as a ``geolocation field'' or as
-a ``data field'', depending on the kind of information contained in
-the field.  As for netCDF files, QDOAS will not write output into an
-existing HDF-EOS5 file.
+default group name is the project name).  When using QDOAS with a
+single output file, the program will check if a netCDF file with that
+filename already exists, and report an error if the file already contains a group with the chosen group name.  However, when writing files in ``automatic'' mode
+(see \nameref{sec:autom-creat-outp}), QDOAS doesn't check in advance
+which output file(-s) it will have to write, and it is left to the
+user to make sure that there are no existing files in the output path
+which will prevent QDOAS from saving the results of a processing run.
 
 QDOAS always saves all the output from a single input file in one shot, either when it has processed the last spectrum of an input file, or when the analysis is stopped using the \textbf{stop button} \includegraphics[width=3mm]{img/Button_Stop.png}.
 
 By default, QDOAS only saves records successfully analyzed.  If the button \textbf{Successful records only} is kept unchecked, all records including reference spectra and records for which the analysis fails (e.g. log error on the spectrum) are saved.
 
 When processing was unsuccessful, QDOAS uses the fill value
-9.969\ldots e+36 for floating point output data, an empty string
-for text output fields, and values -32767, 65535 or -2147483647 for
+9.969\ldots e+36 for floating point output data, an empty string for
+text output fields, and values -32767, 65535 or -2147483647 for
 integer output fields, depending on the range of the output field.
-For HDF-EOS5 and netCDF output formats, the fill values are documented
-in the file metadata.
+For the netCDF output format, fill values are written to the
+\_FillValue attribute of the corresponding variables.
 
 \subsubsection{Automatic Creation Of The Output File Name}\label{sec:autom-creat-outp}
 The path and the name of the output file can be specified in the \textbf{Output Path} field.  If ``automatic'' is used as a file name, QDOAS will generate the name of the output file automatically, using the user-defined output path as a base.
@@ -922,33 +913,50 @@ forget to build an orthogonal base (see page
 \pageref{differential_xs}).
 
 \subsubsection{The Slit Function Parameters Page}
-The \glspl{sfp} can be fitted in this page.
+The fit of the \glspl{sfp} can be configured in this page.  There are
+two predefined parameters -- SFP 1 and SFP 2 -- whose role depends on
+the line shape chosen in the \textbf{Line Shape (SFP)} drop-down menu.
+Note that if you do not want to fit the slit function during the wavelength
+calibration procedure, select \textbf{Don't fit} in the Line Shape
+menu and choose a solar reference spectrum and line shape in the
+\textbf{Slit Page} of \textbf{Projects properties} (see page
+\pageref{sec:projects_slit_page}) instead.
 
 \begin{figure}[!h]
 \includegraphics[width=\textwidth]{img/Calibration_Predefined2.jpg}
-\caption{Calibration Properties: Predefined Page (Parameterisation for an error function line shape)}\label{calibration_predefined}
+\caption{Calibration Properties: SFP Parameters Page (Parameterisation for an error function line shape)}\label{calibration_sfp}
 \end{figure}
 
-There are two predefined items for SFP: SFP 1 and SFP 2.  According to the line shape selected in the \textbf{Calibration page} of \textbf{Projects properties} (see page \pageref{sec:projects_calibration_page}), these parameters are used or ignored.  Note that if you do not want to fit the slit function during the wavelength calibration procedure, select \textbf{Don't fit} ins the Line Shape menu, and choose a solar reference spectrum and line shape in the \textbf{Slit Page} of \textbf{Projects properties} (see page \pageref{sec:projects_slit_page}) instead.
-\vskip 6pt
-\textbf{For analytical line shapes:}
+Table \ref{tab:sfp_meanings} provides an overview of the meaning of
+SFP 1 and 2 for the different possible line shapes.  For analytical
+line shapes, \textbf{SFP 1} is generally used for fitting the
+\gls{fwhm} of the selected line shape.  The Voigt profile function is
+the convolution of a Gaussian and a Lorentzian line shapes, where the
+second parameter is the Lorentz/Gauss ratio.  Asymmetric line shapes
+can be fitted by introducing an asymmetry factor in the Gaussian
+formula.  For two-parameter line shapes, it is generally recommended
+to fix one of the parameters to an estimated value in order to avoid
+numerical instabilities.
 
-\textbf{SFP 1} is generally used for fitting the \gls{fwhm} of the selected line shape.  The Voigt profile function is the convolution of a Gaussian and a Lorentzian line shapes.  The second parameter is the Lorentz/Gauss ratio.  Asymmetric line shapes can be fitted by introducing an asymmetry factor in the Gaussian formula.  For two-parameter line shapes, it is generally recommended to fix one of the parameters to an estimated value in order to avoid numerical instabilities.
-\begin{center}
-\begin{longtable}{lcc}
-\toprule
-& \textbf{SFP 1} & \textbf{SFP 2} \\
-\midrule
-\textbf{File}	& Stretch factor & Stretch factor \\
-& (negative wavelengths)	& (positive wavelengths)	\\
-\textbf{Gaussian}	& \gls{fwhm}	& Ignored \\
-\textbf{Error function}	& FWHM	& Boxcar width \\
-\textbf{2n-Lorentz}	& FWHM	& Ignored \\
-\textbf{Voigt profile}	& FWHM (Gaussian)	& Lorentz/Gauss ratio \\
-\textbf{Asymmetric line shape}	& FWHM (Gaussian)	& Asymmetry factor \\
-\bottomrule
-\end{longtable}
-\end{center}
+\begin{table}\label{tab:sfp_meanings}
+  \centering
+  \setlength\tabcolsep{3.5pt} % default value: 6pt
+  \begin{longtable}{lcc}
+    \toprule
+    & \textbf{SFP 1} & \textbf{SFP 2} \\
+    \midrule
+    \textbf{File}	& Stretch factor & Stretch factor \\
+    & (negative wavelengths)	& (positive wavelengths)	\\
+    \textbf{Gaussian}	& \gls{fwhm}	& Ignored \\
+    \textbf{Error function}	& FWHM	& Boxcar width \\
+    \textbf{2n-Lorentz}	& FWHM	& Ignored \\
+    \textbf{Voigt profile}	& FWHM (Gaussian)	& Lorentz/Gauss ratio \\
+    \textbf{Asymmetric Gaussian}	& FWHM (Gaussian)	& Asymmetry factor \\
+    \bottomrule
+  \end{longtable}
+\caption{Meaning of the SFP parameters for different types of line
+shape.}
+\end{table}
 
 \subsubsection{The Shift and Stretch Pages}
 For the configuration of these pages, refer to the previous section (\ref{sec:shift_stretch_page}, page \pageref{sec:shift_stretch_page}).  In order to avoid the interpolation of the spectrum to calibrate, it is recommended to fit the shift of the high-resolution solar spectrum, represented by the symbol \textbf{Ref}.

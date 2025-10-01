@@ -6,8 +6,8 @@
   ]{geometry}
 \usepackage{titlesec}
 \usepackage[utf8]{inputenc}
- \usepackage[colorlinks=true,linkcolor=blue, urlcolor=blue, pdfborder={0 0 0}]{hyperref}
-\usepackage[toc,nonumberlist]{glossaries}
+\usepackage[colorlinks=true,linkcolor=blue, urlcolor=blue, pdfborder={0 0 0}]{hyperref}
+\usepackage[docdef=restricted,automake,toc,nonumberlist]{glossaries-extra}
 \renewcommand*{\glspostdescription}{}
 \usepackage{graphicx,color}
 \usepackage{subfigure}
@@ -106,8 +106,10 @@
 \include{QDOAS_inputfiles}
 \include{QDOAS_output}
 \include{QDOAS_troubleshooting}
+\include{QDOAS_license}
 
-\printglossaries
+\clearpage
+\printglossary
 
 %\include{QDOAS_annex}
 %\bibliographystyle{plainnat} % harvard % apalike

@@ -4,18 +4,11 @@ The experience of the \gls{bira} in the development and improvement of algorithm
 
 WinDOAS, the first program developed at \gls{bira} in 1997, knew a success story due to a friendly user interface completed with some po\-wer\-ful \glslink{doas}{DOAS} tools.  This program, extensively validated through different campaigns, has been used worldwide and for many different DOAS applications (mainly for ground-based and satellite applications).
 
-QDOAS is a cross-platform implementation of WinDOAS: the software is portable to Windows and Unix-based operating systems whereas WinDOAS was designed only for Windows. The user interface and the engine of QDOAS are similar to those of its predecessor.  WinDOAS is no longer supported.
+QDOAS is a cross-platform implementation of WinDOAS: the software is portable to Windows and Unix-based operating systems whereas WinDOAS was designed only for Windows. The user interface and the engine of QDOAS are similar to those of its predecessor.  WinDOAS is  no longer supported.
 
-QDOAS has been developed in collaboration with
-\href{http://www.stcorp.nl/}{S[\&]T}, a Dutch company well-known for
-the development of cross-platform products and software tools for the
-processing of satellite measurements (\glslink{beat}{BEAT}, VISAN,
-\ldots). The graphical user interface is built on the Open-Source
-version of the Qt toolkit, a cross-platform application framework,
-and Qwt libraries.
+QDOAS has been developed in collaboration with \href{http://www.stcorp.nl/}{S[\&]T}.  The graphical user interface is built on the Open-Source version of the Qt toolkit, a cross-platform application framework, and Qwt libraries.
 
-QDOAS is free software distributed under the terms of the GNU General Public License; it is open source and the code is available on request by contacting the \href{mailto:caroline.fayt@aeronomie.be,thomas.danckaert@aeronomie.be}{authors}.
-This document describes the QDOAS user interface and dialog boxes for configuring the software.  It completes the online help provided with the package.  The algorithms that are used in the software are also summarized.  The document assumes that users  already have a minimum of experience with \gls{doas} applications and retrieval.
+This document describes the QDOAS user interface and dialog boxes for configuring the software.  It completes the online help provided with the package.  The algorithms that are used in the software are also summarized.  The document assumes that users already have a minimum of experience with \gls{doas} applications and retrieval.
 
 \section{Main QDOAS features}
 \subsection{General features}
@@ -50,7 +43,7 @@ This document describes the QDOAS user interface and dialog boxes for configurin
 \item wavelength calibration and instrumental slit function characterization using a \gls{nlls} fitting approach where measured intensities are fitted to a high resolution solar spectrum degraded to the resolution of the instrument. The fitting method (DOAS or intensity fitting) can be different from the method used in the analysis;
 \item possibility to correct for atmospheric absorption and Ring effect;
 \item supports different analytical line shapes, as described in section \ref{sec:wavel-calibr}, page \pageref{sec:wavel-calibr};
-\item allows approximating the initial shift of the NLLS procedure by calculating the best correlation between the spectrum to calibrate and the solar spectrum (cfr the \textbf{calculation of the preshift}, page \pageref{sec:projects_calibration_preshift} );
+\item allows approximating the initial shift of the NLLS procedure by calculating the best correlation between the spectrum to calibrate and the solar spectrum (see \nameref{sec:projects_calibration_preshift}, page \pageref{sec:projects_calibration_preshift});
 \end{qdoasitem}
 
 \subsection{Cross sections handling}
@@ -63,58 +56,82 @@ This document describes the QDOAS user interface and dialog boxes for configurin
 \end{qdoasitem}
 
 \subsection{Output}
-The output is fully configurable. Analysis results and various data related to the measurements can be saved to ASCII, HDF-EOS5 or netCDF files.
+The output is fully configurable. Analysis results and various data related to the measurements can be saved to ASCII or netCDF files.
 
 \subsection{Tools}
 
-The package includes five independent executable or modules~:
+The package includes five independent executables:
 
-  \begin{qdoasitem}
-  \item qdoas~: the main user interface;
-  \item convolution~: the convolution/filtering tool;
-\begin{itemize} \itemsep -2pt
-\item standard and \I0-corrected convolutions are supported;
-\item possibility to create an effective slit function taking into account the (finite) resolution of the source spectrum (using a FT deconvolution method);
-\item asymmetric line shapes, wavelength dependent slit functions;
-\end{itemize}
+\begin{qdoasitem}
+  \item qdoas: the main user interface;
+  \item convolution: the convolution/filtering tool;
+    \begin{itemize} \itemsep -2pt
+    \item standard and \I0-corrected convolutions are supported;
+    \item possibility to create an effective slit function taking into account the (finite) resolution of the source spectrum (using a FT deconvolution method);
+    \item asymmetric line shapes, wavelength dependent slit functions;
+    \end{itemize}
 
-  \item ring~: The ring tool calculates Ring effect cross sections (Rotational Raman Scattering approach);
-  \item usamp~: This tool generates undersampling cross sections;
-  \item doas\_cl~: a powerful command line tool that applies on qdoas, convolution, ring and usamp configuration files (XML format).
+  \item ring: The ring tool calculates Ring effect cross sections (Rotational Raman Scattering approach);
+  \item usamp: This tool generates undersampling cross sections;
+  \item doas\_cl: a powerful command line tool that applies on qdoas, convolution, ring and usamp configuration files (XML format).
   \end{qdoasitem}
 Convolution, ring and undersampling tools can be also called from the QDOAS user interface.
 
 \section{Supported spectra file formats} \label{sec:intro-formats}
 \subsection{Satellite Measurements}
-Spectra measured by the following satellite instruments can be processed by QDOAS~:
+Spectra measured by the following satellite instruments can be processed by QDOAS:
 
 \subsubsection{GOME (ERS-2)}
-
-QDOAS supports the original ASCII file format but it is recommended to use the more suitable binary file format created by a modified version of the \glslink{gdp}{GDP} implemented at \gls{bira} for the automatic selection of the reference spectrum.  Contact the authors for further information about this format.
+QDOAS supports the GOME Level 1 Version 5.1 NetCDF format (\url{https://doi.org/10.5270/ER2-ua38y2m}), as well as
+the legacy ASCII file format.  For users who wish to work with legacy
+GOME data, we recommend to use a more practial binary file format
+created by a modified version of the \glslink{gdp}{GDP} implemented at
+\gls{bira} for the automatic selection of the reference spectrum.
+Contact the authors for further information about this format.
 
 \subsubsection{SCIAMACHY (ENVISAT)}
+Routines to read the \glslink{sciamachy}{SCIAMACHY} PDS file format
+have been kindly provided by IFE/IUP University of Bremen.  SCIAMACHY
+Level 1C versions up to 7.04 (the SCIAL1C utility converts files from
+L1 to L1C).
 
-Routines to read the \glslink{sciamachy}{SCIAMACHY} PDS file format have been kindly provided by IFE/IUP University of Bremen.  SCIAMACHY Level 1C versions up to 7.04 (the SCIAL1C utility converts files from L1 to L1C)
-
-\subsubsection{GOME2 (MetOp)}
-
-QDOAS uses the \glslink{coda}{CODA} library to read spectra from GOME2.  The
-package can be downloaded from the S[\&]T web site. Before using QDOAS
-on GOME2 spectra, CODA should be installed and the
-\texttt{CODA\_DEFINITION} environment variable should be defined.
-
-QDOAS supports GOME2 Level 1B, PPF 5.0 product format version 12.0 and
-below.
+\subsubsection{GOME-2 (MetOp A/B/C)}
+QDOAS uses the \glslink{coda}{CODA} library to read spectra from the
+GOME-2A/B/C instruments.  In order to make this work, CODA needs a
+.codadef file which describes the GOME-2 data format structure.
+Download the file EPS-20250709.codadef from
+\url{https://github.com/stcorp/codadef-eps/releases}, and make sure
+the \verb|CODA_DEFINITION| environment variable contains the path
+where the .codadef file is located (see
+\url{https://stcorp.github.io/coda/doc/html} for details).
 
 \subsubsection{OMI (AURA)}
+QDOAS can work with \glslink{omi}{OMI} L1B collection 3 data, which
+uses the \glslink{hdfeos}{HDF-EOS2} format, as well as the improved
+collection 4 data, which is available in NetCDF format.
 
-\glslink{omi}{OMI} spectra are read using the
-\glslink{hdfeos}{HDF-EOS2} library, which is based on
-\glslink{hdf}{HDF4}.
+\subsubsection{TROPOMI (S5P)}
+QDOAS can process TROPOMI Level 1B radiance
+(\url{https://doi.org/10.5270/S5P-kb39wni}) and irradiance
+(\url{https://doi.org/10.5270/S5P-mhtbru8}) products.
+
+\subsubsection{OMPS (Suomi NPP/NOAA-20)}
+QDOAS supports OMPS Nadir Mapper Level 1B data (\url{https://dx.doi.org/10.5067/DL081SQY7C89}).
+
+\subsubsection{GEMS (GK-2B)}
+QDOAS can process GEMS Level 1 radiance and irradiance data, which are
+available upon request from \gls{nier}
+(\url{https://nesc.nier.go.kr/en/html/index.do}).
+
+\subsubsection{TEMPO (Intelsat 40e)}
+QDOAS supports TEMPO Level 1 radiance
+(\url{https://dx.doi.org/10.5067/IS-40e/TEMPO/RAD_L1.004}) and
+irradiance (\url{https://dx.doi.org/10.5067/IS-40e/TEMPO/IRR_L1.004})
+products, currently at ``provisional'' version 4.
 
 \subsection{Ground-based Measurements}
 
-The most popular file formats supported by QDOAS for ground-based measurements are~:
+The most popular file formats supported by QDOAS for ground-based measurements are:
 
 \subsubsection{SAOZ}
 
@@ -122,11 +139,9 @@ Système d'Analyse par Observation Zénitale developed by the aeronomy lab of th
 
 \subsubsection{MFC format, DOASIS} \label{sec:MFC_DOASIS}
 
-Both binary and std (ASCII) formats are produced by the well-known \glslink{doasis}{DOASIS} program designed by the atmospheric research group at IUP Heidelberg, Germany and widely used in the DOAS community.  It can be obtained from the following URL:
+Both binary and std (ASCII) formats are produced by the well-known \glslink{doasis}{DOASIS} program designed by the atmospheric research group at IUP Heidelberg, Germany and widely used in the DOAS community.
 
-\url{https://doasis.iup.uni-heidelberg.de/bugtracker/projects/doasis}
-
-This format can also be produced by other programs or converted from other formats, e.g.\ the Spectra Suite Ocean Optics software. QDOAS requires the size of the detector.
+This format can also be produced by other programs or converted from other formats, e.g.\ the Ocean Optics SpectraSuite software. QDOAS requires the size of the detector.
 The MFC binary format generated by DOASIS is supported by QDOAS since version 2.111.  The specificity of this format is that spectra are saved in individual files that are not easy to manage mainly for the automatic reference selection (zenith-sky spectrum measured at the minimum SZA of the day or zenith-sky of the scan for MAXDOAS measurements).
 To browse and process them, it is recommended to insert folders instead of individual files.  Browsing records requires the use of the file selection combobox in the toolbar (cfr page \pageref{sec:interface_toolbar} ) as one file contains only one record in this format.  Nevertheless, the
 automatic reference selection is automatically performed by browsing all the files of the current directory.  This could make the analysis heavier and a conversion to the BIRA-IASB MFC Binary format is recommended (using the \texttt{MFC\_Std2Bin} converter available on the FTP server with QDOAS)
@@ -232,357 +247,19 @@ be given in first column of each data set.
 
 Other examples of ASCII files supported by QDOAS are given in appendix \textbf{\ref{cha:input-files-format}}.
 
-\section{System requirements and installation}
-
-\subsection{System Requirements}
-
-The \gls{gui} is built on the Open-Source version of the Qt
-toolkit. As a result, QDOAS is portable to Windows, Linux and macOS,
-and the user interface is effectively the same on all platforms. The
-software is free and distributed under the GNU GPL version 2.0 (see
-\url{http://www.gnu.org/licenses/gpl-2.0.html} for further details).
-
-To obtain the software, get support and receive notificatations of new
-releases, please register on the following page:
-
-\url{http://uv-vis.aeronomie.be/software/QDOAS/QDOAS_Register.php}
-
-\subsection{Install QDOAS on Windows}
-
-Windows users can download the executables and all needed dynamic libraries from our FTP server (address provided after registration).
-\subsubsection{GOME2}
-For GOME2 applications, the \texttt{CODA\_DEFINITION} environment
-variable must be defined.  This variable should point to the file
-system location where the .codadef file that describes the file format
-of the GOME2 input data can be found (currently,
-EPS-20150324.codadef).  In windows, it can be set via
-
-Control Panel $\rightarrow$ System $\rightarrow$ Advanced $\rightarrow$ Environment variables
-
-\subsection{Install QDOAS on Linux}
-Users who wish to use QDOAS on Linux can use the binary package
-provided on our FTP server.  This package should run on almost all
-recent Linux versions.
-
-Users can also choose to compile the program from the source code.
-For systems where the \href{https://www.gnu.org/software/guix}{Guix}
-package manager is available, a package description is provided in the
-file \texttt{qdoas.scm}, found in the top directory of the QDOAS
-source package.  After unpacking the source, QDOAS can be installed
-with the following command:
-\begin{Verbatim}[fontfamily=courier,fontsize=\relsize{-2},xleftmargin=5mm]
-guix package --install-from-file=/path/to/source/qdoas.scm
-\end{Verbatim}
-For other systems, this section contains instructions to compile QDOAS
-and some of the libraries it depends on.
-
-Users without administrator privileges usually have to install QDOAS
-and any extra required libraries in their home directory.  In the
-following instructions, we assume that the user wants to install qdoas
-and any libraries that might need to be installed in the directory,
-\texttt{/home/username}.  Executable files will be installed in
-\texttt{/home/username/bin}, libaries and headers in
-\texttt{/home/username/lib} and \texttt{/home/username/include}.  When
-you want to install the software in a different directory, you will
-need to replace \texttt{/home/username} by the directory of choice in
-the following instructions.
-
-In order that the operating system can find the QDOAS executable
-files, the \texttt{bin} subdirectory must be added to the
-\texttt{\$PATH} system variable.  To do this, the user will add the
-following entry in to their shell (Bash) profile (typically the file
-\texttt{/home/username/.profile}), or execute this command directly
-from the shell\footnote{When you execute this command from the shell,
-  the changes are lost at the end of your session, and you will have
-  repeat the command every time you start a new session.  Add the
-  command to your shell profile to have it executed automatically at
-  the start of every session.}:
-\begin{Verbatim}[fontfamily=courier,fontsize=\relsize{-2},xleftmargin=5mm]
-export PATH=/home/username/bin:$PATH
-\end{Verbatim}
-%$
-
-\subsubsection{C and C++ compiler}
-QDOAS requires gcc and g++ versions 4.7 or higher, or recent versions of the Clang compiler.
-
-\subsubsection{Qt}
-Qdoas uses the Qt libraries.  It can be compiled with Qt5 or, at your
-choice, Qt4.
-
-Qt development packages are available on most Linux distributions, as
-well as on macOS (e.g.\ via Homebrew or MacPorts).  Alternatively,
-you can install Qt yourself from \url{https://www.qt.io/download} and
-follow the installation instructions.
-
-\subsubsection{Qwt}
-Either install a Qwt development package for your OS, or install the
-Qwt library using the source code, available at
-\url{http://sourceforge.net/projects/qwt}.
-
-To install Qwt manually, download the latest source package from the
-Qwt project website and unpack it in a temporary directory. The
-current QDOAS version requires Qwt version 6.1.2 or higher.
-
-Open a shell and enter the Qwt source directory, edit the
-qwtconfig.pri and change the variables according to your installation.
-A sysadmin can set the \texttt{QWT\_PREFIX\_INSTALL} to, for example,
-\texttt{/usr/local}, while a regular user might set it to
-\texttt{/home/username}.
-
-Once the changes are made accordingly to your installation, run the
-command \textbf{qmake qwt.pro} followed by \textbf{make} and finally
-\textbf{make install}. This will build the Qwt libraries and install
-the development package (headers, documentation and runtime
-libraries).
-
-\subsubsection{GSL}
-QDOAS uses numerical routines from the GNU Scientific Library.  You can download this library from \url{https://www.gnu.org/software/gsl}.
-
-From the unpacked source directory, run 
-\begin{Verbatim}[fontfamily=courier,fontsize=\relsize{-2},xleftmargin=5mm]
-$ ./configure --prefix=/home/username
-\end{Verbatim}
-
-And continue with \textbf{make} and \textbf{make install}.
-
-\subsubsection{CODA}\label{sec:coda}
-QDOAS uses the \gls{coda} library developed by S[\&]T to read GOME-2
-data.  The source package is available at
-\url{http://www.stcorp.nl/coda}.
-
-CODA can be installed with the usual ``configure/make/make install''
-procedure.  From the directory where you have downloaded the CODA
-library files, enter
+\section{Installation}
+QDOAS packages for Windows, Linux and macOS systems are available in the Conda package manager.  If Conda is not yet installed on your system, you should install it first\footnote{If you are installing Conda specifically for QDOAS, we recommend the lightweight Miniforge distribution available at \url{https://github.com/conda-forge/miniforge}.  Alternatively, you can obtain Miniconda or the full Anaconda distribution from \url{https://anaconda.org}.}
+.  Once Conda is installed, run the following command from the Conda prompt to install QDOAS:
 
 \begin{Verbatim}[fontfamily=courier,fontsize=\relsize{-2},xleftmargin=5mm]
-$ ./configure --prefix=/home/username
-\end{Verbatim}
-%$
+conda install conda-forge::qdoas
+-\end{Verbatim}
 
-This configures the install script to use the directory structure we
-described earlier.  To complete the installation, type \texttt{make},
-which will compile the library files, and finally \texttt{make
-  install}, which will copy the compiled files, headers and other
-resources to the appropriate subdirectories in \texttt{/home/username}.
-
-If you want to process GOME-2 data using QDOAS, you need to obtain the
-product format descriptions for the GOME-2 data as well.  Download the
-files for ``EUMETSAT EPS GOME-2 and IASI products'' from
-\url{http://stcorp.nl/coda/registration/download}, save them in a
-location such as \texttt{/home/username/share/coda/definitions}, and
-define the environment variable \texttt{CODA\_DEFINITION} so it
-contains the location of the .codadef files.  For example:
-
-\begin{Verbatim}[fontfamily=courier,fontsize=\relsize{-2}]
-In bash:
-   export CODA_DEFINITION="/home/username/share/coda/definitions"
-In c-shell:
-   setenv CODA_DEFINITION "/home/username/share/coda/definitions"
-\end{Verbatim}
-
-Again, it is practical to add these commands to your shell profile.
-
-\subsubsection{HDF-EOS2}
-QDOAS uses the HDF-EOS2 library to read OMI spectra.  The HDF-EOS2
-library itself relies on the HDF4 library.  If these libraries are not
-yet available on your system, you can install them using your Linux
-distribution's package management system, or install them from the
-source code.
-
-If you want to install the libraries from source, HDF4 must be
-installed first.  The HDF4 source code package is available from
-\url{http://www.hdfgroup.org/ftp/HDF/HDF_Current/src}.  You can
-install it using the usual ``configure/make/make install'' procedure.
-To avoid conflicts with the netCDF library, you should disable the
-netCDF interface of the HDF4 library using the configure option
-\texttt{--disable-netcdf}. To avoid a conflict with the HDF5 library,
-we have found it practical to install the HDF4 header files in a
-separate subdirectory using the option \texttt{--includedir}.  The
-\texttt{configure} command which achieves this is:
-
-\begin{Verbatim}[fontfamily=courier,fontsize=\relsize{-2}]
-$ ./configure --prefix=/home/username --disable-netcdf \
-    --includedir=/home/username/include/hdf4
-\end{Verbatim}
-%$
-
-Now, use \texttt{make} and \texttt{make install} to complete the
-installation of HDF4.
-
-Once you have installed the HDF4 library, download the source for
-HDF-EOS2 from
-\url{ftp://edhs1.gsfc.nasa.gov/edhs/hdfeos/latest_release}.  The
-library comes with an installation script, but we recommend installing
-it with the same ``configure/make/make install'' procedure, which is
-also available.  If you installed HDF4 according to the previous
-instructions, the following command should allow you to install
-HDF-EOS2:
-\begin{Verbatim}[fontfamily=courier,fontsize=\relsize{-2}]
-$ ./configure --prefix=/home/username CC=/home/username/bin/h4cc \
-    --enable-install-include
-\end{Verbatim}
-%$
-
-When \texttt{configure} has finished its job, run \texttt{make} and \texttt{make install}.
-
-\subsubsection{HDF5}
-QDOAS can write output data in the HDF-EOS5 and netCDF-4 formats.
-Both formats depend on the HDF5 library.  Again, if these libraries
-are not installed on your system yet, you can either install the
-appropriate packages for your Linux distribution, or compile the
-libraries from source yourself.
-
-Source code packages for HDF5 are available from
-\url{http://www.hdfgroup.org/ftp/HDF5/current/src}.  The installation
-follows the standard ``configure/make/make install'' procedure.  When
-running configure, specify the \texttt{--prefix} as before:
-
+This will install the QDOAS GUI tools qdoas, convolution, ring and usamp, as well as the command line tool \verb|doas_cl|.  Because the GUI tools depend on the Qt libraries, such an installation will take up about 1,4GB of disk space.  Users who only need \verb|doas_cl|  -- e.g.\ for batch processing on a compute server -- can reduce the installation footprint by installing only \verb|doas_cl|:
 \begin{Verbatim}[fontfamily=courier,fontsize=\relsize{-2},xleftmargin=5mm]
-$ ./configure --prefix=/home/username --enable-install-include
-\end{Verbatim}
+conda install conda-forge::doas_cl
+-\end{Verbatim}
 
-Again, run \texttt{make} and \texttt{make install} to complete the
-installation.
-
-\subsubsection{netCDF}
-The netCDF source code is available from
-\url{http://www.unidata.ucar.edu/software/netcdf}.  QDOAS uses the
-netCDF-4 format, which depends on the HDF5 library we've just
-installed.  To ensure that the netCDF installation scripts can find
-your HDF5 library, use the following \texttt{configure} command:
-
-\begin{Verbatim}[fontfamily=courier,fontsize=\relsize{-2},xleftmargin=5mm]
-$ CPPFLAGS=-I/home/username/include LDFLAGS=-L/home/username/lib \
-    ./configure --prefix=/home/username
-\end{Verbatim}
-
-followed by \texttt{make} and \texttt{make install}.
-
-\subsubsection{HDF-EOS5}
-After installing HDF5, you can obtain the HDF-EOS5 source
-code\footnote{The current version 1.15 of the HDF-EOS5 source code
-  contains a bug which causes linking errors when the library is
-  compiled without the SZIP library.  When installing HDF-EOS5 1.15
-  from source, please appy the patch hdf-eos5\_1.15.patch, also
-  available on our FTP server.} at
-\url{ftp://edhs1.gsfc.nasa.gov/edhs/hdfeos5/latest_release}.  This
-package can then be installed using configure and make.  Again, you
-should set \texttt{--prefix=/home/username} to install the library at
-the correct location.  Additionally, you need to add the option
-\texttt{--with-hdf5=/home/username}, so the installation script can
-find the HDF-5 libraries installed in the previous step, and
-\texttt{--enable-install-include}, in order to copy the HDF-EOS5
-header files to the directory \texttt{/home/username/include}, where
-the Qdoas build system expects them:
-
-\begin{Verbatim}[fontfamily=courier,fontsize=\relsize{-2},xleftmargin=5mm]
-$ ./configure --prefix=/home/username --with-hdf5=/home/username \
-    --enable-install-include
-\end{Verbatim}
-%$
-
-Complete the installation of HDF-EOS5 by running \texttt{make} and
-\texttt{make install}.
-
-\subsubsection{QDOAS}
-The QDOAS build configuration uses the Qt utility \textbf{qmake}.  The
-configuration file is \textbf{Src/config.pri}, and some important
-settings are made in the \texttt{unix} section:
-\begin{Verbatim}[fontfamily=courier,fontsize=\relsize{-2},xleftmargin=5mm]
-unix {
-  INCLUDEPATH += $$(HOME)/include
-  QMAKE_LIBDIR += $$(HOME)/lib
-  QMAKE_RPATHDIR += $$(HOME)/lib
-
-  isEmpty(INSTALL_PREFIX) {
-    INSTALL_PREFIX = $$(HOME)
-  }
-
-  INCLUDEPATH += $$INSTALL_PREFIX/include
-  INCLUDEPATH += $$INSTALL_PREFIX/include/hdf4
-  INCLUDEPATH += $$INSTALL_PREFIX/include/qwt
-  QMAKE_LIBDIR += $$INSTALL_PREFIX/lib
-}
-\end{Verbatim}
-
-This configuration assumes that QDOAS should use libraries installed
-in the user's home directory (e.g. \texttt{/home/username}).  If you
-followed the instructions until now, you not need to make any changes
-to this file.  If some of the include files and/or libraries are
-installed in other locations, you may have to add the include files'
-and library files' directories to the variables \texttt{INCLUDEPATH}
-and \texttt{QMAKE\_RPATHDIR}/\texttt{QMAKE\_LIBDIR} respectively.
-Conversely, if QDOAS may not use libraries from the home directory,
-remove the lines referring to \texttt{\$\$(HOME)}.
-
-When you are satisfied with \texttt{config.pri}, go to the directory
-\texttt{Src} contained in the QDOAS source distribution. Run the
-command \textbf{qmake all.pro} followed by \textbf{make}. This will
-create the executable files, \texttt{qdoas}, \texttt{doas\_cl},
-\texttt{convolution}, \texttt{ring} and \texttt{usamp}.  The command
-\texttt{make install} copies the executable files to the directory
-\texttt{\$\$INSTALL\_PREFIX/bin}.
-
-QDOAS uses the Qt resource system so that the executable only depends
-on system Qt and Qwt libraries. The executable can therefore be safely
-moved to another directory.  To rebuild QDOAS after an update of the
-package, run the following commands from the \texttt{Src} directory:
-
-\begin{Verbatim}[fontfamily=courier,fontsize=\relsize{-2},xleftmargin=5mm]
-$ make distclean
-$ qmake all.pro
-$ make
-\end{Verbatim}
-%$
-
-\subsection{QDOAS on macOS}
-Users who wish to run QDOAS on a Mac system have to compile the program from the source code.  We suggest to use the MacPorts package manager, which can automatically install all required libraries, with the exception of CODA.  In the following instructions, we use \texttt{/Users/username} to refer to the user's home directory.
-
-\begin{enumerate}
-\item Install MacPorts: follow the installation instructions at \url{https://www.macports.org/install.php}.
-\item Using MacPorts' \texttt{port} tool, install Qt5, Qwt, HDF-EOS2, HDF-EOS5, netCDF and GSL: open a terminal and enter
-\begin{Verbatim}[fontfamily=courier,fontsize=\relsize{-2},xleftmargin=5mm]
-$ sudo port install qt5 hdfeos hdfeos5 netcdf gsl qwt61 +qt5
-\end{Verbatim}
-\item Install CODA: download and extract the CODA source code (see section \ref{sec:coda}), open a terminal, navigate to the location of the extracted source code, and enter
-  \begin{Verbatim}[fontfamily=courier,fontsize=\relsize{-2},xleftmargin=5mm]
-$ ./configure --prefix=/opt/local
-\end{Verbatim}
-\item Extract the QDOAS source code archive.
-\item Optionally: change the default install location.  By default, the QDOAS applications will be installed in \texttt{/Users/username/bin}.  If you want to install QDOAS in a different location, edit the file \texttt{Src/config.pri} from the QDOAS source bundle and look for the section 'macports'.
-\begin{Verbatim}[fontfamily=courier,fontsize=\relsize{-2},xleftmargin=5mm]
-  macports {
-  INSTALL_PREFIX = $$(HOME)
-  INCLUDEPATH += [...]
-\end{Verbatim}
-  You can replace \texttt{\$\$(HOME)} by a directory of your choice,
-  and save the file.
-\item Open a terminal, navigate to the \texttt{Src} directory of the extracted QDOAS source code and enter the following commands:
-\begin{Verbatim}[fontfamily=courier,fontsize=\relsize{-2},xleftmargin=5mm]
-$ /opt/local/libexec/qt5/bin/qmake CONFIG+=macports
-$ make
-$ make install
-\end{Verbatim}
-  In the second step, you can speed up the compilation process using
-  make's parallel option, i.e.\ use \texttt{make -j8} to run up to 8
-  jobs in parallel.
-\end{enumerate}
-
-You can now run the programs \texttt{qdoas}, \texttt{doas\_cl}, \texttt{convolution}, \texttt{ring} and \texttt{usamp} from the
-terminal as follows:
-\begin{Verbatim}[fontfamily=courier,fontsize=\relsize{-2},xleftmargin=5mm]
-$ /Users/username/bin/qdoas.app/Contents/MacOS/qdoas
-$ /Users/username/bin/doas_cl.app/Contents/MacOS/doas_cl
-$ ...
-\end{Verbatim}
-To avoid having to enter these long paths every time you want to run QDOAS, you can create aliases for the QDOAS applications in your shell profile.  For example, to create an alias \texttt{qdoas}, edit (or, if the file does not exist, create) the file \texttt{/Users/username/.bash\_profile}, and add the following line:
-\begin{Verbatim}[fontfamily=courier,fontsize=\relsize{-2},xleftmargin=5mm]
-alias qdoas="/Users/username/bin/qdoas.app/Contents/MacOS/qdoas"
-\end{Verbatim}
-In your next session you can start QDOAS from the terminal as follows:
-\begin{Verbatim}[fontfamily=courier,fontsize=\relsize{-2},xleftmargin=5mm]
-$ qdoas
-\end{Verbatim}
 \subsection{Online Help}
 QDOAS also provices online help in the form of HTML pages.  The
 content is similar to chapters \ref{cha:descr-algor},
@@ -593,6 +270,10 @@ dedicated subfolder of your system share directory on Linux systems).
 The HTML pages are reachable from the Help button of the configuration
 dialog boxes.  If the page can not be found, the user is is asked to
 provide the location of the help's index.html file, after which the help system should work.
+
+\subsection{Source code}
+The source code for QDOAS is freely available at \url{https://github.com/UVVIS-BIRA-IASB/qdoas}.  The README file contains instructions for users who want to compile QDOAS from source.
+
 
 %%% Local Variables:
 %%% mode: latex
