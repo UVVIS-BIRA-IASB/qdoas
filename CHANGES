@@ -1,3 +1,12 @@
+3.7.7 2025-10-06
+~~~~~~~~~~~~~~~~
+
+ * Restrict calibration plots to the calibration wavelength interval to improve clarity.
+
+ * Don't extrapolate wavelength shift calibration polynomial outside calibration interval.
+
+ * Fix a memory access bug.
+
 3.7.6 2025-08-28
 ~~~~~~~~~~~~~~~~
 
