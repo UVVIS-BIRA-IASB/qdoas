@@ -2397,7 +2397,6 @@ CWInstrTempoEdit::CWInstrTempoEdit(const struct instrumental_tempo *d, QWidget *
   QFrame(parent)
 {
   QVBoxLayout *mainLayout = new QVBoxLayout(this);
-  mainLayout->setMargin(5);
   mainLayout->setSpacing(5);
 
   QGridLayout *gridLayout = new QGridLayout;
