@@ -114,7 +114,7 @@
 
 #define N2_STAT  31    // size of n2 statistical data
 
-static double nodoxygen_n2stat_1[N2_STAT]=
+static double n2stat_1[N2_STAT]=
  {
   (double)  0., (double)  1., (double)  2., (double)  3., (double)  4., (double)  5.,
   (double)  6., (double)  7., (double)  8., (double)  9., (double) 10., (double) 11.,
@@ -124,7 +124,7 @@ static double nodoxygen_n2stat_1[N2_STAT]=
   (double) 30.
  };
 
-static double nodoxygen_n2stat_2[N2_STAT]=
+static double n2stat_2[N2_STAT]=
  {
   (double) 6., (double) 3., (double) 6., (double) 3., (double) 6., (double) 3.,
   (double) 6., (double) 3., (double) 6., (double) 3., (double) 6., (double) 3.,
@@ -134,7 +134,7 @@ static double nodoxygen_n2stat_2[N2_STAT]=
   (double) 6.
  };
 
-static double nodoxygen_n2stat_3[N2_STAT]=
+static double n2stat_3[N2_STAT]=
  {
   (double)    0.0000, (double)    3.9791, (double)   11.9373, (double)   23.8741, (double)   39.7892,
   (double)   59.6821, (double)   83.5521, (double)  111.3983, (double)  143.2197, (double)  179.0154,
@@ -147,7 +147,7 @@ static double nodoxygen_n2stat_3[N2_STAT]=
 
 // Rotation Raman line-specific parameters
 
-static double nodoxygen_n2term[N2_SIZE]=
+static double n2term[N2_SIZE]=
  {
   (double) 1290.7963, (double) 1191.6766, (double) 1096.4948, (double) 1005.2540, (double) 917.9574,
   (double)  834.6081, (double)  755.2090, (double)  679.7628, (double)  608.2722, (double) 540.7395,
@@ -161,7 +161,7 @@ static double nodoxygen_n2term[N2_SIZE]=
   (double)  917.9574, (double) 1005.2540, (double) 1096.4948
  };
 
-static double nodoxygen_n2plactel[N2_SIZE]=
+static double n2plactel[N2_SIZE]=
  {
   (double) 3.601e-1, (double) 3.595e-1, (double) 3.589e-1, (double) 3.581e-1, (double) 3.573e-1,
   (double) 3.565e-1, (double) 3.555e-1, (double) 3.544e-1, (double) 3.532e-1, (double) 3.519e-1,
@@ -175,7 +175,7 @@ static double nodoxygen_n2plactel[N2_SIZE]=
   (double) 3.922e-1, (double) 3.915e-1, (double) 3.908e-1
  };
 
-static double nodoxygen_n2deg[N2_SIZE]=
+static double n2deg[N2_SIZE]=
  {
   (double) 25., (double) 24., (double) 23., (double) 22., (double) 21.,
   (double) 20., (double) 19., (double) 18., (double) 17., (double) 16.,
@@ -189,7 +189,7 @@ static double nodoxygen_n2deg[N2_SIZE]=
   (double) 21., (double) 22., (double) 23.
  };
 
-static double nodoxygen_n2nuc[N2_SIZE]=
+static double n2nuc[N2_SIZE]=
  {
   (double) 3., (double) 6., (double) 3., (double) 6., (double) 3., (double) 6.,
   (double) 3., (double) 6., (double) 3., (double) 6., (double) 3., (double) 6.,
@@ -228,15 +228,15 @@ void raman_n2(double temp,double *n2xsec)
   // Calculate partition function
 
   for (qn2=(double)0.,i=0;i<N2_STAT;i++)
-   qn2+=(nodoxygen_n2stat_1[i]*2.+1.)*nodoxygen_n2stat_2[i]*exp(emult*nodoxygen_n2stat_3[i]);
+   qn2+=(n2stat_1[i]*2.+1.)*n2stat_2[i]*exp(emult*n2stat_3[i]);
 
   // Calculate population fractions for rotational Raman lines and
   // the cross sections (in cm2 * 1.e48), except for gamma**2/lambda**4
 
   for (i=0;i<N2_SIZE;i++)
    {
-    n2frac=(nodoxygen_n2deg[i]*2.+1.)*nodoxygen_n2nuc[i]*exp(emult*nodoxygen_n2term[i])/qn2;
-    n2xsec[i]=prefix*n2frac*nodoxygen_n2plactel[i];
+    n2frac=(n2deg[i]*2.+1.)*n2nuc[i]*exp(emult*n2term[i])/qn2;
+    n2xsec[i]=prefix*n2frac*n2plactel[i];
    }
  }
 
@@ -248,7 +248,7 @@ void raman_n2(double temp,double *n2xsec)
 
 #define O2_STAT   54    // size of o2 statistical data
 
-static double nodoxygen_o2stat_1[O2_STAT]=
+static double o2stat_1[O2_STAT]=
  {
   (double)  0., (double)  2., (double)  1., (double)  2., (double)  4., (double)  3., (double)  4.,
   (double)  6., (double)  5., (double)  8., (double)  6., (double)  7., (double) 10., (double)  8.,
@@ -260,7 +260,7 @@ static double nodoxygen_o2stat_1[O2_STAT]=
   (double) 32., (double) 33., (double) 36., (double) 34., (double) 35.
  };
 
-static double nodoxygen_o2stat_2[O2_STAT]=
+static double o2stat_2[O2_STAT]=
  {
   (double)    0.0000, (double)    2.0843, (double)    3.9611, (double)   16.2529, (double)   16.3876, (double)  18.3372,
   (double)   42.2001, (double)   42.2240, (double)   44.2117, (double)   79.5646, (double)   79.6070, (double)  81.5805,
@@ -276,7 +276,7 @@ static double nodoxygen_o2stat_2[O2_STAT]=
 
 // Rotation Raman line-specific parameters
 
-static double nodoxygen_o2term[O2_SIZE]=
+static double o2term[O2_SIZE]=
  {
   (double) 1606.3533, (double) 1608.0710, (double) 1605.8064, (double) 1420.7672, (double) 1422.5020,
   (double) 1420.2552, (double) 1246.4518, (double) 1248.2040, (double) 1245.9750, (double) 1083.4356,
@@ -317,7 +317,7 @@ static double nodoxygen_o2term[O2_SIZE]=
   (double) 1422.5020, (double) 1420.7672, (double) 1605.8064, (double) 1608.0710, (double) 1606.3533
  };
 
-static double nodoxygen_o2plactel[O2_SIZE]=
+static double o2plactel[O2_SIZE]=
  {
   (double) 3.630e-1, (double) 3.630e-1, (double) 3.637e-1, (double) 3.622e-1, (double) 3.622e-1,
   (double) 3.630e-1, (double) 3.613e-1, (double) 3.613e-1, (double) 3.622e-1, (double) 3.602e-1,
@@ -358,7 +358,7 @@ static double nodoxygen_o2plactel[O2_SIZE]=
   (double) 3.861e-1, (double) 3.868e-1, (double) 3.855e-1, (double) 3.855e-1, (double) 3.861e-1
  };
 
-static double nodoxygen_o2deg[O2_SIZE]=
+static double o2deg[O2_SIZE]=
  {
   (double) 32., (double) 33., (double) 34., (double) 30., (double) 31., (double) 32., (double) 28.,
   (double) 29., (double) 30., (double) 26., (double) 27., (double) 28., (double) 24., (double) 25.,
@@ -416,15 +416,15 @@ void raman_o2(double temp,double *o2xsec)
   // Calculate partition function
 
   for (qo2=(double)0.,i=0;i<O2_STAT;i++)
-   qo2+=(double)(nodoxygen_o2stat_1[i]*2.+1.)*exp(emult*nodoxygen_o2stat_2[i]);
+   qo2+=(double)(o2stat_1[i]*2.+1.)*exp(emult*o2stat_2[i]);
 
   // Calculate population fractions for rotational Raman lines and
   // the cross sections (in cm2 * 1.e48), except for gamma**2/lambda**4
 
   for (i=0;i<O2_SIZE;i++)
    {
-    o2frac=(nodoxygen_o2deg[i]*2.+1.)*exp(emult*nodoxygen_o2term[i])/qo2;
-    o2xsec[i]=prefix*o2frac*nodoxygen_o2plactel[i];
+    o2frac=(o2deg[i]*2.+1.)*exp(emult*o2term[i])/qo2;
+    o2xsec[i]=prefix*o2frac*o2plactel[i];
    }
  }
 
@@ -432,7 +432,7 @@ void raman_o2(double temp,double *o2xsec)
 // MAIN FUNCTION
 // =============
 
-double nodoxygen_n2pos[N2_SIZE]=
+double n2pos[N2_SIZE]=
  {
   (double) -194.3015, (double) -186.4226, (double) -178.5374, (double) -170.6459, (double) -162.7484,
   (double) -154.8453, (double) -146.9368, (double) -139.0233, (double) -131.1049, (double) -123.1819,
@@ -446,7 +446,7 @@ double nodoxygen_n2pos[N2_SIZE]=
   (double)  178.5374, (double)  186.4226, (double)  194.3015
  };
 
-double nodoxygen_o2pos[O2_SIZE]=
+double o2pos[O2_SIZE]=
  {
   (double) -185.5861, (double) -185.5690, (double) -185.5512, (double) -174.3154, (double) -174.2980,
   (double) -174.2802, (double) -163.0162, (double) -162.9980, (double) -162.9809, (double) -151.6906,
@@ -515,7 +515,7 @@ RC raman_convolution(double *xsLambda,double *xsVector,double *xsDeriv2,double *
   double *n2xref,*o2xref,                                                       // rotational Raman spectra
           gamman2,sigprimen2,n2xsec,sign2,sumn2xsec,                            // n2 working variables
           gammao2,sigprimeo2,o2xsec,sigo2,sumo2xsec,                            // o2 working variables
-          sigsq,lambda,lambda1e7,solar,nodoxygen_n2posj,nodoxygen_o2posj,                           // other working variables
+          sigsq,lambda,lambda1e7,solar,n2posj,o2posj,                           // other working variables
           newXs;                                                                // output value
 
   INDEX   i,j;                                                                  // indexes for loops and arrays
@@ -561,8 +561,8 @@ RC raman_convolution(double *xsLambda,double *xsVector,double *xsDeriv2,double *
 
       for (j=0;(j<N2_SIZE) && !rc;j++)
        {
-        nodoxygen_n2posj=nodoxygen_n2pos[j];
-        sigprimen2=(double) lambda1e7+nodoxygen_n2posj;
+        n2posj=n2pos[j];
+        sigprimen2=(double) lambda1e7+n2posj;
         sign2=(double)1.e7/sigprimen2;
 
         sigprimen2 *= sigprimen2;       // **2
@@ -577,8 +577,8 @@ RC raman_convolution(double *xsLambda,double *xsVector,double *xsDeriv2,double *
 
       for (j=0;(j<O2_SIZE) && !rc;j++)
        {
-        nodoxygen_o2posj=nodoxygen_o2pos[j];
-        sigprimeo2 = (double) lambda1e7+nodoxygen_o2posj;
+        o2posj=o2pos[j];
+        sigprimeo2 = (double) lambda1e7+o2posj;
         sigo2=(double)1.e7/sigprimeo2;
 
         sigprimeo2 *= sigprimeo2;       // **2
