@@ -94,12 +94,9 @@ RC MATRIX_netcdf_Load(const char *fileName,MATRIX_OBJECT *pMatrix,
 
   char     fullPath[MAX_ITEM_TEXT_LEN];                                         //!< \details the complete file name to load
   int      imin,imax;                                                           //!< \details indexes ranges for xmin,xmax
-  INDEX    i,j;                                                                 //!< \details indexes for browsing lines and columns in matrix
   double **matrix,**deriv2,                                                     //!< \details resp. pointers to the matrix to load and to the second derivatives
-           xMin,xMax,                                                           //!< \details define the range of values to load for the first column of the matrix
            tempValue;                                                           //!< \details a value of the matrix to load
   RC       rc;                                                                  //!< \details return code
-  double firstCalib;
 
   // Debugging
 
@@ -115,11 +112,7 @@ RC MATRIX_netcdf_Load(const char *fileName,MATRIX_OBJECT *pMatrix,
   DEBUG_Print("File to load : %s\n",fullPath);
   #endif
 
-  firstCalib=(double)0.;
   rc=ERROR_ID_NO;
-
-  xMin=min(xmin,xmax);
-  xMax=max(xmin,xmax);
 
   // Reset matrix
 
@@ -151,19 +144,25 @@ RC MATRIX_netcdf_Load(const char *fileName,MATRIX_OBJECT *pMatrix,
     else
      {
       auto wve = root_group.getVar<double>("wavelength");
-      for (i=0;i<n_wavelength;i++)
-       dwve[i]=wve[i];
+      for (int i=0; i<n_wavelength; i++) {
+        dwve[i]=wve[i];
+      }
 
-      if (fabs(xmax-xmin)<EPSILON)
-       {
+      if (fabs(xmax-xmin)<EPSILON) {
         imin=0;
         imax=n_wavelength-1;
-       }
-      else
-       {
+      } else {
+        if ((xmin < wve[0]) || (xmax > wve[n_wavelength - 1])) {
+          std::stringstream ss;
+          ss << "Requested wavelength range "
+             << xmin << " - " << xmax
+             << " is outside the domain of " << fileName;
+          throw std::runtime_error(ss.str());
+        }
+
         imin=FNPixel((double *)dwve,xmin,n_wavelength,PIXEL_CLOSEST);
         imax=FNPixel((double *)dwve,xmax,n_wavelength,PIXEL_CLOSEST);
-       }
+      }
 
       nl=(imax-imin+1);
 
@@ -174,7 +173,7 @@ RC MATRIX_netcdf_Load(const char *fileName,MATRIX_OBJECT *pMatrix,
 
         memcpy(matrix[0],&dwve[imin],sizeof(double)*nl);
 
-        for (size_t j=1; j <= n_rows; ++j) {
+        for (size_t j=1; j <= static_cast<size_t>(n_rows); ++j) {
           if ((use_row==NULL) || use_row[j-1]) {
             const size_t start[] = {j-1, static_cast<size_t>(imin)};
             const size_t count[] = {1, static_cast<size_t>(nl)};
@@ -184,8 +183,8 @@ RC MATRIX_netcdf_Load(const char *fileName,MATRIX_OBJECT *pMatrix,
         // Flip up/down the matrix
 
         if (reverseFlag && (matrix[0][0]>matrix[0][1]))
-         for (i=0; i<nl/2 ; ++i)
-          for (j=0; j<=n_rows; ++j)                                              // index 0 includes wavelengths
+         for (int i=0; i<nl/2 ; ++i)
+          for (int j=0; j<=n_rows; ++j)                                              // index 0 includes wavelengths
             if ((j==0) || (use_row==NULL) || use_row[j-1])
              {
               tempValue=matrix[j][i];
@@ -196,7 +195,7 @@ RC MATRIX_netcdf_Load(const char *fileName,MATRIX_OBJECT *pMatrix,
         // Calculate second derivatives of the columns of the matrix for future interpolation
 
         if (allocateDeriv2)
-         for (j=1; (j<=n_rows) && !rc; ++j)
+         for (int j=1; (j<=n_rows) && !rc; ++j)
            if ((use_row==NULL) || use_row[j-1])
             rc=SPLINE_Deriv2(((double *)matrix[0]),
                              ((double *)matrix[j]),
