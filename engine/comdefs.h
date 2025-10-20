@@ -292,6 +292,10 @@ SHORT_DATE;
 #define ERROR_ID_TROPOMI_REF                   1600                             // requested reference spectrum not found
 #define ERROR_ID_FILE_FORMAT                   2000                             // bad file format
 
+// Configuration input errors
+
+#define ERROR_ID_ROWSELECTION                  2500                             // invalid row selection input
+
 // =========
 // DEBUGGING
 // =========

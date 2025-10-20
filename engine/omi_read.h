@@ -5,7 +5,6 @@
 
 #define OMI_TOTAL_ROWS 60 // 60 detector rows for OMI
 
-void OMI_TrackSelection(const char *omiTrackSelection,bool *use_row);
 void OMI_ReleaseReference(void);
 void OMI_ReleaseBuffers(void);
 RC   OMI_GetReference(int spectralType, const char *refFile,INDEX indexColumn,double *lambda,double *ref,double *refSigma, int *n_wavel_ref);

@@ -205,6 +205,8 @@ ERROR_TABLE errorTable[]=
   { ERROR_ID_NETCDF                    , "%s"},
   { ERROR_ID_TROPOMI_REF               , "Could not find Tropomi reference spectrum from file %s, row %d: %s"},
   { ERROR_ID_STRAYLIGHT_CORRECTION     , "Wavelength interval defined for straylight bias is not covered by the L1 wavelength calibration" },
+  { ERROR_ID_ROWSELECTION            , "%s"},
+
   // End of the table
 
   { ITEM_NONE                          , "Unknown error (%d)"                                                                                           }

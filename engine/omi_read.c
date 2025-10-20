@@ -384,64 +384,6 @@ static void omi_destroy_orbit_file(struct omi_orbit_file *pOrbitFile) {
   free(pOrbitFile);
 }
 
-void OMI_TrackSelection(const char *omiTrackSelection,bool *use_row)
-{
-  // Declarations
-
-  char str[256];
-  int number1,number2,i,n,resetFlag,rangeFlag;
-
-  // Initializations
-
-  resetFlag=1;
-  rangeFlag=0;
-  n=0;
-
-  number1=number2=-1;
-
-  if (!strlen(omiTrackSelection))
-    for (i=0;i<MAX_SWATHSIZE;i++)
-      use_row[i]=true;
-  else
-    {
-      for (const char *ptr=omiTrackSelection;(int)(ptr-omiTrackSelection)<=256;ptr++)
-        {
-          if (resetFlag)
-            {
-              memset(str,0,256);
-              n=0;
-              resetFlag=0;
-            }
-
-          if ((*ptr>='0') && (*ptr<='9'))
-            str[n++]=*ptr;
-          else if ((*ptr==':') || (*ptr=='-'))
-            {
-              number1=atoi(str);
-              rangeFlag=1;
-              resetFlag=1;
-            }
-          else if ((*ptr==',') || (*ptr==';') || (*ptr=='\0'))
-            {
-              number2=atoi(str);
-
-              if (!rangeFlag)
-                number1=number2;
-
-              if ((number1>0) && (number1<MAX_SWATHSIZE) && (number2>0) && (number2<MAX_SWATHSIZE))
-                for (i=number1-1;i<number2;i++)
-                  use_row[i]=true;
-
-              number1=number2=-1;
-              rangeFlag=0;
-              resetFlag=1;
-
-              if (*ptr=='\0')
-                break;
-            }
-        }
-    }
-}
 
 // -----------------------------------------------------------------------------
 // FUNCTION      OMI_AllocateSwath

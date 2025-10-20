@@ -111,6 +111,8 @@ add_library(engine STATIC
   uoft-read.c
   usamp.c
   usamp.h
+  utils.cpp
+  utils.h
   vector.c
   vector.h
   winfiles.c

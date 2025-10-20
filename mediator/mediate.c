@@ -21,6 +21,7 @@
 #include "output.h"
 #include "kurucz.h"
 #include "svd.h"
+#include "utils.h"
 #include "winthrd.h"
 
 #include "radiance_ref.h"
@@ -814,9 +815,10 @@ void setMediateProjectUndersampling(PRJCT_USAMP *pEngineUsamp,const mediate_proj
 // PURPOSE       Instrumental part of the project properties
 // -----------------------------------------------------------------------------
 
-void setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const mediate_project_instrumental_t *pMediateInstrumental)
+RC setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const mediate_project_instrumental_t *pMediateInstrumental)
  {
    INDEX indexCluster;
+   RC rc = ERROR_ID_NO;
 
    pEngineInstrumental->readOutFormat=(char)pMediateInstrumental->format;       // File format
    pEngineInstrumental->saaConvention=pMediateInstrumental->saaConvention;      // Solar azimuth convention
@@ -982,7 +984,7 @@ void setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const
       strcpy(pEngineInstrumental->calibrationFile,pMediateInstrumental->apex.calibrationFile);
       strcpy(pEngineInstrumental->instrFunction,pMediateInstrumental->apex.transmissionFunctionFile);
 
-      OMI_TrackSelection(pMediateInstrumental->apex.trackSelection,pEngineInstrumental->use_row);
+      rc = parse_trackselection(pMediateInstrumental->apex.trackSelection, pEngineInstrumental->use_row);
 
       break;
     #ifdef PRJCT_INSTR_FORMAT_OLD  
@@ -1195,7 +1197,7 @@ void setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const
       pEngineInstrumental->omi.pixelQFMask=pMediateInstrumental->omi.pixelQFMask;
       pEngineInstrumental->omi.xtrack_mode=pMediateInstrumental->omi.xtrack_mode;
 
-      OMI_TrackSelection(pMediateInstrumental->omi.trackSelection,pEngineInstrumental->use_row);
+      rc = parse_trackselection(pMediateInstrumental->omi.trackSelection,pEngineInstrumental->use_row);
 
       break;
       // ----------------------------------------------------------------------------
@@ -1226,7 +1228,7 @@ void setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const
       strcpy(pEngineInstrumental->calibrationFile,pMediateInstrumental->tropomi.calibrationFile);     // calibration file
       strcpy(pEngineInstrumental->instrFunction,pMediateInstrumental->tropomi.instrFunctionFile);     // instrumental function file
 
-      OMI_TrackSelection(pMediateInstrumental->tropomi.trackSelection,pEngineInstrumental->use_row);
+      rc = parse_trackselection(pMediateInstrumental->tropomi.trackSelection,pEngineInstrumental->use_row);
 
       break;
       // ----------------------------------------------------------------------------
@@ -1272,7 +1274,7 @@ void setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const
         NDET[i] = GEMS_INIT_LENGTH;
         pEngineInstrumental->use_row[i]=false;
        }                                                                                    // Could be reduced by Set function
-      OMI_TrackSelection(pMediateInstrumental->gems.trackSelection,pEngineInstrumental->use_row);
+      rc = parse_trackselection(pMediateInstrumental->gems.trackSelection,pEngineInstrumental->use_row);
 
       strcpy(pEngineInstrumental->calibrationFile,pMediateInstrumental->gems.calibrationFile);     // calibration file
       strcpy(pEngineInstrumental->instrFunction,pMediateInstrumental->gems.transmissionFunctionFile);     // instrumental function file
@@ -1293,6 +1295,7 @@ void setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const
       break;
       // ----------------------------------------------------------------------------
     }
+   return rc;
  }
 
 // -----------------------------------------------------------------------------
@@ -1391,7 +1394,7 @@ int mediateRequestSetProject(void *engineContext,
    ENGINE_CONTEXT *pEngineContext=(ENGINE_CONTEXT *)engineContext;
    PROJECT * pEngineProject= &pEngineContext->project;
 
-   RC rc=ERROR_ID_NO;
+   RC rc1=ERROR_ID_NO, rc2=ERROR_ID_NO;
 
    // Release buffers allocated at the previous session
 
@@ -1412,7 +1415,7 @@ int mediateRequestSetProject(void *engineContext,
    setMediateFilter(&pEngineProject->lfilter,&project->lowpass,0,0);
    setMediateFilter(&pEngineProject->hfilter,&project->highpass,1,0);
    setMediateProjectCalibration(&pEngineProject->kurucz,&pEngineContext->calibFeno,&project->calibration,pEngineContext->project.spectra.displayCalibFlag);
-   setMediateProjectInstrumental(&pEngineProject->instrumental,&project->instrumental);
+   rc1 = setMediateProjectInstrumental(&pEngineProject->instrumental,&project->instrumental);
    setMediateProjectUndersampling(&pEngineProject->usamp,&project->undersampling);
    setMediateProjectSlit(&pEngineProject->slit,&project->slit);
    setMediateProjectOutput(&pEngineProject->asciiResults, project->project_name, &project->output);
@@ -1433,15 +1436,22 @@ int mediateRequestSetProject(void *engineContext,
       for (int i=0;i<project->export_spectra.selection.nSelected;i++)
        fieldsFlag[project->export_spectra.selection.selected[i]]=1;
     }
-
    // Allocate buffers requested by the project
-
-   if (EngineSetProject(pEngineContext)!=ERROR_ID_NO)
-    rc=ERROR_DisplayMessage(responseHandle);
-   else if ((THRD_id==THREAD_TYPE_EXPORT) && !(rc=OUTPUT_CheckPath(pEngineContext,pEngineContext->project.exportSpectra.path,ASCII)))
-    rc=OUTPUT_RegisterSpectra(pEngineContext);
-
-   return (rc!=ERROR_ID_NO)?-1:0;    // supposed that an error at the level of the load of projects stops the current session
+   rc2 = EngineSetProject(pEngineContext);
+   if (rc2 != ERROR_ID_NO) goto handle_errors;
+   if (THRD_id==THREAD_TYPE_EXPORT) {
+     rc2 = OUTPUT_CheckPath(pEngineContext,pEngineContext->project.exportSpectra.path,ASCII);
+     if (rc2 != ERROR_ID_NO) goto handle_errors;
+     rc2 = OUTPUT_RegisterSpectra(pEngineContext);
+     if (rc2 != ERROR_ID_NO) goto handle_errors;
+   }
+ handle_errors:
+   if (rc1 == ERROR_ID_NO && rc2 == ERROR_ID_NO) {
+     return 0;
+   } else {
+     ERROR_DisplayMessage(responseHandle);
+     return -1;    // supposed that an error at the level of the load of projects stops the current session
+   }
  }
 
 // =======================================================================
