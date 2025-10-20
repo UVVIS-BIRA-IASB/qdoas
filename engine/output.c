@@ -26,12 +26,11 @@
   user's configuration and write output to files.
 
   All logic regarding what should written to the output file is
-  handled via OUTPUT_RegisterData():  Each variable that should be
-  written to output is described using a struct output_field.  Output
-  fields containing results of the reference calibration are stored in
-  the array #output_data_calib, and output fields containing results of
-  the analyis (or run calibration) are contained in the array
-  output_data_analysis.
+  handled via OUTPUT_RegisterData(): Each variable that should be
+  written to output is described using a struct output_field.  The
+  memory to store these structs is managed using (C++) vectors
+  output_data_calib_vec and output_data_analysis_vec, which are
+  defined in output_fields.cpp.
 
   The main members of the output_field structure are the buffer
   output_field::data, used to store the required data until it is
@@ -59,6 +58,7 @@
 #include "output.h"
 #include "output_netcdf.h"
 #include "output_common.h"
+#include "output_fields.h"
 
 #include "engine_context.h"
 #include "winsites.h"
@@ -105,10 +105,6 @@ const unsigned long long QDOAS_FILL_UINT64 = 18446744073709551614ULL;
     must correspond to the value of the enum.*/
 const char *output_file_extensions[] = { [ASCII] = ".ASC",[NETCDF] = ".nc" };
 
-struct output_field output_data_analysis[MAX_FIELDS];
-unsigned int output_num_fields = 0;
-struct output_field output_data_calib[MAX_CALIB_FIELDS];
-unsigned int calib_num_fields = 0;
 /*! \brief For GOME-2/Sciamachy automatic reference spectrum: number
     of spectra used. */
 int OUTPUT_exportSpectraFlag=0;
@@ -629,14 +625,15 @@ void OUTPUT_ResetData(void)
 
   NAmfSpace=0;
 
-  for (size_t i=0; i<output_num_fields; i++) {
-    output_field_free(&output_data_analysis[i]);
+  for (size_t i=0; i<output_num_fields(); i++) {
+    output_field_free(output_data_analysis(i));
   }
 
-  for (size_t i=0; i<calib_num_fields; i++) {
-    output_field_free(&output_data_calib[i]);
+  for (size_t i=0; i<calib_num_fields(); i++) {
+    output_field_free(output_data_calib(i));
   }
-  output_num_fields = calib_num_fields = 0;
+
+  free_output_fields();
 
   if (outputRecords!=NULL)
    MEMORY_ReleaseBuffer(__func__,"outputRecords",outputRecords);
@@ -677,7 +674,7 @@ static void OutputRegisterFluxes(const ENGINE_CONTEXT *pEngineContext)
     if (sscanf(ptrOld,"%lf",&OUTPUT_fluxes[OUTPUT_NFluxes])==1)
      {
       sprintf(columnTitle,"Fluxes %g",OUTPUT_fluxes[OUTPUT_NFluxes]);
-      struct output_field *output_flux = &output_data_analysis[output_num_fields++];
+      struct output_field *output_flux = new_analysis_field();
       *output_flux =(struct output_field) {0}; // zero all struct fields
       output_flux->resulttype = PRJCT_RESULTS_FLUX;
       output_flux->fieldname = strdup(columnTitle);
@@ -695,7 +692,7 @@ static void OutputRegisterFluxes(const ENGINE_CONTEXT *pEngineContext)
 }
 
 static void register_field(struct output_field field) {
-  struct output_field *newfield = &output_data_analysis[output_num_fields++];
+  struct output_field *newfield = new_analysis_field();
   *newfield = field;
   newfield->fieldname = strdup(newfield->basic_fieldname);  // allocate a new buffer for the name so we can free() all output_field data later on.
   newfield->windowname = NULL;
@@ -1499,10 +1496,7 @@ static void OutputRegisterFieldsToExport(const ENGINE_CONTEXT *pEngineContext, c
 /*! \brief Helper function to initialize a new output_field in the
     \ref output_data_calib array.*/
 static int register_calibration_field(struct output_field newfield) {
-  if (calib_num_fields == MAX_CALIB_FIELDS) {
-    return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_BUG, "Maximum number of calibration output fields reached.");
-  }
-  struct output_field *calibfield = &output_data_calib[calib_num_fields++];
+  struct output_field *calibfield = new_calib_field();
   *calibfield = newfield; // copy all contents
   if(calibfield->data_cols == 0) // data_cols = 1 as default value -> we only need to set data_cols explicitly if we want a multi-column field
     calibfield->data_cols = 1;
@@ -1644,10 +1638,7 @@ static int OutputRegisterParam(const ENGINE_CONTEXT *pEngineContext)
 
 /*! \brief helper function to initialize an output_field containing analysis results. */
 static int register_analysis_field(const struct output_field* fieldcontent, int index_feno, int index_calib, int index_cross, const char *window_name, const char *symbol_name) {
-  if (output_num_fields == MAX_FIELDS) {
-    return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_BUG, "Maximum number of analysis output fields reached.");
-  }
-  struct output_field *newfield = &output_data_analysis[output_num_fields++];
+  struct output_field *newfield = new_analysis_field();
   *newfield = *fieldcontent;
   char *full_fieldname = malloc(strlen(newfield->basic_fieldname) + strlen(symbol_name) +1);
   sprintf(full_fieldname, "%s%s", newfield->basic_fieldname, symbol_name);
@@ -1997,8 +1988,8 @@ static void OutputSaveRecord(const ENGINE_CONTEXT *pEngineContext,INDEX indexFen
 
       if ((pRecordInfo->i_crosstrack!=ITEM_NONE) && pEngineContext->project.instrumental.use_row[pRecordInfo->i_crosstrack])
        {
-        for(unsigned int i=0; i<output_num_fields; i++) {
-          save_analysis_data(&output_data_analysis[i], index_record, pEngineContext, indexFenoColumn);
+        for(unsigned int i=0; i<output_num_fields(); i++) {
+          save_analysis_data(output_data_analysis(i), index_record, pEngineContext, indexFenoColumn);
         }
 
         outputRecords[index_record].i_crosstrack = pRecordInfo->i_crosstrack; // (outputRecords[index_record].specno-1) % n_crosstrack; //specno is 1-based
@@ -2484,8 +2475,8 @@ RC OUTPUT_FlushBuffers(ENGINE_CONTEXT *pEngineContext)
 
 /*! \brief Save all calibration data to the calibration output buffers.*/
 void save_calibration(void) {
-  for(unsigned int i=0; i<calib_num_fields; i++) {
-    struct output_field *cur_field = &output_data_calib[i];
+  for(unsigned int i=0; i<calib_num_fields(); i++) {
+    struct output_field *cur_field = output_data_calib(i);
     int nbWin = KURUCZ_buffers[cur_field->index_row].Nb_Win;
     for (int indexWin=0;indexWin<nbWin;indexWin++) {
       save_calib_data(cur_field, indexWin);
@@ -2727,14 +2718,14 @@ RC OUTPUT_LocalAlloc(ENGINE_CONTEXT *pEngineContext)
     else
       memset(outputRecords,0,sizeof(OUTPUT_INFO)*output_data_rows);
 
-    for (unsigned int i=0; i<output_num_fields; i++) {
-      struct output_field *pfield = &output_data_analysis[i];
+    for (unsigned int i=0; i<output_num_fields(); i++) {
+      struct output_field *pfield = output_data_analysis(i);
       output_field_clear(pfield); // first clear data, then update "data_rows" value, because data_rows is used to determine number of entries we have to free
       pfield->data_rows = output_data_rows;
       pfield->data = calloc(pfield->data_rows * pfield->data_cols , output_get_size(pfield->memory_type));
     }
-    for (unsigned int i=0; i<calib_num_fields; i++) {
-      struct output_field *calib_field = &output_data_calib[i];
+    for (unsigned int i=0; i<calib_num_fields(); i++) {
+      struct output_field *calib_field = output_data_calib(i);
       output_field_clear(calib_field);
       int nb_win = KURUCZ_buffers[calib_field->index_row].Nb_Win;
       // todo: check if nb_win > 0 ? check rcKurucz?

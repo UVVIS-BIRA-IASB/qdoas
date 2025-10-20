@@ -15,6 +15,8 @@ extern "C" {
 #include "fit_properties.h"
 #include "engine_xsconv.h"
 #include "winfiles.h"
+
+#include "output_fields.h"
 }
 
 using std::string;
@@ -259,8 +261,8 @@ static void write_calibration_field(const struct output_field& calibfield, NetCD
 
 static void write_calibration_data(NetCDFGroup& group) {
 
-  for (unsigned int i=0; i<calib_num_fields; ++i) {
-    const struct output_field& calibfield = output_data_calib[i];
+  for (unsigned int i=0; i<calib_num_fields(); ++i) {
+    const struct output_field& calibfield = *output_data_calib(i);
 
     NetCDFGroup calib_group = group.getGroup(calibfield.windowname).getGroup(calib_subgroup_name);
 
@@ -386,11 +388,11 @@ void create_subgroups(const ENGINE_CONTEXT *pEngineContext,NetCDFGroup &group) {
 			break;
 		}
 	
-  for (unsigned int i=0; i<calib_num_fields; ++i) {
-    if (group.groupID(output_data_calib[i].windowname) < 0) {
+  for (unsigned int i=0; i<calib_num_fields(); ++i) {
+    if (group.groupID(output_data_calib(i)->windowname) < 0) {
       // group not yet created
-		k++;
-      auto subgroup = group.defGroup(output_data_calib[i].windowname);
+      k++;
+      auto subgroup = group.defGroup(output_data_calib(i)->windowname);
       subgroup.defGroup(calib_subgroup_name);
 	  int z=TabFeno[row][k].fit_properties.Z;
 	  double  wvl_fitwin_min=TabFeno[row][k].fit_properties.LFenetre[0][0];
@@ -437,13 +439,10 @@ void create_subgroups(const ENGINE_CONTEXT *pEngineContext,NetCDFGroup &group) {
          }
        }
 
-   for (unsigned int i=0; i<output_num_fields; ++i) {
-    // printf("%s\n",output_data_analysis[i].fieldname);
-    if (output_data_analysis[i].windowname &&
-        group.groupID(output_data_analysis[i].windowname) < 0) {
-
-      group.defGroup(output_data_analysis[i].windowname);
-    
+   for (unsigned int i=0; i<output_num_fields(); ++i) {
+     if (output_data_analysis(i)->windowname &&
+         group.groupID(output_data_analysis(i)->windowname) < 0) {
+       group.defGroup(output_data_analysis(i)->windowname);
     }
   }
 }
@@ -492,10 +491,10 @@ RC netcdf_open(const ENGINE_CONTEXT *pEngineContext, const char *filename,int nu
     write_automatic_reference_info(pEngineContext, output_group);
     write_calibration_data(output_group);
 
-   for (unsigned int i=0; i<output_num_fields; ++i) {
-      NetCDFGroup group = output_data_analysis[i].windowname ?
-        output_group.getGroup(output_data_analysis[i].windowname) : output_group;
-       define_variable(group, output_data_analysis[i], get_netcdf_varname(output_data_analysis[i].fieldname), Analysis);
+   for (unsigned int i=0; i<output_num_fields(); ++i) {
+     NetCDFGroup group = output_data_analysis(i)->windowname ?
+       output_group.getGroup(output_data_analysis(i)->windowname) : output_group;
+     define_variable(group, *output_data_analysis(i), get_netcdf_varname(output_data_analysis(i)->fieldname), Analysis);
     }
   } catch (std::runtime_error& e) {
     output_file.close();
@@ -644,8 +643,8 @@ RC netcdf_write_analysis_data(const bool selected_records[], int num_records, co
   int rc = ERROR_ID_NO;
 
   try {
-    for (unsigned int i=0; i<output_num_fields; ++i) {
-      struct output_field *thefield = &output_data_analysis[i];
+    for (unsigned int i=0; i<output_num_fields(); ++i) {
+      struct output_field *thefield = output_data_analysis(i);
 
       switch(thefield->memory_type) {
       case OUTPUT_INT:

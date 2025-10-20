@@ -71,6 +71,8 @@ add_library(engine STATIC
   output.h
   output_ascii.c
   output_common.h
+  output_fields.h
+  output_fields.cpp
   output_formats.h
   output_netcdf.cpp
   output_netcdf.h

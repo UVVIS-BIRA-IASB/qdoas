@@ -10,9 +10,6 @@
 #include "kurucz.h"
 #include "analyse.h"
 
-#define MAX_FIELDS 3600 // maximum number of output fields
-#define MAX_CALIB_FIELDS 20000 // maximum number of calibration fields
-
 /*! \brief The different data types that can be stored in an \ref
     output_field structure.
 
@@ -150,23 +147,6 @@ typedef struct _outputInfo
   int year,month,day;
   float longit,latit;
 } OUTPUT_INFO;
-
-/*! \brief Number of configured output fields in
-    #output_data_analysis */
-extern unsigned int output_num_fields;
-/*! \brief Number of configured output fields in #output_data_calib */
-extern unsigned int calib_num_fields;
-
-/*! \brief Output fields for analysis results (or, in "run calibration"
-   mode, the results of applying the calibration settings to the
-   measured spectra).
-
-   The number of configured fields is kept in #output_num_fields */
-extern struct output_field output_data_analysis[MAX_FIELDS];
-/*! \brief Output fields for the reference spectrum calibration.
-
-  The number of configured fields is kept in #calib_num_fields. */
-extern struct output_field output_data_calib[MAX_CALIB_FIELDS];
 
 /*! \brief returns the number of bytes used by an output datatype. */
 size_t output_get_size(enum output_datatype datatype);

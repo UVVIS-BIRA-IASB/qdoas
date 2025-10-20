@@ -6,6 +6,7 @@
 
 #include "stdfunc.h"
 #include "output_common.h"
+#include "output_fields.h"
 #include "output.h"
 #include "engine_context.h"
 #include "omi_read.h"
@@ -60,7 +61,7 @@ RC ascii_open(const ENGINE_CONTEXT *pEngineContext, const char *filename) {
          && pEngineContext->project.asciiResults.referenceFlag) {
         write_automatic_reference_info(output_file);
       }
-      if(calib_num_fields)
+      if(calib_num_fields())
         write_calib_output(output_file);
 
       if (OUTPUT_exportSpectraFlag)
@@ -101,8 +102,8 @@ void ascii_close_file(void) {
     output.)*/
 static void OutputAscPrintTitles(FILE *fp){
     fprintf(fp, "# ");
-    for(unsigned int i=0; i<output_num_fields; i++) {
-      struct output_field thefield = output_data_analysis[i];
+    for(unsigned int i=0; i<output_num_fields(); i++) {
+      struct output_field thefield = *output_data_analysis(i);
       for(unsigned int col=0; col<thefield.data_cols; col++) {
         if (thefield.windowname) {
           fprintf(fp, "%s.", thefield.windowname);
@@ -183,8 +184,8 @@ void ascii_write_analysis_data(const bool selected_records[], int num_records) {
   assert(output_file != NULL);
   for(int recordno=0; recordno < num_records; recordno++){
     if(selected_records[recordno]) {
-      for(unsigned int i=0; i<output_num_fields; i++ ) {
-        print_output_field(output_file, &output_data_analysis[i], recordno);
+      for(unsigned int i=0; i<output_num_fields(); i++ ) {
+        print_output_field(output_file, output_data_analysis(i), recordno);
       }
       fprintf(output_file,"\n");
     }
@@ -349,37 +350,34 @@ void ascii_write_spectra_data(const bool selected_records[], int num_records)
 
   assert(output_file != NULL);
 
-  for(int recordno=0; recordno < num_records; recordno++)
-   {
-    if(selected_records[recordno])
-     {
-      for(unsigned int i=0; i<output_num_fields; i++ )
-       {
+  for(int recordno=0; recordno < num_records; recordno++) {
+    if(selected_records[recordno]) {
+      for(unsigned int i=0; i<output_num_fields(); i++ ) {
         // Specific cases (calibration, spectra, and change of formats)
 
-        if (output_data_analysis[i].resulttype==PRJCT_RESULTS_LAMBDA)
-         lambdaIndex=i;
-        else if (output_data_analysis[i].resulttype==PRJCT_RESULTS_SPECTRA)
-         spectraIndex=i;
-        else if (output_data_analysis[i].resulttype==PRJCT_RESULTS_MEASTYPE)
-         print_output_meastype(output_file, &output_data_analysis[i], recordno);
+        if (output_data_analysis(i)->resulttype==PRJCT_RESULTS_LAMBDA)
+          lambdaIndex=i;
+        else if (output_data_analysis(i)->resulttype==PRJCT_RESULTS_SPECTRA)
+          spectraIndex=i;
+        else if (output_data_analysis(i)->resulttype==PRJCT_RESULTS_MEASTYPE)
+          print_output_meastype(output_file, output_data_analysis(i), recordno);
 
         // General cases
 
         else
-         print_output_field_with_title(output_file, &output_data_analysis[i], recordno);
+          print_output_field_with_title(output_file, output_data_analysis(i), recordno);
        }
 
       if ((spectraIndex!=ITEM_NONE) && (lambdaIndex!=ITEM_NONE))
-       print_spectra(output_file,&output_data_analysis[lambdaIndex],&output_data_analysis[spectraIndex],recordno);
+        print_spectra(output_file,output_data_analysis(lambdaIndex),output_data_analysis(spectraIndex),recordno);
       else if (lambdaIndex!=ITEM_NONE)
-       print_spectra(output_file,&output_data_analysis[lambdaIndex],NULL,recordno);
+        print_spectra(output_file,output_data_analysis(lambdaIndex),NULL,recordno);
       else if (spectraIndex!=ITEM_NONE)
-       print_spectra(output_file,NULL,&output_data_analysis[spectraIndex],recordno+total_records);
+        print_spectra(output_file,NULL,output_data_analysis(spectraIndex),recordno+total_records);
 
       nrecords++;
-     }
-   }
+    }
+  }
 
   total_records+=nrecords;
  }
@@ -411,8 +409,8 @@ static void write_automatic_reference_info(FILE *fp)
 static void write_calib_output(FILE *fp)
 {
   fprintf(fp, "%c ", COMMENT_CHAR);
-  for(unsigned int i=0; i<calib_num_fields; i++) {
-    struct output_field thefield = output_data_calib[i];
+  for(unsigned int i=0; i<calib_num_fields(); i++) {
+    struct output_field thefield = *output_data_calib(i);
 
     if (ANALYSE_swathSize > 1)
       fprintf(fp,"Calib(%d/%d).", thefield.index_row+1, ANALYSE_swathSize);
@@ -426,11 +424,11 @@ static void write_calib_output(FILE *fp)
   }
   fprintf(fp, "\n");
 
-  int nbWin = KURUCZ_buffers[output_data_calib[0].index_row].Nb_Win; // kurucz settings are same for all detector rows
+  int nbWin = KURUCZ_buffers[output_data_calib(0)->index_row].Nb_Win; // kurucz settings are same for all detector rows
   for(int recordno=0; recordno < nbWin; recordno++, fprintf(fp,"\n") ){
     fprintf(fp,"%c ", COMMENT_CHAR);
-    for(unsigned int i=0; i<calib_num_fields; i++ ) {
-      print_output_field(fp, &output_data_calib[i], recordno);
+    for(unsigned int i=0; i<calib_num_fields(); i++ ) {
+      print_output_field(fp, output_data_calib(i), recordno);
     }
   }
 }
