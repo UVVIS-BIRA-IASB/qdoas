@@ -1,3 +1,18 @@
+3.7.8 2025-10-21
+~~~~~~~~~~~~~~~~
+
+ * Fix for doas_cl: changing analysis windows settings with the
+   command line option "-xml /project/analysis_window/[...]" did not
+   work anymore since version 3.6.12.  Changes to the configuration
+   were not applied during analysis.  This has now been fixed.
+
+ * Repeated errors of the same type are no longer suppressed.
+
+ * A hardcoded limit on the maximum number of calibration or analysis
+   parameters that could be written to output, has been removed.
+
+ * Fix: Restore Qt6 compatibility.
+
 3.7.7 2025-10-06
 ~~~~~~~~~~~~~~~~
 
