@@ -565,13 +565,13 @@ INDEX AnalyseGetPukiteIndex(CROSS_REFERENCE *pTabCross,int nTabCross,const char 
  }
 
 RC AnalysePukiteConvoluteI0(const FENO *pTabFeno,double conc,double lambda0,
-                               const MATRIX_OBJECT *pXs,
-                               const MATRIX_OBJECT *slitMatrix, const double *slitParam, int slitType,
-                               const double *newlambda,
-                               double *outputPukite1,double *lambdaEff,
-                               double *outputPukite2,double *sigmaEff,
-                               INDEX indexlambdaMin, INDEX indexlambdaMax, const int n_wavel,
-                               INDEX indexFenoColumn, int wveDptFlag)
+                            const MATRIX_OBJECT *pXs,
+                            const MATRIX_OBJECT *slitMatrix, const double *slitParam, int slitType,
+                            const double *newlambda,
+                            double *outputPukite1, // double *lambdaEff,
+                            double *outputPukite2, // double *sigmaEff,
+                            INDEX indexlambdaMin, INDEX indexlambdaMax, const int n_wavel,
+                            INDEX indexFenoColumn, int wveDptFlag)
  {
   // Declarations
 
@@ -779,7 +779,7 @@ RC AnalyseSimplePukiteTerms(double *lambda,double *xs,
   return rc;
  }
 
-RC AnalyseAddPukiteTerm(ENGINE_CONTEXT *pEngineContext, CROSS_REFERENCE *pCross,INDEX indexFenoColumn,int pukiteOrder,INDEX *pIndexPukite)
+RC AnalyseAddPukiteTerm(CROSS_REFERENCE *pCross,INDEX indexFenoColumn,int pukiteOrder,INDEX *pIndexPukite)
  {
   // Declarations
 
@@ -1825,8 +1825,8 @@ RC ANALYSE_XsConvolution(FENO *pTabFeno,double *newlambda,
            else
             rc=AnalysePukiteConvoluteI0(pTabFeno,pTabCross->I0Conc,pTabFeno->lambda0,pXs,slitMatrix,slitParam,slitType,
                                          newlambda,
-                                        (pTabCross->indexPukite1!=ITEM_NONE)?pTabFeno->TabCross[pTabCross->indexPukite1].vector:NULL,(pTabCross->indexPukite1!=ITEM_NONE)?pTabFeno->TabCross[pTabCross->indexPukite1].molecularCrossSection:NULL,
-                                        (pTabCross->indexPukite2!=ITEM_NONE)?pTabFeno->TabCross[pTabCross->indexPukite2].vector:NULL,(pTabCross->indexPukite2!=ITEM_NONE)?pTabFeno->TabCross[pTabCross->indexPukite2].molecularCrossSection:NULL,
+                                        (pTabCross->indexPukite1!=ITEM_NONE)?pTabFeno->TabCross[pTabCross->indexPukite1].vector:NULL, // (pTabCross->indexPukite1!=ITEM_NONE)?pTabFeno->TabCross[pTabCross->indexPukite1].molecularCrossSection:NULL,
+                                        (pTabCross->indexPukite2!=ITEM_NONE)?pTabFeno->TabCross[pTabCross->indexPukite2].vector:NULL, // (pTabCross->indexPukite2!=ITEM_NONE)?pTabFeno->TabCross[pTabCross->indexPukite2].molecularCrossSection:NULL,
                                          indexlambdaMin,indexlambdaMax,n_wavel,indexFenoColumn,wveDptFlag);
            }
 
@@ -1964,7 +1964,7 @@ RC ANALYSE_XsConvolution(FENO *pTabFeno,double *newlambda,
 // AnalyseLoadVector : Load a (2-column) vector from a file
 // --------------------------------------------
 
-RC AnalyseLoadVector(const char *function, const char *fileName, double *lambda, double *vector, const int n_wavel, const int n_col) {
+RC AnalyseLoadVector(const char *fileName, double *lambda, double *vector, const int n_wavel, const int n_col) {
   // Declarations
 
   FILE *fp;
@@ -3809,7 +3809,7 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
       } else {
         VECTOR_Copy(SpectreK,Spectre,n_wavel);
 
-        if (((pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_GEMS) || !(rc=GEMS_LoadCalib(pEngineContext,indexFenoColumn,responseHandle))) &&
+        if (((pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_GEMS) || !(rc=GEMS_LoadCalib(pEngineContext,indexFenoColumn))) &&
             !(rc=KURUCZ_Spectrum(pBuffers->lambda,LambdaK,SpectreK,KURUCZ_buffers[indexFenoColumn].solar,pBuffers->instrFunction,
                                  1,"Calibration applied on spectrum",KURUCZ_buffers[indexFenoColumn].fwhmPolySpec,KURUCZ_buffers[indexFenoColumn].fwhmVector,KURUCZ_buffers[indexFenoColumn].fwhmDeriv2,saveFlag,
                                  KURUCZ_buffers[indexFenoColumn].indexKurucz,responseHandle,indexFenoColumn))) {
@@ -5087,8 +5087,8 @@ RC ANALYSE_LoadCross(ENGINE_CONTEXT *pEngineContext, const ANALYSIS_CROSS *cross
 
         // !!! Pukite, check the different cases and generate error messages for inconsistency
 
-        if (((pEngineCross->indexPukite1==ITEM_NONE) && AnalyseAddPukiteTerm(pEngineContext,pEngineCross,indexFenoColumn,1,&pEngineCross->indexPukite1)) ||
-               ((pEngineCross->crossCorrection==ANLYS_CORRECTION_TYPE_PUKITE) && (pEngineCross->indexPukite2==ITEM_NONE) && AnalyseAddPukiteTerm(pEngineContext,pEngineCross,indexFenoColumn,2,&pEngineCross->indexPukite2)))
+        if (((pEngineCross->indexPukite1==ITEM_NONE) && AnalyseAddPukiteTerm(pEngineCross,indexFenoColumn,1,&pEngineCross->indexPukite1)) ||
+               ((pEngineCross->crossCorrection==ANLYS_CORRECTION_TYPE_PUKITE) && (pEngineCross->indexPukite2==ITEM_NONE) && AnalyseAddPukiteTerm(pEngineCross,indexFenoColumn,2,&pEngineCross->indexPukite2)))
 
             rc=ERROR_SetLast(__func__,ERROR_TYPE_WARNING,ERROR_ID_PUKITE,pTabFeno->windowName,WorkSpace[pEngineCross->Comp].symbolName);
 
@@ -6094,9 +6094,9 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
       case PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF:
         if (pEngineContext->project.instrumental.frm4doas.imagerFlag)
          rc=apex_get_reference(pTabFeno->ref1,indexFenoColumn,lambdaRefEtalon,SrefEtalon,&n_wavel_ref);
-        else if (!(rc=AnalyseLoadVector("ANALYSE_LoadRef (SrefEtalon) ",pTabFeno->ref1,lambdaRefEtalon,SrefEtalon,n_wavel,indexFenoColumn)) &&
+        else if (!(rc=AnalyseLoadVector(pTabFeno->ref1,lambdaRefEtalon,SrefEtalon,n_wavel,indexFenoColumn)) &&
              (pTabFeno->SrefSigma!=NULL) && !is_satellite(pEngineContext->project.instrumental.readOutFormat))
-         rc=AnalyseLoadVector("ANALYSE_LoadRef (SrefEtalon) ",pTabFeno->ref1,lambdaRefEtalon,pTabFeno->SrefSigma,n_wavel,1);  
+         rc=AnalyseLoadVector(pTabFeno->ref1,lambdaRefEtalon,pTabFeno->SrefSigma,n_wavel,1);  
         break;
       case PRJCT_INSTR_FORMAT_TROPOMI:
         rc=tropomi_get_reference_irrad(pTabFeno->ref1,indexFenoColumn,
@@ -6119,11 +6119,9 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
         break;
 
       default:
-        // rc=AnalyseLoadVector("ANALYSE_LoadRef (SrefEtalon) ",pTabFeno->ref1,lambdaRefEtalon,SrefEtalon,n_wavel,indexFenoColumn);
-       
-        if (!(rc=AnalyseLoadVector("ANALYSE_LoadRef (SrefEtalon) ",pTabFeno->ref1,lambdaRefEtalon,SrefEtalon,n_wavel,indexFenoColumn)) &&
+        if (!(rc=AnalyseLoadVector(pTabFeno->ref1,lambdaRefEtalon,SrefEtalon,n_wavel,indexFenoColumn)) &&
              (pTabFeno->SrefSigma!=NULL) && !is_satellite(pEngineContext->project.instrumental.readOutFormat))
-         rc=AnalyseLoadVector("ANALYSE_LoadRef (SrefEtalon) ",pTabFeno->ref1,lambdaRefEtalon,pTabFeno->SrefSigma,n_wavel,1);
+         rc=AnalyseLoadVector(pTabFeno->ref1,lambdaRefEtalon,pTabFeno->SrefSigma,n_wavel,1);
 
         break;
       }
@@ -6187,13 +6185,13 @@ RC ANALYSE_LoadRef(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn)
            if (pEngineContext->project.instrumental.frm4doas.imagerFlag)
               rc=apex_get_reference(pTabFeno->ref2,indexFenoColumn,lambdaRef,Sref,&n_wavel_ref);
            else 
-              rc=AnalyseLoadVector("ANALYSE_LoadRef (Sref) ",pTabFeno->ref2,lambdaRef,Sref,n_wavel,indexFenoColumn);
+              rc=AnalyseLoadVector(pTabFeno->ref2,lambdaRef,Sref,n_wavel,indexFenoColumn);
         break;           
         case PRJCT_INSTR_FORMAT_APEX:
            rc=apex_get_reference(pTabFeno->ref2,indexFenoColumn,lambdaRef,Sref,&n_wavel_ref);
            break;
         default:
-           rc=AnalyseLoadVector("ANALYSE_LoadRef (Sref) ",pTabFeno->ref2,lambdaRef,Sref,n_wavel,indexFenoColumn);
+           rc=AnalyseLoadVector(pTabFeno->ref2,lambdaRef,Sref,n_wavel,indexFenoColumn);
            break;
         }
       if (!rc &&

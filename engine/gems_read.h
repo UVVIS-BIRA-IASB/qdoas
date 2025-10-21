@@ -18,7 +18,7 @@ extern "C" {
 
   int GEMS_Read(ENGINE_CONTEXT *pEngineContext, int record);
 
-  RC GEMS_LoadCalib(ENGINE_CONTEXT *pEngineContext,int indexFenoColumn,void *responseHandle);
+  RC GEMS_LoadCalib(ENGINE_CONTEXT *pEngineContext,int indexFenoColumn);
   int GEMS_init_irradiance(const char *ref_filename, double *lambda, double *spectrum, int* n_wavel_temp);
   int GEMS_init_radref(const char *ref_filename, int* n_wavel_temp);
   

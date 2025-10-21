@@ -271,7 +271,6 @@ int GEMS_init_radref(const char *ref_filename, int *n_wavel_temp) {
 
 int GEMS_Set(ENGINE_CONTEXT *pEngineContext) {
   bool has_irradiance,has_radiance;
-  int orbit_year,orbit_month,orbit_day;
   
   int rc = 0;
 
@@ -466,7 +465,7 @@ void gems_clean(void) {
   n_wve = n_images = n_rows = 0;
 }
 
-RC GEMS_LoadCalib(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn,void *responseHandle) {
+RC GEMS_LoadCalib(ENGINE_CONTEXT *pEngineContext,INDEX indexFenoColumn) {
 
   const int n_wavel=n_wve;
   RC rc=ERROR_ID_NO;

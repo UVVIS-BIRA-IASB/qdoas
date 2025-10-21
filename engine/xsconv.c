@@ -486,8 +486,6 @@ RC XSCONV_GetFwhm(const double *lambda, const double *slit, const double *deriv2
 
   double lmin,lmax,l1,l2,x;                         // search for wavelengths giving function at half way up
 
-  double x0=0.;
-
   if (slitType==SLIT_TYPE_FILE) {
     // Get the value of function half way up
 
