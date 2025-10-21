@@ -527,7 +527,7 @@ RC ParseAnalysisWindow(const vector<string>& xmlFields,int xmlFieldN,int startin
 {
   // Declarations
 
-  auto awList = p->analysisWindowItems();
+  auto& awList = p->analysisWindowItems();
   mediate_analysis_window_t newAnalysisProperties;
 
   string windowName;
