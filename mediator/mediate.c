@@ -1402,7 +1402,7 @@ int mediateRequestSetProject(void *engineContext,
 
    // Transfer projects options from the mediator to the engine
 
-   strncpy(pEngineProject->project_name, project->project_name, PROJECT_NAME_BUFFER_LENGTH-1);
+   strncpy(pEngineProject->project_name, project->project_name, sizeof(pEngineProject->project_name));
    for(unsigned int i=0; i<MAX_SWATHSIZE; ++i)
      pEngineContext->project.instrumental.use_row[i]=true;
 
