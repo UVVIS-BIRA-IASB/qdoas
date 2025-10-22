@@ -167,9 +167,6 @@ static string root_name;                                                        
 static int det_size;                                                             //!< \details The current detector size
 
 static string init_filename;
-static size_t spectral_dim; // number of wavelengths
-static size_t col_dim; // cross-track
-
 
 // int FRM4DOAS_init(const char *reference_filename, ENGINE_CONTEXT *pEngineContext) {
 //   try {

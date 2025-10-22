@@ -326,7 +326,7 @@ CWAnalysisWindowPropertyEditor::CWAnalysisWindowPropertyEditor(const QString &pr
    {
     m_saveResidualCheck = new QCheckBox("Save residuals", residualFrame);
     displayLayout->addWidget(m_saveResidualCheck, 0, 0);   
-    m_saveResidualCheck->setChecked(d->saveResidualsFlag ? Qt::Checked : Qt::Unchecked);
+    m_saveResidualCheck->setChecked(d->saveResidualsFlag);
     residualFrameLayout->addWidget(m_saveResidualCheck);
    }
   else
@@ -411,12 +411,12 @@ CWAnalysisWindowPropertyEditor::CWAnalysisWindowPropertyEditor(const QString &pr
   m_resolEdit->setText(tmpStr.setNum(d->resolFwhm));
   m_lambda0Edit->setText(tmpStr.setNum(d->lambda0));
 
-  m_spectrumCheck->setChecked(d->requireSpectrum ? Qt::Checked : Qt::Unchecked);
-  m_polyCheck->setChecked(d->requirePolynomial ? Qt::Checked : Qt::Unchecked);
-  m_fitsCheck->setChecked(d->requireFit ? Qt::Checked : Qt::Unchecked);
-  m_residualCheck->setChecked(d->requireResidual ? Qt::Checked : Qt::Unchecked);
-  m_predefCheck->setChecked(d->requirePredefined ? Qt::Checked : Qt::Unchecked);
-  m_ratioCheck->setChecked(d->requireRefRatio ? Qt::Checked : Qt::Unchecked);
+  m_spectrumCheck->setChecked(d->requireSpectrum);
+  m_polyCheck->setChecked(d->requirePolynomial);
+  m_fitsCheck->setChecked(d->requireFit);
+  m_residualCheck->setChecked(d->requireResidual);
+  m_predefCheck->setChecked(d->requirePredefined);
+  m_ratioCheck->setChecked(d->requireRefRatio);
 
   m_refOneEdit->setText(d->refOneFile);
   m_refTwoEdit->setText(d->refTwoFile);

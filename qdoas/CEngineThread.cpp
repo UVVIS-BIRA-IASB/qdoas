@@ -24,11 +24,11 @@ CEngineThread::CEngineThread(CQdoasEngineController *parent) :
   m_terminated(false)
 {
   // get an engine context
-  CEngineResponse *resp = new CEngineResponseMessage;
+  CEngineResponseMessage resp;
 
-  int rc = mediateRequestCreateEngineContext(&m_engineContext, resp);
-  assert(rc == 0);
-  delete resp;
+  int rc = mediateRequestCreateEngineContext(&m_engineContext, &resp);
+  if (rc != 0)
+    throw std::runtime_error("Failed to create engine context.");
 }
 
 CEngineThread::~CEngineThread()
@@ -42,8 +42,7 @@ CEngineThread::~CEngineThread()
   while (isRunning())
     QThread::msleep(50);
 
-  int rc = mediateRequestDestroyEngineContext(m_engineContext);
-  assert(rc == 0);
+  mediateRequestDestroyEngineContext(m_engineContext);
 }
 
 void CEngineThread::setRunState(bool setRunning)

@@ -718,6 +718,7 @@ void getValidFieldFlags(int *validFlags, int instrument,int selectorOrigin)
        validFlags[PRJCT_RESULTS_GROUNDP_QF]=1;
      }
 
+     break;
  // ----------------------------------------------------------------------------
 
    case PRJCT_INSTR_FORMAT_APEX :

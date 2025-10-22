@@ -556,7 +556,7 @@ RC ReliMFC(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int localDay
   pBuffers=&pEngineContext->buffers;
 
   memset(fileName,0,MAX_STR_SHORT_LEN+1);
-  strncpy(fileName,pEngineContext->fileInfo.fileName,MAX_STR_SHORT_LEN);
+  strncpy(fileName,pEngineContext->fileInfo.fileName,MAX_STR_SHORT_LEN+1);
   pInstrumental=&pEngineContext->project.instrumental;
   pMfc=&pInstrumental->mfc;
   rc=ERROR_ID_NO;

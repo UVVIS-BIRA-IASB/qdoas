@@ -22,7 +22,6 @@ int NetCDFGroup::read_data_fields(struct netcdf_data_fields *new_fields,int n)
   size_t start[6];
   size_t dimlen;
   int nelemts;
-  int groupId;
   int rc=ERROR_ID_NO;
 
   if ((new_fields!=NULL) && n)
@@ -37,10 +36,9 @@ int NetCDFGroup::read_data_fields(struct netcdf_data_fields *new_fields,int n)
      {
       int varId;
       int dimIds[6];
-      int groupId;
 
       pField=&data_fields_list[i];
-      groupId=(pField->varGroupName.size()==0)?groupID():groupID(pField->varGroupName);
+      int groupId=(pField->varGroupName.size()==0)?groupID():groupID(pField->varGroupName);
 
       if (!nc_inq_varid(groupId, pField->varName.c_str(), &varId) &&
           !nc_inq_varndims(groupId, varId, &pField->varDimsN) &&
@@ -312,7 +310,7 @@ int NetCDFFile::openNetCDF(const string &filename, NetCDFFile::Mode mode, size_t
       // done:
       break;
     }
-    // All other return codes: assume file does not exist ~> fallthrough to nc_create
+    [[fallthrough]]; // All other return codes: assume file does not exist ~> fallthrough to nc_create
   case Mode::write:
     rc = nc_create(filename.c_str(), NC_NETCDF4, &groupid);
     break;

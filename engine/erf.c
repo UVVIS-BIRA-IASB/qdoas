@@ -103,8 +103,8 @@ void gser ( double *gamser, double a, double x, double *gln )
     if ( x <= 0.0 )
        {
          if ( x < 0.0 )
-          ERROR_SetLast("gser",ERROR_TYPE_WARNING,ERROR_ID_ERF,"x less than 0");
-          return;
+           ERROR_SetLast("gser",ERROR_TYPE_WARNING,ERROR_ID_ERF,"x less than 0");
+         return;
        }
     else
        {

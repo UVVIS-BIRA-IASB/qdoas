@@ -515,7 +515,7 @@ RC raman_convolution(double *xsLambda,double *xsVector,double *xsDeriv2,double *
   double *n2xref,*o2xref,                                                       // rotational Raman spectra
           gamman2,sigprimen2,n2xsec,sign2,sumn2xsec,                            // n2 working variables
           gammao2,sigprimeo2,o2xsec,sigo2,sumo2xsec,                            // o2 working variables
-          sigsq,lambda,lambda1e7,solar,n2posj,o2posj,                           // other working variables
+          sigsq,lambda,lambda1e7,n2posj,o2posj,                           // other working variables
           newXs;                                                                // output value
 
   INDEX   i,j;                                                                  // indexes for loops and arrays

@@ -194,7 +194,7 @@ void ascii_write_analysis_data(const bool selected_records[], int num_records) {
 
 /*! \brief Print the field name when <field name> = <field value> syntax is used
             to save data before spectra */
-static void print_output_field_title(FILE *fp,const struct output_field *thefield,int recordno,int col)
+static void print_output_field_title(FILE *fp,const struct output_field *thefield,int col)
  {
   if (thefield->windowname)
    {
@@ -282,7 +282,7 @@ static void print_output_field_with_title(FILE *fp, const struct output_field *t
 
   for(size_t i=0; i<ncols; i++,fprintf(fp,"\n"))
    {
-    print_output_field_title(fp,thefield,recordno,i);
+    print_output_field_title(fp,thefield,i);
     print_output_field_value(fp,thefield,recordno,i);
    }
  }
@@ -293,7 +293,7 @@ static void print_output_meastype(FILE *fp, const struct output_field *thefield,
  {
   int meastype=((int (*)[1])thefield->data)[recordno][0];    // only one element
 
-  print_output_field_title(fp,thefield,recordno,0);
+  print_output_field_title(fp,thefield,0);
 
   switch(meastype)
    {

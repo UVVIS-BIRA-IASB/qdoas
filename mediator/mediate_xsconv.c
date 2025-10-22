@@ -969,12 +969,11 @@ RC mediateRingCalculate(void *engineContext,void *responseHandle)
          *raman,*raman2,*ramanint,                                              // output ring cross section
          *solarLambda,*solarVector,*solarDeriv2,                                // substitution vectors for solar spectrum
          *slitLambda,*slitVector,*slitDeriv2,                                   // substitution vectors for slit function
-         *slitLambda2,*slitVector2,*slitDeriv22,                                // substitution vectors for slit function
          *ringLambda,*ringVector,                                               // substitution vectors for ring cross section
           temp,                                                                 // approximate average temperature in �K for scattering
           slitParam[NSFP];                                                      // gaussian full width at half maximum
 
-  MATRIX_OBJECT  xsSolar,xsSolarConv,xsSlit[NSFP],xsRing,*pSlit,*pSlit2;// solar spectrum and slit function
+  MATRIX_OBJECT  xsSolar,xsSolarConv,xsSlit[NSFP],xsRing,*pSlit;// solar spectrum and slit function
   int     nsolar,nring,                                            // size of previous vectors
           wveDptFlag,
           slitType;                                                             // type of the slit function
@@ -1004,7 +1003,6 @@ RC mediateRingCalculate(void *engineContext,void *responseHandle)
   slitWidth=(double)RING_SLIT_WIDTH;                                            // NB : force slit width to 6 because of convolutions
   slitType=pEngineContext->slitConv.slitType;
   raman=raman2=ramanint=NULL;
-  slitLambda2=slitVector2=slitDeriv22=NULL;
   temp=(double)pEngineContext->temperature;                                        // (double)250.;   May 2005/05/31
   
   rc=ERROR_ID_NO;
@@ -1051,7 +1049,6 @@ RC mediateRingCalculate(void *engineContext,void *responseHandle)
     memcpy(pEngineContext->xsNew.matrix[0],xsRing.matrix[0],sizeof(double)*xsRing.nl);
 
     pSlit=&xsSlit[0];
-    pSlit2=&xsSlit[1];
 
     solarLambda=xsSolarConv.matrix[0];
     solarVector=xsSolarConv.matrix[1];
@@ -1090,15 +1087,6 @@ RC mediateRingCalculate(void *engineContext,void *responseHandle)
 
         memcpy(slitTmp.matrix[0],(double *)pSlit->matrix[0]+1,sizeof(double)*(pSlit->nl-1));
        }
-
-      if (wveDptFlag && ((slitType==SLIT_TYPE_FILE) || (slitType==SLIT_TYPE_ERF) || (slitType==SLIT_TYPE_VOIGT) || (slitType==SLIT_TYPE_AGAUSS) || (slitType==SLIT_TYPE_SUPERGAUSS)))
-       {
-        slitLambda2=pSlit2->matrix[0];
-        slitVector2=pSlit2->matrix[1];
-        slitDeriv22=pSlit2->deriv2[1];
-       }
-      else
-       slitLambda2=slitVector2=slitDeriv22=NULL;
      }
     else
      {
@@ -1364,7 +1352,7 @@ void UsampWriteHeader(ENGINE_XSCONV_CONTEXT *pEngineContext,FILE *fp,int phase)
 // mediateUsampSave : Save the undersampling cross sections
 // --------------------------------------------------------
 
-RC mediateUsampSave(ENGINE_XSCONV_CONTEXT *pEngineContext,char *fileName,int phase,double *lambda,double *usampXS,int nSize,void *responseHandle)
+RC mediateUsampSave(ENGINE_XSCONV_CONTEXT *pEngineContext,char *fileName,int phase,double *lambda,double *usampXS,int nSize)
  {
   // Declarations
 
@@ -1469,8 +1457,8 @@ RC mediateUsampCalculate(void *engineContext,void *responseHandle)
      {
       // Save
 
-      if (!(rc=mediateUsampSave(pEngineContext,pEngineContext->path,1,calibrationMatrix.matrix[0],phase1,nSize,responseHandle)))
-       rc=mediateUsampSave(pEngineContext,pEngineContext->path2,2,calibrationMatrix.matrix[0],phase2,nSize,responseHandle);
+      if (!(rc=mediateUsampSave(pEngineContext,pEngineContext->path,1,calibrationMatrix.matrix[0],phase1,nSize)))
+       rc=mediateUsampSave(pEngineContext,pEngineContext->path2,2,calibrationMatrix.matrix[0],phase2,nSize);
 
       // Plot
 

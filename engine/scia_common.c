@@ -199,8 +199,9 @@ SCIA_err Read_DSD (FILE* unit, DSD *dsd)
 
 SCIA_err Write_DSD (FILE* unit, DSD *dsd)
 {
-    int err;
     char nl[2] = "\n";
+    int err;
+
     err=fprintf(unit,
        "DS_NAME=\"%.28s\"%.1s"
        "DS_TYPE=%c%.1s"
@@ -219,8 +220,8 @@ SCIA_err Write_DSD (FILE* unit, DSD *dsd)
            dsd->dsr_size, nl,
            dsd->spare, nl);
 
-/*    if ( err != 16 )
-      return DSD_ERROR; */
+    if ( err != 16 )
+      return DSD_ERROR;
     return OK;
 }
 

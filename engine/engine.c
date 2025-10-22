@@ -1603,7 +1603,6 @@ RC EngineBuildRefList(ENGINE_CONTEXT *pEngineContext)
   INDEX               indexRecord,                                              // browse spectra records in file
                       indexZmMin,indexZmMax;                                    // index of records with SZA minimum and maximum
 
-  PRJCT_INSTRUMENTAL *pInstr;                                                   // pointer to the instrumental part of the project
   MFC_DOASIS         *pMfc;                                                     // MFC DOASIS format (binary and STD format)
   double              ZmMin,ZmMax;                                              // extrema zenith angles found in file
   int                 NRecord;                                                  // number of hold record
@@ -1628,7 +1627,6 @@ RC EngineBuildRefList(ENGINE_CONTEXT *pEngineContext)
 
   localCalDay=pEngineContext->recordInfo.localCalDay;
 
-  pInstr=&ENGINE_contextRef.project.instrumental;
   pMfc=&pEngineContext->recordInfo.mfcDoasis;
 
   recordNumber=(!pEngineContext->mfcDoasisFlag)?pEngineContext->recordNumber:pMfc->nFiles;
@@ -1641,6 +1639,7 @@ RC EngineBuildRefList(ENGINE_CONTEXT *pEngineContext)
   rc=ERROR_ID_NO;
 
   #ifdef PRJCT_INSTR_FORMAT_OLD
+  PRJCT_INSTRUMENTAL *pInstr = &ENGINE_contextRef.project.instrumental; // pointer to the instrumental part of the project
   if ((pInstr->readOutFormat==PRJCT_INSTR_FORMAT_LOGGER) ||
       (pInstr->readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG) ||
       (pInstr->readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG_OLD))
