@@ -50,11 +50,15 @@ using array2d = boost::const_multi_array_ref<T, 2>;
 
 // create an array {"BAND1", "BAND2", ... } in same order as the
 // tropomiSpectralBand enum:
-const char* band_names[] = {
+static const char* band_names[] = {
 #define EXPAND(BAND, LABEL ) LABEL,
   TROPOMI_BANDS
 #undef EXPAND
 };
+
+#define EXPAND(BAND, LABEL) const char* TROPOMI_##BAND = LABEL;
+  TROPOMI_BANDS
+#undef EXPAND
 
 static const size_t MAX_GROUNDPIXEL = 450;
 

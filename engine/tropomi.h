@@ -19,6 +19,11 @@ enum tropomiSpectralBand {
 #undef EXPAND
 };
 
+// define strings for all TROPOMI bands.
+#define EXPAND(BAND, LABEL) extern const char* TROPOMI_##BAND;
+  TROPOMI_BANDS
+#undef EXPAND
+
 struct instrumental_tropomi {
   char calibrationFile[FILENAME_BUFFER_LENGTH];
   char instrFunctionFile[FILENAME_BUFFER_LENGTH];

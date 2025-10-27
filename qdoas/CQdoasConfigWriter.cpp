@@ -955,7 +955,7 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
           this_xtrack_mode);
 
   // tropomi
-  const char *tropomiSpectralBand;
+  const char *tropomiSpectralBand = TROPOMI_UVIS1;
   switch(d->tropomi.spectralBand) {
     // use macro to generate expression for every value of the
     // tropomiSpectralBand enum:
