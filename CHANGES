@@ -1,3 +1,10 @@
+3.7.9 2025-10-27
+~~~~~~~~~~~~~~~~
+
+ * Fix for automatic reference selection with FRM4DOAS format.
+
+ * Clean up code to avoid a number of compiler warnings.
+
 3.7.8 2025-10-21
 ~~~~~~~~~~~~~~~~
 
