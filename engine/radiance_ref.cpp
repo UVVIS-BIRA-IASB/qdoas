@@ -89,7 +89,7 @@ int radiance_ref_load(const char *filename, int pixel, double *lambda, double *s
       *use_row = 0;
       return rc;
     }
-    for (size_t i = 0; i < n_wavel; ++i) {
+    for (int i = 0; i < n_wavel; ++i) {
       lambda[i] = wavelength->second.at(pixel)[i];
       spectrum[i] = radiance->second.at(pixel)[i];
     }

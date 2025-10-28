@@ -15,7 +15,7 @@ class CRecordValidator : public QValidator
   CRecordValidator(QObject *obj);
 
   void setRange(int bottom, int top);
-  virtual QValidator::State validate(QString &input, int &pos) const;
+  virtual QValidator::State validate(QString &input, int&) const;
 
  private:
   int m_bottom, m_top;
@@ -28,7 +28,7 @@ class CSzaValidator : public QValidator
  public:
   CSzaValidator(QObject *obj);
 
-  virtual QValidator::State validate(QString &input, int &pos) const;
+  virtual QValidator::State validate(QString &input, int&) const;
   virtual void fixup(QString &input) const;
 };
 
@@ -41,7 +41,7 @@ class CDoubleExpFmtValidator : public QValidator
   CDoubleExpFmtValidator(QObject *obj);
   CDoubleExpFmtValidator(double bottom, double top, int sigFigures, QObject *obj);
 
-  virtual QValidator::State validate(QString &input, int &pos) const;
+  virtual QValidator::State validate(QString &input, int&) const;
   virtual void fixup(QString &input) const;
 
   void setRange(double bottom, double top);
@@ -58,7 +58,7 @@ class CDoubleFixedFmtValidator : public QValidator
   CDoubleFixedFmtValidator(QObject *obj);
   CDoubleFixedFmtValidator(double bottom, double top, int decimals, QObject *obj);
 
-  virtual QValidator::State validate(QString &input, int &pos) const;
+  virtual QValidator::State validate(QString &input, int&) const;
   virtual void fixup(QString &input) const;
 
   void setRange(double bottom, double top);

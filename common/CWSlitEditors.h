@@ -64,7 +64,7 @@ class CWSlitFileEdit : public CWSlitFileBase
   void reset(const struct slit_file *d);
   void apply(struct slit_file *d) const;
 
-  virtual void toggleVisible(int state);
+  virtual void toggleVisible(int);
 
 private:
   QLineEdit *m_slitFileEdit, *m_stretchEdit;

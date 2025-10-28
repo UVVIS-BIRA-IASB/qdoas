@@ -97,7 +97,7 @@ void CWSlitNoneEdit::apply(struct slit_file *) const
 {
 }
 
-void CWSlitFileEdit::toggleVisible(int state) {
+void CWSlitFileEdit::toggleVisible(int) {
 
   for(int row=0; row<m_wvlDependentGrid->rowCount(); ++row) {
     for(int col=0; col<m_wvlDependentGrid->columnCount(); ++col) {

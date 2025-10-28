@@ -14,7 +14,7 @@ CWSiteListCombo::CWSiteListCombo(QWidget *parent) :
   repopulate();
 }
 
-void CWSiteListCombo::updateNewSite(const std::string &newSiteName)
+void CWSiteListCombo::updateNewSite(const std::string &)
 {
   QString selected = currentText();
 

@@ -15,7 +15,7 @@ CSzaValidator::CSzaValidator(QObject *obj) :
 {
 }
 
-QValidator::State CSzaValidator::validate(QString &input, int &) const
+QValidator::State CSzaValidator::validate(QString &input, int&) const
 {
   if (input.isEmpty()) return QValidator::Intermediate;
 
@@ -68,7 +68,7 @@ CDoubleExpFmtValidator::CDoubleExpFmtValidator(double bottom, double top, int si
   setSignificantFigures(sigFigures);
 }
 
-QValidator::State CDoubleExpFmtValidator::validate(QString &input, int &pos) const
+QValidator::State CDoubleExpFmtValidator::validate(QString &input, int&) const
 {
   if (input.isEmpty()) return QValidator::Intermediate;
 
@@ -200,7 +200,7 @@ CDoubleFixedFmtValidator::CDoubleFixedFmtValidator(double bottom, double top, in
   setDecimals(decimals);
 }
 
-QValidator::State CDoubleFixedFmtValidator::validate(QString &input, int &pos) const
+QValidator::State CDoubleFixedFmtValidator::validate(QString &input, int&) const
 {
   if (input.isEmpty()) return QValidator::Intermediate;
 
@@ -323,7 +323,7 @@ CRecordValidator::CRecordValidator(QObject *obj) :
   setRange(1, 999999999);
 }
 
-QValidator::State CRecordValidator::validate(QString &input, int &pos) const
+QValidator::State CRecordValidator::validate(QString &input, int&) const
 {
   if (input.isEmpty()) return QValidator::Intermediate;
 
