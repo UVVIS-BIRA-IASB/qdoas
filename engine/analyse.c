@@ -265,7 +265,7 @@ void plot_curves( int page,
     int start = interval_start(interval);
     int end = interval_end(interval);
     for (int j = 0; j!=num_curves; ++j,++segment) {
-      plot_curves[segment] = CURVE(.x = (curve_data[j][0])+start, .y = (curve_data[j][1])+start, .length = end-start+1, .number=j);
+      plot_curves[segment] = CURVE(.name= "", .x = (curve_data[j][0])+start, .y = (curve_data[j][1])+start, .length = end-start+1, .number=j);
     }
   }
   mediateResponsePlotData(page, plot_curves, num_segments, type, forceAutoScaling, title, "Wavelength (nm)", "", responseHandle);

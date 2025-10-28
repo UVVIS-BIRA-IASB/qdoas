@@ -919,8 +919,8 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
          pixMin=spectrum_start(subwindow_fit[indexWindow].specrange);
          pixMax=spectrum_end(subwindow_fit[indexWindow].specrange);
 
-         spectrumData[2*indexWindow] = CURVE(.name="Spectrum", .x=&Lambda[pixMin], .y=&spectrum[pixMin], .length=pixMax-pixMin+1, .style=(indexWindow%2)?DashLine:Line, .number=0);
-         spectrumData[2*indexWindow+1] = CURVE(.name="Adjusted Kurucz", .x=&Lambda[pixMin], .y=&pKurucz->dispSecX[indexWindow][pixMin], .length=pixMax-pixMin+1, .style=(indexWindow%2)?DashLine:Line, .number=1);
+         spectrumData[2*indexWindow] = (struct curve_data) {.name="Spectrum", .x=&Lambda[pixMin], .y=&spectrum[pixMin], .length=pixMax-pixMin+1, .style=(indexWindow%2)?DashLine:Line, .number=0};
+         spectrumData[2*indexWindow+1] = (struct curve_data) {.name="Adjusted Kurucz", .x=&Lambda[pixMin], .y=&pKurucz->dispSecX[indexWindow][pixMin], .length=pixMax-pixMin+1, .style=(indexWindow%2)?DashLine:Line, .number=1};
         }
        mediateResponsePlotData(plotPageCalib,spectrumData,Nb_Win*2,Spectrum,forceAutoScale,string,"Wavelength (nm)","Intensity", responseHandle);
       }
@@ -942,7 +942,7 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
         for (indexWindow=0;indexWindow<Nb_Win;indexWindow++) {
           pixMin=spectrum_start(subwindow_fit[indexWindow].specrange);
           pixMax=spectrum_end(subwindow_fit[indexWindow].specrange);
-          spectrumData[indexWindow] = CURVE(.name="Residual", .x=&Lambda[pixMin], .y=&pKurucz->dispAbsolu[indexWindow][pixMin], .length=pixMax-pixMin+1, .style=(indexWindow%2)?DashLine:Line, .number=0);
+          spectrumData[indexWindow] = (struct curve_data) {.name="Residual", .x=&Lambda[pixMin], .y=&pKurucz->dispAbsolu[indexWindow][pixMin], .length=pixMax-pixMin+1, .style=(indexWindow%2)?DashLine:Line, .number=0};
         }
         mediateResponsePlotData(plotPageCalib,spectrumData,Nb_Win,Spectrum,forceAutoScale,string,"Wavelength (nm)","", responseHandle);
       }
@@ -989,8 +989,8 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
               pKurucz->dispSecX[indexWindow][j]=offset[j];
             }
 
-            spectrumData[(indexWindow<<1)] = CURVE(.name="Measured", .x=&Lambda[pixMin], .y=&pKurucz->dispAbsolu[indexWindow][pixMin], .length=pixMax-pixMin+1, .style=(indexWindow%2)?DashLine:Line, .number=0);
-            spectrumData[(indexWindow<<1)+1] = CURVE(.name="Calculated", .x=&Lambda[pixMin], .y=&pKurucz->dispSecX[indexWindow][pixMin], .length=pixMax-pixMin+1, .style=(indexWindow%2)?DashLine:Line, .number=0);
+            spectrumData[(indexWindow<<1)] = (struct curve_data) {.name="Measured", .x=&Lambda[pixMin], .y=&pKurucz->dispAbsolu[indexWindow][pixMin], .length=pixMax-pixMin+1, .style=(indexWindow%2)?DashLine:Line, .number=0};
+            spectrumData[(indexWindow<<1)+1] = (struct curve_data) {.name="Calculated", .x=&Lambda[pixMin], .y=&pKurucz->dispSecX[indexWindow][pixMin], .length=pixMax-pixMin+1, .style=(indexWindow%2)?DashLine:Line, .number=0};
           }
           mediateResponsePlotData(plotPageCalib,spectrumData,Nb_Win,Spectrum,forceAutoScale,string,"Wavelength (nm)","", responseHandle);
          }
@@ -1030,8 +1030,8 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
                 pKurucz->dispSecX[indexWindow][j]=pKurucz->crossFits.matrix[indexCrossFit][j];
               }
 
-              spectrumData[(indexWindow<<1)] = CURVE(.name="Measured", .x=&Lambda[pixMin], .y=&pKurucz->dispAbsolu[indexWindow][pixMin], .length=pixMax-pixMin+1, .style=(indexWindow%2)?DashLine:Line, .number=0);
-              spectrumData[(indexWindow<<1)+1] = CURVE(.name="Calculated", .x=&Lambda[pixMin], .y=&pKurucz->dispSecX[indexWindow][pixMin], .length=pixMax-pixMin+1, .style=(indexWindow%2)?DashLine:Line, .number=1);
+              spectrumData[(indexWindow<<1)] = (struct curve_data) {.name="Measured", .x=&Lambda[pixMin], .y=&pKurucz->dispAbsolu[indexWindow][pixMin], .length=pixMax-pixMin+1, .style=(indexWindow%2)?DashLine:Line, .number=0};
+              spectrumData[(indexWindow<<1)+1] = (struct curve_data) {.name="Calculated", .x=&Lambda[pixMin], .y=&pKurucz->dispSecX[indexWindow][pixMin], .length=pixMax-pixMin+1, .style=(indexWindow%2)?DashLine:Line, .number=1};
             }
             mediateResponsePlotData(plotPageCalib,spectrumData,Nb_Win,Spectrum,forceAutoScale,string,"Wavelength (nm)","", responseHandle);
           }

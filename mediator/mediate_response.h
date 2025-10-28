@@ -40,7 +40,7 @@ struct curve_data {
 };
 
 // macro to "default-initialize" some fields of a plot_data struct in C
-#define CURVE(...) (struct curve_data) { .name="", .number=-1, .style=Line, ##__VA_ARGS__ }
+#define CURVE(...) (struct curve_data) {.style=Line, ##__VA_ARGS__ }
 
 void mediateResponseAddImage(int page,const char *imageFile,void *responseHandle);
 
