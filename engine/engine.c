@@ -52,6 +52,7 @@
 #include <string.h>
 #include <math.h>
 #include <dirent.h>
+#include <assert.h>
 
 #include "engine.h"
 
@@ -1141,6 +1142,10 @@ RC EngineRequestBeginBrowseSpectra(ENGINE_CONTEXT *pEngineContext,const char *sp
 //    #if defined(__DEBUG_) && __DEBUG_
 //    DEBUG_Start(ENGINE_dbgFile,(char *)"BrowseSpectra",DEBUG_FCTTYPE_MEM,15,DEBUG_DVAR_YES,0);
 //    #endif
+
+   // GUI and command line interface should make sure that run
+   // calibration is only started for suitable instrument formats:
+   assert (THRD_id != THREAD_TYPE_KURUCZ || EngineCanRunCalib(pEngineContext->project.instrumental.readOutFormat));
 
    // Initializations
 
@@ -2294,3 +2299,43 @@ RC EngineNewRef(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
 
    return rc;
  }
+
+bool EngineCanRunCalib(enum _prjctInstrFormat format) {
+  switch(format) {
+  case PRJCT_INSTR_FORMAT_ASCII:
+#ifdef PRJCT_INSTR_FORMAT_OLD
+  case PRJCT_INSTR_FORMAT_LOGGER:
+  case PRJCT_INSTR_FORMAT_ACTON:
+  case PRJCT_INSTR_FORMAT_PDAEGG:
+  case PRJCT_INSTR_FORMAT_PDAEGG_OLD:
+  case PRJCT_INSTR_FORMAT_CCD_OHP_96:
+  case PRJCT_INSTR_FORMAT_CCD_HA_94:
+#endif
+  case PRJCT_INSTR_FORMAT_SAOZ_VIS:
+  case PRJCT_INSTR_FORMAT_SAOZ_EFM:
+  case PRJCT_INSTR_FORMAT_MFC:
+  case PRJCT_INSTR_FORMAT_MFC_STD:
+  case PRJCT_INSTR_FORMAT_MFC_BIRA:
+#ifdef PRJCT_INSTR_FORMAT_OLD
+  case PRJCT_INSTR_FORMAT_RASAS:
+  case PRJCT_INSTR_FORMAT_PDASI_EASOE:
+#endif
+  case PRJCT_INSTR_FORMAT_CCD_EEV:
+  case PRJCT_INSTR_FORMAT_GDP_BIN:
+  case PRJCT_INSTR_FORMAT_SCIA_PDS:
+  case PRJCT_INSTR_FORMAT_UOFT:
+  case PRJCT_INSTR_FORMAT_NOAA:
+  case PRJCT_INSTR_FORMAT_GOME2:
+  case PRJCT_INSTR_FORMAT_MKZY:
+  case PRJCT_INSTR_FORMAT_BIRA_AIRBORNE:
+  case PRJCT_INSTR_FORMAT_BIRA_MOBILE:
+  case PRJCT_INSTR_FORMAT_APEX:
+  case PRJCT_INSTR_FORMAT_OCEAN_OPTICS:
+  case PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF:
+  case PRJCT_INSTR_FORMAT_GOME1_NETCDF:
+  case PRJCT_INSTR_FORMAT_GEMS:
+    return true;
+  default:
+    return false;
+  }
+}

@@ -252,6 +252,7 @@ bool kbhit()
 #include "CBatchEngineController.h"
 #include "CEngineResponse.h"
 #include "CProjectConfigTreeNode.h"
+
 #include "constants.h"
 
 #include "../convolution/CConvConfigHandler.h"
@@ -267,6 +268,7 @@ bool kbhit()
 #include "glob_match.hpp"
 
 extern "C" {
+#include "engine.h"
 #include "stdfunc.h"
 #include "zenithal.h"
 }
@@ -884,6 +886,14 @@ int batchProcessQdoas(commands_t *cmd)
 
   int rc_batch = 0;
   for (const auto& config_item : projectItems) {
+    if (calibSwitch && !EngineCanRunCalib(static_cast<enum _prjctInstrFormat>(config_item.properties()->instrumental.format))) {
+      std::cerr << "ERROR: Option 'run calibration' not implemented "
+                << "for the instrument format of project '"
+                << config_item.name() << "'." << std::endl;
+      retCode = -1;
+      break;
+    }
+
     QdoasBatch batch(config_item, cmd->outputDir, cmd->calibDir, rc_batch);
     if (triggerSwitch) {
       retCode = batch.analyse_project(cmd->triggerDir);

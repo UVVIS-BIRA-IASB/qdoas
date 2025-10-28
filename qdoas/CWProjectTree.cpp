@@ -32,6 +32,10 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 #include "CPreferences.h"
 #include "CWProjectExportEditor.h"
 
+extern "C" {
+#include "engine.h"
+}
+
 #include "debugutil.h"
 
 using std::shared_ptr;
@@ -164,6 +168,14 @@ void CWProjectTree::contextMenuEvent(QContextMenuEvent *e)
     QTreeWidgetItem *item = items.front();
     int itemType = item->type();
 
+    // get the name of the project by recursing until we reach the top level:
+    QTreeWidgetItem *top_item = item;
+    while (top_item->parent()) {
+      top_item = top_item->parent();
+    }
+    const mediate_project_t *project = CWorkSpace::instance()->findProject(top_item->text(0).toStdString());
+    auto can_run_calib = EngineCanRunCalib(static_cast<enum _prjctInstrFormat>(project->instrumental.format));
+
     if (itemType == cSpectraDirectoryItemType) {
       // A Directory item
       CProjectTreeItem *projItem = static_cast<CProjectTreeItem*>(item);
@@ -175,7 +187,7 @@ void CWProjectTree::contextMenuEvent(QContextMenuEvent *e)
 
       menu.addSeparator();
       menu.addAction("Run Analysis", this, SLOT(slotRunAnalysis()))->setEnabled(!m_sessionActive);
-      menu.addAction("Run Calibration", this, SLOT(slotRunCalibration()))->setEnabled(!m_sessionActive);
+      menu.addAction("Run Calibration", this, SLOT(slotRunCalibration()))->setEnabled(!m_sessionActive && can_run_calib);
       menu.addAction("Browse Spectra", this, SLOT(slotBrowseSpectra()))->setEnabled(!m_sessionActive);
       menu.addAction("Export Data/Spectra", this, SLOT(slotExportSpectra()))->setEnabled(!m_sessionActive);
       menu.addSeparator();
@@ -204,7 +216,7 @@ void CWProjectTree::contextMenuEvent(QContextMenuEvent *e)
 
       menu.addSeparator();
       menu.addAction("Run Analysis", this, SLOT(slotRunAnalysis()))->setEnabled(!m_sessionActive);
-      menu.addAction("Run Calibration", this, SLOT(slotRunCalibration()))->setEnabled(!m_sessionActive);
+      menu.addAction("Run Calibration", this, SLOT(slotRunCalibration()))->setEnabled(!m_sessionActive && can_run_calib);
       menu.addAction("Browse Spectra", this, SLOT(slotBrowseSpectra()))->setEnabled(!m_sessionActive);
       menu.addAction("Export Data/Spectra", this, SLOT(slotExportSpectra()))->setEnabled(!m_sessionActive);
       menu.addSeparator();
@@ -226,7 +238,7 @@ void CWProjectTree::contextMenuEvent(QContextMenuEvent *e)
 
       menu.addSeparator();
       menu.addAction("Run Analysis", this, SLOT(slotRunAnalysis()))->setEnabled(!m_sessionActive);
-      menu.addAction("Run Calibration", this, SLOT(slotRunCalibration()))->setEnabled(!m_sessionActive);
+      menu.addAction("Run Calibration", this, SLOT(slotRunCalibration()))->setEnabled(!m_sessionActive && can_run_calib);
       menu.addAction("Browse Spectra", this, SLOT(slotBrowseSpectra()))->setEnabled(!m_sessionActive);
       menu.addAction("Export Data/Spectra", this, SLOT(slotExportSpectra()))->setEnabled(!m_sessionActive);
       menu.addSeparator();
@@ -250,7 +262,7 @@ void CWProjectTree::contextMenuEvent(QContextMenuEvent *e)
 
       menu.addSeparator();
       menu.addAction("Run Analysis", this, SLOT(slotRunAnalysis()))->setEnabled(!m_sessionActive);
-      menu.addAction("Run Calibration", this, SLOT(slotRunCalibration()))->setEnabled(!m_sessionActive);
+      menu.addAction("Run Calibration", this, SLOT(slotRunCalibration()))->setEnabled(!m_sessionActive && can_run_calib);
       menu.addAction("Browse Spectra", this, SLOT(slotBrowseSpectra()))->setEnabled(!m_sessionActive);
       menu.addAction("Export Data/Spectra", this, SLOT(slotExportSpectra()))->setEnabled(!m_sessionActive);
       menu.addSeparator();
@@ -308,7 +320,7 @@ void CWProjectTree::contextMenuEvent(QContextMenuEvent *e)
 
       menu.addSeparator();
       menu.addAction("Run Analysis", this, SLOT(slotRunAnalysis()))->setEnabled(!m_sessionActive);
-      menu.addAction("Run Calibration", this, SLOT(slotRunCalibration()))->setEnabled(!m_sessionActive);
+      menu.addAction("Run Calibration", this, SLOT(slotRunCalibration()))->setEnabled(!m_sessionActive && can_run_calib);
       menu.addAction("Browse Spectra", this, SLOT(slotBrowseSpectra()))->setEnabled(!m_sessionActive);
       menu.addAction("Export Data/Spectra", this, SLOT(slotExportSpectra()))->setEnabled(!m_sessionActive);
       menu.addSeparator();

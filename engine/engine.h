@@ -31,5 +31,6 @@ RC              EngineBuildScanIndex(ENGINE_CONTEXT *pEngineContext);
 RC              EngineEndCurrentSession(ENGINE_CONTEXT *pEngineContext);
 ENGINE_CONTEXT *EngineCreateContext(void);
 RC              EngineDestroyContext(ENGINE_CONTEXT *pEngineContext);
+bool            EngineCanRunCalib(enum _prjctInstrFormat format);
 
 #endif
