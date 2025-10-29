@@ -60,382 +60,100 @@
 #include <cstring>
 
 #include <iostream>
+#include <map>
+#include <tuple>
+#include <variant>
 
 #include "qdoasxml.h"
 
 using std::string;
 using std::vector;
 
-void ProjectApplyDouble(const CProjectConfigItem *p,                            // project to modify
-                        const string& xmlKey,                                   // the path of the field to replace
-                        const string& xmlValue,                                 // string with the new value
-                        double *pDoubleField)                                   // pointer to the field to change (should point within the previous target structure)
- {
-   // Print message with old and new values
-  std::cout << xmlKey << ": "
-            << *pDoubleField << " replaced by " << xmlValue
-            << " (" << p->name() << ")" << std::endl;
+struct config_visitor {
+public:
+  config_visitor(const string& value) : xml_value(value) {};
 
-  // Replace the old value by the new one
-  *pDoubleField = std::stod(xmlValue);
- }
-
-void ProjectApplyInt(const CProjectConfigItem *p,                               // project to modify
-                     const string& xmlKey,                                      // the path of the field to replace
-                     const string& xmlValue,                                    // string with the new value
-                     int *pIntField)                                            // pointer to the field to change (should point within the previous target structure)
- {
-  std::cout << xmlKey << ": "
-            << *pIntField << " replaced by " << xmlValue
-            << " (" << p->name() << ")" << std::endl;
-  // Replace the old value by the new one
-  *pIntField=stoi(xmlValue);
- }
-
-void ProjectApplyChoice(const CProjectConfigItem *p,                            // project to modify
-                        const string& xmlKey,                                   // the path of the field to replace
-                        const string& xmlValue,                                 // string with the new value
-                        const char *optionsList[],                              // list of possible options
-                        int nOptions,                                           // number of options in the previous list
-                        int *pNewIndexOption)                                   // index of the new option
-{
-  int indexOption;
-
-  for (indexOption=0;indexOption<nOptions;indexOption++)
-      if (xmlValue==optionsList[indexOption])
-       break;
-
-  if (indexOption<nOptions) {
-    std::cout << xmlKey << ": " << optionsList[*pNewIndexOption]
-              << " replaced by " << xmlValue << " (" << p->name() << ")" << std::endl;
-
-    // Replace the old value by the new one
-    *pNewIndexOption=indexOption;
+  void operator()(char *p) const {
+    strcpy(p, xml_value.c_str());
   }
-}
 
-void ProjectApplyString(const CProjectConfigItem *p,                               // project to modify
-                     const string& xmlKey,                                          // the path of the field to replace
-                     const string& xmlValue,                                        // string with the new value
-                     char *field)                                            // pointer to the field to change (should point within the previous target structure)
-{
-  std::cout << xmlKey << ": "
-            << field << " replaced by " << xmlValue
-            << " ("  << p->name() << ")" << std::endl;
-  // Replace the old value by the new one
-  strcpy(field,xmlValue.c_str());
-}
-
-// ===================================
-// PROJECT PROPERTIES : SELECTION PAGE
-// ===================================
-
-RC ParseSelection(const vector<string>& xmlFields,int xmlFieldN,int startingField,const string& xmlKey,const string& xmlValue,const CProjectConfigItem *p)
- {
-     // Declarations
-
-  mediate_project_t newProjectProperties;
-  const char *geoSelectionMode[]={"none","circle","rectangle","sites"};
-     int indexField;
-     RC  rc;
-
-     // Initializations
-
-     memcpy(&newProjectProperties,(mediate_project_t *)p->properties(),sizeof(mediate_project_t));
-     rc=ERROR_ID_NO;
-
-     for (indexField=startingField;indexField<xmlFieldN;indexField++)
-      {
-          if (xmlFields.at(indexField)=="sza")
-           {
-               if (indexField+1>=xmlFieldN)
-                std::cout << "sza attribute is missing" << std::endl;
-               else if (xmlFields.at(indexField+1)=="min")
-                ProjectApplyDouble(p,xmlKey,xmlValue,&newProjectProperties.selection.szaMinimum);
-               else if (xmlFields.at(indexField+1)=="max")
-                ProjectApplyDouble(p,xmlKey,xmlValue,&newProjectProperties.selection.szaMaximum);
-               else if (xmlFields.at(indexField+1)=="delta")
-                ProjectApplyDouble(p,xmlKey,xmlValue,&newProjectProperties.selection.szaDelta);
-           }
-    else if (xmlFields.at(indexField)=="record")
-     {
-               if (indexField+1>=xmlFieldN)
-                std::cout << "record attribute is missing" << std::endl;
-               else if (xmlFields.at(indexField+1)=="min")
-                ProjectApplyInt(p,xmlKey,xmlValue,&newProjectProperties.selection.recordNumberMinimum);
-               else if (xmlFields.at(indexField+1)=="max")
-                ProjectApplyInt(p,xmlKey,xmlValue,&newProjectProperties.selection.recordNumberMaximum);
-     }
-          else if (xmlFields.at(indexField)=="cloud")
-           {
-               if (indexField+1>=xmlFieldN)
-                std::cout << "cloud attribute is missing" << std::endl;
-               else if (xmlFields.at(indexField+1)=="min")
-                ProjectApplyDouble(p,xmlKey,xmlValue,&newProjectProperties.selection.cloudFractionMinimum);
-               else if (xmlFields.at(indexField+1)=="max")
-                ProjectApplyDouble(p,xmlKey,xmlValue,&newProjectProperties.selection.cloudFractionMaximum);
-           }
-          else if (xmlFields.at(indexField)=="geolocation")
-           {
-               if (indexField+1>=xmlFieldN)
-                std::cout << "geolocation attribute is missing" << std::endl;
-               else if (xmlFields.at(indexField+1)=="selected")
-       ProjectApplyChoice(p,xmlKey,xmlValue,geoSelectionMode,PRJCT_SPECTRA_MODES_MAX,&newProjectProperties.selection.geo.mode);
-               else if (xmlFields.at(indexField+1)=="circle")
-                {
-                    if (indexField+2>=xmlFieldN)
-                  std::cout << "geolocation/circle attribute is missing" << std::endl;
-                 else if (xmlFields.at(indexField+2)=="radius")
-                  ProjectApplyDouble(p,xmlKey,xmlValue,&newProjectProperties.selection.geo.circle.radius);
-                 else if (xmlFields.at(indexField+2)=="long")
-                  ProjectApplyDouble(p,xmlKey,xmlValue,&newProjectProperties.selection.geo.circle.centerLongitude);
-                 else if (xmlFields.at(indexField+2)=="lat")
-                  ProjectApplyDouble(p,xmlKey,xmlValue,&newProjectProperties.selection.geo.circle.centerLatitude);
-                }
-               else if (xmlFields.at(indexField+1)=="rectangle")
-                {
-                    if (indexField+2>=xmlFieldN)
-                  std::cout << "geolocation/rectangle attribute is missing" << std::endl;
-                 else if (xmlFields.at(indexField+2)=="west")
-                  ProjectApplyDouble(p,xmlKey,xmlValue,&newProjectProperties.selection.geo.rectangle.westernLongitude);
-                 else if (xmlFields.at(indexField+2)=="east")
-                  ProjectApplyDouble(p,xmlKey,xmlValue,&newProjectProperties.selection.geo.rectangle.easternLongitude);
-                 else if (xmlFields.at(indexField+2)=="south")
-                  ProjectApplyDouble(p,xmlKey,xmlValue,&newProjectProperties.selection.geo.rectangle.southernLatitude);
-                 else if (xmlFields.at(indexField+2)=="north")
-                  ProjectApplyDouble(p,xmlKey,xmlValue,&newProjectProperties.selection.geo.rectangle.northernLatitude);
-                }
-               else if (xmlFields.at(indexField+1)=="sites")
-                {
-                    if (indexField+2>=xmlFieldN)
-                  std::cout << "geolocation/sites attribute is missing" << std::endl;
-                 else if (xmlFields.at(indexField+2)=="radius")
-                  ProjectApplyDouble(p,xmlKey,xmlValue,&newProjectProperties.selection.geo.sites.radius);
-                }
-            else
-       std::cout << xmlKey << " unknown path" << std::endl;
-           }
-          else
-     std::cout << xmlKey << " unknown path" << std::endl;
-   }
-
-  p->SetProperties((mediate_project_t *)&newProjectProperties);
-
-  // Return
-
-  return rc;
- }
-
-// ==================================
-// PROJECT PROPERTIES : ANALYSIS PAGE
-// ==================================
-
-RC ParseAnalysis(const vector<string>& xmlFields,int xmlFieldN,int startingField,const string& xmlKey,const string& xmlValue,const CProjectConfigItem *p)
- {
-     // Declarations
-
-  mediate_project_t newProjectProperties;
-     int indexField;
-     RC  rc;
-
-     // Initializations
-
-     memcpy(&newProjectProperties,(mediate_project_t *)p->properties(),sizeof(mediate_project_t));
-     rc=ERROR_ID_NO;
-
-     for (indexField=startingField;indexField<xmlFieldN;indexField++)
-      {
-          if ((xmlFields.at(indexField)=="method") ||
-              (xmlFields.at(indexField)=="fit") ||
-              (xmlFields.at(indexField)=="unit") ||
-              (xmlFields.at(indexField)=="interpolation") ||
-              (xmlFields.at(indexField)=="gap"))
-
-           std::cout << xmlKey << " can not be changed" << std::endl;
-
-          else if (xmlFields.at(indexField)=="converge")
-           ProjectApplyDouble(p,xmlKey,xmlValue,&newProjectProperties.analysis.convergenceCriterion);
-          else if (xmlFields.at(indexField)=="max_iterations")
-           ProjectApplyInt(p,xmlKey,xmlValue,&newProjectProperties.analysis.maxIterations);
-          else
-           std::cout << xmlKey << " unknown path" << std::endl;
+  void operator()(std::tuple<int *, vector<string>> t) const {
+    int val = 0;
+    for (const auto& choice : std::get<1>(t)) {
+      if (xml_value == choice) {
+        *std::get<0>(t) = val;
+        return;
       }
-
-  p->SetProperties((mediate_project_t *)&newProjectProperties);
-
-  // Return
-
-  return rc;
- }
-
-// =====================================
-// PROJECT PROPERTIES : CALIBRATION PAGE
-// =====================================
-
-RC ParseCalibration(const vector<string>& xmlFields,int xmlFieldN,int startingField,const string& xmlKey,const string& xmlValue,const CProjectConfigItem *p)
- {
-  // Declarations
-
-  mediate_project_t newProjectProperties;
-  int indexField;
-  RC  rc;
-
-  // Initializations
-
-  rc=ERROR_ID_NO;
-  memcpy(&newProjectProperties,(mediate_project_t *)p->properties(),sizeof(mediate_project_t));
-
-  for (indexField=startingField;indexField<xmlFieldN;indexField++)
-   {
-    // top attributes
-
-    if (xmlFields.at(indexField)=="line")
-     {
-      if (indexField+1>=xmlFieldN)
-       std::cout << "line attributes are missing" << std::endl;
-      else if (xmlFields.at(indexField+1)=="slfFile")
-       ProjectApplyString(p,xmlKey,xmlValue,newProjectProperties.calibration.slfFile);
-      else
-       std::cout << xmlKey << " can not be changed " << std::endl;
-     }
-   }
-
-  p->SetProperties((mediate_project_t *)&newProjectProperties);
-
-  // Return
-
-  return rc;
- }
-
-// ======================================
-// PROJECT PROPERTIES : INSTRUMENTAL PAGE
-// ======================================
-
-RC ParseInstrumental(const vector<string>& xmlFields,int xmlFieldN,int startingField,const string& xmlValue,const CProjectConfigItem *p)
- {
-   // Declarations
-
-   mediate_project_t newProjectProperties;
-   int indexField;
-   RC  rc;
-
-   // Initializations
-
-   memcpy(&newProjectProperties,(mediate_project_t *)p->properties(),sizeof(mediate_project_t));
-   rc=ERROR_ID_NO;
-
-   for (indexField=startingField;indexField<xmlFieldN;indexField++)
-    {
-     if (xmlFields.at(indexField)=="format")
-      std::cout << "project/instrumental/format field can not be changed" << std::endl;
-     else if (xmlFields.at(indexField)=="site")
-      std::cout << "project/instrumental/site field can not be changed" << std::endl;
-     else if (xmlFields.at(indexField)=="ascii")
-      std::cout << "project/instrumental/ascii field can not be changed yet" << std::endl;
-     else if (xmlFields.at(indexField)=="logger")
-      std::cout << "project/instrumental/logger field can not be changed yet" << std::endl;
-     else if (xmlFields.at(indexField)=="acton")
-      std::cout << "project/instrumental/acton field can not be changed yet" << std::endl;
-     else if (xmlFields.at(indexField)=="pdaegg")
-      std::cout << "project/instrumental/pdaegg field can not be changed yet" << std::endl;
-     else if (xmlFields.at(indexField)=="pdaeggold")
-      std::cout << "project/instrumental/pdaeggold field can not be changed yet" << std::endl;
-     else if (xmlFields.at(indexField)=="ccdohp96")
-      std::cout << "project/instrumental/ccdohp96 field can not be changed yet" << std::endl;
-     else if (xmlFields.at(indexField)=="ccdha94")
-      std::cout << "project/instrumental/ccdha94 field can not be changed yet" << std::endl;
-     else if (xmlFields.at(indexField)=="saozvis")
-      std::cout << "project/instrumental/saozvis field can not be changed yet" << std::endl;
-     else if (xmlFields.at(indexField)=="saozefm")
-      std::cout << "project/instrumental/saozefm field can not be changed yet" << std::endl;
-     else if (xmlFields.at(indexField)=="mfc")
-      std::cout << "project/instrumental/mfc field can not be changed yet" << std::endl;
-     else if (xmlFields.at(indexField)=="mfcbira")
-      std::cout << "project/instrumental/mfcbira field can not be changed yet" << std::endl;
-     else if (xmlFields.at(indexField)=="mfcstd")
-      std::cout << "project/instrumental/mfcstd field can not be changed yet" << std::endl;
-     else if (xmlFields.at(indexField)=="rasas")
-      std::cout << "project/instrumental/rasas field can not be changed yet" << std::endl;
-     else if (xmlFields.at(indexField)=="pdasieasoe")
-      std::cout << "project/instrumental/pdasieasoe field can not be changed yet" << std::endl;
-     else if (xmlFields.at(indexField)=="ccdeev")
-      std::cout << "project/instrumental/ccdeev field can not be changed yet" << std::endl;
-     else if (xmlFields.at(indexField)=="gdpascii")
-      std::cout << "project/instrumental/gdpascii field can not be changed yet" << std::endl;
-     else if (xmlFields.at(indexField)=="gdpbin")
-      std::cout << "project/instrumental/gdpbin field can not be changed yet" << std::endl;
-     else if (xmlFields.at(indexField)=="sciapds")
-      std::cout << "project/instrumental/sciapds field can not be changed yet" << std::endl;
-     else if (xmlFields.at(indexField)=="uoft")
-      std::cout << "project/instrumental/uoft field can not be changed yet" << std::endl;
-     else if (xmlFields.at(indexField)=="noaa")
-      std::cout << "project/instrumental/noaa field can not be changed yet" << std::endl;
-     else if (xmlFields.at(indexField)=="omi")
-      {
-       if (indexField+1>=xmlFieldN)
-        std::cout << "omi attribute is missing" << std::endl;
-       else if (xmlFields.at(indexField+1)=="type")
-        std::cout << "project/instrumental/omi/type field can not be changed" << std::endl;
-       else if (xmlFields.at(indexField+1)=="min")
-        std::cout << "project/instrumental/omi/min field can not be changed" << std::endl;
-       else if (xmlFields.at(indexField+1)=="max")
-        std::cout << "project/instrumental/omi/max field can not be changed" << std::endl;
-       else if (xmlFields.at(indexField+1)=="ave")
-        std::cout << "project/instrumental/omi/ave field can not be changed" << std::endl;
-       else if (xmlFields.at(indexField+1)=="trackSelection")
-        {
-         std::cout << "project/instrumental/omi/trackSelection : " << newProjectProperties.instrumental.omi.trackSelection << " replaced by " << xmlValue << std::endl;
-         strcpy(newProjectProperties.instrumental.omi.trackSelection,xmlValue.c_str());
-        }
-       else if (xmlFields.at(indexField+1)=="xTrackMode")
-        {
-         std::cout << "project/instrumental/omi/xTrackMode : " << xmlValue << std::endl;
-         newProjectProperties.instrumental.omi.xtrack_mode = str_to_mode(xmlValue.c_str());
-        }
-       else if (xmlFields.at(indexField+1)=="calib")
-        std::cout << "project/instrumental/omi/calib field can not be changed" << std::endl;
-       else if (xmlFields.at(indexField+1)=="instr")
-        std::cout << "project/instrumental/omi/instr field can not be changed yet" << std::endl;
-      }
-     else if (xmlFields.at(indexField)=="tropomi")
-      {
-       if (indexField+1>=xmlFieldN)
-        std::cout << "tropomi attribute is missing" << std::endl;
-       else if (xmlFields.at(indexField+1)=="trackSelection")
-        {
-         std::cout << "project/instrumental/tropomi/trackSelection : " << newProjectProperties.instrumental.tropomi.trackSelection << " replaced by " << xmlValue << std::endl;
-         strcpy(newProjectProperties.instrumental.tropomi.trackSelection,xmlValue.c_str());
-        }
-      }
-     else if (xmlFields.at(indexField)=="apex")
-      {
-       if (indexField+1>=xmlFieldN)
-        std::cout << "apex attribute is missing" << std::endl;
-       else if (xmlFields.at(indexField+1)=="trackSelection")
-        {
-         std::cout << "project/instrumental/apex/trackSelection : " << newProjectProperties.instrumental.apex.trackSelection << " replaced by " << xmlValue << std::endl;
-         strcpy(newProjectProperties.instrumental.apex.trackSelection,xmlValue.c_str());
-        }
-      }
-     else if (xmlFields.at(indexField)=="gome2")
-      std::cout << "project/instrumental/gome2 field can not be changed yet" << std::endl;
-     else if (xmlFields.at(indexField)=="mkzy")
-      std::cout << "project/instrumental/mkzy field can not be changed yet" << std::endl;
-     else if (xmlFields.at(indexField)=="biramobile")
-      std::cout << "project/instrumental/biramobile field can not be changed yet" << std::endl;
-     else if (xmlFields.at(indexField)=="biraairborne")
-      std::cout << "project/instrumental/biraairborne field can not be changed yet" << std::endl;
-     else if (xmlFields.at(indexField)=="oceanoptics")
-      std::cout << "project/instrumental/oceanoptics field can not be changed yet" << std::endl;
+      ++val;
     }
+    throw std::runtime_error("Invalid choice: " + xml_value);
+  }
 
+  void operator()(double *d) const {
+    *d = std::stod(xml_value);
+  }
 
-   p->SetProperties(( mediate_project_t *)&newProjectProperties);
+  void operator()(int *i) const {
+    *i = std::stoi(xml_value);
+  }
 
-   // Return
+  void operator()(enum omi_xtrack_mode *m) const {
+    *m = str_to_mode(xml_value.c_str());
+  }
+private:
+  const string& xml_value;
+};
 
-   return rc;
- }
+using config_pointer = std::variant<double *, int *, char *,\
+                                    std::tuple<int *, vector<string> >, \
+                                    enum omi_xtrack_mode *>;
+
+RC parse_project_properties(const string& xmlKey, const string& xmlValue, const CProjectConfigItem *p) {
+  mediate_project_t newProjectProperties = *p->properties();
+  std::map<string, config_pointer> config_keys {
+    {"/project/selection/sza/min", &newProjectProperties.selection.szaMinimum},
+    {"/project/selection/sza/max", &newProjectProperties.selection.szaMaximum},
+    {"/project/selection/sza/delta", &newProjectProperties.selection.szaDelta},
+    {"/project/selection/record/min", &newProjectProperties.selection.recordNumberMinimum},
+    {"/project/selection/record/max", &newProjectProperties.selection.recordNumberMaximum},
+    {"/project/selection/cloud/min", &newProjectProperties.selection.cloudFractionMinimum},
+    {"/project/selection/cloud/max", &newProjectProperties.selection.cloudFractionMaximum},
+    {"/project/selection/geolocation/selected", std::make_tuple(&newProjectProperties.selection.geo.mode,
+                                                                vector<string>{"none","circle","rectangle","sites"})},
+    {"/project/selection/geolocation/circle/radius", &newProjectProperties.selection.geo.circle.radius},
+    {"/project/selection/geolocation/cirle/long", &newProjectProperties.selection.geo.circle.centerLongitude},
+    {"/project/selection/geolocation/cirle/lat", &newProjectProperties.selection.geo.circle.centerLatitude},
+    {"/project/selection/geolocation/rectangle/west", &newProjectProperties.selection.geo.rectangle.westernLongitude},
+    {"/project/selection/geolocation/rectangle/east", &newProjectProperties.selection.geo.rectangle.easternLongitude},
+    {"/project/selection/geolocation/rectangle/south", &newProjectProperties.selection.geo.rectangle.southernLatitude},
+    {"/project/selection/geolocation/rectangle/north", &newProjectProperties.selection.geo.rectangle.northernLatitude},
+    {"/project/selection/geolocation/sites/radius", &newProjectProperties.selection.geo.sites.radius},
+    {"/project/analysis/converge", &newProjectProperties.analysis.convergenceCriterion},
+    {"/project/analysis/max_iterations", &newProjectProperties.analysis.maxIterations},
+    {"/project/calibration/line/slfFile", newProjectProperties.calibration.slfFile},
+    {"/project/instrumental/omi/trackSelection", newProjectProperties.instrumental.omi.trackSelection},
+    {"/project/instrumental/omi/xTrackMode", &newProjectProperties.instrumental.omi.xtrack_mode},
+    {"/project/instrumental/tropomi/trackSelection", newProjectProperties.instrumental.tropomi.trackSelection},
+    {"/project/instrumental/apex/trackSelection", newProjectProperties.instrumental.apex.trackSelection}};
+
+  auto i_config = config_keys.find(xmlKey);
+  if (i_config != config_keys.end()) {
+    config_visitor visitor { xmlValue };
+    try {
+      std::visit(visitor, i_config->second);
+      std::cout << xmlKey << " replaced by " << xmlValue
+                << " ("  << p->name() << ")" << std::endl;
+    } catch (std::exception &e) {
+      std::cerr << "ERROR: invalid setting '" << xmlValue << "' for key " << xmlKey << std::endl;
+      return -1;
+    }
+  } else {
+    std::cerr << "ERROR: unknown -xml configuration key '" << xmlKey << "'" << std::endl;
+    return -1;
+  }
+  p->SetProperties(&newProjectProperties);
+  return ERROR_ID_NO;
+}
 
 // ===========================
 // ANALYSIS WINDOWS PROPERTIES
@@ -665,16 +383,10 @@ RC QDOASXML_Parse(vector<string> &xmlCommands,const CProjectConfigItem *p)
         if (projectField) {
           if (xmlFields.at(indexField)=="display")
             std::cout << xmlKey << " fields can not be changed" << std::endl;
-          else if (xmlFields.at(indexField)=="selection")
-            rc=ParseSelection(xmlFields,xmlFieldsN,indexField+1,xmlKey,xmlValue,p);
-          else if (xmlFields.at(indexField)=="analysis")
-            rc=ParseAnalysis(xmlFields,xmlFieldsN,indexField+1,xmlKey,xmlValue,p);
-          else if (xmlFields.at(indexField)=="instrumental")
-            rc=ParseInstrumental(xmlFields,xmlFieldsN,indexField+1,xmlValue,p);
+          else if (xmlFields.at(indexField)=="selection" || xmlFields.at(indexField)=="analysis" || xmlFields.at(indexField)=="instrumental" || xmlFields.at(indexField)=="calibration")
+            rc = parse_project_properties(xmlKey, xmlValue, p);
           else if (xmlFields.at(indexField)=="analysis_window")
             rc=ParseAnalysisWindow(xmlFields,xmlFieldsN,indexField+1,xmlKey,xmlValue,p);
-          else if (xmlFields.at(indexField)=="calibration")
-            rc=ParseCalibration(xmlFields,xmlFieldsN,indexField+1,xmlKey,xmlValue,p);
           break;
         }
         else if (xmlFields.at(indexField)=="project")

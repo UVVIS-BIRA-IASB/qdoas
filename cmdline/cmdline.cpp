@@ -953,7 +953,7 @@ int readConfigQdoas(commands_t *cmd, vector<CProjectConfigItem>& projectItems)
       for (auto &p : handler.projectItems()) {
         if (boost::iequals(p.name(), cmd->projectName)) {
           if (xmlSwitch) {
-            QDOASXML_Parse(cmd->xmlCommands,&p);
+            retCode = QDOASXML_Parse(cmd->xmlCommands,&p);
           }
           projectItems.push_back(std::move(p));
         }
