@@ -141,7 +141,7 @@ RC parse_project_properties(const string& xmlKey, const string& xmlValue, const 
     config_visitor visitor { xmlValue };
     try {
       std::visit(visitor, i_config->second);
-      std::cout << xmlKey << " replaced by " << xmlValue
+      std::cout << xmlKey << " set to " << xmlValue
                 << " ("  << p->name() << ")" << std::endl;
     } catch (std::exception &e) {
       std::cerr << "ERROR: invalid setting '" << xmlValue << "' for key " << xmlKey << std::endl;
@@ -155,212 +155,77 @@ RC parse_project_properties(const string& xmlKey, const string& xmlValue, const 
   return ERROR_ID_NO;
 }
 
-// ===========================
-// ANALYSIS WINDOWS PROPERTIES
-// ===========================
+RC parse_analysis_window(const string& xmlKey, const string& xmlValue, const CProjectConfigItem *p) {
+  const char prefix[] = "/project/analysis_window";
 
-void AnalysisWindowApplyInt(const vector<CAnalysisWindowConfigItem>& awList,   // list of analysis windows
-                            const string& windowName,                                // the name of a specific analysis window (all windows will be modified if this string is empty)
-                            const string& xmlKey,                                    // the path of the field to replace
-                            int newValue,                                            // new value
-                            mediate_analysis_window_t *pNewAnalysisWindow,           // target structure for analysis windows properties
-                            int *pIntField)                                          // pointer to the field to change (should point within the previous target structure)
-{
-  // Declarations
-  auto awIt = awList.begin();
-  char msgString[MAX_STR_LEN+1];
+  // look for next segment in xmlKey.  We have either
+  //
+  //  - "/project/analysis_window/<window_name>/<setting>" -> change a setting for a specific analysis window
+  //
+  //  - "/project/analysis_window/<setting>" -> change a setting for all analysis windows
+  size_t next_slash = xmlKey.find("/", sizeof(prefix));
+  string next_element = xmlKey.substr(sizeof(prefix),
+                                      (next_slash != string::npos) ? next_slash - sizeof(prefix) : string::npos);
 
-  // Browse
-
-  while (awIt!=awList.end()) {
-    if (windowName.empty() || (windowName==awIt->name())) {
-      memcpy(pNewAnalysisWindow,(mediate_analysis_window_t *)(awIt->properties()),sizeof(mediate_analysis_window_t));
-      sprintf(msgString,"%s : %d replaced by %d (%s)",
-              xmlKey.c_str(),
-              *pIntField,newValue,awIt->name().c_str());
-      std::cout << msgString << std::endl;
-      *pIntField=newValue;
-      awIt->SetProperties(( mediate_analysis_window_t *)pNewAnalysisWindow);
-    }
-    ++awIt;
+  // if no window name is given:
+  string window_name = "";
+  string setting = xmlKey.substr(sizeof(prefix));
+  if (next_slash != string::npos && next_element != "files") {
+    // a window name is given:
+    window_name = next_element;
+    setting = xmlKey.substr(1 + next_slash);
   }
-}
 
-void AnalysisWindowApplyDouble(const vector<CAnalysisWindowConfigItem>& awList,     // list of analysis windows
-                               const string& windowName,                                // the name of a specific analysis window (all windows will be modified if this string is empty)
-                               const string& xmlKey,                                    // the path of the field to replace
-                               const string& xmlValue,                                  // string with the new value
-                               mediate_analysis_window_t *pNewAnalysisWindow,           // target structure for analysis windows properties
-                               double *pDoubleField)                                    // pointer to the field to change (should point within the previous target structure)
-{
-  // Declarations
-
-  auto awIt = awList.begin();
-  char msgString[MAX_STR_LEN+1];
-
-  // Browse
-
-  while (awIt!=awList.end()) {
-    if (windowName.empty() || (windowName==awIt->name())) {
-      memcpy(pNewAnalysisWindow,(mediate_analysis_window_t *)(awIt->properties()),sizeof(mediate_analysis_window_t));
-      sprintf(msgString,"%s : %.2lf replaced by %s (%s)",
-              xmlKey.c_str(),
-              *pDoubleField,xmlValue.c_str(),awIt->name().c_str());
-      std::cout << msgString << std::endl;
-      *pDoubleField=(double)atof(xmlValue.c_str());
-      awIt->SetProperties(( mediate_analysis_window_t *)pNewAnalysisWindow);
-    }
-    ++awIt;
-  }
-}
-
-void AnalysisWindowApplyString(const vector<CAnalysisWindowConfigItem>& awList,     // list of analysis windows
-                               const string& windowName,                                // the name of a specific analysis window (all windows will be modified if this string is empty)
-                               const string& xmlKey,                                    // the path of the field to replace
-                               const string& xmlValue,                                  // string with the new value
-                               mediate_analysis_window_t *pNewAnalysisWindow,           // target structure for analysis windows properties
-                               char *field)                                             // pointer to the field to change (should point within the previous target structure)
- {
-   // Declarations
-
-   auto awIt = awList.begin();
-   char msgString[MAX_STR_LEN+1];
-
-   // Browse
-   while (awIt!=awList.end()) {
-     if (windowName.empty() || (windowName==awIt->name())) {
-       memcpy(pNewAnalysisWindow,(mediate_analysis_window_t *)(awIt->properties()),sizeof(mediate_analysis_window_t));
-       sprintf(msgString,"%s : %s replaced by %s (%s)",
-               xmlKey.c_str(),
-               field,xmlValue.c_str(),awIt->name().c_str());
-       std::cout << msgString << std::endl;
-       strcpy(field,xmlValue.c_str());
-       awIt->SetProperties(( mediate_analysis_window_t *)pNewAnalysisWindow);
-     }
-     ++awIt;
-   }
- }
-
-RC ParseAnalysisWindow(const vector<string>& xmlFields,int xmlFieldN,int startingField,const string& xmlKey,const string& xmlValue,const CProjectConfigItem *p)
-{
-  // Declarations
-
-  auto& awList = p->analysisWindowItems();
   mediate_analysis_window_t newAnalysisProperties;
 
-  string windowName;
+  std::map<string, config_pointer> config_keys {
+    {"min", &newAnalysisProperties.fitMinWavelength},
+    {"max", &newAnalysisProperties.fitMaxWavelength},
+    {"resol_fwhm", &newAnalysisProperties.resolFwhm},
+    {"lambda0", &newAnalysisProperties.lambda0},
+    {"files/refone", newAnalysisProperties.refOneFile},
+    {"files/reftwo", newAnalysisProperties.refTwoFile},
+    {"files/residual", newAnalysisProperties.residualFile},
+    {"files/szacenter", &newAnalysisProperties.refSzaCenter},
+    {"files/szadelta", &newAnalysisProperties.refSzaDelta},
+    {"files/minlon", &newAnalysisProperties.refMinLongitude},
+    {"files/maxlon", &newAnalysisProperties.refMaxLongitude},
+    {"files/minlat", &newAnalysisProperties.refMinLatitude},
+    {"files/maxlat", &newAnalysisProperties.refMaxLatitude},
+    {"files/refns", &newAnalysisProperties.refSpectrumSelection},
+    {"files/cloudfmin", &newAnalysisProperties.cloudFractionMin},
+    {"files/cloudfmax", &newAnalysisProperties.cloudFractionMax},
+    {"files/maxdoasrefmode", std::make_tuple(&newAnalysisProperties.refSpectrumSelection,
+                                             vector<string>{"sza","scan"})},
+    {"files/scanmode", std::make_tuple(&newAnalysisProperties.refSpectrumSelectionScanMode,
+                                       vector<string>{"before","after", "average", "interpolate"})}
+  };
 
-  int indexField;
-  int displayField;
-  int filesField;
-  RC  rc;
-
-  // Initializations
-
-  displayField=filesField=0;
-  rc=ERROR_ID_NO;
-
-  for (indexField=startingField;indexField<xmlFieldN;indexField++)
-    {
-      // top attributes
-
-      if (!displayField && !filesField)
-        {
-          if ((xmlFields.at(indexField)=="disable") ||
-              (xmlFields.at(indexField)=="kurucz"))
-
-            std::cout << xmlKey << " can not be changed" << std::endl;
-
-          // Fitting interval
-
-          else if (xmlFields.at(indexField)=="min")
-            AnalysisWindowApplyDouble(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,&newAnalysisProperties.fitMinWavelength);
-          else if (xmlFields.at(indexField)=="max")
-            AnalysisWindowApplyDouble(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,&newAnalysisProperties.fitMaxWavelength);
-          else if (xmlFields.at(indexField)=="resol_fwhm")
-            AnalysisWindowApplyDouble(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,&newAnalysisProperties.resolFwhm);
-          else if (xmlFields.at(indexField)=="lambda0")
-            AnalysisWindowApplyDouble(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,&newAnalysisProperties.lambda0);
-          else if (xmlFields.at(indexField)=="display")
-            std::cout << "project/analysis_window/display fields can not be changed" << std::endl;
-          else if (xmlFields.at(indexField)=="refsel")
-            {
-              if ((xmlValue!="auto") && (xmlValue!="file"))
-                std::cout << xmlKey << " do not support " << xmlValue << std::endl;
-              else
-                AnalysisWindowApplyInt(awList,windowName,xmlKey,(xmlValue=="auto")?ANLYS_REF_SELECTION_MODE_AUTOMATIC:ANLYS_REF_SELECTION_MODE_FILE,&newAnalysisProperties,&newAnalysisProperties.refSpectrumSelection);
-            }
-          else if (xmlFields.at(indexField)=="files")
-            filesField=1;
-          else
-            windowName=xmlFields.at(indexField);
-        }
-
-      // files section
-
-      else if (filesField)
-        {
-          if (xmlFields.at(indexField)=="refone")
-            AnalysisWindowApplyString(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,newAnalysisProperties.refOneFile);
-          else if (xmlFields.at(indexField)=="reftwo")
-            AnalysisWindowApplyString(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,newAnalysisProperties.refTwoFile);
-          else if (xmlFields.at(indexField)=="residual")
-            AnalysisWindowApplyString(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,newAnalysisProperties.residualFile);
-          else if (xmlFields.at(indexField)=="szacenter")
-            AnalysisWindowApplyDouble(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,&newAnalysisProperties.refSzaCenter);
-          else if (xmlFields.at(indexField)=="szadelta")
-            AnalysisWindowApplyDouble(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,&newAnalysisProperties.refSzaDelta);
-          else if (xmlFields.at(indexField)=="minlon")
-            AnalysisWindowApplyDouble(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,&newAnalysisProperties.refMinLongitude);
-          else if (xmlFields.at(indexField)=="maxlon")
-            AnalysisWindowApplyDouble(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,&newAnalysisProperties.refMaxLongitude);
-          else if (xmlFields.at(indexField)=="minlat")
-            AnalysisWindowApplyDouble(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,&newAnalysisProperties.refMinLatitude);
-          else if (xmlFields.at(indexField)=="maxlat")
-            AnalysisWindowApplyDouble(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,&newAnalysisProperties.refMaxLatitude);
-          else if (xmlFields.at(indexField)=="refns")
-            AnalysisWindowApplyInt(awList,windowName,xmlKey,atoi(xmlValue.c_str()),&newAnalysisProperties,&newAnalysisProperties.refSpectrumSelection);
-          else if (xmlFields.at(indexField)=="cloudfmin")
-            AnalysisWindowApplyDouble(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,&newAnalysisProperties.cloudFractionMin);
-          else if (xmlFields.at(indexField)=="cloudfmax")
-            AnalysisWindowApplyDouble(awList,windowName,xmlKey,xmlValue,&newAnalysisProperties,&newAnalysisProperties.cloudFractionMax);
-          else if (xmlFields.at(indexField)=="maxdoasrefmode")
-            {
-              if ((xmlValue!="scan") && (xmlValue!="sza"))
-                std::cout << xmlKey << " do not support " << xmlValue << std::endl;
-              else
-                AnalysisWindowApplyInt(awList,windowName,xmlKey,(xmlValue=="scan")?ANLYS_MAXDOAS_REF_SCAN:ANLYS_MAXDOAS_REF_SZA,&newAnalysisProperties,&newAnalysisProperties.refSpectrumSelection);
-            }
-          else if (xmlFields.at(indexField)=="scanmode")
-            {
-                 if (xmlValue=="before")
-                  AnalysisWindowApplyInt(awList,windowName,xmlKey,ANLYS_MAXDOAS_REF_SCAN_BEFORE,&newAnalysisProperties,&newAnalysisProperties.refSpectrumSelection);
-                 else if (xmlValue=="after")
-                  AnalysisWindowApplyInt(awList,windowName,xmlKey,ANLYS_MAXDOAS_REF_SCAN_AFTER,&newAnalysisProperties,&newAnalysisProperties.refSpectrumSelection);
-                 else if (xmlValue=="average")
-                  AnalysisWindowApplyInt(awList,windowName,xmlKey,ANLYS_MAXDOAS_REF_SCAN_AVERAGE,&newAnalysisProperties,&newAnalysisProperties.refSpectrumSelection);
-                 else if (xmlValue=="interpolate")
-                  AnalysisWindowApplyInt(awList,windowName,xmlKey,ANLYS_MAXDOAS_REF_SCAN_INTERPOLATE,&newAnalysisProperties,&newAnalysisProperties.refSpectrumSelection);
-                 else
-               std::cout << xmlKey << " do not support " << xmlValue << std::endl;
-            }
-
-          // pixel selection for GOME-ERS2 -> not supported
-
-            else if ((xmlFields.at(indexField)=="east") ||
-                     (xmlFields.at(indexField)=="center") ||
-                     (xmlFields.at(indexField)=="west") ||
-                     (xmlFields.at(indexField)=="backscan"))
-
-                    std::cout << xmlKey << " can not be changed" << std::endl;
-        }
+  auto i_config = config_keys.find(setting);
+  if (i_config != config_keys.end()) {
+    auto& awList = p->analysisWindowItems();
+    for (auto &aw : awList) {
+      if (!window_name.empty() && window_name != aw.name()) {
+        continue;
+      }
+      config_visitor visitor { xmlValue };
+      newAnalysisProperties = *aw.properties();
+      try {
+        std::visit(visitor, i_config->second);
+        std::cout << prefix << "/" << setting << " set to " << xmlValue
+                  << " ("  << aw.name() << ")" << std::endl;
+        aw.SetProperties(&newAnalysisProperties);
+      } catch (std::exception &e) {
+        std::cerr << "ERROR: invalid setting '" << xmlValue << "' for key " << prefix << "/" << setting << std::endl;
+        return -1;
+      }
     }
-
-
-  // Return
-
-  return rc;
- }
+  } else {
+    std::cerr << "ERROR: unknown -xml configuration key '" << prefix << "/" << setting << "'" << std::endl;
+    return -1;
+  }
+  return ERROR_ID_NO;
+}
 
 RC QDOASXML_Parse(vector<string> &xmlCommands,const CProjectConfigItem *p)
  {
@@ -369,29 +234,20 @@ RC QDOASXML_Parse(vector<string> &xmlCommands,const CProjectConfigItem *p)
   for (const auto& xml_cmd : xmlCommands) {
     vector<string> xmlParts;
     boost::split(xmlParts, xml_cmd, boost::is_any_of("="));
-    if (xmlParts.size()==2) {
-      const auto xmlKey=xmlParts.at(0);
-      const auto xmlValue=xmlParts.at(1);
+    if (xmlParts.size()!=2) {
+      std::cerr << "ERROR: illegal value for -xml option: '" << xml_cmd << "'"
+                << " (expect 'key=value' format)" << std::endl;
+      return -1;
+    }
 
-      vector<string> xmlFields;
-      boost::split(xmlFields, xmlKey, boost::is_any_of("/"));
-      size_t xmlFieldsN=xmlFields.size();
+    const auto xmlKey=xmlParts.at(0);
+    const auto xmlValue=xmlParts.at(1);
 
-      int projectField = 0;
-
-      for (size_t indexField=0;(indexField<xmlFieldsN) && !rc;indexField++) {
-        if (projectField) {
-          if (xmlFields.at(indexField)=="display")
-            std::cout << xmlKey << " fields can not be changed" << std::endl;
-          else if (xmlFields.at(indexField)=="selection" || xmlFields.at(indexField)=="analysis" || xmlFields.at(indexField)=="instrumental" || xmlFields.at(indexField)=="calibration")
-            rc = parse_project_properties(xmlKey, xmlValue, p);
-          else if (xmlFields.at(indexField)=="analysis_window")
-            rc=ParseAnalysisWindow(xmlFields,xmlFieldsN,indexField+1,xmlKey,xmlValue,p);
-          break;
-        }
-        else if (xmlFields.at(indexField)=="project")
-          projectField=1;
-      }
+    if (xmlKey.rfind("/project/analysis_window", 0) == 0) {
+      // starts with "/project/analysis_window:
+      rc = parse_analysis_window(xmlKey,xmlValue,p);
+    } else {
+      rc = parse_project_properties(xmlKey, xmlValue, p);
     }
     if (rc) {
       break;
@@ -400,4 +256,3 @@ RC QDOASXML_Parse(vector<string> &xmlCommands,const CProjectConfigItem *p)
 
   return rc;
  }
-
