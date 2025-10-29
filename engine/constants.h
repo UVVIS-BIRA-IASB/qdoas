@@ -758,5 +758,5 @@ enum omi_xtrack_mode {
 };
 
 extern const char *STR_IGNORE, *STR_STRICT, *STR_NONSTRICT;
-extern enum omi_xtrack_mode str_to_mode(const char *configstr);
+enum omi_xtrack_mode str_to_mode(const char *configstr);
 #endif
