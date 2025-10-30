@@ -1225,116 +1225,114 @@ void CQdoasConfigWriter::writeSpectraTreeNode(FILE *fp, const QTreeWidgetItem *i
 
 void CQdoasConfigWriter::writeAnalysisWindows(FILE *fp, const QString &projectName, const QTreeWidgetItem *item)
 {
-  const CAnalysisWindowItem *awItem;
-  const mediate_analysis_window_t *properties;
-  QString awName, tmpStr;
-
   CPathMgr *pathMgr = CPathMgr::instance();
 
-  int n = item->childCount();
-  int i = 0;
-
-  while (i < n) {
-    awItem = dynamic_cast<const CAnalysisWindowItem*>(item->child(i));
-    if (awItem != NULL) {
-      awName = awItem->text(0);
-
-      properties = CWorkSpace::instance()->findAnalysisWindow(projectName.toStdString(), awName.toStdString());
-      if (properties != NULL) {
-
-        fprintf(fp, "    <analysis_window name=\"%s\" disable=\"%s\" kurucz=", awName.toUtf8().constData(),
-                (awItem->isEnabled() ? sFalse : sTrue));
-
-        switch (properties->kuruczMode) {
-        case ANLYS_KURUCZ_REF:
-          fprintf(fp, "\"ref\""); break;
-        case ANLYS_KURUCZ_SPEC:
-          fprintf(fp, "\"spec\""); break;
-        case ANLYS_KURUCZ_REF_AND_SPEC:
-          fprintf(fp, "\"ref+spec\""); break;
-        default:
-          fprintf(fp, "\"none\"");
-        }
-        if (properties->refSpectrumSelection == ANLYS_REF_SELECTION_MODE_AUTOMATIC)
-          fprintf(fp, " refsel=\"auto\"");
-        else
-          fprintf(fp, " refsel=\"file\"");
-
-        fprintf(fp, " min=\"%.3f\" max=\"%.3f\" resol_fwhm=\"%.3f\" lambda0=\"%.3f\" >\n", properties->fitMinWavelength, properties->fitMaxWavelength, properties->resolFwhm,properties->lambda0);
-
-        fprintf(fp, "      <display spectrum=\"%s\" poly=\"%s\" fits=\"%s\" residual=\"%s\" predef=\"%s\" ratio=\"%s\" />\n",
-                (properties->requireSpectrum ? sTrue : sFalse),
-                (properties->requirePolynomial ? sTrue : sFalse),
-                (properties->requireFit ? sTrue : sFalse),
-                (properties->requireResidual ? sTrue : sFalse),
-                (properties->requirePredefined ? sTrue : sFalse),
-                (properties->requireRefRatio ? sTrue : sFalse));
-
-        tmpStr = pathMgr->simplifyPath(QString(properties->refOneFile));
-        fprintf(fp, "      <files refone=\"%s\"\n", tmpStr.toUtf8().constData());
-        tmpStr = pathMgr->simplifyPath(QString(properties->refTwoFile));
-        fprintf(fp, "             reftwo=\"%s\"\n", tmpStr.toUtf8().constData());
-        tmpStr = pathMgr->simplifyPath(QString(properties->residualFile));
-
-        fprintf(fp,
-                "             residual=\"%s\"\n"
-                "             saveresiduals=\"%s\"\n"
-                "             szacenter=\"%.3f\" szadelta=\"%.3f\" scanmode=",tmpStr.toUtf8().constData(),(properties->saveResidualsFlag ? sTrue : sFalse),properties->refSzaCenter , properties->refSzaDelta);
-
-        switch(properties->refSpectrumSelectionScanMode)
-          {
-          case ANLYS_MAXDOAS_REF_SCAN_BEFORE :
-            fprintf(fp,"\"before\" ");
-            break;
-
-          case ANLYS_MAXDOAS_REF_SCAN_AVERAGE :
-            fprintf(fp,"\"average\" ");
-            break;
-
-          case ANLYS_MAXDOAS_REF_SCAN_INTERPOLATE :
-            fprintf(fp,"\"interpolate\" ");
-            break;
-
-          default :
-            fprintf(fp,"\"after\" ");
-            break;
-          }
-
-        fprintf(fp,"minlon=\"%.3f\" maxlon=\"%.3f\" minlat=\"%.3f\" maxlat=\"%.3f\" cloudfmin=\"%.3f\" cloudfmax=\"%.3f\"\n",
-                properties->refMinLongitude, properties->refMaxLongitude,
-                properties->refMinLatitude, properties->refMaxLatitude,
-                properties->cloudFractionMin,properties->cloudFractionMax);
-
-        fprintf(fp,
-                "             maxdoasrefmode=\"%s\"\n",
-                (properties->refMaxdoasSelection==ANLYS_MAXDOAS_REF_SCAN)?"scan":"sza");
-        // for backwards compatibility, we still write the GOME pixeltype selection configuration, defaulting to "true" for all types.
-        fprintf(fp,
-                "             east=\"true\" center=\"true\" west=\"true\" backscan=\"true\" />\n");
-
-        // cross sections ....
-        writeCrossSectionList(fp, &(properties->crossSectionList));
-
-        // linear
-        writeLinear(fp, &(properties->linear));
-
-        // nonlinear
-        writeNonLinear(fp, &(properties->nonlinear));
-
-        // shift and stretch
-        writeShiftStretchList(fp, &(properties->shiftStretchList));
-
-        // gaps...
-        writeGapList(fp, &(properties->gapList));
-
-        // output...
-        writeOutputList(fp, &(properties->outputList));
-
-        fprintf(fp, "    </analysis_window>\n");
-      }
+  for (int i=0; i!=item->childCount(); ++i) {
+    const CAnalysisWindowItem *awItem = dynamic_cast<const CAnalysisWindowItem*>(item->child(i));
+    if (awItem == NULL) {
+      continue;
     }
 
-    ++i;
+    QString awName = awItem->text(0);
+
+    const mediate_analysis_window_t *properties = CWorkSpace::instance()->findAnalysisWindow(projectName.toStdString(), awName.toStdString());
+    if (properties == NULL) {
+      continue;
+    }
+
+    fprintf(fp, "    <analysis_window name=\"%s\" disable=\"%s\" kurucz=", awName.toUtf8().constData(),
+            (awItem->isEnabled() ? sFalse : sTrue));
+
+    switch (properties->kuruczMode) {
+    case ANLYS_KURUCZ_REF:
+      fprintf(fp, "\"ref\""); break;
+    case ANLYS_KURUCZ_SPEC:
+      fprintf(fp, "\"spec\""); break;
+    case ANLYS_KURUCZ_REF_AND_SPEC:
+      fprintf(fp, "\"ref+spec\""); break;
+    default:
+      fprintf(fp, "\"none\"");
+    }
+    if (properties->refSpectrumSelection == ANLYS_REF_SELECTION_MODE_AUTOMATIC)
+      fprintf(fp, " refsel=\"auto\"");
+    else
+      fprintf(fp, " refsel=\"file\"");
+
+    fprintf(fp, " min=\"%.3f\" max=\"%.3f\" resol_fwhm=\"%.3f\" lambda0=\"%.3f\" >\n",
+            properties->fitMinWavelength, properties->fitMaxWavelength, properties->resolFwhm,properties->lambda0);
+
+    fprintf(fp, "      <display spectrum=\"%s\" poly=\"%s\" fits=\"%s\" residual=\"%s\" predef=\"%s\" ratio=\"%s\" />\n",
+            (properties->requireSpectrum ? sTrue : sFalse),
+            (properties->requirePolynomial ? sTrue : sFalse),
+            (properties->requireFit ? sTrue : sFalse),
+            (properties->requireResidual ? sTrue : sFalse),
+            (properties->requirePredefined ? sTrue : sFalse),
+            (properties->requireRefRatio ? sTrue : sFalse));
+
+    QString tmpStr = pathMgr->simplifyPath(QString(properties->refOneFile));
+    fprintf(fp, "      <files refone=\"%s\"\n", tmpStr.toUtf8().constData());
+    tmpStr = pathMgr->simplifyPath(QString(properties->refTwoFile));
+    fprintf(fp, "             reftwo=\"%s\"\n", tmpStr.toUtf8().constData());
+    tmpStr = pathMgr->simplifyPath(QString(properties->residualFile));
+
+    fprintf(fp,
+            "             residual=\"%s\"\n"
+            "             saveresiduals=\"%s\"\n"
+            "             szacenter=\"%.3f\" szadelta=\"%.3f\" scanmode=",
+            tmpStr.toUtf8().constData(),
+            (properties->saveResidualsFlag ? sTrue : sFalse),
+            properties->refSzaCenter , properties->refSzaDelta);
+
+    switch(properties->refSpectrumSelectionScanMode)
+      {
+      case ANLYS_MAXDOAS_REF_SCAN_BEFORE :
+        fprintf(fp,"\"before\" ");
+        break;
+
+      case ANLYS_MAXDOAS_REF_SCAN_AVERAGE :
+        fprintf(fp,"\"average\" ");
+        break;
+
+      case ANLYS_MAXDOAS_REF_SCAN_INTERPOLATE :
+        fprintf(fp,"\"interpolate\" ");
+        break;
+
+      default :
+        fprintf(fp,"\"after\" ");
+        break;
+      }
+
+    fprintf(fp,"minlon=\"%.3f\" maxlon=\"%.3f\" minlat=\"%.3f\" maxlat=\"%.3f\" cloudfmin=\"%.3f\" cloudfmax=\"%.3f\"\n",
+            properties->refMinLongitude, properties->refMaxLongitude,
+            properties->refMinLatitude, properties->refMaxLatitude,
+            properties->cloudFractionMin,properties->cloudFractionMax);
+
+    fprintf(fp,
+            "             maxdoasrefmode=\"%s\"\n",
+            (properties->refMaxdoasSelection==ANLYS_MAXDOAS_REF_SCAN)?"scan":"sza");
+    // for backwards compatibility, we still write the GOME pixeltype selection configuration, defaulting to "true" for all types.
+    fprintf(fp,
+            "             east=\"true\" center=\"true\" west=\"true\" backscan=\"true\" />\n");
+
+    // cross sections ....
+    writeCrossSectionList(fp, &(properties->crossSectionList));
+
+    // linear
+    writeLinear(fp, &(properties->linear));
+
+    // nonlinear
+    writeNonLinear(fp, &(properties->nonlinear));
+
+    // shift and stretch
+    writeShiftStretchList(fp, &(properties->shiftStretchList));
+
+    // gaps...
+    writeGapList(fp, &(properties->gapList));
+
+    // output...
+    writeOutputList(fp, &(properties->outputList));
+
+    fprintf(fp, "    </analysis_window>\n");
   }
 }
 
