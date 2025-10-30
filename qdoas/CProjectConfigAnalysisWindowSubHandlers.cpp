@@ -103,12 +103,6 @@ void CAnalysisWindowSubHandler::start(const xmlstring &element, const map<xmlstr
     d->refMaxLongitude = parse_value<double>(atts, "maxlon");
     d->refMinLatitude = parse_value<double>(atts, "minlat");
     d->refMaxLatitude = parse_value<double>(atts, "maxlat");
-    d->refNs = parse_value<int>(atts, "refns");
-
-    if (d->refNs<=0)
-     d->refNs=1;
-    else if (d->refNs>50)
-     d->refNs=50;
 
     d->cloudFractionMin = parse_value<double>(atts, "cloudfmin");
     d->cloudFractionMax = parse_value<double>(atts, "cloudfmax");

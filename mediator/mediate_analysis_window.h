@@ -42,7 +42,6 @@ extern "C" {
     double refMaxLongitude;
     double refMinLatitude;
     double refMaxLatitude;
-    int refNs;
     double cloudFractionMin;
     double cloudFractionMax;
     int requireSpectrum;

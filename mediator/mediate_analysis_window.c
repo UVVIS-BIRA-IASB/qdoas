@@ -39,7 +39,6 @@ void initializeMediateAnalysisWindow(mediate_analysis_window_t *d)
   d->fitMaxWavelength=
   d->lambda0=(double)0.;
 
-  d->refNs=1;
   d->refSpectrumSelectionScanMode=ANLYS_MAXDOAS_REF_SCAN_AFTER;
 
   // Cross sections
