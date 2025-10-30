@@ -69,6 +69,13 @@
 using std::string;
 using std::vector;
 
+// variant to store different pointer types, pointing to the different
+// types of config structs we want to update:
+using config_pointer = std::variant<double *, int *, char *,\
+                                    std::tuple<int *, vector<string> >, \
+                                    enum omi_xtrack_mode *>;
+
+// visitor to handle the different pointer types:
 struct config_visitor {
 public:
   config_visitor(const string& value) : xml_value(value) {};
@@ -78,35 +85,36 @@ public:
   }
 
   void operator()(std::tuple<int *, vector<string>> t) const {
-    int val = 0;
-    for (const auto& choice : std::get<1>(t)) {
-      if (xml_value == choice) {
-        *std::get<0>(t) = val;
+    // For enum values formatted as strings: match the string against
+    // the list of allowed choices, and write the index of the correct
+    // value.
+    auto& [out, choices] = t;
+    for (size_t i=0; i!=choices.size(); ++i) {
+      if (xml_value == choices[i]) {
+        *out = i;
         return;
       }
-      ++val;
     }
     throw std::runtime_error("Invalid choice: " + xml_value);
   }
 
   void operator()(double *d) const {
+    // Parse the string as a double
     *d = std::stod(xml_value);
   }
 
   void operator()(int *i) const {
+    // Parse the string as an int
     *i = std::stoi(xml_value);
   }
 
   void operator()(enum omi_xtrack_mode *m) const {
+    // Specific for the omi_xtrack_mode enum: convert string to enum.
     *m = str_to_mode(xml_value.c_str());
   }
 private:
   const string& xml_value;
 };
-
-using config_pointer = std::variant<double *, int *, char *,\
-                                    std::tuple<int *, vector<string> >, \
-                                    enum omi_xtrack_mode *>;
 
 RC parse_project_properties(const string& xmlKey, const string& xmlValue, const CProjectConfigItem *p) {
   mediate_project_t newProjectProperties = *p->properties();
@@ -227,8 +235,7 @@ RC parse_analysis_window(const string& xmlKey, const string& xmlValue, const CPr
   return ERROR_ID_NO;
 }
 
-RC QDOASXML_Parse(vector<string> &xmlCommands,const CProjectConfigItem *p)
- {
+RC QDOASXML_Parse(vector<string> &xmlCommands,const CProjectConfigItem *p) {
   RC rc = ERROR_ID_NO;
 
   for (const auto& xml_cmd : xmlCommands) {
@@ -255,4 +262,4 @@ RC QDOASXML_Parse(vector<string> &xmlCommands,const CProjectConfigItem *p)
   }
 
   return rc;
- }
+}
