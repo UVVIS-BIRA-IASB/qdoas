@@ -875,7 +875,7 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
       shiftPoly[i]=Pcalib[pKurucz->shiftDegree+1];
       for (j=pKurucz->shiftDegree;j>=1;j--) {
         double i_pixel = i;
-        // To avoid blowup of the polynomial fit, extrapolate shiftPoly as a constant outside calibration range: 
+        // To avoid blowup of the fitted polynomial, extrapolate shiftPoly as a constant outside calibration range:
         if (i_pixel < SvdPDeb) {
           i_pixel = SvdPDeb;
         } else if (i_pixel > SvdPFin) {
@@ -1065,8 +1065,18 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
         if (TabCross[Feno->indexFwhmParam[indexParam]].FitParam!=ITEM_NONE) {
           for (i=0;i<n_wavel;i++) {
             fwhmVector[indexParam][i]=(double)coeff[indexParam][pKurucz->fwhmDegree];
-            for (j=pKurucz->fwhmDegree-1;j>=0;j--)
-              fwhmVector[indexParam][i]=fwhmVector[indexParam][i]*(double)Lambda[i]+coeff[indexParam][j];
+            for (j=pKurucz->fwhmDegree-1;j>=0;j--) {
+              int i_pixel = i;
+              // To avoid blowup of the fitted polynomial, extrapolate fwhmVector as a constant outside the calibration range:
+              // evaluate fitted polynomial at Lambda[i_pixel], which is fixed to start or end of calibration interval if we
+              // are outside the calibration interval.
+              if (i_pixel < SvdPDeb) {
+                i_pixel = SvdPDeb;
+              } else if (i_pixel > SvdPFin) {
+                i_pixel = SvdPFin;
+              }
+              fwhmVector[indexParam][i]=fwhmVector[indexParam][i]*(double)Lambda[i_pixel]+coeff[indexParam][j];
+            }
           }
 
           if ((rc=SPLINE_Deriv2(Lambda,fwhmVector[indexParam],fwhmDeriv2[indexParam],n_wavel,__func__))!=0)
