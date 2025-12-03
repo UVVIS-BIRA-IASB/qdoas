@@ -618,9 +618,9 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
 
   if ((solar=MEMORY_AllocDVector(__func__,"solar",0,n_wavel))==NULL)
     rc=ERROR_ID_ALLOC;
-  else if (!pKuruczOptions->fwhmFit) 
+  else if (!pKuruczOptions->fwhmFit)
    {
-    if (pSlitOptions->slitFunction.slitType==SLIT_TYPE_NONE) 
+    if (pSlitOptions->slitFunction.slitType==SLIT_TYPE_NONE)
      {
       if ((pKurucz->hrSolar.nl==n_wavel) && VECTOR_Equal(pKurucz->hrSolar.matrix[0],oldLambda,n_wavel,(double)1.e-7))
         VECTOR_Copy(solar,pKurucz->hrSolar.matrix[1],n_wavel);
@@ -629,22 +629,22 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
        rc=SPLINE_Deriv2(pKurucz->hrSolarGridded.matrix[0],pKurucz->hrSolarGridded.matrix[1],pKurucz->hrSolarGridded.deriv2[1],pKurucz->hrSolarGridded.nl,__func__);
       //  SPLINE_Vector(pKurucz->hrSolar.matrix[0],pKurucz->hrSolar.matrix[1],pKurucz->hrSolar.deriv2[1],pKurucz->hrSolar.nl,
       //                oldLambda,solar,n_wavel,pAnalysisOptions->interpol);
-     } 
-    else 
+     }
+    else
      {
       // 20130208 : a high resolution spectrum is now loaded from the slit page of project properties and convolved
       // 20210924 : convolved on a high resolution grid (0.01 nm)
 //       rc=ANALYSE_ConvoluteXs(NULL,ANLYS_CROSS_ACTION_CONVOLUTE,(double)0.,&pKurucz->hrSolar,
 //                              ANALYSIS_slitMatrix,slitParam,pSlitOptions->slitFunction.slitType,
 //                              oldLambda,solar,0,n_wavel,n_wavel,0,pSlitOptions->slitFunction.slitWveDptFlag);
-//      
+//
       if (!(rc=ANALYSE_ConvoluteXs(NULL,ANLYS_CROSS_ACTION_CONVOLUTE,(double)0.,&pKurucz->hrSolar,
                              ANALYSIS_slitMatrix,slitParam,pSlitOptions->slitFunction.slitType,
                              pKurucz->hrSolarGridded.matrix[0],pKurucz->hrSolarGridded.matrix[1],0,pKurucz->hrSolarGridded.nl,pKurucz->hrSolarGridded.nl,0,pSlitOptions->slitFunction.slitWveDptFlag)))
        rc=SPLINE_Deriv2(pKurucz->hrSolarGridded.matrix[0],pKurucz->hrSolarGridded.matrix[1],pKurucz->hrSolarGridded.deriv2[1],pKurucz->hrSolarGridded.nl,__func__);
      }
-   }  
-  else 
+   }
+  else
    {
     VECTOR_Copy(solar,reference,n_wavel);
    }
@@ -909,8 +909,8 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
 
      if (pKuruczOptions->divisionMode==PRJCT_CALIB_WINDOWS_CONTIGUOUS) {
        MEDIATE_PLOT_CURVES(plotPageCalib, Spectrum, forceAutoScale, string, "Wavelength (nm)", "Intensity", responseHandle,
-                           CURVE(.name="Spectrum", .x=&Lambda[SvdPDeb], .y=&spectrum[SvdPDeb], .length=(SvdPFin-SvdPDeb)),
-                           CURVE(.name="Adjusted Kurucz", .x=&Lambda[SvdPDeb], .y=&ANALYSE_secX[SvdPDeb], .length=(SvdPFin-SvdPDeb)));
+                           CURVE(.name="Spectrum", .x=&Lambda[SvdPDeb], .y=&spectrum[SvdPDeb], .length=(SvdPFin-SvdPDeb), .number=0),
+                           CURVE(.name="Adjusted Kurucz", .x=&Lambda[SvdPDeb], .y=&ANALYSE_secX[SvdPDeb], .length=(SvdPFin-SvdPDeb), .number=1));
       }
      else
       {
@@ -977,8 +977,8 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
             ANALYSE_secX[j]=offset[j];
            }
           MEDIATE_PLOT_CURVES(plotPageCalib,Spectrum,forceAutoScale,string,"Wavelength (nm)","",responseHandle,
-                              CURVE(.name="Measured", .x=Lambda, .y=ANALYSE_absolu, .length=n_wavel),
-                              CURVE(.name="Calculated", .x=Lambda, .y=ANALYSE_secX, .length=n_wavel));
+                              CURVE(.name="Measured", .x=Lambda, .y=ANALYSE_absolu, .length=n_wavel, .number=0),
+                              CURVE(.name="Calculated", .x=Lambda, .y=ANALYSE_secX, .length=n_wavel, .number=1));
         } else {
           for (indexWindow=0;indexWindow<Nb_Win;indexWindow++) {
             pixMin=spectrum_start(subwindow_fit[indexWindow].specrange);
@@ -1017,8 +1017,8 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
             }
 
             MEDIATE_PLOT_CURVES(plotPageCalib,Spectrum,forceAutoScale,string,"Wavelength (nm)","", responseHandle,
-                                CURVE(.name="Measured", .x=Lambda, .y=ANALYSE_absolu, .length=n_wavel),
-                                CURVE(.name="Calculated", .x=Lambda, .y=ANALYSE_secX, .length=n_wavel));
+                                CURVE(.name="Measured", .x=Lambda, .y=ANALYSE_absolu, .length=n_wavel, .number=0),
+                                CURVE(.name="Calculated", .x=Lambda, .y=ANALYSE_secX, .length=n_wavel, .number=1));
 
           } else {
             for (indexWindow=0;indexWindow<Nb_Win;indexWindow++) {
@@ -1049,8 +1049,8 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
         sprintf(string,"Shift (%d/%d)",indexFenoColumn+1,ANALYSE_swathSize);
 
       MEDIATE_PLOT_CURVES(plotPageCalib,Spectrum,forceAutoScale,string,"Wavelength (nm)","Shift (nm)", responseHandle,
-                          CURVE(.name="Polynomial fitting individual shift points", .x=&Lambda[SvdPDeb], .y=&shiftPoly[SvdPDeb], .length=(SvdPFin-SvdPDeb)),
-                          CURVE(.name="Shift calculated in the individual small windows", .x=VLambda+1, .y=VShift+1, .length=Nb_Win, .style=Point));
+                          CURVE(.name="Polynomial fitting individual shift points", .x=&Lambda[SvdPDeb], .y=&shiftPoly[SvdPDeb], .length=(SvdPFin-SvdPDeb), .number=0),
+                          CURVE(.name="Shift calculated in the individual small windows", .x=VLambda+1, .y=VShift+1, .length=Nb_Win, .style=Point, .number=1) );
     }
 
     // Display wavelength dependence of fwhm
@@ -1085,8 +1085,8 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
 
         if (pKurucz->displayShift) {
           MEDIATE_PLOT_CURVES(plotPageCalib,Spectrum,forceAutoScale,string,"Wavelength (nm)",(pKuruczOptions->fwhmType==SLIT_TYPE_FILE)?"":"SFP (nm)", responseHandle,
-                              CURVE(.name="Polynomial fitting individual FWHM points", .x=&Lambda[SvdPDeb], .y=&fwhmVector[indexParam][SvdPDeb], .length=(SvdPFin-SvdPDeb)),
-                              CURVE(.name="FWHM calculated in the individual small windows", .x=VLambda+1, .y=fwhm[indexParam], .length=Nb_Win, .style=Point));
+                              CURVE(.name="Polynomial fitting individual FWHM points", .x=&Lambda[SvdPDeb], .y=&fwhmVector[indexParam][SvdPDeb], .length=(SvdPFin-SvdPDeb), .number=0),
+                              CURVE(.name="FWHM calculated in the individual small windows", .x=VLambda+1, .y=fwhm[indexParam], .length=Nb_Win, .style=Point, .number=1));
         }
       }
     }
@@ -1379,7 +1379,7 @@ RC KURUCZ_Reference(double *instrFunction,INDEX refFlag,int saveFlag,int gomeFla
           VECTOR_Copy(pKurucz->KuruczFeno[indexFeno].chiSquare,pKurucz->KuruczFeno[indexRef].chiSquare,Nb_Win);
           VECTOR_Copy(pKurucz->KuruczFeno[indexFeno].wve,pKurucz->KuruczFeno[indexRef].wve,Nb_Win);
           VECTOR_Copy(pKurucz->KuruczFeno[indexFeno].chiSquare,pKurucz->KuruczFeno[indexRef].chiSquare,Nb_Win);
-          
+
           memcpy(pKurucz->KuruczFeno[indexFeno].nIter,pKurucz->KuruczFeno[indexRef].nIter,sizeof(int)*Nb_Win);
 
           if (TabFeno[indexFenoColumn][pKurucz->indexKurucz].NTabCross)
@@ -1606,17 +1606,17 @@ RC KURUCZ_Alloc(const PROJECT *pProject, const double *lambda,INDEX indexKurucz,
   shiftDegree=pKuruczOptions->shiftPolynomial;
 
   rc=ERROR_ID_NO;
-  
-  // Check if the degree of the polynomial for the shift of for the stretch is less than the number of calibration windows   
-  
+
+  // Check if the degree of the polynomial for the shift of for the stretch is less than the number of calibration windows
+
   if ((pKuruczOptions->shiftPolynomial>=Nb_Win) || (pKuruczOptions->fwhmFit && (pKuruczOptions->fwhmPolynomial>=Nb_Win)))
    {
     rc=ERROR_SetLast(__func__,ERROR_TYPE_FATAL,ERROR_ID_CALIBRATION_POLYNOMIAL,"Slit File");
     goto EndKuruczAlloc;
-   }  
-  
+   }
+
   // Check validity of entry fields in Kurucz tab page of project properties panel
-  
+
   if (pKuruczOptions->fwhmFit)
    {
     pKurucz->fwhmDegree=pKuruczOptions->fwhmPolynomial;
@@ -1629,7 +1629,7 @@ RC KURUCZ_Alloc(const PROJECT *pProject, const double *lambda,INDEX indexKurucz,
     if (rc!=ERROR_ID_NO)
      goto EndKuruczAlloc;
    }
-   
+
   if (((pKurucz->KuruczFeno=(KURUCZ_FENO *)MEMORY_AllocBuffer(__func__,"KuruczFeno",NFeno,sizeof(KURUCZ_FENO),0,MEMORY_TYPE_STRUCT))==NULL) ||
       ((pKurucz->dispAbsolu=(double **)MEMORY_AllocBuffer(__func__,"dispAbsolu",Nb_Win,sizeof(double **),0,MEMORY_TYPE_PTR))==NULL) ||
       ((pKurucz->dispSecX=(double **)MEMORY_AllocBuffer(__func__,"dispSecX",Nb_Win,sizeof(double **),0,MEMORY_TYPE_PTR))==NULL) ||
@@ -1726,7 +1726,7 @@ RC KURUCZ_Alloc(const PROJECT *pProject, const double *lambda,INDEX indexKurucz,
 
     rc=XSCONV_ConvertCrossSectionFile(&pKurucz->hrSolar,lambdaMin-7.-step*pKurucz->solarFGap,lambdaMax+7.+step*pKurucz->solarFGap,(double)0.,CONVOLUTION_CONVERSION_NONE);
   }
-  
+
   if( !rc) {
     // If the fwhm of the slit function is fitted, then we can use the same high resolution solar
     // spectrum.  If we do not fit the slit function, the solar spectrum has to be preconvolved.
@@ -1739,7 +1739,7 @@ RC KURUCZ_Alloc(const PROJECT *pProject, const double *lambda,INDEX indexKurucz,
 
      goto EndKuruczAlloc;
 
-    if (!rc && !pKuruczOptions->fwhmFit) 
+    if (!rc && !pKuruczOptions->fwhmFit)
      {
       int hrKuruczLambdaN=ceil((pKuruczOptions->lambdaRight-pKuruczOptions->lambdaLeft)+6.)*100.; // grid of 0.01 nm; 3 nm security gap both sides
       if (!(rc = MATRIX_Allocate(&pKurucz->hrSolarGridded,hrKuruczLambdaN, 2, 0, 0, 1, __func__)))
@@ -1747,7 +1747,7 @@ RC KURUCZ_Alloc(const PROJECT *pProject, const double *lambda,INDEX indexKurucz,
         for (int i=0;i<hrKuruczLambdaN;i++)
          pKurucz->hrSolarGridded.matrix[0][i]=pKuruczOptions->lambdaLeft-3.+0.01*i;
        }
-     }    
+     }
 
     VECTOR_Init(pKurucz->solar,(double)0.,n_wavel);
 
