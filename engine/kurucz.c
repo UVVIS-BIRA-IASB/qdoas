@@ -909,8 +909,8 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
 
      if (pKuruczOptions->divisionMode==PRJCT_CALIB_WINDOWS_CONTIGUOUS) {
        MEDIATE_PLOT_CURVES(plotPageCalib, Spectrum, forceAutoScale, string, "Wavelength (nm)", "Intensity", responseHandle,
-                           CURVE(.name="Spectrum", .x=&Lambda[SvdPDeb], .y=&spectrum[SvdPDeb], .length=(SvdPFin-SvdPDeb), .number=0),
-                           CURVE(.name="Adjusted Kurucz", .x=&Lambda[SvdPDeb], .y=&ANALYSE_secX[SvdPDeb], .length=(SvdPFin-SvdPDeb), .number=1));
+                           CURVE(.name="Spectrum", .x=Lambda, .y=spectrum, .length=n_wavel, .number=0),
+                           CURVE(.name="Adjusted Kurucz", .x=Lambda, .y=ANALYSE_secX, .length=n_wavel, .number=1));
       }
      else
       {
