@@ -2529,8 +2529,8 @@ RC ANALYSE_AlignReference(ENGINE_CONTEXT *pEngineContext,int refFlag,void *respo
 
         const int indexPage=plotPageRef; // (pEngineContext->satelliteFlag || (ANALYSE_swathSize>1))?plotPageRef:WrkFeno+plotPageAnalysis-1;
         MEDIATE_PLOT_CURVES(indexPage, Spectrum, forceAutoScale, refTitle, "Wavelength (nm)", "Intensity", responseHandle,
-                            CURVE(.name="Measured", .x=&lambda[SvdPDeb], .y=&pFeno->SrefEtalon[SvdPDeb], .length=SvdPFin-SvdPDeb+1),
-                            CURVE(.name="Calculated", .x=&lambda[SvdPDeb], .y=&ANALYSE_secX[SvdPDeb], .length=SvdPFin-SvdPDeb+1));
+                            CURVE(.name="Measured", .x=&lambda[SvdPDeb], .y=&pFeno->SrefEtalon[SvdPDeb], .length=SvdPFin-SvdPDeb+1, .number=0),
+                            CURVE(.name="Calculated", .x=&lambda[SvdPDeb], .y=&ANALYSE_secX[SvdPDeb], .length=SvdPFin-SvdPDeb+1, .number=1));
         mediateResponseLabelPage(indexPage,pEngineContext->fileInfo.fileName, "Reference", responseHandle);
 
         ANALYSE_plotRef=1;
