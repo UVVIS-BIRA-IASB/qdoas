@@ -769,7 +769,7 @@ and climatological AMF.
 \subsection{Graphical Display Of Spectral Fit Results}\label{sec:graph-displ-spectr}
 According to the selected fitting method, different formulas are used
 to display the measured data and the calculated fit results.  Tables
-\ref{tab:display_results_od} and \ref{tab:display_results_intensity}
+\ref{tab:display_results_od} and \ref{tab:display_results_{in}tensity}
 explain which quantities are displayed on the fit results page for
 optical density fitting mode and intensity fitting mode.  The
 following quantities are used:
@@ -814,9 +814,200 @@ following quantities are used:
     \bottomrule
    \end{tabular}
    \caption{Formulas used by QDOAS to display the results of a fit in intensity fitting mode.  $S^j$ is the reference cross section for species $j$ and $c_j$ the corresponding SCD.  $P(\lambda)$ is the polynomial obtained from the fit.  See equations \eqref{eq:residual}-\eqref{eq:display_offset} for the definitions of the quantities $R_\mathrm{norm}, R_\mathrm{i}$ and~$O$.}
-   \label{tab:display_results_intensity}
+   \label{tab:display_results_{in}tensity}
  \end{table}
 
+\section{Pukite and Molecular ring corrections}
+\label{sec:pukite-ring-correction}
+
+\subsection{Addition of Pukite terms}\label{pukite-terms}
+
+\subsubsection{Introduction}\label{pukite-ring-introduction}
+
+The Pukite correction consists in a linearization of the AMFs as a
+function of the wavelength and the trace gas vertical optical depth
+(Pukite et al., 2010). It is similar to AMF wavelength correction but
+with two terms. For example, the Pukite-corrected $O_3$
+slant optical depth will be approximated as follows:
+
+\begin{equation}
+  \label{eq:pukite-ring-eq-o3-example}
+\tau_{o3}=S_{o3}^0 \sigma_{o3}+P_1 (\lambda-\lambda_0 ) \sigma_{o3}+P_2 (\sigma_{o3}-\sigma_{o3}^0 ) \sigma_{o3}
+\end{equation}
+
+Accordingly, the program has to create two new cross sections to apply
+this correction. Options are the same as for the original cross
+sections. Interpolation and standard convolution lead to interpolation
+or convolution of the individual Pukite terms.
+
+To allow for proper estimation of uncertainties, the linearization must
+be performed around a reference wavelength ($\lambda_0$) and the
+corresponding cross-section ($\sigma_{o3}^0$). The Pukite correction can be
+implemented with or without $I_0$-correction. The
+formulation of the Pukite cross-section terms differs slightly in the 2
+cases.
+
+\subsubsection{Pukite without $I_0$ correction}\label{pukite-without-i0-correction}
+
+Without $I_0$ correction, the implementation is
+straightforward. The program has to create two additional cross-sections
+accounting for the first-order linearization in lambda and vertical
+optical depth:
+
+\begin{align}
+\mathrm{Puk}_1=(\lambda-\lambda_0 ) \sigma_\lambda \\
+\mathrm{Puk}_2=(\sigma_\lambda-\sigma_0 ) \sigma_\lambda
+\end{align}
+
+The reference wavelength $\lambda_0$ must be configurable by the user. The
+same value is also used for the polynomial terms.
+
+\subsubsection{Pukite with $I_0$ correction}\label{pukite-with-i0-correction} 
+
+When considering the $I_0$-effect, things are a bit more complicated. Let us start from the expression of the optical depth (e.g. for the $O_3$ case, but the formulation is generic in concept):
+
+\begin{equation}
+\tau=-\ln\left( \frac{F*\left\{ I_0\cdot \exp\left( -\mathrm{VC}\cdot\mathrm{AMF}_\lambda\cdot\sigma_\lambda\right) \right\} }{F*I_0} \right)  
+\end{equation}
+
+where $F$ is the slit function, $I_0$ is the solar spectrum, $\sigma$ is the ozone cross-section (simply at one $\tau$). If we consider the $AMF$ $1^{st}$ order expansion, we have:
+
+\begin{equation}
+\tau=-\ln\left( \frac{F*\left\{ I_0\cdot \exp\left( -\mathrm{SCo}\cdot\sigma_\lambda-\rho\left( 1,\lambda\right) \right) \cdot\sigma_\lambda\right\} }{F*I_0} \right)  
+\end{equation}
+
+where $\rho(1,\lambda)$ is a first order term and $SCo$ is not dependent on $\lambda$.
+
+If we assume $\rho(1,\lambda)$ to be a small term which is generally reasonable, e.g. in the $SO_2$ fitting window (see figure \ref{fig:fig_pukite_o3amf}),
+
+\begin{figure}
+  \centering
+    \includegraphics[width=0.45\textwidth]{./img/Algo_pukite_o3amf.jpg}
+\label{fig:fig_pukite_o3amf}
+\end{figure}
+
+we can linearize the equation (knowing that $\exp(x)=1+x$ and $\ln(1+x) \sim x$ when $x<<1$ ) and obtain:
+
+\begin{equation}
+\tau=\mathrm{SC}\cdot\sigma_{Io-corr}+\frac{ F*\left\{ \mathrm{Io}\cdot\exp\left( -\mathrm{SCo}\cdot\sigma_\lambda\right) \cdot\rho\left( 1,\lambda\right) \cdot\sigma_\lambda \right\} }{ F*\left\{ \mathrm{Io}\cdot\exp\left( -\mathrm{SCo}\cdot\sigma_\lambda\right) \right\} }  
+\end{equation}
+
+where $\sigma_{Io-corr}$ is the solar-$Io$ corrected cross-section and $SC$ is the fitted slant column parameter.
+Now let us consider the wavelength dependence of the AMF as in Pukite et al. (2010) % ??? ~\citep{pukite-2010}: 
+
+\begin{equation}
+\rho\left( 1,\lambda\right) =P_1\cdot\left( \lambda-\lambda_0 \right) +P_2\cdot\left( \sigma-\sigma_0\right)
+\end{equation}
+
+and injecting in the equation above, two new terms are found (Pukite terms corrected for solar $Io$). 
+
+\begin{align}
+\mathrm{Puk1}_{Io-corr}=\frac{F*\left\{ I_0\cdot\exp\left( -\mathrm{SCo}\cdot\sigma_\lambda\right)\cdot\lambda\cdot\sigma_\lambda\right\} }{ F*\left\{ I_0\cdot\exp\left( -\mathrm{SCo}\cdot\sigma_\lambda\right) \right\} }-\lambda_0\cdot\sigma_{Io-corr}  \\
+\mathrm{Puk2}_{Io-corr}=\frac{F*\left\{ I_0\cdot\exp\left( -\mathrm{SCo}\cdot\sigma_\lambda\right)\cdot\sigma_\lambda^2\right\} }{ F*\left\{ I_0\cdot\exp\left( -\mathrm{SCo}\cdot\sigma_\lambda\right) \right\} }-\sigma_0\cdot\sigma_{Io-corr}
+\end{align}
+
+Note that the linearization around $\lambda_0$ implies the approximation :
+
+\begin{equation}
+\frac{F*\left\{ I_0\cdot\exp\left( -\mathrm{SCo}\dot\sigma_\lambda\right) \cdot\sigma_\lambda\right\} }{ F*\left\{ I_0\cdot\exp\left( -\mathrm{SCo}\cdot\sigma_\lambda\right) \right\} } \cong\sigma_{Io-corr}
+\end{equation}
+
+This is necessary to make results independent of the choice of $\lambda_0$ and to allow for factorization of the terms in a wavelength-dependent slant column:
+
+\begin{equation}
+\tau=\mathrm{SC}\cdot\sigma_{Io-corr}+P_1\cdot\mathrm{Puk1}_{Io-corr}+P_2\cdot\mathrm{Puk2}_{Io-corr}=\mathrm{SC}_\lambda\cdot\sigma_{Io-corr}
+\end{equation}
+
+$SC$ is the fitted slant column, corresponding to the SCD value at $\lambda_0$
+
+and
+
+\begin{equation}
+\mathrm{SC}_\lambda\cong\mathrm{SC}+P_1\cdot\left( \lambda-\lambda_0\right) +P_2\cdot\left( \sigma_{Io-corr}-\sigma_0\right)
+\end{equation}
+
+\subsection{Molecular Ring correction}\label{molecular-ring-correction}
+
+In the atmosphere, not only elastic processes occur, but also inelastic processes like Raman scattering, which change the wavelength of the scattered photon. To account for such processes, the measured radiance can be split into three terms, 
+one term including photons having undergone only elastic processes and two additional terms including photons which have undergone at least one inelastic scattering (or reflection) process:
+\begin{align}
+R_T^\lambda=R_{el}^\lambda+R_{inel,in}^\lambda-R_{inel,out}^\lambda \\
+R_T^\lambda=R_{el}^\lambda\cdot\left( 1+\frac{R_{inel,in}^\lambda-R_{inel,out}^\lambda }{R_{el}^\lambda}\right) \\
+R_T^\lambda=R_{el}^\lambda\cdot\left( 1+f_R\right)
+\end{align}
+
+With $f_R$ defined as a Ring filling factor:
+
+\begin{equation}
+f_R=\frac{R_T}{R_{el}}-1
+\end{equation}
+
+In case of a DOAS retrieval, we usually work with the log-ratio of a radiance spectrum against an irradiance spectrum ($I_0$):
+
+\begin{align}
+\mathrm{log}\left( \frac{R_T}{I_0}\right) =\mathrm{log}\left( \frac{R_{el}}{I_0} \right) +\mathrm{log}\left( 1+f_R \right) \\
+\mathrm{log}\left( \frac{R_T}{I_0}\right)\cong\mathrm{log}\left( \frac{R_{el}}{I_0} \right) +f_R
+\end{align}
+
+Following the approach proposed by Wagner et al. (2009) and extended by Lerot et al. (2014), we can express the 3 radiance terms as follows:
+
+\begin{align}
+R_{el}^\lambda=T_{el}\cdot I_0  \\
+R_{inel,out}^\lambda=T_{inel}\cdot I_0  \\ 
+R_{inel,in}^\lambda=T_{inel}\cdot I_0 \cdot\sigma_R\cdot\frac{\exp\left( -\tau_{out}-\tau_{in}^{RRS}\right) }{\exp\left( -\tau_{tota}l\right) } 
+\end{align}
+
+Where $\tau_{total}$ represents the trace gas optical density along the elastic light path, $\tau_{out}$ the optical depth along the outgoing light path (after inelastic scattering) and 
+$\tau_{in}^{RRS}$ the optical depth on the incoming light path (before inelastic scattering). The typical geometry of the solar light path in a Raman scattering atmosphere is represented in the figure below. RRS stands for Rotational Raman Scattering, 
+$T_{el}$ is the atmospheric transmission for the elastic radiance and $T_{inel}$ the transmission for the inelastic radiance. $\sigma_R$ is the normalised Ring cross-section as defined in Wagner et al. (2009). This cross-section can be calculated using the Ring tool of QDOAS.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.9\textwidth]{Algo_light_path_raman_scattering.png}
+  \caption{Typical light path geometry in a Raman scattering atmosphere}
+\label{fig:light_path_raman_scattering}
+\end{figure}
+
+Combining the equations above, we can express the Ring filling factor as follows:
+\begin{align}
+f_R=\frac{T{inel}}{T_{el}}\left\{ \sigma_R\cdot\exp\left( \tau_{total}-\tau_{out}-\tau_{in}^{RRS} \right) -1 \right\} \\
+f_R=\frac{T{inel}}{T_{el}}\left\{ \sigma_R\cdot\exp\left( \tau_{in}-\tau_{in}^{RRS} \right) -1 \right\}
+\end{align}
+
+The term $\frac{T_{inel}}{T_{el}}$  describes the probability of a photon to have undergone a $RRS$ process. This term varies smoothly with wavelength, and can often be assumed to be constant within a typically small fitting interval. The second term describes the structured part of the Ring filling, including the impact of molecular absorption (molecular Ring). Accordingly we define a modified Ring cross-section:
+
+\begin{equation}
+\sigma_R^\prime=\sigma_R\cdot\exp\left( \tau_{in}-\tau_{in}^{RRS} \right) -1
+\end{equation}
+
+The term in the exponential describes the molecular absorption contained in the Ring signal. For the case of an absorber located at high altitude (e.g. stratospheric ozone), this term can be approximated in a simple way:
+
+\begin{align}
+\Delta\tau=\tau_{in}-\tau_{in}^{RRS}=A_{in}N_v\left( \sigma_g-\sigma_g^{RRS} \right) \\
+\Delta\tau\cong A_{tot}\left( \lambda \right) N_v \frac{A_{in}}{A_{tot}} \left( \sigma_g-\sigma_g^{RRS} \right)
+\end{align}
+
+or
+
+\begin{equation}
+\Delta\tau\cong N_s\left( \lambda \right) \frac{A_{in}}{A_{tot}} \left( \sigma_g-\sigma_g^{RRS} \right)
+\end{equation}
+
+
+
+Where $\sigma_g$ is the absorption cross-section of gaz g (e.g. $O_3$), $\sigma_g^{RRS}$ the same cross-section smoothed by the Raman scattering,  and $N_s\left( \lambda\right)$ is the 
+wavelength-dependent slant column of gaz g. $A_{in}/A_{tot}$  represents the mean ratio of the geometrical light paths along the total and incoming paths. For a satellite nadir geometry, 
+this can be approximated by :
+
+\begin{equation}
+\frac{A_{in}}{A_{tot}} = \frac{\mathrm{sec}\left( \mathrm{SZA}\right) }{\mathrm{sec}\left( \mathrm{SZA}\right) + \mathrm{sec}\left( \mathrm{VZA}\right) }
+% = \frac{ \mathrm{sec⁡}\left( \mathrm{SZA}\right) }{ \mathrm{sec}\left(⁡ \mathrm{SZA}\right) + \mathrm{sec}\left(⁡ \mathrm{VZA}\right) }   
+\end{equation}
+
+with $SZA$ the solar zenith angle, and $VZA$ to line-of-sight viewing zenith angle.
+In ground-based zenith-sky (or MAX-DOAS) geometry, the factor is equal to unity $\left( \frac{A_{in}}{A_tot}=1\right)$.
+The implementation of the molecular Ring correction implies an iteration, where the fitted trace gas slant column (and its eventual wavelength-dependence if 
+a Pukite correction is applied) is injected into the modified Ring cross-section. 
 
 \section{Block-diagram structure of the program}
 \label{sec:block-diagr-struct}
@@ -1082,7 +1273,7 @@ with the instrumental slit function $F$:
 \end{equation}
 The intensities measured by the spectrometer can be defined as
 \begin{align}
-  \label{eq:incoming_intensity}
+  \label{eq:incoming_{in}tensity}
   I_0^{\mathrm{meas}}(\lambda) &= (F\ast I_0)(\lambda)\,,\\
   I^{\mathrm{meas}}(\lambda) &= (F\ast I)(\lambda) = \left( F \ast I_0 \exp(-S_0 \cdot c)\right)(\lambda)\,.
 \end{align}
