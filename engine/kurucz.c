@@ -1317,7 +1317,6 @@ RC KURUCZ_Reference(double *instrFunction,INDEX refFlag,int saveFlag,int gomeFla
 
   // Initializations
 
-  KURUCZ_indexLine=1;
   pKurucz=&KURUCZ_buffers[indexFenoColumn];
   const int n_wavel = NDET[indexFenoColumn];
   pKuruczFeno=&TabFeno[indexFenoColumn][pKurucz->indexKurucz];
