@@ -332,7 +332,7 @@ RC   ANALYSE_CurFitMethod(INDEX indexFenoColumn, const double *Spectre, const do
 void ANALYSE_ResetData(void);
 RC   ANALYSE_SetInit(ENGINE_CONTEXT *pEngineContext);
 RC ANALYSE_fit_shift_stretch(int indexFeno, int indexFenoColumn, const double *spec1, const double *spec2, double *shift, double *stretch, double *stretch2, double *sigma_shift, double *sigma_stretch, double *sigma_stretch2);
-RC   ANALYSE_AlignReference(ENGINE_CONTEXT *pEngineContext,int refFlag,void *responseHandle,INDEX indexFenoColumn);
+RC   ANALYSE_AlignReference(const ENGINE_CONTEXT *pEngineContext,int refFlag,void *responseHandle,INDEX indexFenoColumn);
 RC   ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle);
 
 void ANALYSE_SetAnalysisType(INDEX indexFenoColumn);

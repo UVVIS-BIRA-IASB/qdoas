@@ -2473,7 +2473,7 @@ RC ANALYSE_fit_shift_stretch(int indexFeno, int indexFenoColumn, const double *s
 //  refFlag==0 : GB, file mode selection or satellite, file mode selection, radasref as ref1
 //  refFlag==1 : GB, automatic mode selection or satellite
 //  refFlag==2 : Satellites, automatic mode  , file mode selection, radasref && kurucz on irradiance
-RC ANALYSE_AlignReference(ENGINE_CONTEXT *pEngineContext,int refFlag,void *responseHandle,INDEX indexFenoColumn) {
+RC ANALYSE_AlignReference(const ENGINE_CONTEXT *pEngineContext,int refFlag,void *responseHandle,INDEX indexFenoColumn) {
   RC rc = ERROR_ID_NO;
 
   for (int WrkFeno=0; WrkFeno<NFeno && !rc; WrkFeno++) {
