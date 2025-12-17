@@ -47,7 +47,6 @@
 #include "spline.h"
 #include "mediate.h"
 #include "engine.h"
-#include "kurucz.h"
 #include "analyse.h"
 #include "vector.h"
 #include "zenithal.h"
@@ -195,8 +194,6 @@ static struct omi_ref OMI_ref[MAX_FENO]; // the number of reference spectra is l
 static struct omi_orbit_file* reference_orbit_files[MAX_OMI_FILES]; // List of filenames for which the current automatic reference spectrum is valid. -> all spectra from the same day/same directory.
 static int num_reference_orbit_files = 0;
 static bool automatic_reference_ok[OMI_TOTAL_ROWS]; // array to keep track if automatic reference creation spectrum failed for one of the detector rows
-
-int omiSwathOld=ITEM_NONE;
 
 static RC OmiOpen(struct omi_orbit_file *pOrbitFile, const ENGINE_CONTEXT *pEngineContext);
 static void omi_free_swath_data(struct omi_swath_earth *pSwath);
@@ -1406,7 +1403,6 @@ RC OMI_Set(ENGINE_CONTEXT *pEngineContext)
 
   // Initializations
   pEngineContext->recordNumber=0;
-  omiSwathOld=ITEM_NONE;
   RC rc=ERROR_ID_NO;
 
   // Release old buffers and close file (if open)
@@ -1550,10 +1546,6 @@ RC  OMI_read_earth(ENGINE_CONTEXT *pEngineContext,int recordNo)
   }
 
   if ((THRD_id==THREAD_TYPE_ANALYSIS) && omiRefFilesN) {
-    if (omiSwathOld!=i_alongtrack) {
-      KURUCZ_indexLine=1;
-      omiSwathOld=i_alongtrack;
-    }
     VECTOR_Copy(pEngineContext->buffers.lambda_irrad,OMI_ref[0].omiRefLambda[i_crosstrack],pOrbitFile->nWavel);
     VECTOR_Copy(pEngineContext->buffers.irrad,OMI_ref[0].omiRefSpectrum[i_crosstrack],pOrbitFile->nWavel);
   }
@@ -1665,5 +1657,4 @@ void OMI_ReleaseBuffers(void) {
 
   omiRefFilesN=0; // the total number of files to browse in one shot
   omiTotalRecordNumber=0;
-  omiSwathOld=ITEM_NONE;
 }
