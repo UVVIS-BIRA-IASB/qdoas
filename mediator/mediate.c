@@ -1810,170 +1810,164 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
        pTabFeno=&TabFeno[indexFenoColumn][NFeno];
 
        pTabFeno->hidden=!indexFeno;
-       pAnalysisWindows=(!pTabFeno->hidden)? &analysisWindows[indexFeno-1]: &calibWindows;
-
        pTabFeno->NDET=NDET[indexFenoColumn];
        pTabFeno->n_wavel_ref1=n_wavel_temp1;
        pTabFeno->n_wavel_ref2=n_wavel_temp2;
        const int n_wavel = pTabFeno->NDET;
 
-       if ((pTabFeno->hidden<2) && ((THRD_id==THREAD_TYPE_ANALYSIS) || (pTabFeno->hidden==1))) {
-         // QDOAS : avoid the load of disabled analysis windows with hidden==2
+       pAnalysisWindows=(!pTabFeno->hidden)? &analysisWindows[indexFeno-1]: &calibWindows;
 
-         if (pTabFeno->hidden) {                                                     // if indexFeno==0, load calibration parameters
-           strcpy(pTabFeno->windowName,"Calibration description");                   // like WinDOAS
-           pTabFeno->analysisMethod=pKuruczOptions->analysisMethod;
-         } else {                                                                    // otherwise, load analysis windows from analysisWindows[indexFeno-1]
-           // Load data from analysis windows panels
+       if (THRD_id==THREAD_TYPE_KURUCZ && !pTabFeno->hidden) { // For "Run calibration", we only load the calibration settings.
+         continue;
+       }
 
-           strcpy(pTabFeno->windowName,pAnalysisWindows->name);
-           strcpy(pTabFeno->residualsFile,pAnalysisWindows->residualFile);
-           strcpy(pTabFeno->ref1,pAnalysisWindows->refOneFile);
-           strcpy(pTabFeno->ref2,pAnalysisWindows->refTwoFile);
+       if (pTabFeno->hidden) {                                                     // if indexFeno==0, load calibration parameters
+         strcpy(pTabFeno->windowName,"Calibration description");                   // like WinDOAS
+         pTabFeno->analysisMethod=pKuruczOptions->analysisMethod;
+       } else {                                                                    // otherwise, load analysis windows from analysisWindows[indexFeno-1]
+         // Load data from analysis windows panels
 
-           pTabFeno->resolFwhm=pAnalysisWindows->resolFwhm;
-           pTabFeno->lambda0=pAnalysisWindows->lambda0;
+         strcpy(pTabFeno->windowName,pAnalysisWindows->name);
+         strcpy(pTabFeno->residualsFile,pAnalysisWindows->residualFile);
+         strcpy(pTabFeno->ref1,pAnalysisWindows->refOneFile);
+         strcpy(pTabFeno->ref2,pAnalysisWindows->refTwoFile);
 
-           pTabFeno->saveResidualsFlag=(!pTabFeno->hidden)?pAnalysisWindows->saveResidualsFlag:0;
+         pTabFeno->resolFwhm=pAnalysisWindows->resolFwhm;
+         pTabFeno->lambda0=pAnalysisWindows->lambda0;
 
-           if (fabs(pTabFeno->lambda0)<EPSILON)
-            pTabFeno->lambda0=(double)0.5*(pAnalysisWindows->fitMinWavelength+pAnalysisWindows->fitMaxWavelength);
+         pTabFeno->saveResidualsFlag=(!pTabFeno->hidden)?pAnalysisWindows->saveResidualsFlag:0;
 
-           if ((pTabFeno->refSpectrumSelectionMode=pAnalysisWindows->refSpectrumSelection)==ANLYS_REF_SELECTION_MODE_AUTOMATIC) {
-               if (((pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_ASCII) && is_maxdoas(pEngineContext->project.instrumental.readOutFormat)) ||
-                   ((pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_ASCII) && (pEngineContext->project.instrumental.ascii.elevSaveFlag || (pEngineContext->project.instrumental.ascii.format==PRJCT_INSTR_ASCII_FORMAT_COLUMN_EXTENDED)))) {
+         if (fabs(pTabFeno->lambda0)<EPSILON)
+           pTabFeno->lambda0=(double)0.5*(pAnalysisWindows->fitMinWavelength+pAnalysisWindows->fitMaxWavelength);
 
-             //if ((pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_CCD_EEV) || (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_MFC) || (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_MFC_STD) || (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_MFC_BIRA) ||
-             //    (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_BIRA_MOBILE) || (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_BIRA_AIRBORNE) || (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF) ||
-             //   ((pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_ASCII) && (pEngineContext->project.instrumental.ascii.elevSaveFlag || (pEngineContext->project.instrumental.ascii.format==PRJCT_INSTR_ASCII_FORMAT_COLUMN_EXTENDED)))) {
+         if ((pTabFeno->refSpectrumSelectionMode=pAnalysisWindows->refSpectrumSelection)==ANLYS_REF_SELECTION_MODE_AUTOMATIC) {
+           if (((pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_ASCII) && is_maxdoas(pEngineContext->project.instrumental.readOutFormat)) ||
+               ((pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_ASCII) && (pEngineContext->project.instrumental.ascii.elevSaveFlag || (pEngineContext->project.instrumental.ascii.format==PRJCT_INSTR_ASCII_FORMAT_COLUMN_EXTENDED)))) {
 
-               if ((pTabFeno->refMaxdoasSelectionMode=pAnalysisWindows->refMaxdoasSelection)==ANLYS_MAXDOAS_REF_SCAN)
-                 pEngineContext->analysisRef.refScan++;
-               else if (pTabFeno->refMaxdoasSelectionMode==ANLYS_MAXDOAS_REF_SZA)
-                 pEngineContext->analysisRef.refSza++;
-             }
-
-             pTabFeno->refSpectrumSelectionScanMode=pAnalysisWindows->refSpectrumSelectionScanMode;
-
-             pTabFeno->refSZA=(double)pAnalysisWindows->refSzaCenter;
-             pTabFeno->refSZADelta=(double)pAnalysisWindows->refSzaDelta;
-
-             pTabFeno->refLatMin=pAnalysisWindows->refMinLatitude;
-             pTabFeno->refLatMax=pAnalysisWindows->refMaxLatitude;
-             pTabFeno->refLonMin=pAnalysisWindows->refMinLongitude;
-             pTabFeno->refLonMax=pAnalysisWindows->refMaxLongitude;
-
-             pTabFeno->cloudFractionMin=pAnalysisWindows->cloudFractionMin;
-             pTabFeno->cloudFractionMax=pAnalysisWindows->cloudFractionMax;
-
-             pEngineContext->analysisRef.refAuto++;
-
-             if ((fabs(pTabFeno->refLonMax-pTabFeno->refLonMin)>1.e-5) ) // && (fabs(pTabFeno->refLonMax-pTabFeno->refLonMin)<359.))
-               pEngineContext->analysisRef.refLon++;
+             if ((pTabFeno->refMaxdoasSelectionMode=pAnalysisWindows->refMaxdoasSelection)==ANLYS_MAXDOAS_REF_SCAN)
+               pEngineContext->analysisRef.refScan++;
+             else if (pTabFeno->refMaxdoasSelectionMode==ANLYS_MAXDOAS_REF_SZA)
+               pEngineContext->analysisRef.refSza++;
            }
 
-           if (pEngineContext->project.spectra.displayFitFlag) {
+           pTabFeno->refSpectrumSelectionScanMode=pAnalysisWindows->refSpectrumSelectionScanMode;
 
-             pTabFeno->displaySpectrum=pAnalysisWindows->requireSpectrum;
-             pTabFeno->displayResidue=pAnalysisWindows->requireResidual;
-             pTabFeno->displayTrend=pAnalysisWindows->requirePolynomial;
-             pTabFeno->displayRefEtalon=pAnalysisWindows->requireRefRatio;
-             pTabFeno->displayFits=pAnalysisWindows->requireFit;
-             pTabFeno->displayPredefined=pAnalysisWindows->requirePredefined;
+           pTabFeno->refSZA=(double)pAnalysisWindows->refSzaCenter;
+           pTabFeno->refSZADelta=(double)pAnalysisWindows->refSzaDelta;
 
-             pTabFeno->displayFlag=pTabFeno->displaySpectrum+
-               pTabFeno->displayResidue+
-               pTabFeno->displayTrend+
-               pTabFeno->displayRefEtalon+
-               pTabFeno->displayFits+
-               pTabFeno->displayPredefined;
-           }
+           pTabFeno->refLatMin=pAnalysisWindows->refMinLatitude;
+           pTabFeno->refLatMax=pAnalysisWindows->refMaxLatitude;
+           pTabFeno->refLonMin=pAnalysisWindows->refMinLongitude;
+           pTabFeno->refLonMax=pAnalysisWindows->refMaxLongitude;
 
-           pTabFeno->useKurucz=pAnalysisWindows->kuruczMode;
+           pTabFeno->cloudFractionMin=pAnalysisWindows->cloudFractionMin;
+           pTabFeno->cloudFractionMax=pAnalysisWindows->cloudFractionMax;
 
-           pTabFeno->analysisMethod=pAnalysisOptions->method;
-           useKurucz+=pAnalysisWindows->kuruczMode;
-         }  // if (pTabFeno->hidden)
+           pEngineContext->analysisRef.refAuto++;
 
-         pTabFeno->Decomp=1;
+           if ((fabs(pTabFeno->refLonMax-pTabFeno->refLonMin)>1.e-5) ) // && (fabs(pTabFeno->refLonMax-pTabFeno->refLonMin)<359.))
+             pEngineContext->analysisRef.refLon++;
+         }
 
-         // spikes buffer
-         if ((pTabFeno->spikes == NULL) &&
-             ((pTabFeno->spikes=(bool *)MEMORY_AllocBuffer(__func__,"spikes",n_wavel,sizeof(int),0,MEMORY_TYPE_INT))==NULL)) {
-           rc = ERROR_ID_ALLOC;
+         if (pEngineContext->project.spectra.displayFitFlag) {
+
+           pTabFeno->displaySpectrum=pAnalysisWindows->requireSpectrum;
+           pTabFeno->displayResidue=pAnalysisWindows->requireResidual;
+           pTabFeno->displayTrend=pAnalysisWindows->requirePolynomial;
+           pTabFeno->displayRefEtalon=pAnalysisWindows->requireRefRatio;
+           pTabFeno->displayFits=pAnalysisWindows->requireFit;
+           pTabFeno->displayPredefined=pAnalysisWindows->requirePredefined;
+
+           pTabFeno->displayFlag=pTabFeno->displaySpectrum+
+             pTabFeno->displayResidue+
+             pTabFeno->displayTrend+
+             pTabFeno->displayRefEtalon+
+             pTabFeno->displayFits+
+             pTabFeno->displayPredefined;
+         }
+
+         pTabFeno->useKurucz=pAnalysisWindows->kuruczMode;
+
+         pTabFeno->analysisMethod=pAnalysisOptions->method;
+         useKurucz+=pAnalysisWindows->kuruczMode;
+       }  // if (pTabFeno->hidden)
+
+       pTabFeno->Decomp=1;
+
+       // spikes buffer
+       if ((pTabFeno->spikes == NULL) &&
+           ((pTabFeno->spikes=(bool *)MEMORY_AllocBuffer(__func__,"spikes",n_wavel,sizeof(int),0,MEMORY_TYPE_INT))==NULL)) {
+         rc = ERROR_ID_ALLOC;
+         break;
+       }
+
+       // Wavelength scales read out
+
+       if (((pTabFeno->Lambda==NULL) && ((pTabFeno->Lambda=MEMORY_AllocDVector(__func__,"Lambda",0,n_wavel-1))==NULL)) ||
+           ((pTabFeno->LambdaK==NULL) && ((pTabFeno->LambdaK=MEMORY_AllocDVector(__func__,"LambdaK",0,n_wavel-1))==NULL)) ||
+           ((pTabFeno->LambdaRef==NULL) && ((pTabFeno->LambdaRef=MEMORY_AllocDVector(__func__,"LambdaRef",0,n_wavel-1))==NULL)) ||
+
+           // omi rejected pixels
+
+           ((pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_OMI) && pEngineContext->project.instrumental.omi.pixelQFRejectionFlag &&
+            (pTabFeno->omiRejPixelsQF == NULL) && ((pTabFeno->omiRejPixelsQF=(bool *)MEMORY_AllocBuffer(__func__,"omiRejPixelsQF",n_wavel,sizeof(int),0,MEMORY_TYPE_INT))==NULL))) {
+         rc=ERROR_ID_ALLOC;
+         break;
+       }
+
+       if ( pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_OMI
+            && strlen(pInstrumental->calibrationFile) ) {
+         int n_wavel_ref;
+         rc=OMI_GetReference(pInstrumental->omi.spectralType,pInstrumental->calibrationFile,indexFenoColumn,pEngineContext->buffers.lambda,pEngineContext->buffers.spectrum,pEngineContext->buffers.sigmaSpec, &n_wavel_ref);
+
+         if (rc != 0) {
            break;
          }
+       }
 
-         // Wavelength scales read out
+       memcpy(pTabFeno->LambdaRef,pEngineContext->buffers.lambda,sizeof(double)*n_wavel);
+       memcpy(pTabFeno->Lambda,pEngineContext->buffers.lambda,sizeof(double)*n_wavel);
 
-         if (((pTabFeno->Lambda==NULL) && ((pTabFeno->Lambda=MEMORY_AllocDVector(__func__,"Lambda",0,n_wavel-1))==NULL)) ||
-             ((pTabFeno->LambdaK==NULL) && ((pTabFeno->LambdaK=MEMORY_AllocDVector(__func__,"LambdaK",0,n_wavel-1))==NULL)) ||
-             ((pTabFeno->LambdaRef==NULL) && ((pTabFeno->LambdaRef=MEMORY_AllocDVector(__func__,"LambdaRef",0,n_wavel-1))==NULL)) ||
+       // TODO: ANALYSE_LoadRef can change NDET[] -> should n_wavel be updated here?
+       if (!(rc=ANALYSE_LoadRef(pEngineContext,indexFenoColumn)) &&   // eventually, modify LambdaRef for continuous functions
+           !(rc=ANALYSE_LoadCross(pEngineContext,pAnalysisWindows->crossSectionList.crossSection,pAnalysisWindows->crossSectionList.nCrossSection,pTabFeno->LambdaRef,indexFenoColumn)) &&
+           !(rc=mediateRequestSetAnalysisLinear(&pAnalysisWindows->linear,indexFenoColumn)) &&
 
-             // omi rejected pixels
+           // Caro : int the future, replace structures anlyswin_nonlinear and calibration_sfp with the following one more flexible
+           //        mediateRequestSetAnalysisNonLinearDoas and mediateRequestSetAnalysisNonLinearCalib would be replaced by only one call to ANALYSE_LoadNonLinear
 
-             ((pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_OMI) && pEngineContext->project.instrumental.omi.pixelQFRejectionFlag &&
-              (pTabFeno->omiRejPixelsQF == NULL) && ((pTabFeno->omiRejPixelsQF=(bool *)MEMORY_AllocBuffer(__func__,"omiRejPixelsQF",n_wavel,sizeof(int),0,MEMORY_TYPE_INT))==NULL))) {
-           rc=ERROR_ID_ALLOC;
-           break;
+           ((!pTabFeno->hidden && !(rc=mediateRequestSetAnalysisNonLinearDoas(pEngineContext,&pAnalysisWindows->nonlinear,pTabFeno->LambdaRef,indexFenoColumn))) ||
+            (pTabFeno->hidden && !(rc=mediateRequestSetAnalysisNonLinearCalib(pEngineContext,pEngineContext->calibFeno.sfp,pTabFeno->LambdaRef,indexFenoColumn)))) &&
+
+           !(rc=ANALYSE_LoadShiftStretch(pAnalysisWindows->shiftStretchList.shiftStretch,pAnalysisWindows->shiftStretchList.nShiftStretch,indexFenoColumn)) &&
+           !(rc=ANALYSE_LoadOutput(pAnalysisWindows->outputList.output,pAnalysisWindows->outputList.nOutput,indexFenoColumn)) &&
+           (pTabFeno->hidden ||
+            (!(rc=ANALYSE_LoadGaps(pEngineContext,pAnalysisWindows->gapList.gap,pAnalysisWindows->gapList.nGap,pTabFeno->LambdaRef,pAnalysisWindows->fitMinWavelength,pAnalysisWindows->fitMaxWavelength,indexFenoColumn)) &&
+
+             (!pTabFeno->gomeRefFlag || !(rc=FIT_PROPERTIES_alloc(__func__,&pTabFeno->fit_properties)))
+             ))) {
+         if (pTabFeno->hidden==1) {
+           indexKurucz=0;  // used to be indexKurucz = NFeno, but pTabFeno->hidden == 1 would only occur for NFeno=0; in fact indexKurucz is always == 0...
+         } else {
+           useUsamp+=pTabFeno->useUsamp;
+           xsToConvolute+=pTabFeno->xsToConvolute;
+           xsToConvoluteI0+=pTabFeno->xsToConvoluteI0;
+
+           if (pTabFeno->gomeRefFlag || pEngineContext->refFlag) {
+             memcpy(pTabFeno->Lambda,pTabFeno->LambdaRef,sizeof(double)*n_wavel);
+             memcpy(pTabFeno->LambdaK,pTabFeno->LambdaRef,sizeof(double)*n_wavel);
+
+             rc=ANALYSE_XsInterpolation(pTabFeno,pTabFeno->LambdaRef,indexFenoColumn);
+           }
          }
 
-         if ( pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_OMI
-              && strlen(pInstrumental->calibrationFile) ) {
-           int n_wavel_ref;
-           rc=OMI_GetReference(pInstrumental->omi.spectralType,pInstrumental->calibrationFile,indexFenoColumn,pEngineContext->buffers.lambda,pEngineContext->buffers.spectrum,pEngineContext->buffers.sigmaSpec, &n_wavel_ref);
-
-           if (rc != 0) {
-             break;
-           }
-
+         ANALYSE_SetAnalysisType(indexFenoColumn);
+         if (!pTabFeno->hidden) {
+           lambdaMin=min(lambdaMin,pTabFeno->LambdaRef[0]);
+           lambdaMax=max(lambdaMax,pTabFeno->LambdaRef[n_wavel-1]);
          }
-
-         memcpy(pTabFeno->LambdaRef,pEngineContext->buffers.lambda,sizeof(double)*n_wavel);
-         memcpy(pTabFeno->Lambda,pEngineContext->buffers.lambda,sizeof(double)*n_wavel);
-
-         // TODO: ANALYSE_LoadRef can change NDET[] -> should n_wavel be updated here?
-         if (!(rc=ANALYSE_LoadRef(pEngineContext,indexFenoColumn)) &&   // eventually, modify LambdaRef for continuous functions
-             !(rc=ANALYSE_LoadCross(pEngineContext,pAnalysisWindows->crossSectionList.crossSection,pAnalysisWindows->crossSectionList.nCrossSection,pTabFeno->LambdaRef,indexFenoColumn)) &&
-             !(rc=mediateRequestSetAnalysisLinear(&pAnalysisWindows->linear,indexFenoColumn)) &&
-
-             // Caro : int the future, replace structures anlyswin_nonlinear and calibration_sfp with the following one more flexible
-             //        mediateRequestSetAnalysisNonLinearDoas and mediateRequestSetAnalysisNonLinearCalib would be replaced by only one call to ANALYSE_LoadNonLinear
-
-             ((!pTabFeno->hidden && !(rc=mediateRequestSetAnalysisNonLinearDoas(pEngineContext,&pAnalysisWindows->nonlinear,pTabFeno->LambdaRef,indexFenoColumn))) ||
-              (pTabFeno->hidden && !(rc=mediateRequestSetAnalysisNonLinearCalib(pEngineContext,pEngineContext->calibFeno.sfp,pTabFeno->LambdaRef,indexFenoColumn)))) &&
-
-             !(rc=ANALYSE_LoadShiftStretch(pAnalysisWindows->shiftStretchList.shiftStretch,pAnalysisWindows->shiftStretchList.nShiftStretch,indexFenoColumn)) &&
-             !(rc=ANALYSE_LoadOutput(pAnalysisWindows->outputList.output,pAnalysisWindows->outputList.nOutput,indexFenoColumn)) &&
-             (pTabFeno->hidden ||
-              (!(rc=ANALYSE_LoadGaps(pEngineContext,pAnalysisWindows->gapList.gap,pAnalysisWindows->gapList.nGap,pTabFeno->LambdaRef,pAnalysisWindows->fitMinWavelength,pAnalysisWindows->fitMaxWavelength,indexFenoColumn)) &&
-
-               (!pTabFeno->gomeRefFlag || !(rc=FIT_PROPERTIES_alloc(__func__,&pTabFeno->fit_properties)))
-               ))) {
-           if (pTabFeno->hidden==1) {
-             indexKurucz=NFeno;
-           } else {
-             useUsamp+=pTabFeno->useUsamp;
-             xsToConvolute+=pTabFeno->xsToConvolute;
-             xsToConvoluteI0+=pTabFeno->xsToConvoluteI0;
-
-             if (pTabFeno->gomeRefFlag || pEngineContext->refFlag) {
-               memcpy(pTabFeno->Lambda,pTabFeno->LambdaRef,sizeof(double)*n_wavel);
-               memcpy(pTabFeno->LambdaK,pTabFeno->LambdaRef,sizeof(double)*n_wavel);
-
-               rc=ANALYSE_XsInterpolation(pTabFeno,pTabFeno->LambdaRef,indexFenoColumn);
-             }
-           }
-
-           ANALYSE_SetAnalysisType(indexFenoColumn);
-           if (!pTabFeno->hidden) {
-             lambdaMin=min(lambdaMin,pTabFeno->LambdaRef[0]);
-             lambdaMax=max(lambdaMax,pTabFeno->LambdaRef[n_wavel-1]);
-           }
-
-           NFeno++;
-         }
-       } // if ((pTabFeno->hidden<2) && ((THRD_id==THREAD_TYPE_ANALYSIS) || (pTabFeno->hidden==1)))
+       }
+       ++NFeno;
      }  // for (indexFeno=0;(indexFeno<numberOfWindows+1) && !rc;indexFeno++)
    } // for (indexFenoColumn=0;(indexFenoColumn<ANALYSE_swathSize) && !rc;indexFenoColumn++)
 
