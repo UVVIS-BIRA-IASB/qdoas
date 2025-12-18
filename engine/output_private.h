@@ -17,7 +17,7 @@ RC write_spikes(char *spikestring, unsigned int length, bool *spikes,int ndet);
 double output_flux(const ENGINE_CONTEXT *pEngineContext, double wavelength, int indexFenoColumn);
 
 static inline FENO *get_tabfeno_calib(struct output_field *this_field UNUSED, int indexFenoColumn) {
-  FENO *tabfeno_kurucz = &TabFeno[indexFenoColumn][KURUCZ_buffers[indexFenoColumn].indexKurucz];
+  FENO *tabfeno_kurucz = &TabFeno[indexFenoColumn][INDEX_KURUCZ];
   return tabfeno_kurucz->rcKurucz ? NULL : tabfeno_kurucz;
 }
 
@@ -26,7 +26,7 @@ static inline FENO *get_tabfeno_analysis(struct output_field *this_field, int in
 }
 
 static inline CROSS_RESULTS *get_cross_results_calib(struct output_field *this_field, int indexFenoColumn, int index_calib) {
-  FENO *pTabFeno = &TabFeno[indexFenoColumn][KURUCZ_buffers[indexFenoColumn].indexKurucz];
+  FENO *pTabFeno = &TabFeno[indexFenoColumn][INDEX_KURUCZ];
   return (pTabFeno->rc || pTabFeno->rcKurucz)
     ? NULL
     : &KURUCZ_buffers[indexFenoColumn].KuruczFeno[this_field->index_feno].results[index_calib][this_field->index_cross];

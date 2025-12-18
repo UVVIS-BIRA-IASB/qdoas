@@ -3812,7 +3812,7 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
         if (((pEngineContext->project.instrumental.readOutFormat!=PRJCT_INSTR_FORMAT_GEMS) || !(rc=GEMS_LoadCalib(pEngineContext,indexFenoColumn))) &&
             !(rc=KURUCZ_Spectrum(pBuffers->lambda,LambdaK,SpectreK,KURUCZ_buffers[indexFenoColumn].solar,pBuffers->instrFunction,
                                  1,"Calibration applied on spectrum",KURUCZ_buffers[indexFenoColumn].fwhmPolySpec,KURUCZ_buffers[indexFenoColumn].fwhmVector,KURUCZ_buffers[indexFenoColumn].fwhmDeriv2,saveFlag,
-                                 KURUCZ_buffers[indexFenoColumn].indexKurucz,responseHandle,indexFenoColumn))) {
+                                 INDEX_KURUCZ, responseHandle,indexFenoColumn))) {
 
           for (int WrkFeno=0;WrkFeno<NFeno;++WrkFeno) {
             FENO *pTabFeno=&TabFeno[indexFenoColumn][WrkFeno];

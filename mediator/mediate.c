@@ -1675,7 +1675,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
        xsToConvolute,                                                           // flag set if at least one cross section has to be convolved in at least one analysis window
        xsToConvoluteI0,                                                         // flag set if at least one cross section has to be I0-convolved in at least one analysis window
        saveFlag;
-   INDEX indexKurucz,indexWindow;
+   INDEX indexWindow;
    ENGINE_CONTEXT *pEngineContext;                                               // engine context
    PRJCT_INSTRUMENTAL *pInstrumental;
    const mediate_analysis_window_t *pAnalysisWindows;                            // pointer to the current analysis window from the user interface
@@ -1698,7 +1698,6 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
    pInstrumental=&pEngineContext->project.instrumental;
    saveFlag=(int)pEngineContext->project.spectra.displayDataFlag;
    useKurucz=useUsamp=xsToConvolute=xsToConvoluteI0=0;
-   indexKurucz=ITEM_NONE;
 
    // for imagers, it is possible that errors occur for only some of
    // the rows.  In that case, analysis can continue for the other
@@ -1946,9 +1945,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
 
              (!pTabFeno->gomeRefFlag || !(rc=FIT_PROPERTIES_alloc(__func__,&pTabFeno->fit_properties)))
              ))) {
-         if (pTabFeno->hidden==1) {
-           indexKurucz=0;  // used to be indexKurucz = NFeno, but pTabFeno->hidden == 1 would only occur for NFeno=0; in fact indexKurucz is always == 0...
-         } else {
+         if (!pTabFeno->hidden) {
            useUsamp+=pTabFeno->useUsamp;
            xsToConvolute+=pTabFeno->xsToConvolute;
            xsToConvoluteI0+=pTabFeno->xsToConvoluteI0;
@@ -2065,7 +2062,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
 
        if ((THRD_id==THREAD_TYPE_KURUCZ) || useKurucz) {
 
-         rc=KURUCZ_Alloc(&pEngineContext->project,pEngineContext->buffers.lambda,indexKurucz,lambdaMin,lambdaMax,indexFenoColumn, &hr_solar_temp, &slit_matrix_temp);
+         rc=KURUCZ_Alloc(&pEngineContext->project,pEngineContext->buffers.lambda,lambdaMin,lambdaMax,indexFenoColumn, &hr_solar_temp, &slit_matrix_temp);
          if (rc) {
            goto handle_errors; // If KURUCZ_Alloc fails, there is a fatal configuration error.
          }

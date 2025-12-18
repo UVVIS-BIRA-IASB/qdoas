@@ -5,6 +5,8 @@
 #include "engine_context.h"
 #include "fit_properties.h"
 
+#define INDEX_KURUCZ 0
+
 struct _KuruczFeno {
   struct fit_properties * subwindow_fits; // fit properties for calibration subwindows
   double         *Grid;
@@ -47,8 +49,6 @@ struct _Kurucz {
           fwhmDegree,                           // degree of the fwhm polynomial
           solarFGap;
 
-  INDEX   indexKurucz;                          // index of analysis window with Kurucz description
-
   char   displayFit;                           // display fit flag
   char   displayResidual;                      // display new calibration flag
   char   displayShift;                         // display shift in each pixel flag
@@ -74,7 +74,7 @@ RC   KURUCZ_Spectrum(const double *oldLambda, double *newLambda, double *spectru
                    INDEX indexFeno,void *responseHandle,INDEX indexFenoColumn);
 RC   KURUCZ_ApplyCalibration(FENO *pTabFeno,double *newLambda,INDEX indexFenoColumn);
 RC   KURUCZ_Reference(double *instrFunction,INDEX refFlag,int saveFlag,int gomeFlag,void *responseHandle,INDEX indexFenoColumn);
-RC   KURUCZ_Alloc(const PROJECT *pProject, const double *lambda, INDEX indexKurucz, double lambdaMin, double lambdaMax,
+RC   KURUCZ_Alloc(const PROJECT *pProject, const double *lambda, double lambdaMin, double lambdaMax,
                   INDEX indexFenoColumn, const MATRIX_OBJECT *hr_solar, const MATRIX_OBJECT *slit_matrix);
 void KURUCZ_Init(int gomeFlag,INDEX indexFenoColumn);
 void KURUCZ_Free(void);

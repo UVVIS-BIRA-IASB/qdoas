@@ -210,14 +210,13 @@ RC KuruczConvolveSolarSpectrum(MATRIX_OBJECT *pSolar,double *newlambda,int n_wav
  {
      // Declarations
 
-     CROSS_REFERENCE *TabCross;
+  CROSS_REFERENCE *TabCross;
   MATRIX_OBJECT slitMatrix[NSFP],*pSlitMatrix;
   double slitParam[NSFP];
   SLIT slitOptions;
   int slitType;
   int shiftIndex,i;
   RC rc;
-  KURUCZ *pKurucz;
 
 #if defined(__DEBUG_) && __DEBUG_
   DEBUG_FunctionBegin(__func__,DEBUG_FCTTYPE_APPL|DEBUG_FCTTYPE_MEM);
@@ -225,8 +224,7 @@ RC KuruczConvolveSolarSpectrum(MATRIX_OBJECT *pSolar,double *newlambda,int n_wav
 
   // Initializations
 
-  pKurucz=&KURUCZ_buffers[indexFenoColumn];
-  Feno=&TabFeno[indexFenoColumn][pKurucz->indexKurucz];
+  Feno=&TabFeno[indexFenoColumn][INDEX_KURUCZ];
   TabCross=Feno->TabCross;
   rc=ERROR_ID_NO;
 
@@ -565,7 +563,7 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
 
   // Use substitution variables
 
-  Feno=&TabFeno[indexFenoColumn][pKurucz->indexKurucz];
+  Feno=&TabFeno[indexFenoColumn][INDEX_KURUCZ];
   shiftSign=(Feno->indexSpectrum!=ITEM_NONE)?(double)-1.:(double)1.;            // very important !!!
   TabCross=Feno->TabCross;
 
@@ -721,7 +719,7 @@ RC KURUCZ_Spectrum(const double *oldLambda,double *newLambda,double *spectrum,co
     // DEBUG_Start(ENGINE_dbgFile,"Kurucz",DEBUG_FCTTYPE_MATH|DEBUG_FCTTYPE_APPL,5,DEBUG_DVAR_YES,0); // !debugResetFlag++);
 #endif
 
-    if (((rc=ANALYSE_SvdInit(&TabFeno[indexFenoColumn][pKurucz->indexKurucz], &subwindow_fit[indexWindow], n_wavel, Lambda))!=ERROR_ID_NO) ||
+    if (((rc=ANALYSE_SvdInit(&TabFeno[indexFenoColumn][INDEX_KURUCZ], &subwindow_fit[indexWindow], n_wavel, Lambda))!=ERROR_ID_NO) ||
 
         // Analysis method
 
@@ -1319,7 +1317,7 @@ RC KURUCZ_Reference(double *instrFunction,INDEX refFlag,int saveFlag,int gomeFla
 
   pKurucz=&KURUCZ_buffers[indexFenoColumn];
   const int n_wavel = NDET[indexFenoColumn];
-  pKuruczFeno=&TabFeno[indexFenoColumn][pKurucz->indexKurucz];
+  pKuruczFeno=&TabFeno[indexFenoColumn][INDEX_KURUCZ];
   TabCross=pKuruczFeno->TabCross;
 
   rc=ERROR_ID_NO;
@@ -1381,9 +1379,9 @@ RC KURUCZ_Reference(double *instrFunction,INDEX refFlag,int saveFlag,int gomeFla
 
           memcpy(pKurucz->KuruczFeno[indexFeno].nIter,pKurucz->KuruczFeno[indexRef].nIter,sizeof(int)*Nb_Win);
 
-          if (TabFeno[indexFenoColumn][pKurucz->indexKurucz].NTabCross)
+          if (TabFeno[indexFenoColumn][INDEX_KURUCZ].NTabCross)
             for (indexWindow=0;indexWindow<Nb_Win;indexWindow++)
-              memcpy(pKurucz->KuruczFeno[indexFeno].results[indexWindow],pKurucz->KuruczFeno[indexRef].results[indexWindow],sizeof(CROSS_RESULTS)*TabFeno[indexFenoColumn][pKurucz->indexKurucz].NTabCross);
+              memcpy(pKurucz->KuruczFeno[indexFeno].results[indexWindow],pKurucz->KuruczFeno[indexRef].results[indexWindow],sizeof(CROSS_RESULTS)*TabFeno[indexFenoColumn][INDEX_KURUCZ].NTabCross);
 
           if (pKuruczOptions->fwhmFit) {
             for (maxParam=0;maxParam<MAX_KURUCZ_FWHM_PARAM;maxParam++)
@@ -1545,7 +1543,6 @@ void KURUCZ_Init(int gomeFlag,INDEX indexFenoColumn) {
 //
 // INPUT           pProject     pointer to the current project
 //                 lambda       original wavelength calibration
-//                 indexKurucz  index of analysis window with Kurucz description for the current project;
 //                 lambdaMin    lower limit of the wavelength calibration interval
 //                 lambdaMax    upper limit of the wavelength calibration interval
 //                 hr_solar     pre-loaded contents of the high-resolution reference spectrum (from calibration or slit page)
@@ -1555,7 +1552,7 @@ void KURUCZ_Init(int gomeFlag,INDEX indexFenoColumn) {
 
 // Note : lambdaMin, lambdaMax not really used
 
-RC KURUCZ_Alloc(const PROJECT *pProject, const double *lambda,INDEX indexKurucz,double lambdaMin,double lambdaMax,INDEX indexFenoColumn,
+RC KURUCZ_Alloc(const PROJECT *pProject, const double *lambda,double lambdaMin,double lambdaMax,INDEX indexFenoColumn,
                 const MATRIX_OBJECT *hr_solar, const MATRIX_OBJECT *slit_matrix)
  {
   // Declarations
@@ -1585,7 +1582,7 @@ RC KURUCZ_Alloc(const PROJECT *pProject, const double *lambda,INDEX indexKurucz,
   memset(&pKurucz->slitFunction,0,sizeof(MATRIX_OBJECT));
   memset(&pKurucz->hrSolarGridded,0,sizeof(MATRIX_OBJECT));
 
-  FENO *pKuruczFeno=&TabFeno[indexFenoColumn][indexKurucz]; // analysis window with Kurucz description
+  FENO *pKuruczFeno=&TabFeno[indexFenoColumn][INDEX_KURUCZ]; // analysis window with Kurucz description
 
   step=(double)0.;
 
@@ -1751,9 +1748,6 @@ RC KURUCZ_Alloc(const PROJECT *pProject, const double *lambda,INDEX indexKurucz,
     VECTOR_Init(pKurucz->solar,(double)0.,n_wavel);
 
     // Initialize other fields of global structure
-
-    pKurucz->indexKurucz=indexKurucz;
-
     pKurucz->Nb_Win=Nb_Win;
     pKurucz->shiftDegree=shiftDegree;
 
