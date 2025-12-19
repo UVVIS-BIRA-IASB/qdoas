@@ -1446,10 +1446,10 @@ int mediateRequestSetProject(void *engineContext,
      if (rc2 != ERROR_ID_NO) goto handle_errors;
    }
  handle_errors:
+   ERROR_DisplayMessage(responseHandle);
    if (rc1 == ERROR_ID_NO && rc2 == ERROR_ID_NO) {
      return 0;
    } else {
-     ERROR_DisplayMessage(responseHandle);
      return -1;    // supposed that an error at the level of the load of projects stops the current session
    }
  }
@@ -1698,11 +1698,6 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
    pInstrumental=&pEngineContext->project.instrumental;
    saveFlag=(int)pEngineContext->project.spectra.displayDataFlag;
    useKurucz=useUsamp=xsToConvolute=xsToConvoluteI0=0;
-
-   // for imagers, it is possible that errors occur for only some of
-   // the rows.  In that case, analysis can continue for the other
-   // rows, but we still want to display a warning message.
-   bool imager_err = false;
 
    memset(&calibWindows,0,sizeof(mediate_analysis_window_t));
    memset(&hr_solar_temp, 0, sizeof(hr_solar_temp));
@@ -2081,7 +2076,6 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
      if ( (ANALYSE_swathSize > 1) && rc) {
        // Error on one irradiance spectrum shouldn't stop the analysis of other spectra
        ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_IMAGER_CALIB, 1+indexFenoColumn);
-       imager_err = true;
        for (indexWindow=0;indexWindow<NFeno;indexWindow++)
          TabFeno[indexFenoColumn][indexWindow].rcKurucz=rc;
        rc=ERROR_ID_NO;
@@ -2103,11 +2097,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
    MATRIX_Free(&hr_solar_temp, __func__);
    MATRIX_Free(&slit_matrix_temp, __func__);
 
-   if (rc!=ERROR_ID_NO) {
-     ERROR_DisplayMessage(responseHandle);
-   } else if (imager_err) {
-     ERROR_DisplayMessage(responseHandle);
-   }
+   ERROR_DisplayMessage(responseHandle);
 
    #if defined(__DEBUG_) && __DEBUG_
    DEBUG_Stop(__func__);
@@ -2499,15 +2489,11 @@ int mediateRequestNextMatchingAnalyseSpectrum(void *engineContext,
 
     if ((pEngineContext->mfcDoasisFlag || (pEngineContext->lastSavedRecord!=pEngineContext->indexRecord)) &&
         (   ((THRD_id==THREAD_TYPE_ANALYSIS) && pEngineContext->project.asciiResults.analysisFlag && (!pEngineContext->project.asciiResults.successFlag || !pEngineContext->recordInfo.rc )) // (!pEngineContext->project.asciiResults.successFlag /* || nrc */))
-            || ((THRD_id==THREAD_TYPE_KURUCZ) && pEngineContext->project.asciiResults.calibFlag) ) )
-
+            || ((THRD_id==THREAD_TYPE_KURUCZ) && pEngineContext->project.asciiResults.calibFlag) ) ) {
       pEngineContext->recordInfo.rc=OUTPUT_SaveResults(pEngineContext,pEngineContext->recordInfo.i_crosstrack);
+    }
 
-//    if (!rc)
-//      rc=rcOutput;
-
-     if (pEngineContext->recordInfo.rc!=ERROR_ID_NO)
-      ERROR_DisplayMessage(responseHandle);
+    ERROR_DisplayMessage(responseHandle);
     }
 
    // NB if the function returns -1, the problem is that it is not possible to process
