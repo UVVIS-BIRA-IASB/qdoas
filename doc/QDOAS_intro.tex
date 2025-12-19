@@ -130,33 +130,7 @@ irradiance (\url{https://dx.doi.org/10.5067/IS-40e/TEMPO/IRR_L1.004})
 products, currently at ``provisional'' version 4.
 
 \subsubsection{APEX}
-
-APEX data is a very simple netCDF format useful to analyze 2D spectra.  It is straight forward for example for tests on synthetic 2D-spectra.
-
-Dimensions are :
-
-\begin{quote}
-\begin{Verbatim}[fontfamily=courier,fontsize=\relsize{-4}]
-   col_dim        the number of columns of the image 
-   row_dim        the number of rows of the image 
-   spectral_dim   the spectral dimension    
-\end{Verbatim}
-\end{quote}
-
-And possible variables with their dimensions are :
-
-\begin{quote}
-\begin{Verbatim}[fontfamily=courier,fontsize=\relsize{-4}]
-   radiance              row_dim x col_dim x spectral_dim (*)
-   radiance_wavelength   row_dim x col_dim x spectral_dim (*)
-   solar_zenith_angle    row_dim x col_dim 
-   viewing_zenith_angle  row_dim x col_dim 
-   latitude              row_dim x col_dim 
-   longitude             row_dim x col_dim
-\end{Verbatim}
-\end{quote}
-
-(*) : indicates mandatory variables.
+APEX is a very simple netCDF format, which can be useful to analyze data from imager-type instruments which are not supported by QDOAS, or synthetic test data.  The format is described in detail in appendix \ref{sec:apex-file-format}.
 
 \subsection{Ground-based Measurements}
 
