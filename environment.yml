@@ -12,5 +12,5 @@ dependencies:
   - libnetcdf
   - libxmlpp
   - libxml2-devel
-  - qt-main
+  - qt6-main
   - qwt
