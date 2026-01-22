@@ -84,11 +84,14 @@ CWProjectTabAnalysis::CWProjectTabAnalysis(const mediate_project_analysis_t *pro
   ++row;
 
   // Residual spike tolerance
-  mainLayout->addWidget(new QLabel("Spike tolerance factor (>3.0)", this), row, 1);
+  mainLayout->addWidget(new QLabel("Spike tolerance", this), row, 1);
   m_spikeTolerance = new QLineEdit(this);
   m_spikeTolerance->setFixedWidth(cStandardEditWidth);
-  m_spikeTolerance->setValidator(new CDoubleFixedFmtValidator(3., 999.9, 1, m_spikeTolerance));  // residuals up to 3x average are always allowed.
-  mainLayout->addWidget(m_spikeTolerance, row, 2);
+  m_spikeTolerance->setValidator(new CDoubleFixedFmtValidator(1., 999.9, 1, m_spikeTolerance));  // residuals up to 3x average are always allowed.
+  QHBoxLayout *spikelayout = new QHBoxLayout();
+  spikelayout->addWidget(m_spikeTolerance);
+  spikelayout->addWidget(new QLabel(QString("<p>&sigma;</p>"), this));
+  mainLayout->addLayout(spikelayout, row, 2);
   ++row;
 
   mainLayout->setRowStretch(row, 4);
