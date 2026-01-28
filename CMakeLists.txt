@@ -4,9 +4,9 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
     cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 endif()
 
-project(qdoas VERSION 3.7.9)
+project(qdoas VERSION 3.7.10)
 
-set(QDOAS_DATE "27 October 2025")
+set(QDOAS_DATE "28 January 2026")
 
 get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 

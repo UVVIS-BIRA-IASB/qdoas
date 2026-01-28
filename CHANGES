@@ -1,3 +1,14 @@
+3.7.10 2026-01-28
+~~~~~~~~~~~~~~~~~
+
+ * Calibration Residual, Shift and SFP plots wavelength range is now
+   restricted to the fitting window.
+
+ * For imagers, calibration results for all detector rows are shown
+   again.
+
+ * Fix '-xml' command line option parsing; reduce compiler warnings.
+
 3.7.9 2025-10-27
 ~~~~~~~~~~~~~~~~
 
