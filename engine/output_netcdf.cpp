@@ -15,7 +15,6 @@ extern "C" {
 #include "fit_properties.h"
 #include "engine_xsconv.h"
 #include "winfiles.h"
-
 #include "output_fields.h"
 }
 
@@ -205,7 +204,7 @@ static void define_variable(NetCDFGroup &group, const struct output_field& thefi
 }
 
 static void write_global_attrs(const ENGINE_CONTEXT*pEngineContext, NetCDFGroup &group) {
-  static const string qdoas_attr = string("Results obtained using Qdoas (")
+  const string qdoas_attr = string("Results obtained using Qdoas (")
     + cQdoasVersionString + "), \n"
     "Belgian Institute for Space Aeronomy (BIRA-IASB)\n"
     "http://uv-vis.bira.be/software/QDOAS";
@@ -213,17 +212,39 @@ static void write_global_attrs(const ENGINE_CONTEXT*pEngineContext, NetCDFGroup 
   group.putAttr("Qdoas", qdoas_attr);
 
   time_t curtime = time(NULL);
-  group.putAttr("CreationTime",string(ctime(&curtime) ) );
+  group.putAttr("CreationTime", ctime(&curtime));
 
-  // const char *input_filename = strrchr(pEngineContext->fileInfo.fileName,PATH_SEP);
-  // if (input_filename) {
-  //  ++input_filename; // if we have found PATH_SEP, file name starts at character behind PATH_SEP
-  //} else { // no PATH_SEP found -> just use fileinfo.fileName
-  //  input_filename = pEngineContext->fileInfo.fileName;
-  // }
   group.putAttr("InputFile", pEngineContext->fileInfo.fileName);  // better to have the full path name
   group.putAttr("QDOASConfig", pEngineContext->project.config_file);
   group.putAttr("QDOASConfigProject", pEngineContext->project.project_name);
+
+  const char* sensor = "Sensor";
+  const char* omi_bands[] = {"UV_1","UV_2","VIS"};
+  const char* gome2_bands[] = {"Band_1a","Band_1b","Band_2a","Band_2b","Band_3", "Band_4"};
+  const char* tropomi_bands[] = {"UV_1 / BAND1","UV_2 / BAND2","UVIS_3 / BAND3","UVIS_4 / BAND4","NIR5 / BAND5","NIR6 / BAND6","SWIR7 / BAND7","SWIR8 / BAND8 "};
+
+  switch (pEngineContext->project.instrumental.readOutFormat) {
+  case PRJCT_INSTR_FORMAT_OMI:
+    group.putAttr(sensor,"OMI");
+    group.putAttr("L1 spectral_band",omi_bands[pEngineContext->project.instrumental.omi.spectralType]);
+    break;
+  case PRJCT_INSTR_FORMAT_OMPS:
+    group.putAttr(sensor,"OMPS");
+    break;
+  case PRJCT_INSTR_FORMAT_TROPOMI:
+    group.putAttr(sensor,"TROPOMI");
+    group.putAttr("L1 spectral_band", tropomi_bands[pEngineContext->project.instrumental.tropomi.spectralBand]);
+    break;
+  case PRJCT_INSTR_FORMAT_SCIA_PDS:
+    group.putAttr(sensor,"SCIAMACHY");
+    break;
+  case PRJCT_INSTR_FORMAT_GOME2:
+    group.putAttr(sensor,"GOME-2");
+    group.putAttr("L1 spectral_band",gome2_bands[pEngineContext->project.instrumental.user]);
+    break;
+  case PRJCT_INSTR_FORMAT_GOME1_NETCDF:
+    group.putAttr(sensor,"GOME-1");
+  }
 }
 
 static void write_calibration_field(const struct output_field& calibfield, NetCDFGroup &group, const string& varname,
@@ -352,97 +373,63 @@ void write_automatic_reference_info(const ENGINE_CONTEXT *pEngineContext, NetCDF
 }
 
 
-void print_metadata_sensor(const ENGINE_CONTEXT *pEngineContext,NetCDFGroup &maingroup){
-	string sensor="Sensor";
-	vector<string> omi_bands {"UV_1","UV_2","VIS"};
-	vector<string> tropomi_bands {"UV_1 / BAND1","UV_2 / BAND2","UVIS_3 / BAND3","UVIS_4 / BAND4","NIR5 / BAND5","NIR6 / BAND6","SWIR7 / BAND7","SWIR8 / BAND8 "};
-	vector<string> gome2_bands {"Band_1a","Band_1b","Band_2a","Band_2b","Band_3", "Band_4"};
-
-	if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_OMI){
-		maingroup.putAttr(sensor,"OMI");
-		maingroup.putAttr("L1 spectral_band",omi_bands[pEngineContext->project.instrumental.omi.spectralType]);
-		} 
-	if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_OMPS) maingroup.putAttr(sensor,"OMPS");
-	if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_TROPOMI) {
-		maingroup.putAttr(sensor,"TROPOMI");
-		string band=tropomi_bands[pEngineContext->project.instrumental.tropomi.spectralBand];
-		maingroup.putAttr("L1 spectral_band",band);
-	}
-	if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_SCIA_PDS) maingroup.putAttr(sensor,"SCIAMACHY");
-	if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_GOME2){
-		maingroup.putAttr(sensor,"GOME-2");
-		maingroup.putAttr("L1 spectral_band",gome2_bands[pEngineContext->project.instrumental.user]);
-	}
-	if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_GOME1_NETCDF) maingroup.putAttr(sensor,"GOME-1");
-}
-
 // create a subgroup for each analysis window, and for the calibration
 // data belonging to that window
 void create_subgroups(const ENGINE_CONTEXT *pEngineContext,NetCDFGroup &group) {
-
-	int row;
-	int k=0;
-	print_metadata_sensor(pEngineContext, group); 
-	for(row=0; row< ANALYSE_swathSize; row++ )
-		if (pEngineContext->project.instrumental.use_row[row]){
-			break;
-		}
-	
   for (unsigned int i=0; i<calib_num_fields(); ++i) {
     if (group.groupID(output_data_calib(i)->windowname) < 0) {
       // group not yet created
-      k++;
       auto subgroup = group.defGroup(output_data_calib(i)->windowname);
       subgroup.defGroup(calib_subgroup_name);
-	  int z=TabFeno[row][k].fit_properties.Z;
-	  double  wvl_fitwin_min=TabFeno[row][k].fit_properties.LFenetre[0][0];
-	  double  wvl_fitwin_max=TabFeno[row][k].fit_properties.LFenetre[z-1][1];
-	  char str1[200];
-	  sprintf(str1,"%.3lf : %.3lf",wvl_fitwin_min, wvl_fitwin_max);
-	  subgroup.putAttr("fitting window range",str1);
-	  
     }
   }
 
-      for(int analysiswindow=0; analysiswindow < NFeno; ++analysiswindow)
-       {
-        const FENO *pTabFeno = &TabFeno[row][analysiswindow];
-
-        if (!pTabFeno->hidden && (group.groupID(pTabFeno->windowName)<0))
-         {
-          auto subgroup=group.defGroup(pTabFeno->windowName);
-		  int z=TabFeno[row][analysiswindow].fit_properties.Z;
-		  double  wvl_fitwin_min=pTabFeno->fit_properties.LFenetre[0][0];
-		  double  wvl_fitwin_max=pTabFeno->fit_properties.LFenetre[z-1][1];
-		  char str1[200];
-		  sprintf(str1,"%.3lf : %.3lf",wvl_fitwin_min, wvl_fitwin_max);
-		  subgroup.putAttr("fitting window range",str1);
-	  
-          CROSS_REFERENCE *pTabCross;
-
-          // needs the wavelength at the center of the fitting window for profiling algorithm
-
-          if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF)
-           {
-            char str[80];
-            sprintf(str,"%.3lf",pTabFeno->lambda0);
-            subgroup.putAttr("lambda0", str);
-           }
-
-          for (int i=0;i<pTabFeno->NTabCross;i++)
-           {
-            pTabCross=(CROSS_REFERENCE *)&pTabFeno->TabCross[i];
-
-            if ((pTabCross->IndSvdA>0) && (WorkSpace[pTabCross->Comp].type==WRK_SYMBOL_CROSS))
-             subgroup.putAttr(WorkSpace[pTabCross->Comp].symbolName,WorkSpace[pTabCross->Comp].crossFileName);
-           }
-         }
-       }
-
-   for (unsigned int i=0; i<output_num_fields(); ++i) {
+  for (unsigned int i=0; i<output_num_fields(); ++i) {
      if (output_data_analysis(i)->windowname &&
          group.groupID(output_data_analysis(i)->windowname) < 0) {
        group.defGroup(output_data_analysis(i)->windowname);
+    }
+  }
+
+  // Write some analysis window properties to the netCDF group attributes:
+  // find first enabled row for this project
+  int row = 0;
+  for(; row< ANALYSE_swathSize; row++ ) {
+    if (pEngineContext->project.instrumental.use_row[row]){
+      break;
+    }
+  }
+
+  for(int analysiswindow=0; analysiswindow < NFeno; ++analysiswindow) {
+    const FENO *pTabFeno = &TabFeno[row][analysiswindow];
+    if (pTabFeno->hidden)
+      continue;
+
+    auto subgroup = group.groupID(pTabFeno->windowName) <0 ? group.defGroup(pTabFeno->windowName) : group.getGroup(pTabFeno->windowName);
+
+    int z = TabFeno[row][analysiswindow].fit_properties.Z;
+    double wvl_fitwin_min=pTabFeno->fit_properties.LFenetre[0][0];
+    double wvl_fitwin_max=pTabFeno->fit_properties.LFenetre[z-1][1];
+    char str1[200];
+    sprintf(str1,"%.3lf : %.3lf",wvl_fitwin_min, wvl_fitwin_max);
+    subgroup.putAttr("fitting window range", str1);
+    subgroup.putAttr("ref1", pTabFeno->ref1);
+    subgroup.putAttr("ref2", pTabFeno->ref2);
+
+    CROSS_REFERENCE *pTabCross;
+
+    // needs the wavelength at the center of the fitting window for profiling algorithm
+    if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF) {
+      char str[80];
+      sprintf(str,"%.3lf",pTabFeno->lambda0);
+      subgroup.putAttr("lambda0", str);
+    }
+
+    for (int i=0;i<pTabFeno->NTabCross;i++) {
+      pTabCross=(CROSS_REFERENCE *)&pTabFeno->TabCross[i];
+
+      if ((pTabCross->IndSvdA>0) && (WorkSpace[pTabCross->Comp].type==WRK_SYMBOL_CROSS))
+        subgroup.putAttr(WorkSpace[pTabCross->Comp].symbolName,WorkSpace[pTabCross->Comp].crossFileName);
     }
   }
 }
@@ -765,7 +752,7 @@ RC netcdf_open_calib(const ENGINE_CONTEXT *pEngineContext, const char *filename,
     // Create attributes
 
     time_t curtime = time(NULL);
-    output_file_calib.putAttr("created",string(ctime(&curtime) ) );
+    output_file_calib.putAttr("created", ctime(&curtime));
     output_file_calib.putAttr("description","Solar irradiances with grid corrected by QDOAS");
     output_file_calib.putAttr("title","Solar irradiances with grid corrected by QDOAS");
 

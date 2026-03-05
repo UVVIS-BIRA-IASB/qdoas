@@ -234,8 +234,11 @@ public:
     }
     putAttr(name, charvec.size(), charvec.data(), varid);
   }
+  inline void putAttr(const std::string& name, const char *in, int varid=NC_GLOBAL) {
+    putAttr(name, strlen(in), in, varid);
+  }
   inline void putAttr(const std::string&name, char *in, int varid=NC_GLOBAL) {
-    ncPutAttr(varid, name.c_str(), strlen(in), in);
+    putAttr(name, strlen(in), in, varid);
   }
 
   int groupID(const std::string& groupName) const;
