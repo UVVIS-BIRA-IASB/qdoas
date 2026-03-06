@@ -1,0 +1,32 @@
+cff-version: 1.2.0
+title: QDOAS
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Caroline
+    family-names: Fayt
+    affiliation: BIRA-IASB
+    orcid: "https://orcid.org/0009-0006-1560-6621"
+  - family-names: "Danckaert"
+    given-names: "Thomas"
+    orcid: "https://orcid.org/0000-0001-8620-4765"
+  - family-names: "Van Roozendael"
+    given-names: "Michel"
+    orcid: "https://orcid.org/0009-0008-9606-1364"
+  - family-names: "Vlietinck"
+    given-names: "Jonas"
+    orcid: "https://orcid.org/0009-0003-5197-6038"
+identifiers:
+  - type: doi
+    value: 10.18758/oqvqk2j3
+repository-code: 'https://github.com/UVVIS-BIRA-IASB/qdoas'
+url: 'https://atmospherictoolbox.org/qdoas'
+abstract: >-
+  QDOAS is a cross-platform application which performs differential
+  optical absorption spectroscopy (DOAS) retrievals of trace gases from
+  UV-visible spectral measurements (satellite, ground-based, mobile or
+  aircraft-based instruments).
+license: BSD-3-Clause
+date-released: '2026-01-28'
