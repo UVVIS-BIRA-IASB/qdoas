@@ -170,14 +170,15 @@ static void define_variable(NetCDFGroup &group, const struct output_field& thefi
 
   const int varid = group.defVar(varname, dimids, getNCType(thefield.memory_type));
 
-   if (thefield.memory_type!=OUTPUT_STRING){
-  group.defVarChunking(varid, NC_CHUNKED, chunksizes.data());
+  if (thefield.memory_type!=OUTPUT_STRING){
+    group.defVarChunking(varid, NC_CHUNKED, chunksizes.data());
     group.defVarDeflate(varid);
-   group.defVarFletcher32(varid, NC_FLETCHER32);
-   }
+    group.defVarFletcher32(varid, NC_FLETCHER32);
+  }
   switch (thefield.memory_type) {
   case OUTPUT_STRING:
-    group.putAttr("_FillValue", QDOAS_FILL_STRING, varid);
+    // pass the fill value as char**, because must write this as an NC_STRING attribute, not NC_CHAR array:
+    group.putAttr("_FillValue", 1, &QDOAS_FILL_STRING, varid);
     break;
   case OUTPUT_SHORT:
     group.putAttr("_FillValue", QDOAS_FILL_SHORT, varid);
@@ -696,7 +697,6 @@ RC netcdf_create_calib_var(const char *varname,vector<int>& dimids,vector<size_t
     output_file_calib.defVarChunking(varid, NC_CHUNKED, chunksizes.data());
     output_file_calib.defVarDeflate(varid);
     output_file_calib.defVarFletcher32(varid, NC_FLETCHER32);
-
 
     output_file_calib.putAttr("_FillValue", QDOAS_FILL_DOUBLE, varid);
    }
