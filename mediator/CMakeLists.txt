@@ -23,6 +23,8 @@ add_library(mediate STATIC
   mediate_usamp.h
   mediate_xsconv.c
   mediate_xsconv.h
+  utils.h
+  utils.cpp
 )
 
 target_compile_features(mediate PUBLIC cxx_std_11)

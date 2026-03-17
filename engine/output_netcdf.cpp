@@ -1,9 +1,10 @@
 #include <array>
 #include <algorithm>
-#include <map>
 #include <cassert>
+#include <chrono>
+#include <format>
+#include <map>
 #include <sstream>
-#include <ctime>
 
 #include "netcdfwrapper.h"
 #include "output_netcdf.h"
@@ -30,6 +31,8 @@ static size_t n_alongtrack, n_crosstrack, n_calib;
 static int successFlag;
 
 const static string calib_subgroup_name = "Calib";
+
+constexpr static string iso_format = "{:%FT%TZ}"; // iso datetime format
 
 // map of dimension-name -> dimension-size.
 map<const string, size_t> dimensions = {
@@ -212,8 +215,7 @@ static void write_global_attrs(const ENGINE_CONTEXT*pEngineContext, NetCDFGroup 
 
   group.putAttr("Qdoas", qdoas_attr);
 
-  time_t curtime = time(NULL);
-  group.putAttr("CreationTime", ctime(&curtime));
+  group.putAttr("CreationTime", std::format(iso_format, std::chrono::utc_clock::now()));
 
   group.putAttr("InputFile", pEngineContext->fileInfo.fileName);  // better to have the full path name
   group.putAttr("QDOASConfig", pEngineContext->project.config_file);
@@ -411,9 +413,7 @@ void create_subgroups(const ENGINE_CONTEXT *pEngineContext,NetCDFGroup &group) {
     int z = TabFeno[row][analysiswindow].fit_properties.Z;
     double wvl_fitwin_min=pTabFeno->fit_properties.LFenetre[0][0];
     double wvl_fitwin_max=pTabFeno->fit_properties.LFenetre[z-1][1];
-    char str1[200];
-    sprintf(str1,"%.3lf : %.3lf",wvl_fitwin_min, wvl_fitwin_max);
-    subgroup.putAttr("fitting window range", str1);
+    subgroup.putAttr("fitting window range", std::format("{:.3f} : {:.3f}", wvl_fitwin_min, wvl_fitwin_max));
     subgroup.putAttr("ref1", pTabFeno->ref1);
     subgroup.putAttr("ref2", pTabFeno->ref2);
 
@@ -421,9 +421,7 @@ void create_subgroups(const ENGINE_CONTEXT *pEngineContext,NetCDFGroup &group) {
 
     // needs the wavelength at the center of the fitting window for profiling algorithm
     if (pEngineContext->project.instrumental.readOutFormat==PRJCT_INSTR_FORMAT_FRM4DOAS_NETCDF) {
-      char str[80];
-      sprintf(str,"%.3lf",pTabFeno->lambda0);
-      subgroup.putAttr("lambda0", str);
+      subgroup.putAttr("lambda0", std::format("{:.3f}", pTabFeno->lambda0));
     }
 
     for (int i=0;i<pTabFeno->NTabCross;i++) {
@@ -740,7 +738,6 @@ RC netcdf_open_calib(const ENGINE_CONTEXT *pEngineContext, const char *filename,
    {
     fclose(fp);
     string error_message(string(new_filename) + " already exists");
-    //sprintf(error_message,"%s already exists",new_filename);
     return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, error_message.c_str());
    }
   
@@ -751,8 +748,7 @@ RC netcdf_open_calib(const ENGINE_CONTEXT *pEngineContext, const char *filename,
 
     // Create attributes
 
-    time_t curtime = time(NULL);
-    output_file_calib.putAttr("created", ctime(&curtime));
+    output_file_calib.putAttr("created", std::format(iso_format, std::chrono::utc_clock::now()));
     output_file_calib.putAttr("description","Solar irradiances with grid corrected by QDOAS");
     output_file_calib.putAttr("title","Solar irradiances with grid corrected by QDOAS");
 

@@ -111,8 +111,6 @@ add_library(engine STATIC
   uoft-read.c
   usamp.c
   usamp.h
-  utils.cpp
-  utils.h
   vector.c
   vector.h
   winfiles.c
@@ -130,7 +128,8 @@ add_library(engine STATIC
   zenithal.h
 )
 
-target_link_libraries(engine PRIVATE
+target_link_libraries(engine PUBLIC mediate
+                             PRIVATE
                              config
                              Boost::boost Eigen3::Eigen
                              ${HDF5_CXX_LIBRARIES}
@@ -147,5 +146,5 @@ if (HDF4_MFHDF)
 target_link_libraries(engine PRIVATE ${HDF4_MFHDF})
 endif (HDF4_MFHDF)
 
-target_compile_features(engine PUBLIC cxx_std_17)
+target_compile_features(engine PUBLIC cxx_std_20)
 set_property(TARGET engine PROPERTY C_STANDARD 99)
