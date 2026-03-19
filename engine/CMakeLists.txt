@@ -128,8 +128,8 @@ add_library(engine STATIC
   zenithal.h
 )
 
-target_link_libraries(engine PUBLIC mediate
-                             PRIVATE
+target_link_libraries(engine PRIVATE
+                             mediate
                              config
                              Boost::boost Eigen3::Eigen
                              ${HDF5_CXX_LIBRARIES}
