@@ -805,11 +805,13 @@ int batchProcess(commands_t *cmd)
     default:
       break;
     }
-  } catch (std::exception& e) {
-    // catch all, report error below
+  } catch (xmlpp::internal_error & e) {
+    std::cerr << "Failed to parse configuration file \"" << cmd->configFile << "\".  File missing?" << std::endl;
+  } catch (xmlpp::parse_error & e) {
+    std::cerr << "Failed to parse configuration file \"" << cmd->configFile << "\".  Check xml structure." << std::endl;
+  } catch (std::exception & e) {
+    std::cerr << "Failed to parse configuration file \"" << cmd->configFile << "\"." << std::endl;
   }
-  std::cerr << "Failed to parse configuration file \""
-            << cmd->configFile  << "\"" << std::endl;
   return 1;
 }
 
