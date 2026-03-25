@@ -137,6 +137,23 @@ static string get_netcdf_varname(const char *varname_in) {
   return result;
 }
 
+static void write_wavelengths(NetCDFGroup &group, int index_feno, const ENGINE_CONTEXT *pEngineContext) {
+  for (size_t i_crosstrack=0; i_crosstrack != n_crosstrack; ++i_crosstrack) {
+    if (!pEngineContext->project.instrumental.use_row[i_crosstrack]) {
+      continue;
+    }
+    const FENO& tabfeno = TabFeno[i_crosstrack][index_feno];
+    vector<double> lambdas;
+    doas_iterator my_iterator;
+    for(int i = iterator_start(&my_iterator, tabfeno.fit_properties.specrange); i != ITERATOR_FINISHED; i=iterator_next(&my_iterator)) {
+      lambdas.push_back(tabfeno.Lambda[i]);
+    }
+    const size_t start[] = {i_crosstrack, 0};
+    const size_t count[] = {1, lambdas.size()};
+    group.putVar("fit_wavelengths", start, count, lambdas.data());
+  }
+}
+
 static void define_variable(NetCDFGroup &group, const struct output_field& thefield, const string& varname, enum vartype vtype) {
 
   vector<int> dimids;
@@ -164,7 +181,7 @@ static void define_variable(NetCDFGroup &group, const struct output_field& thefi
       string str=group.getName()+".n_datapoint";
       dimensions[str]=thefield.data_cols;
       dimids.push_back(get_dimid(str));
-      chunksizes.push_back((size_t)thefield.data_cols);      
+      chunksizes.push_back((size_t)thefield.data_cols);
      }
     
   }
@@ -178,6 +195,19 @@ static void define_variable(NetCDFGroup &group, const struct output_field& thefi
     group.defVarDeflate(varid);
     group.defVarFletcher32(varid, NC_FLETCHER32);
   }
+
+  // if outputting residuals, also define variable for calibrated wavelengths
+  if (thefield.memory_type == OUTPUT_RESIDUAL) {
+    string dimname = group.getName()+".n_datapoint";
+    vector<int> dimids_wavel {{get_dimid("n_crosstrack"), get_dimid(dimname)}};
+    vector<size_t> chunksizes_wavel {{(size_t)n_crosstrack, (size_t)thefield.data_cols}};
+
+    const int varid_wavel = group.defVar("fit_wavelengths", dimids_wavel, NC_DOUBLE);
+    group.defVarChunking(varid_wavel, NC_CHUNKED, chunksizes_wavel.data());
+    group.defVarDeflate(varid_wavel);
+    group.defVarFletcher32(varid_wavel, NC_FLETCHER32);
+  }
+
   switch (thefield.memory_type) {
   case OUTPUT_STRING:
     // pass the fill value as char**, because must write this as an NC_STRING attribute, not NC_CHAR array:
@@ -481,7 +511,11 @@ RC netcdf_open(const ENGINE_CONTEXT *pEngineContext, const char *filename,int nu
      NetCDFGroup group = output_data_analysis(i)->windowname ?
        output_group.getGroup(output_data_analysis(i)->windowname) : output_group;
      define_variable(group, *output_data_analysis(i), get_netcdf_varname(output_data_analysis(i)->fieldname), Analysis);
-    }
+     if (output_data_analysis(i)->memory_type == OUTPUT_RESIDUAL) {
+       write_wavelengths(group, output_data_analysis(i)->index_feno, pEngineContext);
+     }
+   }
+
   } catch (std::runtime_error& e) {
     output_file.close();
     return ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_NETCDF, e.what() );
