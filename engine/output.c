@@ -1693,6 +1693,17 @@ static int register_analysis_output_field(int field,struct outputconfig analysis
   return rc;
 }
 
+static int get_max_dimL(int indexFeno) {
+  int result = 0;
+  for (int row=0; row!=ANALYSE_swathSize; ++row) {
+    const FENO *pTabFeno=&TabFeno[row][indexFeno];
+    if (pTabFeno->fit_properties.DimL > result) {
+      result = pTabFeno->fit_properties.DimL;
+    }
+  }
+  return result;
+}
+
 static int register_analysis_output(const PRJCT_RESULTS *pResults, int indexFenoColumn,int indexFeno, int index_calib, const char *windowName) {
 
   FENO *pTabFeno=&TabFeno[indexFenoColumn][indexFeno];
@@ -1735,7 +1746,7 @@ static int register_analysis_output(const PRJCT_RESULTS *pResults, int indexFeno
         .get_data = (func_void) &get_processing_error_flag} },
     { (outputRunCalib || !pTabFeno->saveResidualsFlag) ? -1 : PRJCT_RESULTS_RESIDUAL_SPECTRUM,
       { .basic_fieldname = "residual_spectrum", .format = FORMAT_DOUBLE, .memory_type = OUTPUT_RESIDUAL,
-        .get_data = (func_void) &get_residual_spectrum, .data_cols=pTabFeno->fit_properties.DimL} }
+        .get_data = (func_void) &get_residual_spectrum, .data_cols=get_max_dimL(indexFeno)} }
 
   };
 

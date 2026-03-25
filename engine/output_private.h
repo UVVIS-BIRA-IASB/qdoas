@@ -707,15 +707,21 @@ static inline void get_spikes(struct output_field *this_field, char **spike_list
 
 static inline void get_residual_spectrum(struct output_field *this_field, double *residualSpectrum, const ENGINE_CONTEXT *pEngineContext UNUSED, int indexFenoColumn, int index_calib UNUSED) {
   FENO *pTabFeno = this_field->get_tabfeno(this_field, indexFenoColumn);
-  
-  if (pTabFeno->residualSpectrum!=NULL)
-   memcpy(residualSpectrum,pTabFeno->residualSpectrum,sizeof(double)*this_field->data_cols);
-  else
-   for (size_t i=0; i!=this_field->data_cols; ++i)
-     residualSpectrum[i]=QDOAS_FILL_DOUBLE;
+
+  size_t i=0;
+  // First get residual, if it exists:
+  if (pTabFeno->residualSpectrum!=NULL) {
+    for (; i!=pTabFeno->fit_properties.DimL; ++i) {
+      residualSpectrum[i] = pTabFeno->residualSpectrum[i];
+    }
+  }
+  // For imagers, the number of spetral points be different for each row, as it depends on the calibration for that
+  // detector row.  data_cols is set to the maximum number of spectral points of all rows, so ff this row has less
+  // spectral points, we use fill values for the remaining part of the buffer.
+  for (; i!=this_field->data_cols; ++i) {
+    residualSpectrum[i]=QDOAS_FILL_DOUBLE;
+  }
 }
-
-
 
 static inline void omi_get_rejected_pixels(struct output_field *this_field, char **pixel_list, const ENGINE_CONTEXT *pEngineContext UNUSED, int indexFenoColumn, int index_calib UNUSED) {
   FENO *pTabFeno = this_field->get_tabfeno(this_field, indexFenoColumn);
