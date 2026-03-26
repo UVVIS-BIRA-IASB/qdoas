@@ -709,8 +709,8 @@ static inline void get_residual_spectrum(struct output_field *this_field, double
   FENO *pTabFeno = this_field->get_tabfeno(this_field, indexFenoColumn);
 
   size_t i=0;
-  // First get residual, if it exists:
-  if (pTabFeno->residualSpectrum!=NULL) {
+  // First get residual, if it exists and retrieval succeeded:
+  if (pTabFeno->residualSpectrum!=NULL && !pTabFeno->rc) {
     for (; i!=pTabFeno->fit_properties.DimL; ++i) {
       residualSpectrum[i] = pTabFeno->residualSpectrum[i];
     }
