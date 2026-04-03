@@ -1,0 +1,54 @@
+publiccodeYmlVersion: "0"
+
+name: QDOAS
+url: "https://github.com/UVVIS-BIRA-IASB/qdoas"
+platforms:
+  - linux
+  - windows
+  - mac
+
+developmentStatus: stable
+
+softwareType: "standalone/desktop"
+
+description:
+  en:
+    shortDescription: >
+      QDOAS is a cross-platform appplication for the retrieval
+      of trace gas concentrations from hyperspectral images using
+      the DOAS technique.
+
+    longDescription: >
+      QDOAS is a cross-platform application based on
+      the long experience of BIRA-IASB (Royal Belgian Institute for
+      Space Aeronomy) in the development and improvement of algorithms
+      for the retrieval of trace gases from UV-Visible spectral
+      measurements (satellite, ground-based, mobile or aircraft-based
+      instruments) using the Differential Optical Absorption
+      Spectroscopy (DOAS) method. This software evolves along with the
+      measurement techniques in DOAS. It has been extensively
+      validated in different intercomparison campaigns. The friendly
+      user interface, flexibility and the robustness of the algorithms
+      largely contribute to QDOAS success in the world.
+
+    features:
+      - GUI for configuration of analysis settings.
+      - Command line application for batch processing.
+      - Additional tools for convolution and generation of
+        Ring and undersampling cross sections.
+
+legal:
+  license: BSD-3-Clause
+
+maintenance:
+  type: "internal"
+
+  contacts:
+    - name: Thomas Danckaert
+    - name: Caroline Fayt
+    - name: Jeroen van Gent
+
+localisation:
+  localisationReady: false
+  availableLanguages:
+    - en
