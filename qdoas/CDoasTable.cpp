@@ -859,25 +859,36 @@ bool CDoasTableColumnComboBox::eventFilter(QObject *, QEvent *e) {
 void CDoasTableColumnComboBox::list_context_menu(QPoint pos) {
   QAbstractItemView* comboView = view();
   QModelIndex index = comboView->indexAt(pos);
-  QAction *selectedItem;
 
-  int optionIndex=-1;
+  int optionIndex = index.row();
 
-  if ((m_type!=ANLYS_COMBO_NONE) && (m_menu!=NULL) && ((selectedItem=m_menu->exec(comboView->mapToGlobal(pos)))!=NULL) )
-   {
+  QString menu_text;
 
-    QString selectedText=selectedItem->text();;
-    char str[100];
+  // Only open context menu when it's needed:
+  if ((m_type == ANLYS_COMBO_DIFF_ORTHO && (optionIndex == ANLYS_DIFFORTHO_ORTHOGONALIZATION ||
+                                            optionIndex == ANLYS_DIFFORTHO_SUBTRACTION)) ||
+      (m_type == ANLYS_COMBO_CORRECTION && (optionIndex == ANLYS_CORRECTION_TYPE_MOLECULAR_RING ||
+                                                      optionIndex == ANLYS_CORRECTION_TYPE_MOLECULAR_RING_SLOPE))) {
+    QAction *action = m_menu->exec( comboView->mapToGlobal(pos));
+    if (action == nullptr) { // user did not select a symbol from te context menu
+      return;
+    }
+    menu_text = action->text();
+  }
 
-    if ((m_type==ANLYS_COMBO_DIFF_ORTHO) && ((optionIndex=index.row())>ANLYS_DIFFORTHO_DIFFERENTIAL_XS))
-     sprintf(str,"%s %s",((optionIndex==ANLYS_DIFFORTHO_ORTHOGONALIZATION)? "Orthogonalize to" : "Subtract from"),selectedText.toLatin1().data());
-    else if ((m_type==ANLYS_COMBO_CORRECTION) && ((optionIndex=index.row())==ANLYS_CORRECTION_TYPE_MOLECULAR_RING))
-     sprintf(str,"Mol. ring (%s)",selectedText.toLatin1().data());
-    else if ((m_type==ANLYS_COMBO_CORRECTION) && ((optionIndex=index.row())==ANLYS_CORRECTION_TYPE_MOLECULAR_RING_SLOPE))
-     sprintf(str,"Slope+Mol. ring (%s)",selectedText.toLatin1().data());
-
-    setItemText(optionIndex,str);
-   }
+  if (m_type == ANLYS_COMBO_DIFF_ORTHO) {
+    if (optionIndex == ANLYS_DIFFORTHO_ORTHOGONALIZATION) {
+      setItemText(optionIndex, "Orthogonalize to " + menu_text);
+    } else if (optionIndex == ANLYS_DIFFORTHO_SUBTRACTION) {
+      setItemText(optionIndex, "Subtract from " + menu_text);
+    }
+  } else if (m_type == ANLYS_COMBO_CORRECTION) {
+    if (optionIndex == ANLYS_CORRECTION_TYPE_MOLECULAR_RING) {
+      setItemText(optionIndex, "Mol. ring (" + menu_text + ")");
+    } else if (optionIndex == ANLYS_CORRECTION_TYPE_MOLECULAR_RING_SLOPE) {
+      setItemText(optionIndex, "Slope+Mol. ring (" + menu_text + ")");
+    }
+  }
 }
 
 CDoasTableColumnComboBox::CDoasTableColumnComboBox(int type,const QString &excludedSymbol,QWidget *parent) :
