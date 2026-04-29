@@ -4925,64 +4925,64 @@ RC ANALYSE_LoadCross(ENGINE_CONTEXT *pEngineContext, const ANALYSIS_CROSS *cross
 
         NWorkSpace++;
       }
+    }
 
-      // Check cross sections have the correct number of columns.
-      // We have the following possibilities:
-      //
-      //  - normal or I0 convolution: 2 columns
-      //  - ring convolution: 4 columns
-      //  - no convolution:  1 + ANALYSE_swathSize columns
-      //    (preconvolved xs for each detector row)
-      if ( ( (pTabFeno->hidden || pTabFeno->useKurucz) // we are in the calibration procedure, or in an analysis window which relies on Kuruz calibration
-             && pEngineContext->project.kurucz.fwhmFit) // slit function was fit in Kurucz calibration procedure
-           || pEngineContext->project.slit.slitFunction.slitType != SLIT_TYPE_NONE) { // slit function is specified in the project's slit tab
-        // the analysis uses convolution (Kurucz-fitted slit function or slit function set in slit tab):
-        switch (pCross->crossType) {
-        case ANLYS_CROSS_ACTION_CONVOLUTE:
-        case ANLYS_CROSS_ACTION_CONVOLUTE_I0:
-          if (pWrkSymbol->xs.nc != 2) {
-            rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_XS_COLUMNS, pCross->symbol, pWrkSymbol->xs.nc, 2);
-          }
-          break;
-        case ANLYS_CROSS_ACTION_CONVOLUTE_RING:
-          if (pWrkSymbol->xs.nc != 4) {
-            rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_XS_RING, pCross->symbol);
-          }
-          break;
-        case ANLYS_CROSS_ACTION_NOTHING:
-        case ANLYS_CROSS_ACTION_INTERPOLATE:
-          // interpolated/preset cross section is allowed in a project
-          // using online convolution, but normally there should be 1
-          // column for each detector row:
-          if (pWrkSymbol->xs.nc != (1+ANALYSE_swathSize) ) {
-            int tmp_rc = ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_XS_COLUMNS, pCross->symbol, pWrkSymbol->xs.nc, 1+ANALYSE_swathSize);
-            if (pWrkSymbol->xs.nc != 2) {
-              // we allow cross sections with 2 columns, but give a
-              // warning. When the number of columns does not match 2
-              // or (1+ANALYSE_swathSize), something is not right =>
-              // return the error:
-              rc = tmp_rc;
-            }
-          }
-          break;
+    // Check cross sections have the correct number of columns.
+    // We have the following possibilities:
+    //
+    //  - normal or I0 convolution: 2 columns
+    //  - ring convolution: 4 columns
+    //  - no convolution:  1 + ANALYSE_swathSize columns
+    //    (preconvolved xs for each detector row)
+    if ( ( (pTabFeno->hidden || pTabFeno->useKurucz) // we are in the calibration procedure, or in an analysis window which relies on Kuruz calibration
+           && pEngineContext->project.kurucz.fwhmFit) // slit function was fit in Kurucz calibration procedure
+         || pEngineContext->project.slit.slitFunction.slitType != SLIT_TYPE_NONE) { // slit function is specified in the project's slit tab
+      // the analysis uses convolution (Kurucz-fitted slit function or slit function set in slit tab):
+      switch (pCross->crossType) {
+      case ANLYS_CROSS_ACTION_CONVOLUTE:
+      case ANLYS_CROSS_ACTION_CONVOLUTE_I0:
+        if (pWrkSymbol->xs.nc != 2) {
+          rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_XS_COLUMNS, pCross->symbol, pWrkSymbol->xs.nc, 2);
         }
-      } else {
-        // analysis uses preconvolved cross sections
+        break;
+      case ANLYS_CROSS_ACTION_CONVOLUTE_RING:
+        if (pWrkSymbol->xs.nc != 4) {
+          rc = ERROR_SetLast(__func__, ERROR_TYPE_FATAL, ERROR_ID_XS_RING, pTabFeno->windowName, pCross->symbol);
+        }
+        break;
+      case ANLYS_CROSS_ACTION_NOTHING:
+      case ANLYS_CROSS_ACTION_INTERPOLATE:
+        // interpolated/preset cross section is allowed in a project
+        // using online convolution, but normally there should be 1
+        // column for each detector row:
         if (pWrkSymbol->xs.nc != (1+ANALYSE_swathSize) ) {
-          int tmp_rc = ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_XS_COLUMNS, pCross->crossSectionFile, pWrkSymbol->xs.nc, 1+ANALYSE_swathSize);
+          int tmp_rc = ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_XS_COLUMNS, pCross->symbol, pWrkSymbol->xs.nc, 1+ANALYSE_swathSize);
           if (pWrkSymbol->xs.nc != 2) {
-            // same as above for ACTION_NOTHING/ACTION_INTERPOLATE:
-            // for preconvolved cross sections, if the number of
-            // columns does not match 1+indexFenocolumn, we allow
-            // 2-column cross sections with a warning, otherwise,
-            // return an error
+            // we allow cross sections with 2 columns, but give a
+            // warning. When the number of columns does not match 2
+            // or (1+ANALYSE_swathSize), something is not right =>
+            // return the error:
             rc = tmp_rc;
           }
-        } else if (pCross->crossType == ANLYS_CROSS_ACTION_CONVOLUTE ||
-                   pCross->crossType == ANLYS_CROSS_ACTION_CONVOLUTE_I0 ||
-                   pCross->crossType == ANLYS_CROSS_ACTION_CONVOLUTE_RING) {
-          rc=ERROR_SetLast(__func__,ERROR_TYPE_FATAL,ERROR_ID_CONVOLUTION, pCross->symbol);
         }
+        break;
+      }
+    } else {
+      // analysis uses preconvolved cross sections
+      if (pWrkSymbol->xs.nc != (1+ANALYSE_swathSize) ) {
+        int tmp_rc = ERROR_SetLast(__func__, ERROR_TYPE_WARNING, ERROR_ID_XS_COLUMNS, pCross->crossSectionFile, pWrkSymbol->xs.nc, 1+ANALYSE_swathSize);
+        if (pWrkSymbol->xs.nc != 2) {
+          // same as above for ACTION_NOTHING/ACTION_INTERPOLATE:
+          // for preconvolved cross sections, if the number of
+          // columns does not match 1+indexFenocolumn, we allow
+          // 2-column cross sections with a warning, otherwise,
+          // return an error
+          rc = tmp_rc;
+        }
+      } else if (pCross->crossType == ANLYS_CROSS_ACTION_CONVOLUTE ||
+                 pCross->crossType == ANLYS_CROSS_ACTION_CONVOLUTE_I0 ||
+                 pCross->crossType == ANLYS_CROSS_ACTION_CONVOLUTE_RING) {
+        rc=ERROR_SetLast(__func__,ERROR_TYPE_FATAL,ERROR_ID_CONVOLUTION, pCross->symbol);
       }
     }
 

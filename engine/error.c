@@ -109,7 +109,7 @@ ERROR_TABLE errorTable[]=
   { ERROR_ID_DIR_NOT_FOUND             , "directory %s does not exist %s"},
   { ERROR_ID_XS_BAD_WAVELENGTH         , "the cross section '%s' should be defined on the same grid as the reference one when 'None' is selected as Interp/conv action"},
   { ERROR_ID_XS_COLUMNS                , "cross section file for '%s' has %d columns, but %d columns are expected"},
-  { ERROR_ID_XS_RING                   , "configuration error for cross section '%s': cross section is configured to use 'convolve Ring', but its input file does not have 4 columns"},
+  { ERROR_ID_XS_RING                   , "configuration error in %s: cross section '%s' is set to 'convolve Ring', but its input file does not have 4 columns"},
   { ERROR_ID_XS_FILENAME               , "missing filename for cross section '%s'"},
   { ERROR_ID_MISSING_INITIAL_CALIB     , "configuration error: no initial wavelength calibration (please provide a calibration file or a reference spectrum)"},
   { ERROR_ID_REF_SOLAR_IDENTICAL       , "reference spectrum is identical to the solar spectrum used for the calibration, calibration will be bypassed."      },
