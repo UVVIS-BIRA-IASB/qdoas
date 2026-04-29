@@ -1,42 +1,43 @@
-\chapter{QDOAS Overview} \label{cha:intro}
-\section{Introduction}
+\chapter{Introduction} \label{cha:intro}
+\section{Overview}
+The purpose of this manual is to explain how to use the different QDOAS features, and provide a basic description of their implementation.  Chapter \ref{cha:descr-algor} describes the implementation of the various algorithms in some detail, along with a brief review of their theoretical background and references to literature.  If you are already familliar with \acrfull{doas} retrievals and want to learn how to configure QDOAS, you can read the section \nameref{sec:interface} at the end of this chapter, as well as chapter \ref{cha:quickstart} -- \nameref{cha:quickstart}, which illustrates how to set up an example configuration to retrieve \NO2{} columns from ASCII spectra.  Chapter \ref{cha:properties} contains a more detailed description of the interface, explaining where the different configuration options can be found and how they can be combined.  Appendix \ref{cha:input-files-format} describes the file formats for some of the required input data.
+
+\section{QDOAS history}
 The experience of the \gls{bira} in the development and improvement of algorithms for the retrieval of trace gas concentrations goes back to the early 1990s, with atmospheric research activities using ground-based UV-Visible spectrometers aiming at the long-term monitoring of minor components involved in the catalytic destruction of the ozone layer or in anthropogenic pollution.
 
 WinDOAS, the first program developed at \gls{bira} in 1997, knew a success story due to a friendly user interface completed with some po\-wer\-ful \glslink{doas}{DOAS} tools.  This program, extensively validated through different campaigns, has been used worldwide and for many different DOAS applications (mainly for ground-based and satellite applications).
 
 QDOAS is a cross-platform implementation of WinDOAS: the software is portable to Windows and Unix-based operating systems whereas WinDOAS was designed only for Windows. The user interface and the engine of QDOAS are similar to those of its predecessor.  WinDOAS is  no longer supported.
 
-QDOAS has been developed in collaboration with \href{http://www.stcorp.nl/}{S[\&]T}.  The graphical user interface is built on the Open-Source version of the Qt toolkit, a cross-platform application framework, and Qwt libraries.
-
-This document describes the QDOAS user interface and dialog boxes for configuring the software.  It completes the online help provided with the package.  The algorithms that are used in the software are also summarized.  The document assumes that users already have a minimum of experience with \gls{doas} applications and retrieval.
+QDOAS has been developed in collaboration with \href{http://www.stcorp.nl}{S[\&]T}.  The graphical user interface is built on the Open-Source version of the Qt toolkit, a cross-platform application framework, and Qwt libraries.
 
 \section{Main QDOAS features}
-\subsection{General features}
+\subsection{General}
 \begin{qdoasitem}
-\item The main components of the \gls{gui} are organized in multi-page panels with a fixed arrangement and tab-switched access to the different pages;
-\item The application is based on a tree structure;
-\item All the spectral windows are processed in one shot and there is a tab-switched access between the different fitting windows;
-\item Large amount of files can be processed in one shot;
-\item Support different spectra file formats (see section \ref{sec:intro-formats}) and specificities for satellites, ground-based and airborne measurements are accounted for;
-\item On line help in HTML format
+\item All settings can be made using the \gls{gui}.  Configuration parameters are arranged in menus with tab pages per topic.
+\item A tree structure provides an overview of the different projects, with their input files and different spectral windows for analysis.
+\item All the spectral windows are processed in one shot, settings for different windows may be accessed through tab pages.
+\item QDOAS can process a large number of files in one run.
+\item QDOAS read spectra stored in a number of different file formats (see section \ref{sec:intro-formats}) and takes into accounts the specifics of various satellite, ground-based and airborne measurements.
+\item On line help in HTML format.
 \end{qdoasitem}
 \subsection{Plot}
 \begin{qdoasitem}
-\item Visualization of spectra and the results in different tab pages;
-\item Possibility to set plot contour and style;
-\item Interactive plot mode (zooming, overlay of an existing ASCII file, possibility to fix the scaling of the plot, \ldots): activated by right clicking the title of the plot ;
-\item Export of plot in different portable image formats (png, jpg)
+\item Visualization of spectra and the results in different tab pages.
+\item Configure plot contour and style.
+\item Interactive plot mode (zooming, overlay of an existing ASCII file, possibility to fix the scaling of the plot, \ldots): activated by right clicking the title of the plot.
+\item Export of plots in different portable image formats (png, jpg).
 \end{qdoasitem}
 \subsection{Analysis}
 \begin{qdoasitem}
-\item DOAS/intensity fitting modes;
-\item shift/stretch (in nm) fully configurable for any spectral item (cross section or spectrum);
-\item automatic reference selection from the input spectra file taking account for specificities for satellites or MAXDOAS measurements (scans);
-\item possibility to constrain the slant column density of a molecule to the value found in a previous window;
-\item possibility to filter spectra and cross sections before analysis (supported filters include Kaiser, gaussian, boxcar, Savitsky Golay…);
-\item possibility to define gaps or automatically remove spikes within fitting intervals (e.g. to eliminate bad pixels);
-\item possibility to fit an instrumental offset;
-\item possibility to define several configurations of spectral windows under a project;
+\item Optical depth or intensity fitting modes.
+\item shift/stretch (in nm) fully configurable for any spectral item (cross section or spectrum).
+\item Automatically select a reference from the input spectra, taking into account specifics of for satellite or MAXDOAS measurements (scans).
+\item Constrain the slant column density of a molecule to the value found in a previous window.
+\item Filter spectra and cross sections before analysis (supported filters include Kaiser, gaussian, boxcar, Savitsky Golay…).
+\item Define gaps in the spectral window for analsysis, or automatically remove spikes within fitting intervals (e.g. to eliminate bad pixels).
+\item Fit an instrumental offset.
+\item Configure a number of different spectral windows within a single project,
 \end{qdoasitem}
 \subsection{Calibration And Slit Function Characterization}
 \begin{qdoasitem}
@@ -278,6 +279,7 @@ provide the location of the help's index.html file, after which the help system 
 \subsection{Source code}
 The source code for QDOAS is freely available at \url{https://github.com/UVVIS-BIRA-IASB/qdoas}.  The README file contains instructions for users who want to compile QDOAS from source.
 
+\input{QDOAS_interface}
 
 %%% Local Variables:
 %%% mode: latex
