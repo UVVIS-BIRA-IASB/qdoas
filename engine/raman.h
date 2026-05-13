@@ -64,7 +64,7 @@ extern "C" {
 
 // Prototypes
 
-RC raman_convolution(double *xsLambda,double *xsVector,double *xsDeriv2,double *xsConv,int n,double temp,int normalizeFlag);
+RC raman_convolution(const double *xsLambda, const double *xsVector, const double *xsDeriv2, double *xsConv, int n, double temp, int normalizeFlag);
 
 #if defined(_cplusplus) || defined(__cplusplus)
 }

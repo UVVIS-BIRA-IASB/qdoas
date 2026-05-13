@@ -777,7 +777,7 @@ RC FilterConv(PRJCT_FILTER *pFilter,double *Input,double *Output,int Size)
 //               0 on success
 // -----------------------------------------------------------------------------
 
-RC FILTER_Vector(PRJCT_FILTER *pFilter,double *Input,double *Output,double *tmpVector,int Size,int outputType)
+RC FILTER_Vector(PRJCT_FILTER *pFilter, const double *Input,double *Output,double *tmpVector,int Size,int outputType)
  {
   // Declarations
 

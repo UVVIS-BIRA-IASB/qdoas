@@ -326,7 +326,7 @@ RC   ANALYSE_ConvoluteXs(const FENO *pTabFeno,int action,double conc,const MATRI
                          const MATRIX_OBJECT *slitMatrix,const double *slitParam, int slitType,
                          const double *newlambda, double *output, INDEX indexlambdaMin, INDEX indexlambdaMax, const int n_wavel,
                          INDEX indexFenoColumn, int wveDptFlag);
-RC   ANALYSE_XsConvolution(FENO *pTabFeno,double *newLambda,MATRIX_OBJECT *slitMatrix,double *slitParam,int slitType,INDEX indexFenoColumn,int wveDptFlag);
+RC   ANALYSE_XsConvolution(FENO *pTabFeno, const double *newLambda, const MATRIX_OBJECT *slitMatrix, const double *slitParam,int slitType,INDEX indexFenoColumn,int wveDptFlag);
 RC   ANALYSE_SvdInit(FENO *feno, struct fit_properties *fit, const int n_wavel, const double *lambda);
 RC   ANALYSE_CurFitMethod(INDEX indexFenoColumn, const double *Spectre, const double *SigmaSpec, const double *Sref, int n_wavel, double *residuals, double *Chisqr,int *pNiter,double speNormFact,double refNormFact, struct fit_properties *fit);
 void ANALYSE_ResetData(void);
@@ -360,7 +360,7 @@ enum _pixelSelection {
   PIXEL_CLOSEST
 };
 
-RC FNPixel (double *lambdaVector, double lambdaValue, int npts,int pixelSelection);
+RC FNPixel (const double *lambdaVector, double lambdaValue, int npts,int pixelSelection);
 
 extern double center_pixel_wavelength(int first, int last);
 

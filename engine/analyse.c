@@ -344,7 +344,7 @@ int reinit_analysis(FENO *pFeno, const int n_wavel) {
   return ANALYSE_SvdInit(pFeno,&pFeno->fit_properties, n_wavel, Lambda);
  }
 
-void AnalyseGetFenoLim(FENO *pFeno,INDEX *pLimMin,INDEX *pLimMax, const int n_wavel)
+void AnalyseGetFenoLim(const FENO *pFeno,INDEX *pLimMin,INDEX *pLimMax, const int n_wavel)
 {
   int deb,fin,Dim;
 
@@ -411,7 +411,7 @@ void ANALYSE_InitResults(void)
 // FNPixel : Get a pixel from a wavelength
 // ---------------------------------------
 
-RC FNPixel(double *lambdaVector,double lambdaValue,int npts,int pixelSelection)
+RC FNPixel(const double *lambdaVector,double lambdaValue,int npts,int pixelSelection)
 {
   // Declarations
 
@@ -746,10 +746,10 @@ RC AnalysePukiteConvoluteI0(const FENO *pTabFeno,double conc,double lambda0,
   return rc;
  }
 
-RC AnalyseSimplePukiteTerms(double *lambda,double *xs,
-                               double *pukite1Vector,double *pukite1Deriv2,
-                               double *pukite2Vector,double *pukite2Deriv2,
-                               int n,double lambda0)
+RC AnalyseSimplePukiteTerms(const double *lambda, const double *xs,
+                            double *pukite1Vector, double *pukite1Deriv2,
+                            double *pukite2Vector, double *pukite2Deriv2,
+                            int n,double lambda0)
  {
   // Declarations
 
@@ -1600,30 +1600,6 @@ RC ANALYSE_XsInterpolation(FENO *pTabFeno, const double *newLambda,INDEX indexFe
      }
    }
 
-  // Molecular ring (commented because, done in convolution)
-
-// !!!  if (!rc && pTabFeno->molecularCorrection && !pTabFeno->xsToConvolute)
-// !!!   {
-// !!!    for (indexTabCross=0;(indexTabCross<pTabFeno->NTabCross) && !rc;indexTabCross++)
-// !!!     {
-// !!!      pTabCross=&pTabFeno->TabCross[indexTabCross];
-// !!!
-// !!!      if ((WorkSpace[pTabCross->Comp].type==WRK_SYMBOL_CROSS) &&   // take only cross sections into account
-// !!!          (pTabCross->molecularCrossSection!=NULL) && !pTabCross->isPukite)
-// !!!       {
-// !!!        VECTOR_Init(pTabCross->molecularCrossSection,(double)0.,pTabFeno->NDET);
-// !!!
-// !!!        if (!(rc=raman_convolution(newLambda,
-// !!!                                   pTabCross->vector,
-// !!!                                   pTabCross->Deriv2,
-// !!!                                   pTabCross->molecularCrossSection,pTabFeno->NDET,(double)250.,1)))
-// !!!
-// !!!         for (int i=0;i<pTabFeno->NDET;i++)
-// !!!          pTabCross->molecularCrossSection[i]=pTabCross->vector[i]-pTabCross->molecularCrossSection[i];
-// !!!       }
-// !!!     }
-// !!!   }
-
   // Return
 
   if (filtCross!=NULL)
@@ -1757,8 +1733,8 @@ RC ANALYSE_ConvoluteXs(const FENO *pTabFeno,int action,double conc,
 // ANALYSE_XsConvolution : Real time convolution of high resolution cross sections
 // -------------------------------------------------------------------------------
 
-RC ANALYSE_XsConvolution(FENO *pTabFeno,double *newlambda,
-                         MATRIX_OBJECT *slitMatrix,double *slitParam,int slitType,
+RC ANALYSE_XsConvolution(FENO *pTabFeno, const double *newlambda,
+                         const MATRIX_OBJECT *slitMatrix, const double *slitParam,int slitType,
                          INDEX indexFenoColumn,int wveDptFlag)
 {
   // Declarations
@@ -1922,8 +1898,6 @@ RC ANALYSE_XsConvolution(FENO *pTabFeno,double *newlambda,
       pTabCross=&pTabFeno->TabCross[indexTabCross];
 
       if ((WorkSpace[pTabCross->Comp].type==WRK_SYMBOL_CROSS) &&   // take only cross sections into account
-   //      ((pTabCross->crossAction==ANLYS_CROSS_ACTION_CONVOLUTE) ||
-   //       (pTabCross->crossAction==ANLYS_CROSS_ACTION_CONVOLUTE_I0)) &&
           !pTabCross->isPukite &&
           (pTabCross->molecularCrossSection!=NULL))
        {
@@ -1937,15 +1911,6 @@ RC ANALYSE_XsConvolution(FENO *pTabFeno,double *newlambda,
          for (int i=0;i<pTabFeno->NDET;i++)
           pTabCross->molecularCrossSection[i]=pTabCross->vector[i]-pTabCross->molecularCrossSection[i];
 
-// Making the convolution on the whole vector gives similar results for interpolation only
-//
-//        if (!(rc=raman_convolution(&newlambda[indexlambdaMin],
-//                                   &pTabCross->vector[indexlambdaMin],
-//                                   &pTabCross->Deriv2[indexlambdaMin],
-//                                   &pTabCross->molecularCrossSection[indexlambdaMin],indexlambdaMax-indexlambdaMin,(double)250.,1)))
-//
-//         for (int i=indexlambdaMin;i<indexlambdaMax;i++)
-//          pTabCross->molecularCrossSection[i]=pTabCross->vector[i]-pTabCross->molecularCrossSection[i];
        }
      }
    }
