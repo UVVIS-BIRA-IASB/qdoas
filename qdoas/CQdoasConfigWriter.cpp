@@ -472,6 +472,30 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
       (d->ascii.flagTime ? sTrue : sFalse), (d->ascii.flagWavelength ? sTrue : sFalse),
       (d->ascii.straylight ? sTrue : sFalse),d->ascii.lambdaMin,d->ascii.lambdaMax);
 
+  fprintf(fp, " type=");
+  switch (d->ascii.spectralType) {
+  case PRJCT_INSTR_MAXDOAS_TYPE_NONE:
+    fprintf(fp, "\"all\"");
+    break;
+  case PRJCT_INSTR_MAXDOAS_TYPE_ZENITH:
+    fprintf(fp, "\"zenith\"");
+    break;
+  case PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS:
+    fprintf(fp, "\"off-axis\"");
+    break;
+  case PRJCT_INSTR_MAXDOAS_TYPE_DIRECTSUN:
+    fprintf(fp, "\"direct-sun\"");
+    break;
+  case PRJCT_INSTR_MAXDOAS_TYPE_ALMUCANTAR:
+    fprintf(fp, "\"almucantar\"");
+    break;
+  case PRJCT_INSTR_MAXDOAS_TYPE_MOON:
+    fprintf(fp, "\"moon\"");
+    break;
+  default:
+    fprintf(fp, "\"invalid\"");
+  }
+
   tmpStr = pathMgr->simplifyPath(QString(d->ascii.calibrationFile));
   fprintf(fp, " calib=\"%s\"", tmpStr.toUtf8().constData());
 
@@ -1085,6 +1109,9 @@ void CQdoasConfigWriter::writePropertiesInstrumental(FILE *fp, const mediate_pro
     break;
   case PRJCT_INSTR_MAXDOAS_TYPE_ALMUCANTAR:
     fprintf(fp, "\"almucantar\"");
+    break;
+  case PRJCT_INSTR_MAXDOAS_TYPE_MOON:
+    fprintf(fp, "\"moon\"");
     break;
   default:
     fprintf(fp, "\"invalid\"");

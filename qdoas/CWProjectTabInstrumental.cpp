@@ -250,7 +250,7 @@ CWProjectTabInstrumental::CWProjectTabInstrumental(const mediate_project_instrum
   m_tempoEdit = new CWInstrTempoEdit(&(instr->tempo));
   index = m_formatStack->addWidget(m_tempoEdit);
   m_instrumentToStackIndexMap.insert(std::map<int,int>::value_type(PRJCT_INSTR_FORMAT_TEMPO, index));
-  
+
   // ocean optics
   m_oceanOpticsEdit = new CWInstrOceanOpticsEdit(&(instr->oceanoptics));
   index = m_formatStack->addWidget(m_oceanOpticsEdit);
@@ -654,6 +654,7 @@ CWInstrAsciiEdit::CWInstrAsciiEdit(const struct instrumental_ascii *d, QWidget *
   row=0;
 
   groupLayout->addWidget(m_strayLightConfig);
+
   mainLayout->addLayout(groupLayout);
 
   // bottom layout - det. size and files
@@ -665,6 +666,19 @@ CWInstrAsciiEdit::CWInstrAsciiEdit(const struct instrumental_ascii *d, QWidget *
   m_detSizeEdit->setFixedWidth(cStandardEditWidth);
   m_detSizeEdit->setValidator(new QIntValidator(0, 8192, m_detSizeEdit));
   bottomLayout->addWidget(m_detSizeEdit, row, 1);
+  ++row;
+
+  // Spectral Type
+  m_spectraTypeLabel=new QLabel("Spectral Type", this);
+  bottomLayout->addWidget(m_spectraTypeLabel, row, 0);
+  m_spectralTypeCombo = new QComboBox(this);
+  m_spectralTypeCombo->addItem("All", QVariant(PRJCT_INSTR_MAXDOAS_TYPE_NONE));
+  m_spectralTypeCombo->addItem("Zenith only", QVariant(PRJCT_INSTR_MAXDOAS_TYPE_ZENITH));
+  m_spectralTypeCombo->addItem("Off-axis", QVariant(PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS));
+  m_spectralTypeCombo->addItem("Direct sun", QVariant(PRJCT_INSTR_MAXDOAS_TYPE_DIRECTSUN));
+  m_spectralTypeCombo->addItem("Almucantar", QVariant(PRJCT_INSTR_MAXDOAS_TYPE_ALMUCANTAR));
+  m_spectralTypeCombo->addItem("Moon", QVariant(PRJCT_INSTR_MAXDOAS_TYPE_MOON));
+  bottomLayout->addWidget(m_spectralTypeCombo, row, 1);
   ++row;
 
   // files
@@ -708,6 +722,15 @@ CWInstrAsciiEdit::CWInstrAsciiEdit(const struct instrumental_ascii *d, QWidget *
   m_strayLightConfig->setLambdaMin(d->lambdaMin);
   m_strayLightConfig->setLambdaMax(d->lambdaMax);
 
+  // spectral type
+
+  if (d->format == PRJCT_INSTR_ASCII_FORMAT_COLUMN_EXTENDED)
+   {
+    int index = m_spectralTypeCombo->findData(QVariant(d->spectralType));
+    if (index != -1)
+     m_spectralTypeCombo->setCurrentIndex(index);
+   }
+
   connect(m_lineRadioButton, SIGNAL(toggled(bool)), this, SLOT(slotAsciiFormatChanged(bool)));
   connect(m_columnRadioButton, SIGNAL(toggled(bool)), this, SLOT(slotAsciiFormatChanged(bool)));
   connect(m_columnExtendedRadioButton, SIGNAL(toggled(bool)), this, SLOT(slotAsciiExtendedFormatChanged(bool)));
@@ -740,6 +763,10 @@ void CWInstrAsciiEdit::apply(struct instrumental_ascii *d) const
   d->lambdaMin = m_strayLightConfig->getLambdaMin();
   d->lambdaMax = m_strayLightConfig->getLambdaMax();
 
+  // spectral type
+  if (d->format == PRJCT_INSTR_ASCII_FORMAT_COLUMN_EXTENDED)
+   d->spectralType = m_spectralTypeCombo->itemData(m_spectralTypeCombo->currentIndex()).toInt();
+
   // files
   strcpy(d->calibrationFile, m_fileOneEdit->text().toLocal8Bit().data());
   strcpy(d->transmissionFunctionFile, m_fileTwoEdit->text().toLocal8Bit().data());
@@ -756,6 +783,8 @@ void CWInstrAsciiEdit::setflagsEnabled(bool enableFlag)
    m_timeCheck->show();
    m_lambdaCheck->show();
    m_flagsGroup->show();
+   m_spectraTypeLabel->hide();
+   m_spectralTypeCombo->hide();
   }
  else
   {
@@ -766,6 +795,10 @@ void CWInstrAsciiEdit::setflagsEnabled(bool enableFlag)
    m_timeCheck->hide();
    m_lambdaCheck->hide();
    m_flagsGroup->hide();
+   m_spectraTypeLabel->show();
+   m_spectralTypeCombo->show();
+
+
   }
 }
 
@@ -1265,20 +1298,20 @@ CWInstrFrm4doasEdit::CWInstrFrm4doasEdit(const struct instrumental_frm4doas *d, 
   m_imagersGroup->setCheckable(true);
 
   QHBoxLayout *imagersLayout=new QHBoxLayout(m_imagersGroup);
-  
+
   imagersLayout->addWidget(new QLabel("Spectral dim", this), Qt::AlignRight);             // detector size label
   m_spectralDimEdit = new QLineEdit(this);
   m_spectralDimEdit->setFixedWidth(100);
   m_spectralDimEdit->setValidator(new QIntValidator(0, 8192, m_spectralDimEdit));
   imagersLayout->addWidget(m_spectralDimEdit, Qt::AlignRight);
-  
+
   imagersLayout->addWidget(new QLabel("Spatial dim", this), Qt::AlignRight);             // detector size label
   m_spatialDimEdit = new QLineEdit(this);
   m_spatialDimEdit->setFixedWidth(100);
   m_spatialDimEdit->setValidator(new QIntValidator(1, 2048, m_spatialDimEdit));
-  imagersLayout->addWidget(m_spatialDimEdit, Qt::AlignRight);  
+  imagersLayout->addWidget(m_spatialDimEdit, Qt::AlignRight);
   imagersLayout->addStretch(3);
-  
+
   groupLayout->addWidget(m_strayLightConfig);
   groupLayout->addWidget(m_imagersGroup);
   groupLayout->addStretch(1);
@@ -1302,6 +1335,7 @@ CWInstrFrm4doasEdit::CWInstrFrm4doasEdit(const struct instrumental_frm4doas *d, 
   m_spectralTypeCombo->addItem("Off-axis", QVariant(PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS));
   m_spectralTypeCombo->addItem("Direct sun", QVariant(PRJCT_INSTR_MAXDOAS_TYPE_DIRECTSUN));
   m_spectralTypeCombo->addItem("Almucantar", QVariant(PRJCT_INSTR_MAXDOAS_TYPE_ALMUCANTAR));
+  m_spectralTypeCombo->addItem("Moon", QVariant(PRJCT_INSTR_MAXDOAS_TYPE_MOON));
   gridLayout->addWidget(m_spectralTypeCombo, row, 1);
   ++row;
 
@@ -1310,14 +1344,14 @@ CWInstrFrm4doasEdit::CWInstrFrm4doasEdit(const struct instrumental_frm4doas *d, 
                    d->calibrationFile, sizeof(d->calibrationFile),
                    d->transmissionFunctionFile, sizeof(d->transmissionFunctionFile));
 
-  
+
   mainLayout->addLayout(gridLayout);
   mainLayout->addStretch(1);
 
   // initialise the values
 
   m_imagersGroup->setChecked(d->imagerFlag);
-  
+
   if (d->imagerFlag)
   {
    m_detSizeLabel->setEnabled(false);
@@ -1328,17 +1362,17 @@ CWInstrFrm4doasEdit::CWInstrFrm4doasEdit(const struct instrumental_frm4doas *d, 
   tmpStr.setNum(d->detectorSize);
   m_detSizeEdit->validator()->fixup(tmpStr);
   m_detSizeEdit->setText(tmpStr);
-  
+
   // spectral dim
   tmpStr.setNum(d->spectralDim);
   m_spectralDimEdit->validator()->fixup(tmpStr);
-  m_spectralDimEdit->setText(tmpStr); 
-  
-  
+  m_spectralDimEdit->setText(tmpStr);
+
+
   // spatial dim
   tmpStr.setNum(d->spatialDim);
   m_spatialDimEdit->validator()->fixup(tmpStr);
-  m_spatialDimEdit->setText(tmpStr);  
+  m_spatialDimEdit->setText(tmpStr);
 
   // spectral type
 
@@ -1350,7 +1384,7 @@ CWInstrFrm4doasEdit::CWInstrFrm4doasEdit(const struct instrumental_frm4doas *d, 
   m_strayLightConfig->setChecked(d->straylight ? true : false);
   m_strayLightConfig->setLambdaMin(d->lambdaMin);
   m_strayLightConfig->setLambdaMax(d->lambdaMax);
-  
+
   connect(m_imagersGroup, SIGNAL(toggled(bool)), this, SLOT(slotFrm4doasImagers(bool)));
 }
 
@@ -1366,12 +1400,12 @@ void CWInstrFrm4doasEdit::apply(struct instrumental_frm4doas *d) const
 
   // detector size
   d->detectorSize = m_detSizeEdit->text().toInt();
-  
+
   // spectral dim
-  d->spectralDim = m_spectralDimEdit->text().toInt();  
-  
+  d->spectralDim = m_spectralDimEdit->text().toInt();
+
   // spatial dim
-  d->spatialDim = m_spatialDimEdit->text().toInt();  
+  d->spatialDim = m_spatialDimEdit->text().toInt();
 
   // spectral type
   d->spectralType = m_spectralTypeCombo->itemData(m_spectralTypeCombo->currentIndex()).toInt();

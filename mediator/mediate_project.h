@@ -218,7 +218,8 @@ extern "C" {
     int flagDate;
     int flagTime;
     int flagWavelength;
-    int  straylight;
+    int straylight;
+    int spectralType;
     double lambdaMin,lambdaMax;
     char calibrationFile[FILENAME_BUFFER_LENGTH];
     char transmissionFunctionFile[FILENAME_BUFFER_LENGTH];

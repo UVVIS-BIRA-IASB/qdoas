@@ -808,6 +808,26 @@ void CProjectInstrumentalSubHandler::start(const xmlstring &element, const map<x
     m_instrumental->ascii.lambdaMin = parse_value<double>(atts, "lambda_min");
     m_instrumental->ascii.lambdaMax = parse_value<double>(atts, "lambda_max");
 
+    str = value(atts, "type");
+
+    if (!str.empty())
+      {
+      if (str == "all")
+        m_instrumental->ascii.spectralType = PRJCT_INSTR_MAXDOAS_TYPE_NONE;
+      else if (str == "zenith")
+        m_instrumental->ascii.spectralType = PRJCT_INSTR_MAXDOAS_TYPE_ZENITH;
+      else if (str == "off-axis")
+        m_instrumental->ascii.spectralType = PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS;
+      else if (str == "direct-sun")
+        m_instrumental->ascii.spectralType = PRJCT_INSTR_MAXDOAS_TYPE_DIRECTSUN;
+      else if (str == "almucantar")
+        m_instrumental->ascii.spectralType = PRJCT_INSTR_MAXDOAS_TYPE_ALMUCANTAR;
+      else if (str == "moon")
+        m_instrumental->ascii.spectralType = PRJCT_INSTR_MAXDOAS_TYPE_MOON;
+      else
+        m_instrumental->ascii.spectralType=PRJCT_INSTR_MAXDOAS_TYPE_NONE;
+     }
+
     str = value(atts, "calib");
     if (!str.empty()) {
       str = m_master->pathExpand(str);
@@ -1418,13 +1438,13 @@ void CProjectInstrumentalSubHandler::start(const xmlstring &element, const map<x
     m_instrumental->frm4doas.detectorSize = parse_value<int>(atts, "size");
     m_instrumental->frm4doas.spectralDim = parse_value<int>(atts, "spectral_dim");
     m_instrumental->frm4doas.spatialDim = parse_value<int>(atts, "spatial_dim");
-    
+
     if ((m_instrumental->frm4doas.spectralDim<=0) && (m_instrumental->frm4doas.detectorSize>0))
       m_instrumental->frm4doas.spectralDim=m_instrumental->frm4doas.detectorSize;
-    
+
     if (m_instrumental->frm4doas.spatialDim<=0)
       m_instrumental->frm4doas.spatialDim=1;
-    
+
     m_instrumental->frm4doas.straylight = (value(atts, "straylight") == "true") ? 1 : 0;
     m_instrumental->frm4doas.lambdaMin = parse_value<double>(atts, "lambda_min");
     m_instrumental->frm4doas.lambdaMax = parse_value<double>(atts, "lambda_max");
@@ -1443,6 +1463,8 @@ void CProjectInstrumentalSubHandler::start(const xmlstring &element, const map<x
         m_instrumental->frm4doas.spectralType = PRJCT_INSTR_MAXDOAS_TYPE_DIRECTSUN;
       else if (str == "almucantar")
         m_instrumental->frm4doas.spectralType = PRJCT_INSTR_MAXDOAS_TYPE_ALMUCANTAR;
+      else if (str == "moon")
+        m_instrumental->frm4doas.spectralType = PRJCT_INSTR_MAXDOAS_TYPE_MOON;
       else
         throw std::runtime_error("Invalid ccdeev Type");
      }

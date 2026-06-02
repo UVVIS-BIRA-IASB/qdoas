@@ -111,7 +111,7 @@ struct _prjctUsamp {
 
 typedef struct _prjctAsciiFormat
  {
-  int   format,szaSaveFlag,azimSaveFlag,elevSaveFlag,timeSaveFlag,dateSaveFlag,lambdaSaveFlag;
+  int   format,szaSaveFlag,azimSaveFlag,elevSaveFlag,timeSaveFlag,dateSaveFlag,lambdaSaveFlag,spectralType;
  }
 PRJCT_ASCII;
 

@@ -214,6 +214,8 @@ private:
   QRadioButton *m_lineRadioButton, *m_columnRadioButton,*m_columnExtendedRadioButton;
   QCheckBox *m_zenCheck, *m_aziCheck, *m_eleCheck, *m_dateCheck, *m_timeCheck, *m_lambdaCheck;
   StrayLightConfig *m_strayLightConfig;
+  QLabel *m_spectraTypeLabel;
+  QComboBox *m_spectralTypeCombo;
 };
 
 //--------------------------------------------------------------------------
@@ -512,7 +514,7 @@ class CWInstrFrm4doasEdit : public CWAllFilesEdit
 
   void apply(struct instrumental_frm4doas *d) const;
 
- public slots:  
+ public slots:
   void slotFrm4doasImagers(bool state);
 
  private:

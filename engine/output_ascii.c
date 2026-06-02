@@ -267,10 +267,10 @@ static void print_output_field_value(FILE *fp, const struct output_field *thefie
      fprintf(fp, thefield->format, thedate->da_year, thedate->da_mon, thedate->da_day, thetime->ti_hour, thetime->ti_min, thetime->ti_sec,(millis != -1) ? millis : micros );
 
     break;
-    
+
   case OUTPUT_RESIDUAL:    // in ASCII output format, ignore OUTPUT_RESIDUAL
   default:                 // residuals are not saved in the output file but in a separate file
-   break;    
+   break;
   }
 }
 
@@ -307,6 +307,10 @@ static void print_output_meastype(FILE *fp, const struct output_field *thefield,
  // ----------------------------------------------------------------------------
     case PRJCT_INSTR_MAXDOAS_TYPE_ALMUCANTAR :
          fprintf(fp,"ALM\n");
+    break;
+ // ----------------------------------------------------------------------------
+    case PRJCT_INSTR_MAXDOAS_TYPE_MOON :
+         fprintf(fp,"MOON\n");
     break;
  // ----------------------------------------------------------------------------
     case PRJCT_INSTR_MAXDOAS_TYPE_DIRECTSUN :

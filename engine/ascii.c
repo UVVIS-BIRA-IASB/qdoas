@@ -67,6 +67,7 @@
 #define NEXT_DOUBLE "%lf%*[^0-9.\n\r-]"
 #define NEXT_FLOAT "%f%*[^0-9.\n\r-]"
 #define NEXT_DATE "%d/%d/%d%*[^\n\r0-9.-]"
+#define NEXT_STRING "[^\n\r]"
 #define COMMENT_LINE " %1[*;#]%*[^\n\r]"
 
 #define MAX_ASC_FIELDS 29
@@ -298,7 +299,7 @@ RC ASCII_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int local
  {
   // Declarations
 
-  RECORD_INFO *pRecordInfo;                                                         // pointer to the record part of the engine context
+  RECORD_INFO *pRecordInfo;                                                     // pointer to the record part of the engine context
   PRJCT_INSTRUMENTAL *pInstr;                                                   // pointer to the instrumental part of the pEngineContext structure
   double *spectrum,*lambda,                                                     // the spectrum and the wavelength calibration to read
           tmLocal;                                                              // the measurement time in seconds
@@ -540,6 +541,8 @@ RC ASCII_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int local
     }
 
     pRecordInfo->maxdoas.measurementType=(elevFlag && (pRecordInfo->elevationViewAngle<(double)80.))?PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS:PRJCT_INSTR_MAXDOAS_TYPE_ZENITH;
+
+    // measurementType=(pInstr->ascii.format==PRJCT_INSTR_ASCII_FORMAT_COLUMN_EXTENDED)?pEngineContext->project.instrumental.user:(elevFlag && (pRecordInfo->elevationViewAngle<(double)80.))?PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS:PRJCT_INSTR_MAXDOAS_TYPE_ZENITH
 
     // Get information on the current record
     if (timeFlag) {

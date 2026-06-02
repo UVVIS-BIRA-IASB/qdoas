@@ -474,7 +474,7 @@ void mediateRequestPlotSpectra(ENGINE_CONTEXT *pEngineContext,void *responseHand
           (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG_OLD) ||
           (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_ACTON) ||
           (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_PDASI_EASOE) ||
-         #endif 
+         #endif
           (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_CCD_EEV)) &&
          (pEngineContext->fileInfo.darkFp!=NULL) && (pBuffers->darkCurrent!=NULL)) {
        sprintf(tmpString,"Dark current (%d/%d)",pEngineContext->indexRecord,pEngineContext->recordNumber);
@@ -511,7 +511,7 @@ void mediateRequestPlotSpectra(ENGINE_CONTEXT *pEngineContext,void *responseHand
          #ifdef PRJCT_INSTR_FORMAT_OLD
           (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG) ||
           (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_PDAEGG_OLD) ||
-         #endif 
+         #endif
           (pInstrumental->readOutFormat==PRJCT_INSTR_FORMAT_CCD_EEV)) &&
          (pBuffers->specMax!=NULL) &&
          (pRecord->NSomme>1)) {
@@ -849,7 +849,7 @@ RC setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const m
       strcpy(pEngineInstrumental->instrFunction,pMediateInstrumental->logger.transmissionFunctionFile);     // instrumental function file
 
       break;
-    #endif  
+    #endif
       // ----------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_ASCII :                                                                 // Format ASCII
 
@@ -863,16 +863,20 @@ RC setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const m
       pEngineInstrumental->ascii.dateSaveFlag=pMediateInstrumental->ascii.flagDate;                  // 1 if the date information is saved in the file
       pEngineInstrumental->ascii.lambdaSaveFlag=pMediateInstrumental->ascii.flagWavelength;          // 1 if the wavelength calibration is saved with spectra in the file
 
+      pEngineInstrumental->ascii.spectralType=pEngineInstrumental->ascii.spectralType;
+
       pEngineInstrumental->offsetFlag=pMediateInstrumental->ascii.straylight;
       pEngineInstrumental->lambdaMin=pMediateInstrumental->ascii.lambdaMin;
       pEngineInstrumental->lambdaMax=pMediateInstrumental->ascii.lambdaMax;
+
+      pEngineInstrumental->user=pMediateInstrumental->ascii.spectralType;
 
       strcpy(pEngineInstrumental->calibrationFile,pMediateInstrumental->ascii.calibrationFile);      // calibration file
       strcpy(pEngineInstrumental->instrFunction,pMediateInstrumental->ascii.transmissionFunctionFile);      // instrumental function file
 
       break;
       // ----------------------------------------------------------------------------
-    #ifdef PRJCT_INSTR_FORMAT_OLD  
+    #ifdef PRJCT_INSTR_FORMAT_OLD
     case PRJCT_INSTR_FORMAT_PDAEGG_OLD :                                                            // PDA EG&G (spring 94)
 
       NDET[0]=1024;                                                                                     // size of the detector
@@ -909,7 +913,7 @@ RC setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const m
       strcpy(pEngineInstrumental->instrFunction,pMediateInstrumental->pdasieasoe.transmissionFunctionFile); // instrumental function file
 
       break;
-    #endif  
+    #endif
       // ----------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_OCEAN_OPTICS :                                                                 // Format OCEAN OPTICS
 
@@ -987,7 +991,7 @@ RC setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const m
       rc = parse_trackselection(pMediateInstrumental->apex.trackSelection, pEngineInstrumental->use_row);
 
       break;
-    #ifdef PRJCT_INSTR_FORMAT_OLD  
+    #ifdef PRJCT_INSTR_FORMAT_OLD
     case PRJCT_INSTR_FORMAT_RASAS :                                                                 // Format RASAS (INTA)
 
       NDET[0]=1024;                                                                                     // size of the detector
@@ -1000,7 +1004,7 @@ RC setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const m
       strcpy(pEngineInstrumental->instrFunction,pMediateInstrumental->rasas.transmissionFunctionFile);      // instrumental function file
 
       break;
-    #endif  
+    #endif
       // ----------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_NOAA :                                                                  // NOAA
 
@@ -1265,7 +1269,7 @@ RC setMediateProjectInstrumental(PRJCT_INSTRUMENTAL *pEngineInstrumental,const m
         strcpy(pEngineInstrumental->calibrationFile,pMediateInstrumental->frm4doas.calibrationFile); // calibration file
         strcpy(pEngineInstrumental->instrFunction,pMediateInstrumental->frm4doas.transmissionFunctionFile); // instrumental function file
       }
-      break;      
+      break;
       // ----------------------------------------------------------------------------
     case PRJCT_INSTR_FORMAT_GEMS :
 
@@ -1773,8 +1777,8 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
      }
      else
        pInstrumental->use_row[0]=true;
-     break;      
-      
+     break;
+
    case PRJCT_INSTR_FORMAT_APEX:
      // TODO: generalize for different analysis windows APEX
      rc = apex_init(analysisWindows[0].refOneFile,pEngineContext);
@@ -1976,7 +1980,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
      lambdaMin=pEngineContext->buffers.lambda[0];
      lambdaMax=pEngineContext->buffers.lambda[max_ndet-1];
    }
-   
+
    if (!useKurucz && (THRD_id!=THREAD_TYPE_KURUCZ))
      pEngineContext->project.kurucz.fwhmFit=0;
 
@@ -1992,7 +1996,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
    }
    if (rc)
      goto handle_errors;
-   
+
    if ((THRD_id==THREAD_TYPE_KURUCZ) || useKurucz) {
      // pre-load multi-row Kurucz reference spectrum one time, reuse it for each indexFenoColumn in KURUCZ_Alloc
      char kurucz_file[MAX_ITEM_TEXT_LEN];
@@ -2091,7 +2095,7 @@ int mediateRequestSetAnalysisWindows(void *engineContext,
     rc=ANALYSE_UsampBuild(0,1,0);   // !!! ACCOUNT FOR UNDERSAMPLING ???
 
  handle_errors:
- 
+
    GEMS_CloseReferences();
    radiance_ref_clear_cache();
    MATRIX_Free(&hr_solar_temp, __func__);
@@ -2287,7 +2291,7 @@ int mediateRequestNextMatchingSpectrum(ENGINE_CONTEXT *pEngineContext,void *resp
                      (latit<min(pProject->spectra.latMin,pProject->spectra.latMax)))))) {
          geoFlag=0;
        }
-       
+
        // Check SZA
 
        if (geoFlag &&
@@ -2355,7 +2359,7 @@ int mediateRequestNextMatchingSpectrum(ENGINE_CONTEXT *pEngineContext,void *resp
    else if (THRD_id==THREAD_TYPE_EXPORT)
     {
         int indexFenoColumn=(pEngineContext->recordNumber - 1) % ANALYSE_swathSize;
-        
+
         OUTPUT_SaveResults(pEngineContext,indexFenoColumn);
     }
 
