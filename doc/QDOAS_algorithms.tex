@@ -854,13 +854,13 @@ The term in the exponential describes the molecular absorption contained in the 
 
 \begin{align}
   \Delta\tau =\tau_\mathrm{in}-\tau_\mathrm{in}^\mathrm{RRS} &=A_\mathrm{in}N_v\left( \sigma-\sigma^{RRS} \right) \\
-&\cong A_\mathrm{tot}\left( \lambda \right) N_v \frac{A_\mathrm{in}}{A_\mathrm{tot}} \left( \sigma-\sigma^{RRS} \right)
+&\cong A_\mathrm{tot}( \lambda ) N_v \frac{A_\mathrm{in}}{A_\mathrm{tot}} \left( \sigma-\sigma^{RRS} \right)
 \end{align}
 
 or
 
 \begin{equation}
-\Delta\tau\cong N_s\left( \lambda \right) \frac{A_\mathrm{in}}{A_\mathrm{tot}} \left( \sigma-\sigma^{RRS} \right) \, ,
+\Delta\tau\cong N_s(\lambda) \frac{A_\mathrm{in}}{A_\mathrm{tot}} \left( \sigma-\sigma^{RRS} \right) \, ,
 \end{equation}
 
 where $\sigma$ is the absorber cross section, $\sigma^{RRS}$ the same cross section smoothed by Raman scattering, and $N_s(\lambda)$ is the slant column of the absorber, for which QDOAS will take into account the wavelength dependence if a Pukite correction is used.  $A_\mathrm{in}/A_\mathrm{tot}$  represents the mean ratio of air mass factors along the incoming and total light path.  We can further approximate this using the geometrical air mass factors.  For a satellite nadir geometry, this approximation is given by
@@ -873,9 +873,8 @@ with SZA the solar zenith angle, and VZA the line-of-sight viewing zenith angle.
 In ground-based (zenith-sky or MAX-DOAS) geometry, the factor is equal to unity ($A_\mathrm{in} = A_\mathrm{tot}$).
 
 The molecular Ring correction implies an iterative retrieval, where the fitted
-trace gas slant column (and its eventual wavelength-dependence if a
-Pukite correction is applied) from the previous iteration is injected
-into the modified Ring cross section \eqref{eq:sigma_ring_modified} for the next iteration, until convergene is reached.  When the molecular Ring effect can be neglected, the Qdoas ring tool can be used to generate a Ring cross section $\sigma_\mathrm{R}$
+trace gas slant column from the previous iteration is injected
+into the modified Ring cross section \eqref{eq:sigma_ring_modified} for the next iteration, until convergence is reached.  When the molecular Ring effect can be neglected, the Qdoas ring tool can be used to generate a Ring cross section $\sigma_\mathrm{R}$
 following equation ~\eqref{eq:sigma_ring}.
 
 \subsection{Undersampling Correction}\label{sec:unders-corr}
