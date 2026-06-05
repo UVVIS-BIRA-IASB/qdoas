@@ -1,3 +1,30 @@
+3.7.11 2026-06-05
+~~~~~~~~~~~~~~~~~
+
+ * Add NetCDF attributes containing the ref1 / ref2 used for each analysis
+   window to QDOAS output files.
+
+ * Where possible, write output text attributes as NC_CHAR arrays instead
+   of lists of variable length strings.
+
+ * Use ISO format for the CreationTime NetCDF attribute, instead of using a
+   localized date/time format.
+
+ * Spike removal: allow setting values as low as 1.
+
+ * Command line: distinguish between "missing file" and "unreadable file"
+   when config parsing fails.
+
+ * Check cross section input files have the right number of columns for
+   each analysis window.  Previously, cross sections settings would only be
+   checked for the first analysis window where a given cross section is used,
+   so incompatible settings in another analysis window would go unchecked.
+
+ * Fix right-click context menu for "Subtract/Orthog" and "Correction"
+   columns in analysis window molecules table.
+
+ * Add "moon" measurement type for ASCII extended and FRM4DOAS formats.
+
 3.7.10 2026-01-28
 ~~~~~~~~~~~~~~~~~
 
