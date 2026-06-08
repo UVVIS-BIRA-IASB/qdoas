@@ -215,7 +215,7 @@ static void write_global_attrs(const ENGINE_CONTEXT*pEngineContext, NetCDFGroup 
 
   group.putAttr("Qdoas", qdoas_attr);
 
-  group.putAttr("CreationTime", std::format(iso_format, std::chrono::utc_clock::now()));
+  group.putAttr("CreationTime", std::format(iso_format, std::chrono::system_clock::now()));
 
   group.putAttr("InputFile", pEngineContext->fileInfo.fileName);  // better to have the full path name
   group.putAttr("QDOASConfig", pEngineContext->project.config_file);
@@ -748,7 +748,7 @@ RC netcdf_open_calib(const ENGINE_CONTEXT *pEngineContext, const char *filename,
 
     // Create attributes
 
-    output_file_calib.putAttr("created", std::format(iso_format, std::chrono::utc_clock::now()));
+    output_file_calib.putAttr("created", std::format(iso_format, std::chrono::system_clock::now()));
     output_file_calib.putAttr("description","Solar irradiances with grid corrected by QDOAS");
     output_file_calib.putAttr("title","Solar irradiances with grid corrected by QDOAS");
 
