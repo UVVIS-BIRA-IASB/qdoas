@@ -1,4 +1,4 @@
-3.7.11 2026-06-06
+3.7.12 2026-06-08
 ~~~~~~~~~~~~~~~~~
 
  * Replace use of std::chrono::utc_clock by ...::system_clock to allow
