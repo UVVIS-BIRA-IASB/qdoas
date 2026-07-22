@@ -194,7 +194,7 @@ Cross sections are filtered by subtracting (optical density fitting) or dividing
 For the moment, high-pass filtering is supported only in optical density fitting mode. It can be applied during the phase of calibration and/or during the analysis of spectra.
 
 \subsection{Calibration Page}\label{sec:projects_calibration_page}
-The configurtion of the wavelength calibration procedure is explained in detail in section \ref{sec:conf-wavel-calibr}.
+The configuration of the wavelength calibration procedure is explained in detail in section \ref{sec:conf-wavel-calibr}.
 
 \begin{figure}[!h]
 \subsection{Undersampling Page} \label{sec:projects_undersampling_page} \hfill
@@ -222,7 +222,7 @@ By default, no undersampling correction is applied.
 \subsubsection{Method}
 Different methods for the calculation of the undersampling correction are available.
 \begin{longtable}[h]{l p{8cm}}
-\textbf{From file} & Undersampling cross sections are provided in files like usual cross sections. These files might be created using the \textbf{\nameref{sec:tool_undersampling}}. The files have to be provided in the \textbf{Analysis windows properties} (\textbf{Molecules} or \textbf{Predefined paremeters} page according to the selected analysis method). \\ [6pt]
+\textbf{From file} & Undersampling cross sections are provided in files like usual cross sections. These files might be created using the \textbf{\nameref{sec:tool_undersampling}}. The files have to be provided in the \textbf{Analysis windows properties} (\textbf{Molecules} or \textbf{Predefined parameters} page according to the selected analysis method). \\ [6pt]
 \textbf{Fixed phase} & QDOAS uses the information derived from the calibration procedure to create the undersampling cross sections, with a fixed value of the shift. The selection of this method is recommended. \\ [6pt]
 \textbf{Automatic phase} & The undersampling cross sections are calculated at each iteration of the analysis procedure, using the fitted value for the shift between the reference and the measured spectra. This method is rather time consuming and only applicable for testing purposes.	 \\ [6pt]
 \end{longtable}
@@ -356,14 +356,14 @@ OMI L1B data in the \citet{OMI_iods}.
 \end{figure}
 \FloatBarrier
 
-Input cross sections have to be degraded to the resolution of the instrument before the analysis. This can be done using the \textbf{convolution tool}. However the programme also authorizes the direct use of high-resolution cross sections which will be convolved in real time using information provided in this page \underline{\textbf{if and only if}} the slit function is not characterized by the \textbf{wavelength calibration procedure}.
+Input cross sections have to be degraded to the resolution of the instrument before the analysis. This can be done using the \textbf{convolution tool}. However the program also supports high-resolution cross sections which will be convolved in real time using information provided in this page \underline{\textbf{if and only if}} the slit function is not characterized by the \textbf{wavelength calibration procedure}.
 
 \subsubsection{Slit Function Type}
-Several analytic line shapes are proposed including line shapes supported by the \textbf{wavelength calibration procedure} (gaussian, lorentzian, error function, voigt and asymmetric line shapes). Different fields have to be completed according to the selected slit function. ASCII file is requested for slit functions measured in laboratory (option \textbf{File}) or when the ``Wavelength dependent'' button is checked (analytical line shapes).
+Several analytic line shapes are proposed including line shapes supported by the \textbf{wavelength calibration procedure} (Gaussian, Lorentzian, error function, Voigt and asymmetric line shapes). Different fields have to be completed according to the selected slit function. ASCII file is requested for slit functions measured in laboratory (option \textbf{File}) or when the ``Wavelength dependent'' button is checked (analytical line shapes).
 
 \begin{itemize}
 \item \underline{Slit functions measured in laboratory}: the first column should be the wavelength grid of the line shape; the maximum of the line shape is expected around 0 nm;  look-up tables can be specified for line shapes defined at different wavelengths (in this case, the first line gives the individual wavelengths).
-\item \underline{Wavelength dependent analytical slit functions}: the input file should contain the \gls{fwhm} variation with the wavelenth calibration; at a given wavelength, cross sections will be convolved with the appropriate resolution.
+\item \underline{Wavelength dependent analytical slit functions}: the input file should contain the \gls{fwhm} variation with the wavelength calibration; at a given wavelength, cross sections will be convolved with the appropriate resolution.
 \item \underline{Wavelength dependent stretch factors on a user-defined slit function}:
 To account for an asymmetry of the slit function that varies with the wavelength, a three columns ASCII file can be specified in addition to the slit function file.  This ``Stretch on wavelength'' file should contain the wavelength calibration and the two values of the stretch to apply on the grid of the line shape, one for each side of the slit function.
 Such a file can be obtained by merging in one file the parameters SFP1 and SFP2 resulting of the wavelength calibration (use the \textbf{Save As} option from the title of the plots to save the curves in an ASCII file).
@@ -407,7 +407,7 @@ When processing was unsuccessful, QDOAS uses the fill value
 text output fields, and values -32767, 65535 or -2147483647 for
 integer output fields, depending on the range of the output field.
 For the netCDF output format, fill values are written to the
-\_FillValue attribute of the corresponding variables.
+\texttt{\_FillValue} attribute of the corresponding variables.
 
 \subsubsection{Automatic Creation Of The Output File Name}\label{sec:autom-creat-outp}
 The path and the name of the output file can be specified in the \textbf{Output Path} field.  If ``automatic'' is used as a file name, QDOAS will generate the name of the output file automatically, using the user-defined output path as a base.
@@ -429,12 +429,12 @@ Where:
 For satellite measurements, the \textbf{Use file name} button has no effect. If overpasses calculation is requested (option \textbf{Sites} in the \textbf{Geolocation} frame of the \textbf{Selection} page), then the output file name is determined as above ($<$output path$>$/XXYYYYMM.ASC where XX is the abbreviation of the station). Otherwise, for SCIAMACHY files, the output file name automatically created has the syntax SCIA\_YYYYMMDD\_NNNN.ASC where YYYYMMDD is the date of measurement (year, month, day) and NNNN the orbit number. For other satellite formats, the original file name is used (but with the file extension \textbf{``.ASC''}). Files are distributed in a year/month/day folder structure if the \textbf{Directories} button is checked.
 
 \subsubsection{Fluxes}
-The \textbf{flux} is the value of the signal averaged over pixels within a bandwith around the specified wavelength.  Divided by the exposure time, this can be used to check a relative intensity.  To calculate and save fluxes in the output file, specify the central wavelengths separated by the semicolon (;) character. For example, to get fluxes at 330 nm, 350 nm and 380 nm, enter:
+The \textbf{flux} is the value of the signal averaged over pixels within a bandwidth around the specified wavelength.  Divided by the exposure time, this can be used to check a relative intensity.  To calculate and save fluxes in the output file, specify the central wavelengths separated by the semicolon (;) character. For example, to get fluxes at 330 nm, 350 nm and 380 nm, enter:
 \begin{center}
 330; 350; 380;
 \end{center}
 The averaging bandwidth in nm is also requested (for example a bandwidth of 1 nm means that pixels within the central wavelength +/- 0.5 nm will be averaged).
-Coulour indexes are the ratio between two fluxes and can be easily recalculate from output fluxes.
+Color indexes are the ratio between two fluxes and can be easily recalculate from output fluxes.
 
 \subsubsection{Selection Of Fields To Output}
 The content of this frame is similar to the one in the \textbf{Display page}.  In QDOAS, the output is fully configurable. Information related to the measurements (e.g. date and time, viewing angles, geolocation coordinates,~\dots) can be selected in this page. The selection of analysis results (e.g. slant column densities, fitted non-linear parameters,~\dots) is made individually in the \textbf{Analysis windows properties} pages. The selected instrument or file format determines the list of fields available for output. For example, information on cloud fraction and cloud top pressure is available only for satellite instruments. A non-exhaustive list of fields available for ground-based and satellite measurements is given in appendix \textbf{\ref{cha:output}}.
@@ -457,7 +457,7 @@ In the DOAS technique, spectra are always analyzed with respect to a reference s
 In addition, QDOAS gives the possibility to define two reference spectra (\textbf{Reference 1} and \textbf{Reference 2}). \textbf{Reference 1} is always a file; according to the \textbf{Ref. Selection mode}, \textbf{Reference 2} can be the name of an ASCII file or a spectrum automatically selected by the program. These options determines on which reference spectrum the wavelength calibration procedure is applied:
 \begin{itemize}
 \item If only one reference spectrum is specified (\textbf{Reference 1} or \textbf{Reference 2}), it is used as control spectrum i.e. the \I0 spectrum in the Beer-Lambert law. The wavelength calibration procedure is applied on this spectrum and the cross sections are re-interpolated on the new calculated grid before the analysis of spectra.
-\item If two reference spectra are given, the wavelength calibration is applied only on the first one (\textbf{Reference 1}); the shift between both reference spectra is then determined (using a \gls{nlls} fitting approach) in order to align cross sections on the second reference spectrum (\textbf{Reference 2}) and spectra are analysed w.r.t. \textbf{Reference 2}.
+\item If two reference spectra are given, the wavelength calibration is applied only on the first one (\textbf{Reference 1}); the shift between both reference spectra is then determined (using a \gls{nlls} fitting approach) in order to align cross sections on the second reference spectrum (\textbf{Reference 2}) and spectra are analyzed w.r.t. \textbf{Reference 2}.
 \end{itemize}
 
 \subsubsection{Automatic Reference Selection}
@@ -609,7 +609,7 @@ The ``Correction'' column allows to apply specific corrections to the slant colu
 \end{description}
 
 \subsubsection{Fitted Parameters}
-QDOAS minimises residuals of the DOAS equation using a Marquardt-Levenberg \gls{nlls} fitting algorithm. The method implements a gradient expansion algorithm, which is based on the iterative combination of a steepest descent method (suitable for approaching the minimum from far away) and a linearisation of the fitting function.
+QDOAS minimizes residuals of the DOAS equation using a Marquardt-Levenberg \gls{nlls} fitting algorithm. The method implements a gradient expansion algorithm, which is based on the iterative combination of a steepest descent method (suitable for approaching the minimum from far away) and a linearization of the fitting function.
 
 \begin{itemize}
 \item In ``optical density fitting'', slant column densities of the molecules are fitted linearly.  For a linear fit, \textbf{SCD Delta}, \textbf{SCD min} and \textbf{SCD max} values are ignored.  For molecules for which \textbf{SCD Fit} is unchecked, the optical density contribution is fixed to the product of the concentration value given in the \textbf{SCD Init} column and the molecule cross section.  Otherwise, SCD Init is also ignored in optical density fitting mode.
@@ -787,7 +787,7 @@ spectra. The \textbf{Analysis Method} (optical density fitting or
 intensity fitting) can be different from the one selected for the
 analysis of spectra in the \textbf{Analysis page}.
 
-The calibration procedure also allows the characterisation of the
+The calibration procedure also allows the characterization of the
 instrumental slit function, through fitting of user-defined
 \glspl{sfp}, either the \gls{fwhm} of an analytical line shape (see
 the \textbf{\nameref{sec:analyt-line-shap}}, page
@@ -815,7 +815,7 @@ different settings below.
 There are two cases to consider:
 \begin{enumerate}
 \item The slit function (line shape) of the instrument is known and
-  there is no need to characterise it once again (\textbf{Line Shape}
+  there is no need to characterize it once again (\textbf{Line Shape}
   ``Don't fit'').  Then the \textbf{Solar Ref. File} in this page is
   disabled; it should be given in the \textbf{Slit page}, together
   with the known instrumental line shape.
@@ -882,7 +882,7 @@ of the following options from the \textbf{Subdivision} drop-down menu:
   the subwindows in order to improve the stability of the calibration
   fit in each subwindow.
 \item[Custom] With the ``Custom'' option, the user can manually set
-  the limits of the subintervals used in the calibration.  Clicking on
+  the limits of the sub-intervals used in the calibration.  Clicking on
   the ``Define windows'' button opens a pop-up where the lower and
   upper wavelength limit can be configured for each subwindow.
 \end{description}
@@ -941,7 +941,7 @@ menu and choose a solar reference spectrum and line shape in the
 
 \begin{figure}[!h]
 \includegraphics[width=\textwidth]{img/Calibration_Predefined2.jpg}
-\caption{Calibration Properties: SFP Parameters Page (Parameterisation for an error function line shape)}\label{calibration_sfp}
+\caption{Calibration Properties: SFP Parameters Page (Parameterization for an error function line shape)}\label{calibration_sfp}
 \end{figure}
 
 Table \ref{tab:sfp_meanings} provides an overview of the meaning of

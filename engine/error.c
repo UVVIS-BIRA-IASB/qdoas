@@ -154,7 +154,7 @@ ERROR_TABLE errorTable[]=
 
   { ERROR_ID_SVD_ILLCONDITIONED       , "ill-conditioned matrix"                                                                                             },
   { ERROR_ID_SVD_ARG                   , "the number of lines of the matrix to decompose is expected to be higher than the number of columns (%d x %d)"       },
-  { ERROR_ID_SPLINE                    , "spline interpolation requests increasing absissae (indexes : %d - %d, values : %g - %g)"                            },
+  { ERROR_ID_SPLINE                    , "spline interpolation requests increasing abscissae (indexes : %d - %d, values : %g - %g)"                            },
   { ERROR_ID_VOIGT                     , "Voigt function failed (x=%g,y=%g)"                                                                                  },
   { ERROR_ID_ERF                       , "error with the calculation of the erf function (%s)"                                                                },
   { ERROR_ID_JULIAN_DAY                , "error in the calculation of the Julian day : Julian = %d, Year = %d"                                                },

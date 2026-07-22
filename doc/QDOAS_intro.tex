@@ -1,6 +1,6 @@
 \chapter{Introduction} \label{cha:intro}
 \section{Overview}
-The purpose of this manual is to explain how to use the different QDOAS features, and provide a basic description of their implementation.  Chapter \ref{cha:descr-algor} describes the implementation of the various algorithms in some detail, along with a brief review of their theoretical background and references to literature.  If you are already familliar with \acrfull{doas} retrievals and want to learn how to configure QDOAS, you can read the section \nameref{sec:interface} at the end of this chapter, as well as chapter \ref{cha:quickstart} -- \nameref{cha:quickstart}, which illustrates how to set up an example configuration to retrieve \NO2{} columns from ASCII spectra.  Chapter \ref{cha:properties} contains a more detailed description of the interface, explaining where the different configuration options can be found and how they can be combined.  Appendix \ref{cha:input-files-format} describes the file formats for some of the required input data.
+The purpose of this manual is to explain how to use the different QDOAS features, and provide a basic description of their implementation.  Chapter \ref{cha:descr-algor} describes the implementation of the various algorithms in some detail, along with a brief review of their theoretical background and references to literature.  If you are already familiar with \acrfull{doas} retrievals and want to learn how to configure QDOAS, you can read the section \nameref{sec:interface} at the end of this chapter, as well as chapter \ref{cha:quickstart} -- \nameref{cha:quickstart}, which illustrates how to set up an example configuration to retrieve \NO2{} columns from ASCII spectra.  Chapter \ref{cha:properties} contains a more detailed description of the interface, explaining where the different configuration options can be found and how they can be combined.  Appendix \ref{cha:input-files-format} describes the file formats for some of the required input data.
 
 \section{QDOAS history}
 The experience of the \gls{bira} in the development and improvement of algorithms for the retrieval of trace gas concentrations goes back to the early 1990s, with atmospheric research activities using ground-based UV-Visible spectrometers aiming at the long-term monitoring of minor components involved in the catalytic destruction of the ozone layer or in anthropogenic pollution.
@@ -34,8 +34,8 @@ QDOAS has been developed in collaboration with \href{http://www.stcorp.nl}{S[\&]
 \item shift/stretch (in nm) fully configurable for any spectral item (cross section or spectrum).
 \item Automatically select a reference from the input spectra, taking into account specifics of for satellite or MAXDOAS measurements (scans).
 \item Constrain the slant column density of a molecule to the value found in a previous window.
-\item Filter spectra and cross sections before analysis (supported filters include Kaiser, gaussian, boxcar, Savitsky Golay…).
-\item Define gaps in the spectral window for analsysis, or automatically remove spikes within fitting intervals (e.g. to eliminate bad pixels).
+\item Filter spectra and cross sections before analysis (supported filters include Kaiser, Gaussian, boxcar, Savitsky Golay…).
+\item Define gaps in the spectral window for analysis, or automatically remove spikes within fitting intervals (e.g. to eliminate bad pixels).
 \item Fit an instrumental offset.
 \item Configure a number of different spectral windows within a single project,
 \end{qdoasitem}
@@ -85,7 +85,7 @@ Spectra measured by the following satellite instruments can be processed by QDOA
 \subsubsection{GOME (ERS-2)}
 QDOAS supports the GOME Level 1 Version 5.1 NetCDF format (\url{https://doi.org/10.5270/ER2-ua38y2m}), as well as
 the legacy ASCII file format.  For users who wish to work with legacy
-GOME data, we recommend to use a more practial binary file format
+GOME data, we recommend to use a more practical binary file format
 created by a modified version of the \glslink{gdp}{GDP} implemented at
 \gls{bira} for the automatic selection of the reference spectrum.
 Contact the authors for further information about this format.
@@ -151,7 +151,7 @@ Python tools to convert the most common native format to the FRM4DOAS netCDF one
 \subsubsection{MFC binary, BIRA-IASB} \label{sec:MFC_bin}
 
 Both native binary and ascii (std) formats produced by DOASIS or MS-DOAS acquisition S/W are widely used in the DOAS community.  Nevertheless with one spectrum per file and sometimes the files of one measurement day spread across two folders, the automatic reference selection is not straightforward.
-The automatic reference selection is implemented for the native MFC binary format (without garantee that it will work in any case) and not in the std format.  Even if it is still possible to read spectra, \textbf{no further development or support will be provided for the native format}.  BIRA-IASB has developed its own MFC binary format (MFC BIRA-IASB binary format) in which all spectra of a same day including dark currents and offsets measured the night are saved in a single file.
+The automatic reference selection is implemented for the native MFC binary format (without guarantee that it will work in any case) and not in the std format.  Even if it is still possible to read spectra, \textbf{no further development or support will be provided for the native format}.  BIRA-IASB has developed its own MFC binary format (MFC BIRA-IASB binary format) in which all spectra of a same day including dark currents and offsets measured the night are saved in a single file.
 
 Syntax to use from command line is
 
@@ -245,7 +245,7 @@ developed at the Chalmers University of Technology, Goteborg, Sweden (MANNE Kihl
 
 \subsubsection{SAOZ}
 
-Système d'Analyse par Observation Zénitale developed by the aeronomy lab of the CNRS (JP Pommereau, F Goutail,...), France, and largely used in the \glslink{ndacc}{NDACC} network for stratospheric total ozone and \NO2 monitoring.   Both PCD/NMOS 512 and EFM 1024 (SAM) formats are supported.
+Système d'Analyse par Observation Zénithale developed by the aeronomy lab of the CNRS (JP Pommereau, F Goutail,...), France, and largely used in the \glslink{ndacc}{NDACC} network for stratospheric total ozone and \NO2 monitoring.   Both PCD/NMOS 512 and EFM 1024 (SAM) formats are supported.
 
 \subsection{The ASCII File Format}
 The format of spectra files is usually specific to the acquisition program.  If a format is not supported by QDOAS, it should be possible to convert the spectra to the QDOAS ASCII format. In the QDOAS ASCII format, spectra can be provided in the file one record per line \textbf{(line format)} or one spectral value per line \textbf{(column format)}.  
@@ -266,7 +266,7 @@ conda install conda-forge::doas_cl
 -\end{Verbatim}
 
 \subsection{Online Help}
-QDOAS also provices online help in the form of HTML pages.  The
+QDOAS also provides online help in the form of HTML pages.  The
 content is similar to chapters \ref{cha:descr-algor},
 \ref{cha:properties} and \ref{cha:tools} of this document.  The HTML
 files have to be copied on your disk (usually a subfolder Help of the
