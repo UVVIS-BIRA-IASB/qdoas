@@ -9,4 +9,6 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 static const char cQdoasVersionString[] = "Qdoas version @qdoas_VERSION@ - @QDOAS_DATE@";
 
+static const char qdoas_citation[] = "Fayt, C., Danckaert, T., Van Roozendael, M., & Vlietinck, J. (@QDOAS_YEAR@). QDOAS trace gas retrieval software (Version @qdoas_VERSION@) [Computer software]. Royal Belgian Institute for Space Aeronomy. https://doi.org/10.18758/oqvqk2j3";
+
 #endif

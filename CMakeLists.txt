@@ -7,6 +7,9 @@ endif()
 project(qdoas VERSION 3.7.12)
 
 set(QDOAS_DATE "8 June 2026")
+# extract year from date by converting it into a list and getting the last element:
+string(REPLACE " " ";" QDOAS_DATE_LIST ${QDOAS_DATE})
+list(GET QDOAS_DATE_LIST -1 QDOAS_YEAR)
 
 get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 

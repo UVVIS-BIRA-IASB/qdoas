@@ -205,10 +205,12 @@
 //  ----------------------------------------------------------------------------
 //
 #include <clocale>
+#include <cctype>
 #include <cstdio>
 #include <cstring>
 #include <ctime>
 
+#include <algorithm>
 #include <filesystem>
 #include <iostream>
 #include <memory>
@@ -283,13 +285,6 @@ namespace fs = std::filesystem;
 //-------------------------------------------------------------------
 // types
 //-------------------------------------------------------------------
-
-enum RunMode {
-  None,
-  Error,
-  Help,
-  Batch
-};
 
 enum BatchTool {
   UnknownConfig,
@@ -509,10 +504,8 @@ double GetFiles(const string &triggerPath,vector<string> &filenames,double lastT
 // declarations
 //-------------------------------------------------------------------
 
-enum RunMode parseCommandLine(int argc, char **argv, commands_t *cmd);
 enum BatchTool requiredBatchTool(const string &filename);
 void showUsage();
-void showHelp();
 int  batchProcess(commands_t *cmd);
 
 int batchProcessQdoas(commands_t *cmd);
@@ -575,44 +568,6 @@ private:
 
 //-------------------------------------------------------------------
 
-int main(int argc, char **argv)
-{
-  int retCode = 0;
-
-  // ----------------------------------------------------------------------------
-
-  setlocale(LC_NUMERIC, "C");
-
-  // ----------------------------------------------------------------------------
-
-  if (argc == 1) {
-
-    showUsage();
-  }
-  else {
-    commands_t cmd;
-
-    enum RunMode runMode = parseCommandLine(argc, argv, &cmd);
-
-    switch (runMode) {
-    case None:
-    case Error:
-      showUsage();
-      break;
-    case Help:
-      showHelp();
-      break;
-    case Batch:
-      retCode = batchProcess(&cmd);
-      break;
-    }
-  }
-
-  return retCode;
-}
-
-//-------------------------------------------------------------------
-
 // Replace '\' path separators by '/' in filenames:
 //
 // On windows, we may end up with a mixt of '\' and '/' in paths, but
@@ -625,14 +580,45 @@ string make_pathsep_forward(string path) {
   return path;
 }
 
-enum RunMode parseCommandLine(int argc, char **argv, commands_t *cmd)
-{
-  // extract data from command line
-  enum RunMode runMode = None;
-  int i = 1;
-  int fileSwitch = 0;
+// Wrap a line to fit in a terminal
+string wrap_string(string input, size_t cols=78, size_t indent=0) {
+  string out(indent, ' ');
+  auto i_out = std::back_inserter(out);
+  auto cur_pos = input.begin();
+  size_t cur_col = indent;
+  while (cur_pos != input.end()) {
+    auto next_space = std::find_if(cur_pos, input.end(), [](char c) {return std::isspace(c);});
+    size_t word_len = next_space - cur_pos;
+    if (cur_col + word_len > cols) {  // next word would exceed line length -> insert newline and indent
+      out.push_back('\n');
+      for (size_t i=0; i != indent; ++i) {
+        out.push_back(' ');
+      }
+      cur_col = indent;
+    }
+    auto next_nonspace = std::find_if(next_space, input.end(), [](char c) {return !std::isspace(c);});
+    std::copy(cur_pos, next_nonspace, i_out);
+    cur_col += next_nonspace - cur_pos;
+    cur_pos = next_nonspace;
+  }
+  return out;
+}
+//-------------------------------------------------------------------
 
-  while (runMode != Error && i < argc) {
+int main(int argc, char **argv)
+{
+  setlocale(LC_NUMERIC, "C");
+
+  if (argc == 1) {
+    showUsage();
+    return 0;
+  }
+
+  bool run = false;
+  int fileSwitch = 0;
+  commands_t cmd;
+
+  for( int i=1; i < argc; ++i) {
 
     // options ...
     if (argv[i][0] == '-') {
@@ -642,85 +628,81 @@ enum RunMode parseCommandLine(int argc, char **argv, commands_t *cmd)
 
         if (++i < argc && argv[i][0] != '-') {
           fileSwitch=0;
-          if (cmd->configFile.empty()) {
-            cmd->configFile = argv[i];
-            runMode = Batch;
-          }
-         else
+          if (cmd.configFile.empty()) {
+            cmd.configFile = argv[i];
+            run = true;
+          } else {
            std::cerr << "Duplicate '-c' option." << std::endl;
-        }
-        else {
-          runMode = Error;
+           return 1;
+          }
+        } else {
           std::cerr << "Option '-c' requires an argument (configuration file)." << std::endl;
+          return 1;
         }
-       }
+      }
       // -----------------------------------------------------------------------
       // project name file (analysis mode) ...
       else if (!strcmp(argv[i], "-a")) {
-       if (++i < argc && argv[i][0] != '-') {
-         fileSwitch=0;
-         cmd->projectName = argv[i];
-       }
-       else {
-        runMode = Error;
-        std::cerr << "Option '-a' requires an argument (project name)." << std::endl;
-       }
+        if (++i < argc && argv[i][0] != '-') {
+          fileSwitch=0;
+          cmd.projectName = argv[i];
+        } else {
+          std::cerr << "Option '-a' requires an argument (project name)." << std::endl;
+          return 1;
+        }
       }
       // -----------------------------------------------------------------------
       // project name file ...
       else if (!strcmp(argv[i], "-k")) {
-       if (++i < argc && argv[i][0] != '-') {
-         fileSwitch=0;
-         calibSwitch=1;
-         cmd->projectName = argv[i];
-       }
-       else {
-         runMode = Error;
-         std::cerr << "Option '-k' requires an argument (project name)." << std::endl;
-       }
+        if (++i < argc && argv[i][0] != '-') {
+          fileSwitch=0;
+          calibSwitch=1;
+          cmd.projectName = argv[i];
+        } else {
+          std::cerr << "Option '-k' requires an argument (project name)." << std::endl;
+          return 1;
+        }
       }
       // -----------------------------------------------------------------------
       // trigger path ...
       else if (!strcmp(argv[i], "-t") || !strcmp(argv[i], "-trigger")) {
-       if (++i < argc && argv[i][0] != '-') {
-         fileSwitch=0;
-         triggerSwitch=1;
-         cmd->triggerDir = argv[i];
-       }
-       else {
-         runMode = Error;
-         std::cerr << "Option '-t' requires an argument (trigger path)." << std::endl;
-       }
+        if (++i < argc && argv[i][0] != '-') {
+          fileSwitch=0;
+          triggerSwitch=1;
+          cmd.triggerDir = argv[i];
+        } else {
+          std::cerr << "Option '-t' requires an argument (trigger path)." << std::endl;
+          return 1;
+        }
       }
       // -----------------------------------------------------------------------
       // save irradiances
       else if (!strcmp(argv[i], "-saveref")) {
-            calibSaveSwitch=calibSwitch;
-            if (!calibSwitch)
-              std::cerr << "Warning : Option '-saveref' has effect only with '-k' option." << std::endl;
+        calibSaveSwitch=calibSwitch;
+        if (!calibSwitch) {
+          std::cerr << "Warning : Option '-saveref' only has effect if combined with option '-k'." << std::endl;
+        }
       }
       // -----------------------------------------------------------------------
       // filename to analyze ...
       else if (!strcmp(argv[i], "-f")) {
-       if (++i < argc && argv[i][0] != '-') {
-         fileSwitch=1;
-         cmd->filenames.push_back(argv[i]);
-       }
-       else {
-         runMode = Error;
+        if (++i < argc && argv[i][0] != '-') {
+          fileSwitch=1;
+          cmd.filenames.push_back(argv[i]);
+        } else {
          std::cerr << "Option '-f' requires an argument (filename)." << std::endl;
-       }
+         return 1;
+        }
       }
       // -----------------------------------------------------------------------
       // save new irradiance ...
       else if (!strcmp(argv[i], "-new_irrad")) {
         if (++i < argc && argv[i][0] != '-') {
           calibSaveSwitch=1;
-          cmd->calibDir=argv[i];
-        }
-        else {
-          runMode = Error;
+          cmd.calibDir=argv[i];
+        } else {
           std::cerr << "Option '-new_irrad' requires an argument (filename)." << std::endl;
+          return 1;
         }
       }
       // -----------------------------------------------------------------------
@@ -728,57 +710,64 @@ enum RunMode parseCommandLine(int argc, char **argv, commands_t *cmd)
       else if (!strcmp(argv[i],"-xml")) {
         if (++i < argc && argv[i][0] != '-') {
           xmlSwitch=1;
-          cmd->xmlCommands.push_back(argv[i]);
-        }
-        else {
-          runMode = Error;
+          cmd.xmlCommands.push_back(argv[i]);
+        } else {
           std::cerr << "Option '-xml' requires at least an argument (xmlPath=xmlValue)." << std::endl;
+          return 1;
         }
       }
       // -----------------------------------------------------------------------
       // verbose mode ...
-      else if (!strcmp(argv[i],"-v"))
-       verboseMode=1;
+      else if (!strcmp(argv[i],"-v")) {
+        verboseMode=1;
+      }
+      else if (!strcmp(argv[i], "-version")) {
+        std::cout << cQdoasVersionString << std::endl;
+        return 0;
+      }
       // -----------------------------------------------------------------------
       // output directory ...
       else if (!strcmp(argv[i], "-o")) {
         if (++i < argc && argv[i][0] != '-') {
           fileSwitch=0;
-          cmd->outputDir = make_pathsep_forward(argv[i]);
-        }
-        else {
-          runMode = Error;
+          cmd.outputDir = make_pathsep_forward(argv[i]);
+        } else {
           std::cerr << "Option '-o' requires an argument (directory)." << std::endl;
+          return 1;
         }
       }
       // -----------------------------------------------------------------------
       // help ...
       else if (!strcmp(argv[i], "-h")) { // help ...
         fileSwitch=0;
-        runMode = Help;
+        showUsage();
+        return 0;
       }
-    }
-    else if (fileSwitch)
-     cmd->filenames.push_back(argv[i]);
-    else
-    {
-      runMode = Error;
+      else if (!strcmp(argv[i], "-cite")) { // citation
+        std::cout << qdoas_citation << std::endl;
+        return 0;
+      }
+    } else if (fileSwitch) {
+      cmd.filenames.push_back(argv[i]);
+    } else {
       std::cerr << "Invalid argument '" << argv[i] << "'" << std::endl;
+      return 1;
     }
-    ++i;
   }
 
-  if ((runMode==None) && calibSaveSwitch && !calibSwitch)
-   std::cerr << "Warning : -new_irrad switch to use only with -k option; ignored " << std::endl;
-  else if (!cmd->filenames.empty() && triggerSwitch)
-   {
+  if (!run && calibSaveSwitch && !calibSwitch) {
+    std::cerr << "Warning : -new_irrad switch to use only with -k option; ignored " << std::endl;
+  } else if (!cmd.filenames.empty() && triggerSwitch) {
     std::cerr << "Warning : -t/-trigger switch ignored if switch -f is used" << std::endl;
     triggerSwitch=0;
-   }
+  }
+  if (!run) {
+    showUsage();
+    return 1;
+  }
 
-  // consistency checks ??
-
-  return runMode;
+  // If we get here, we are set up to start batch processing
+  return batchProcess(&cmd);
 }
 
 //-------------------------------------------------------------------
@@ -847,29 +836,37 @@ void showUsage()
   std::cout <<
     "doas_cl -c <config file> [-a/-k <project name>] [-o <output>] [-f <file>]...\n"
     "\n"
-    "    -c <config file>    : A QDoas, convolution, [ring or usamp] config file.\n"
-    "                          The tool to invoke is determined from the type of\n"
-    "                          configuration file specified;\n"
+    "    -c <config file>    : A QDoas, convolution, ring or usamp config file.\n"
+    "                          doas_cl will detect the configuration file type\n"
+    "                          and run the corresponding tool\n"
     "\n"
     "    -a <project name>   : for QDoas, run analysis on the specified project\n"
     "    -k <project name>   : for QDoas, run calibration on the specified project\n"
     "\n"
-    "    -new_irrad <output> : for QDoas, run calibration, GEMS measurements, \n"
+    "    -new_irrad <output> : for QDoas, run calibration, GEMS measurements,\n"
     "                          calibrated irradiances file\n"
     "\n"
     "    -v                  : verbose on (default is off)\n"
     "\n"
-    "    -xml <path=value>   : advanced option to replace the values of some options \n"
+    "    -xml <path=value>   : advanced option to replace the values of some options\n"
     "                          in the configuration file by new ones.\n"
     "    -t, -trigger <path=value> : advanced option to trigger the files to process\n"
+    "\n"
+    "    -h, -help           : show this help message\n"
+    "\n"
+    "    -cite               : show suggested citation for QDoas\n"
+    "\n"
+    "    -version            : show version number and release date\n"
     "------------------------------------------------------------------------------\n"
     "doas_cl is a tool of QDoas, a product jointly developed by BIRA-IASB and S[&]T\n"
+    "\n"
+    "To guarantee continued funding for maintenance and evolution of the software,\n"
+    "please use the following citation if you use results obtained with QDoas in a\n"
+    "publication:\n"
+    "\n"
+            << wrap_string(qdoas_citation, 78, 4) << "\n"
+    "\n"
     "version: " << cQdoasVersionString << std::endl ;
-}
-
-void showHelp()
-{
-  std::cout << cQdoasVersionString << std::endl << std::endl;
 }
 
 int batchProcessQdoas(commands_t *cmd)

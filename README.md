@@ -6,7 +6,7 @@ QDOAS is now part of the [Atmospheric Toolbox](https://atmospherictoolbox.org).
 
 Ready-for-use packages for windows, linux and MAC systems are available from [conda-forge](https://anaconda.org/conda-forge/qdoas), you can install them using the [Miniconda](https://docs.anaconda.com/free/miniconda/index.html) or [Anaconda](https://www.anaconda.com/download) package managers.
 
-This readme.md file summarizes the main features and provides prerequisites and instructions to compile QDOAS.
+This README summarizes the main features and provides prerequisites and instructions to compile QDOAS.
 
 ## Main Features
 
@@ -42,7 +42,7 @@ This readme.md file summarizes the main features and provides prerequisites and 
 * possibility to fix the column density of any selected species;
 * possibility to convolve cross-sections in real time using a user defined slit function or the information on calibration and slit function provided by the wavelength calibration procedure;
 * possibility to handle differences in resolutions between measured and control spectra;
-* use of Pukite cross sections (preconvolved or calculated by the S/W);
+* use of "Pukite" cross sections (preconvolved or calculated online);
 * molecular ring correction to account for non linear effects in the spectral analysis windows
 
 ### Calibration And Slit Function Characterization
@@ -111,19 +111,23 @@ Convolution, Ring and usamp tools manage their own configuration files and can b
 
 ### Starting with QDOAS
 
-If you are not familiar with QDOAS, just call qdoas to open the graphics user environment and follow the instructions in the "Quickstart" chapter of the [S/W User Manual](http://uv-vis.aeronomie.be/software/QDOAS/QDOAS_manual.pdf).
+If you are not familiar with QDOAS, just call qdoas to open the graphics user environment and follow the instructions in the "Quickstart" chapter of the [User Manual](http://uv-vis.aeronomie.be/software/QDOAS/QDOAS_manual.pdf).
 
 GOME2 applications requires that the CODA library is previously installed (the package can be downloaded from the [CODA GithHub](https://github.com/stcorp/coda/releases/latest) web site) and the `CODA_DEFINITION` environment variable is defined, pointing to the location where to find the codadef definitions of the supported data products.
 
 ## Authors
 
-The following people contributed to the S/W :
+The following people contributed to QDOAS :
 
 * **Caroline FAYT, Jonas VLIETINCK, Thomas DANCKAERT and Michel VAN ROOZENDAEL** from BIRA-IASB
 * **Sander NIEMEIJER, Ian PRICE** from S&T
 
-In case of publication of results obtained using QDOAS, please mention the [QDOAS S/W user manual]((http://uv-vis.aeronomie.be/software/QDOAS/QDOAS_manual.pdf)) in the reference and the authors in the acknowledgements (see above).
+If you publish results obtained with the help of QDOAS, please include the following citation:
+
+Fayt, C., Danckaert, T., Van Roozendael, M., & Vlietinck, J. (2026). QDOAS trace gas retrieval software (Version 3.7.12) [Computer software]. Royal Belgian Institute for Space Aeronomy. https://doi.org/10.18758/oqvqk2j3
+
+Citations help us obtain funding for continued maintenance and development of the software.
 
 ## Acknowledgements
 
-The authors would also like to acknowledge all people who have contributed directly or indirectly to the S/W user manual and/or to the improvement of the code.
+The authors would also like to acknowledge all people who have contributed directly or indirectly to the user manual and/or to the improvement of the code.
