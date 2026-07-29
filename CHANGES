@@ -1,3 +1,15 @@
+3.7.13 2026-07-29
+~~~~~~~~~~~~~~~~~
+
+ * When writing fitting residuals to output, also write the corresponding
+   wavelength grid to the netCDF output file.
+
+ * Fix: when writing fitting residuals to output, for imager type instruments,
+   the fitting window may contain a different number of pixels depending on
+   detector row.
+
+ * Include LaTeX source for the updated manual.
+
 3.7.12 2026-06-08
 ~~~~~~~~~~~~~~~~~
 
