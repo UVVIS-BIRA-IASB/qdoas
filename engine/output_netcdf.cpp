@@ -146,7 +146,7 @@ static void write_wavelengths(NetCDFGroup &group, int index_feno, const ENGINE_C
     vector<double> lambdas;
     doas_iterator my_iterator;
     for(int i = iterator_start(&my_iterator, tabfeno.fit_properties.specrange); i != ITERATOR_FINISHED; i=iterator_next(&my_iterator)) {
-      lambdas.push_back(tabfeno.Lambda[i]);
+      lambdas.push_back(tabfeno.LambdaK[i]);
     }
     const size_t start[] = {i_crosstrack, 0};
     const size_t count[] = {1, lambdas.size()};
