@@ -60,8 +60,6 @@ enum _wrkSymbolType
   WRK_SYMBOL_SPECTRUM
  };
 
-#pragma pack(push,1)
-
 struct _wrkSymbol {
   char        type,                           // type of symbol
                 symbolName[MAX_STR_LEN+1],      // name of symbol
@@ -288,7 +286,6 @@ struct _feno {
   double          lambda0_pukite;                                               // selected wavelength for the normalization of cross sections when Pukite terms are calculated (by default, wavelength at the spectral window center)
   int             molecularCorrection;
 };
-#pragma pack(pop)
 
 extern FENO         **TabFeno,*Feno;
 
