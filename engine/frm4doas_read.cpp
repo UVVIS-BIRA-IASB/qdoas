@@ -437,10 +437,11 @@ RC FRM4DOAS_Read(ENGINE_CONTEXT *pEngineContext,int recordNo,int dateFlag,int lo
       
     if (rc || (((measurementType==PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS) && (pRecordInfo->maxdoas.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS) && (pRecordInfo->maxdoas.measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_ZENITH)) ||
                ((measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_OFFAXIS) && (measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_NONE) && (pRecordInfo->maxdoas.measurementType!=measurementType))) ||
-                (dateFlag && !std::isnan(pRecordInfo->elevationViewAngle) && 
-               ((fabs(pRecordInfo->elevationViewAngle+1.)>EPSILON) || (fabs(pRecordInfo->azimuthViewAngle+1.)>EPSILON)) &&
+                (dateFlag && (measurementType!=PRJCT_INSTR_MAXDOAS_TYPE_ZENITH) && 
+                             (std::isnan(pRecordInfo->elevationViewAngle) || 
+              (((fabs(pRecordInfo->elevationViewAngle+1.)>EPSILON) || (fabs(pRecordInfo->azimuthViewAngle+1.)>EPSILON)) &&
                ((pRecordInfo->elevationViewAngle<pEngineContext->project.spectra.refAngle-pEngineContext->project.spectra.refTol) ||
-                (pRecordInfo->elevationViewAngle>pEngineContext->project.spectra.refAngle+pEngineContext->project.spectra.refTol))))    
+                (pRecordInfo->elevationViewAngle>pEngineContext->project.spectra.refAngle+pEngineContext->project.spectra.refTol))))))
       
      rc=ERROR_ID_FILE_RECORD;
    }
