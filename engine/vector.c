@@ -57,21 +57,6 @@
 #endif
 
 // -----------------------------------------------------------------------------
-// FUNCTION      VECTOR_Init
-// -----------------------------------------------------------------------------
-// PURPOSE       initialization of all vector components to one constant value
-//
-// INPUT         value  : the constant value to use for initializing the vector;
-//               dim    : the size of vector to initialize;
-//
-// OUTPUT        vector : the content of this vector is modified by the function.
-// -----------------------------------------------------------------------------
-
-void VECTOR_Init (double *vector, double value, int dim ) {
-  for (int i=0; i<dim; vector[i++]=value );
-}
-
-// -----------------------------------------------------------------------------
 // FUNCTION      VECTOR_Copy
 // -----------------------------------------------------------------------------
 // PURPOSE       Copy the content of a vector of double to another vector

@@ -4,9 +4,9 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
     cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 endif()
 
-project(qdoas VERSION 3.7.12)
+project(qdoas VERSION 3.7.13)
 
-set(QDOAS_DATE "8 June 2026")
+set(QDOAS_DATE "29 July 2026")
 # extract year from date by converting it into a list and getting the last element:
 string(REPLACE " " ";" QDOAS_DATE_LIST ${QDOAS_DATE})
 list(GET QDOAS_DATE_LIST -1 QDOAS_YEAR)
