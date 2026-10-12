@@ -949,13 +949,20 @@ int readConfigQdoas(commands_t *cmd, vector<CProjectConfigItem>& projectItems)
     // is a specific project required ...
     if (!cmd->projectName.empty()) {
       // select only the matching project and discard the rest ...
+      bool found_project = false;
       for (auto &p : handler.projectItems()) {
         if (boost::iequals(p.name(), cmd->projectName)) {
           if (xmlSwitch) {
             retCode = QDOASXML_Parse(cmd->xmlCommands,&p);
           }
           projectItems.push_back(std::move(p));
+          found_project =  true;
+          break;
         }
+      }
+      if (!found_project) { // none of the projectItems() match the required name
+        std::cerr << "ERROR: this configuration does not contain a project with the name '" << cmd->projectName << "'" << std::endl;
+        retCode = 1;
       }
     } else if(xmlSwitch) {
       std::cerr << "-xml switch can only be used when processing a single project.  Use switch -a <projectname>" << std::endl;
