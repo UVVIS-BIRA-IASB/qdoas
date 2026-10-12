@@ -50,11 +50,9 @@
 #include <string.h>
 
 #include "doas.h"
+#include "vector.h"
 
-#ifdef _MSC_VER
-// Older Visual C does not know C99 restrict keyword
-#define restrict
-#endif
+extern inline void VECTOR_Init (double *vector, double value, int dim);
 
 // -----------------------------------------------------------------------------
 // FUNCTION      VECTOR_Copy
@@ -143,7 +141,7 @@ void VECTOR_Copy (double *target, const double *source, int dim ) {
 //               0 otherwise.
 // -----------------------------------------------------------------------------
 
-RC VECTOR_Log(double *restrict out, const double *restrict in, int dim, const char *callingFunction) {
+RC VECTOR_Log(double *out, const double *in, int dim, const char *callingFunction) {
   for (int i=0; i!=dim; ++i) {
     if (in[i]<=(double)0.)
       return ERROR_SetLast(callingFunction,ERROR_TYPE_WARNING,ERROR_ID_LOG);
