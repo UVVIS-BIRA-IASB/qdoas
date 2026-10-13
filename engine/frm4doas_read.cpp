@@ -49,36 +49,21 @@
 
 #include <string>
 #include <vector>
-#include <array>
-#include <set>
-#include <tuple>
-#include <stdexcept>
-#include <algorithm>
-#include <sstream>
 
-#include <cassert>
 #include <cmath>
 
 #include "frm4doas_read.h"
 #include "netcdfwrapper.h"
-// #include "dir_iter.h"
 
 extern "C" {
 #include "winthrd.h"
-#include "comdefs.h"
-#include "stdfunc.h"
 #include "engine_context.h"
 #include "engine.h"
-#include "mediate.h"
-#include "analyse.h"
-#include "spline.h"
-#include "vector.h"
 #include "zenithal.h"
 }
 
 using std::string;
 using std::vector;
-using std::set;
 
 // ======================
 // STRUCTURES DEFINITIONS
