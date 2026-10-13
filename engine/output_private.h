@@ -15,6 +15,7 @@
 
 RC write_spikes(char *spikestring, unsigned int length, bool *spikes,int ndet);
 double output_flux(const ENGINE_CONTEXT *pEngineContext, double wavelength, int indexFenoColumn);
+double output_ref_flux(const ENGINE_CONTEXT *pEngineContext, double wavelength, int index_feno, int indexFenoColumn);
 
 static inline FENO *get_tabfeno_calib(struct output_field *this_field UNUSED, int indexFenoColumn) {
   FENO *tabfeno_kurucz = &TabFeno[indexFenoColumn][INDEX_KURUCZ];
@@ -786,6 +787,14 @@ static inline void get_rc_calib(struct output_field *this_field, int *rc, const 
 static inline void get_flux(struct output_field *this_field, double *flux, const ENGINE_CONTEXT *pEngineContext, int indexFenoColumn, int index_calib UNUSED) {
   if (pEngineContext->project.instrumental.use_row[indexFenoColumn] ) {
     *flux = output_flux(pEngineContext, OUTPUT_fluxes[this_field->index_flux], indexFenoColumn);
+  } else {
+    *flux = QDOAS_FILL_DOUBLE;
+  }
+}
+
+static inline void get_ref_flux(struct output_field *this_field, double *flux, const ENGINE_CONTEXT *pEngineContext, int indexFenoColumn, int index_calib UNUSED) {
+  if (pEngineContext->project.instrumental.use_row[indexFenoColumn] ) {
+    *flux = output_ref_flux(pEngineContext, OUTPUT_fluxes[this_field->index_flux], this_field->index_feno, indexFenoColumn);
   } else {
     *flux = QDOAS_FILL_DOUBLE;
   }

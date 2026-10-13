@@ -152,6 +152,7 @@ static void save_calibration(void);
 static void output_field_clear(struct output_field *this_field);
 static void output_field_free(struct output_field *this_field);
 struct field_attribute *copy_attributes(const struct field_attribute *attributes, int num_attributes);
+static int register_analysis_field(const struct output_field* fieldcontent, int index_feno, int index_calib, int index_cross, const char *window_name, const char *symbol_name);
 
 /*! \brief Calculate flux for a given wavelength.*/
 double output_flux(const ENGINE_CONTEXT *pEngineContext, double wavelength, int i_crosstrack) {
@@ -179,6 +180,32 @@ double output_flux(const ENGINE_CONTEXT *pEngineContext, double wavelength, int 
     flux/=(double)(imax-imin+1);
 
    }
+  return flux;
+}
+
+/*! \brief Calculate reference flux for a given wavelength.*/
+double output_ref_flux(const ENGINE_CONTEXT *pEngineContext, double wavelength, int index_feno, int i_crosstrack) {
+  const int n_wavel = NDET[i_crosstrack];
+  double flux =0.;
+  double bandWidth=pEngineContext->project.asciiResults.bandWidth;
+
+  const FENO *pTabFeno = &TabFeno[i_crosstrack][index_feno];
+  const double *wavel_grid = pTabFeno->LambdaRef;
+  const double *spec = pTabFeno->Sref;
+
+  if ( wavelength >= wavel_grid[0] && wavelength <= wavel_grid[n_wavel-1] ) {
+    // The interval is defined in nm
+    int imin = max(FNPixel(wavel_grid, wavelength - 0.5 * bandWidth, n_wavel, PIXEL_CLOSEST),0);
+    int imax = min(FNPixel(wavel_grid, wavelength + 0.5 * bandWidth, n_wavel, PIXEL_CLOSEST), n_wavel-1);
+
+    // Flux calculation
+    for (int i=imin; i<=imax; i++) {
+      flux += spec[i];
+    }
+
+    flux /= imax-imin+1;
+    flux *= pTabFeno->refNormFact;
+  }
   return flux;
 }
 
@@ -683,6 +710,34 @@ static void OutputRegisterFluxes(const ENGINE_CONTEXT *pEngineContext)
       output_flux->index_flux = OUTPUT_NFluxes;
       output_flux->get_data = (func_void)&get_flux;
       output_flux->data_cols = 1;
+
+      // register reference flux.  Since the reference can be set per
+      // analysis window, this is an analysis output field.
+      for (int indexFeno=0;indexFeno<NFeno;indexFeno++) {
+        // find analysis window name from first row for which tabfeno[row][].windowName is filled:
+        int indexFenoColumn = 0;
+        // For imagers: increase indexFenoColumn until we find a used track, otherwise: use track 0
+        for(indexFenoColumn=0; indexFenoColumn<ANALYSE_swathSize; indexFenoColumn++) {
+          if (pEngineContext->project.instrumental.use_row[indexFenoColumn] ) {
+            break;
+          }
+        }
+        const FENO *pTabFeno=&TabFeno[indexFenoColumn][indexFeno];
+
+        if(!outputRunCalib && !pTabFeno->hidden) {
+          sprintf(columnTitle,"Reference Fluxes %g",OUTPUT_fluxes[OUTPUT_NFluxes]);
+          struct output_field newfield = { .resulttype = PRJCT_RESULTS_FLUX,
+                                           .basic_fieldname = columnTitle,
+                                           .format = "%#15.6le",
+                                           .memory_type = OUTPUT_DOUBLE,
+                                           .index_flux = OUTPUT_NFluxes,
+                                           .get_data = (func_void)&get_ref_flux,
+                                           .data_cols = 1 };
+
+          register_analysis_field(&newfield, indexFeno, ITEM_NONE, ITEM_NONE, pTabFeno->windowName, "");
+        }
+      }
+
       OUTPUT_NFluxes++;
      }
 
