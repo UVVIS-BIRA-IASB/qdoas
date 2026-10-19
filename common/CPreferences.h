@@ -36,7 +36,7 @@ class CPreferences
   void setDirectoryNameGivenFile(const QString &key, const QString &fileName);
 
   QString fileExtension(const QString &key, int index, const QString &fallback = QString()) const;
-  void setFileExtension(const QString &key, int index, const QString &extension);
+  void setFileExtension(const QString &key, int index, const QString &extension, bool overwrite = true);
   void setFileExtensionGivenFile(const QString &key, int index, const QString &fileName);
 
   QList<int> columnWidthList(const QString &key, const QList<int> &fallback = QList<int>()) const;
@@ -65,6 +65,7 @@ class CPreferences
   CPreferences();
   CPreferences(const CPreferences &) {}
   CPreferences& operator=(const CPreferences &) { return *this; }
+  void load_default_preferences();
 
  private:
   static CPreferences *m_instance;

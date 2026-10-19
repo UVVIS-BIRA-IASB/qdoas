@@ -12,6 +12,8 @@ algorithm.  Copyright (C) 2007  S[&]T and BIRA
 
 #include "CPreferences.h"
 
+#include "constants.h"
+
 #include "debugutil.h"
 
 
@@ -54,6 +56,19 @@ CPreferences::CPreferences()
   QCoreApplication::setOrganizationDomain("www.oma.be");
 
   m_settings = new QSettings("BIRA-IASB", PREF_KEY);
+  load_default_preferences();
+}
+
+void CPreferences::load_default_preferences() {
+  // set file name extension for some common satellite formats if no
+  // preference was set by the user yet:
+  setFileExtension("Instrument", PRJCT_INSTR_FORMAT_OMPS, "h5", false);
+  setFileExtension("Instrument", PRJCT_INSTR_FORMAT_OMI, "he4", false);
+  setFileExtension("Instrument", PRJCT_INSTR_FORMAT_TROPOMI, "nc", false);
+  setFileExtension("Instrument", PRJCT_INSTR_FORMAT_GOME1_NETCDF, "nc", false);
+  setFileExtension("Instrument", PRJCT_INSTR_FORMAT_GEMS, "nc", false);
+  setFileExtension("Instrument", PRJCT_INSTR_FORMAT_OMIV4, "nc", false);
+  setFileExtension("Instrument", PRJCT_INSTR_FORMAT_TEMPO, "nc", false);
 }
 
 // interface for saving/restoring preferences...
@@ -110,7 +125,7 @@ QString CPreferences::fileExtension(const QString &key, int index, const QString
   return tmp;
 }
 
-void CPreferences::setFileExtension(const QString &key, int index, const QString &extension)
+void CPreferences::setFileExtension(const QString &key, int index, const QString &extension, bool overwrite)
 {
   QString tmp(key);
   QTextStream stream(&tmp);
@@ -118,7 +133,9 @@ void CPreferences::setFileExtension(const QString &key, int index, const QString
   stream << index;
 
   m_settings->beginGroup("FileExtension");
-  m_settings->setValue(tmp, extension);
+  if (!m_settings->contains(tmp) || overwrite) {
+    m_settings->setValue(tmp, extension);
+  }
   m_settings->endGroup();
 }
 
