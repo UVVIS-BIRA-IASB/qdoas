@@ -145,8 +145,8 @@ void CWProjectTabSlit::slotSolarRefFileBrowse()
   CPreferences *pref = CPreferences::instance();
 
   QString filename = QFileDialog::getOpenFileName(this, "Select Solar Reference File",
-                          pref->directoryName("Ref"),
-                          "Kurucz File (*.ktz);;All Files (*)");
+                                                  pref->directoryName("Ref"),
+                                                  "Kurucz File (*.ktz *.nc);;All Files (*)");
 
   if (!filename.isEmpty()) {
     pref->setDirectoryNameGivenFile("Ref", filename);
