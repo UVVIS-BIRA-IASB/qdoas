@@ -1,3 +1,19 @@
+3.7.14 2026-10-28
+~~~~~~~~~~~~~~~~~
+
+ * output: When writing flux at given wavelengths to output, also
+   write the reference spectrum flux at the same wavelengths.  For
+   calibrated radiances / irradiances, this can be used to obtain the
+   reflectance at those wavelengths.  Since a different reference
+   spectrum can be used per analysis window, the reference spectrum
+   flux is saved in the analysis window output subgroup for NetCDF
+   files.
+
+ * doas_cl: Print an error message when an incorrect project name is
+   used with the command line option '-a', instead of silently failing.
+
+ * FRM4DOAS: Fix issue for spectra where viewing angle is not specified.
+
 3.7.13 2026-07-29
 ~~~~~~~~~~~~~~~~~
 
