@@ -1190,9 +1190,9 @@ RC KURUCZ_ApplyCalibration(FENO *pTabFeno,double *newLambda,INDEX indexFenoColum
 
   if (newDimL != pTabFeno->fit_properties.DimL) {
     // reallocate complete FIT_PROPERTIES structure.
-    FIT_PROPERTIES_free("KURUCZ_ApplyCalibration ",&pTabFeno->fit_properties);
+    FIT_PROPERTIES_free(__func__,&pTabFeno->fit_properties);
     pTabFeno->fit_properties.DimL=newDimL;
-    FIT_PROPERTIES_alloc("KURUCZ_ApplyCalibration ",&pTabFeno->fit_properties);
+    FIT_PROPERTIES_alloc(__func__,&pTabFeno->fit_properties);
   } else if(pTabFeno->fit_properties.specrange != NULL) {
     // only update specrange
     spectrum_destroy(pTabFeno->fit_properties.specrange);
