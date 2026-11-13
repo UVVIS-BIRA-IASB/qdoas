@@ -1679,15 +1679,15 @@ RC ANALYSE_ConvoluteXs(const FENO *pTabFeno,int action,double conc,
    }
   else
    memcpy(&xshr,pXs,sizeof(MATRIX_OBJECT));
-
+  
   if (!rc && !(rc=MATRIX_Allocate(&xsNew,n_wavel,2,0,0,1,__func__)))
    {
-        VECTOR_Copy(xsNew.matrix[0],newlambda,n_wavel);
+    VECTOR_Copy(xsNew.matrix[0],newlambda,n_wavel);
     VECTOR_Init(xsNew.matrix[1],(double)0.,n_wavel);
 
     if (action==ANLYS_CROSS_ACTION_CONVOLUTE_I0)
      VECTOR_Init(IcVector,(double)0.,n_wavel);
-
+     
     if (!(rc=XSCONV_TypeStandard(&xsNew,indexlambdaMin,indexlambdaMax,&xshr,(action==ANLYS_CROSS_ACTION_CONVOLUTE_I0)?&xsI0:&xshr,IcVector,slitType,slitMatrix,(double *)slitParam,wveDptFlag)))
      {
       for (j=indexlambdaMin;(j<indexlambdaMax) && !rc;j++)
@@ -1783,7 +1783,7 @@ RC ANALYSE_XsConvolution(FENO *pTabFeno, const double *newlambda,
         if ((pTabCross->crossAction==ANLYS_CROSS_ACTION_CONVOLUTE) || (pTabCross->crossAction==ANLYS_CROSS_ACTION_CONVOLUTE_I0))
          {
           // Do not convolve pukite cross sections
-
+           
           if (!pTabCross->isPukite &&
               !(rc=ANALYSE_ConvoluteXs(pTabFeno,pTabCross->crossAction,pTabCross->I0Conc,pXs,slitMatrix,slitParam,slitType,
                                        newlambda,pTabCross->vector,indexlambdaMin,indexlambdaMax,n_wavel,indexFenoColumn,wveDptFlag)) &&
@@ -2027,7 +2027,7 @@ RC AnalyseFwhmCorrectionK(const double *Spectre, const double *Sref,double *Spec
   // Declarations
 
   MATRIX_OBJECT slitMatrix[NSFP];
-  double specFwhm,refFwhm,*xsTrav;
+  double specFwhm,refFwhm,*xsTrav,slitParam[NSFP];
   INDEX j;
   RC rc;
 
@@ -2038,15 +2038,16 @@ RC AnalyseFwhmCorrectionK(const double *Spectre, const double *Sref,double *Spec
   // Initializations
 
   memset(slitMatrix,0,sizeof(MATRIX_OBJECT)*NSFP);
+  VECTOR_Init(slitParam,(double)0.,NSFP);
   xsTrav=NULL;
 
   // Function specified for fitting fwhm in Kurucz should be supported
 
   if ((pKuruczOptions->fwhmType!=SLIT_TYPE_GAUSS) && (pKuruczOptions->fwhmType!=SLIT_TYPE_ERF))
    rc=ERROR_SetLast(__func__,ERROR_TYPE_FATAL,ERROR_ID_SLIT);
-
+  
   // Buffer allocation
-
+  
   else if ((xsTrav=(double *)MEMORY_AllocDVector(__func__,"xsTrav",0,n_wavel-1))==NULL)
    rc=ERROR_ID_ALLOC;
 
@@ -2097,7 +2098,15 @@ RC AnalyseFwhmCorrectionK(const double *Spectre, const double *Sref,double *Spec
    }
 
   // Real time convolution for high resolution cross sections
-
+  
+  if (!rc && Feno->xsToConvolute && !(rc=MATRIX_Allocate(&slitMatrix[0],n_wavel,2,0,0,1,"AnalyseFwhmCorrectionK (slitMatrix)")))
+   {
+    VECTOR_Copy(slitMatrix[0].matrix[0],Lambda,n_wavel);
+    VECTOR_Copy(slitMatrix[0].matrix[1],xsTrav,n_wavel);
+    
+    if (!(rc=SPLINE_Deriv2(slitMatrix[0].matrix[0],slitMatrix[0].matrix[1],slitMatrix[0].deriv2[1],slitMatrix[0].nl,"AnalyseFwhmCorrectionK")))
+     rc=ANALYSE_XsConvolution(Feno,Lambda,slitMatrix,slitParam,pKuruczOptions->fwhmType,indexFenoColumn,1);
+   }
   // SuperGauss : to check later if (!rc && Feno->xsToConvolute)
   // SuperGauss : to check later  {
   // SuperGauss : to check later   rc=ANALYSE_XsConvolution(Feno,Lambda,NULL,NULL,pKuruczOptions->fwhmType,xsTrav,KURUCZ_buffers[0].fwhmVector[1],indexFenoColumn,(pKuruczOptions->fwhmType==SLIT_TYPE_FILE)?1:0);
@@ -2107,6 +2116,8 @@ RC AnalyseFwhmCorrectionK(const double *Spectre, const double *Sref,double *Spec
 
   if (xsTrav!=NULL)
     MEMORY_ReleaseDVector(__func__,"xsTrav",xsTrav,0);
+     
+  MATRIX_Free(&slitMatrix,__func__);     
 
 #if defined(__DEBUG_) && __DEBUG_
   DEBUG_FunctionStop(__func__,rc);
@@ -3758,7 +3769,7 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
     // Apply Kurucz on spectrum
 
     for (int WrkFeno=0;WrkFeno<NFeno;WrkFeno++)
-     if (!TabFeno[indexFenoColumn][WrkFeno].hidden && !TabFeno[indexFenoColumn][WrkFeno].rc &&
+     if (!TabFeno[indexFenoColumn][WrkFeno].hidden && // !TabFeno[indexFenoColumn][WrkFeno].rc &&
          ((TabFeno[indexFenoColumn][WrkFeno].useKurucz==ANLYS_KURUCZ_REF_AND_SPEC) ||
           (TabFeno[indexFenoColumn][WrkFeno].useKurucz==ANLYS_KURUCZ_SPEC)))
 
