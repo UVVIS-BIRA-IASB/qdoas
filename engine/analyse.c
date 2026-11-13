@@ -3768,13 +3768,14 @@ RC ANALYSE_Spectrum(ENGINE_CONTEXT *pEngineContext,void *responseHandle)
     }
     // Apply Kurucz on spectrum
 
-    for (int WrkFeno=0;WrkFeno<NFeno;WrkFeno++)
-     if (!TabFeno[indexFenoColumn][WrkFeno].hidden && // !TabFeno[indexFenoColumn][WrkFeno].rc &&
-         ((TabFeno[indexFenoColumn][WrkFeno].useKurucz==ANLYS_KURUCZ_REF_AND_SPEC) ||
-          (TabFeno[indexFenoColumn][WrkFeno].useKurucz==ANLYS_KURUCZ_SPEC)))
-
+    for (int WrkFeno=0;WrkFeno<NFeno;WrkFeno++) {
+      if(!TabFeno[indexFenoColumn][WrkFeno].hidden &&
+         (TabFeno[indexFenoColumn][WrkFeno].useKurucz==ANLYS_KURUCZ_REF_AND_SPEC ||
+          TabFeno[indexFenoColumn][WrkFeno].useKurucz==ANLYS_KURUCZ_SPEC)) {
       useKurucz++;
+    }
 
+    }
     if (useKurucz || (THRD_id==THREAD_TYPE_KURUCZ))
      {
       if (((SpectreK=(double *)MEMORY_AllocDVector(__func__,"SpectreK",0,n_wavel-1))==NULL) ||
