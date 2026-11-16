@@ -1,3 +1,11 @@
+3.7.15 2026-11-16
+~~~~~~~~~~~~~~~~~
+
+ * Fix: high resolution cross sections were not convolved in
+   'Ref+Spectra' calibration mode.  Note that this mode should only be
+   used when radiance calibration is highly unstable, e.g. for
+   unthermostated instruments.
+
 3.7.14 2026-10-28
 ~~~~~~~~~~~~~~~~~
 
