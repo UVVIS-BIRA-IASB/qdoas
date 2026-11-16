@@ -2116,8 +2116,10 @@ RC AnalyseFwhmCorrectionK(const double *Spectre, const double *Sref,double *Spec
 
   if (xsTrav!=NULL)
     MEMORY_ReleaseDVector(__func__,"xsTrav",xsTrav,0);
-     
-  MATRIX_Free(&slitMatrix,__func__);     
+
+  for (size_t i=0; i!= NSFP; ++i) {
+      MATRIX_Free(&slitMatrix[i], __func__);
+  }
 
 #if defined(__DEBUG_) && __DEBUG_
   DEBUG_FunctionStop(__func__,rc);
