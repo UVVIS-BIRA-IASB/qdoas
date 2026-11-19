@@ -535,8 +535,8 @@ RC mediateConvolutionCalculate(void *engineContext,void *responseHandle)
            sprintf(windowTitle,(pEngineContext->convolutionType!=CONVOLUTION_TYPE_NONE)?"Spectrum after convolution (%d)":"Spectrum after interpolation (%d)",islit);
 
           MEDIATE_PLOT_CURVES(0,Spectrum,forceAutoScale,windowTitle,"Wavelength (nm)","",responseHandle,
-                              CURVE(.name="High resolution spectrum", .x=XSCONV_xshr.matrix[0], .y=XSCONV_xshr.matrix[1], .length=XSCONV_xshr.nl),
-                              CURVE(.name=windowTitle, .x=XSCONV_xsnew.matrix[0]+nFilter,.y=XSCONV_xsnew.matrix[1]+nFilter,.length=XSCONV_xsnew.nl-2*nFilter));
+                              CURVE(.name="High resolution spectrum", .x=XSCONV_xshr.matrix[0], .y=XSCONV_xshr.matrix[1], .length=XSCONV_xshr.nl,.number=0),
+                              CURVE(.name=windowTitle, .x=XSCONV_xsnew.matrix[0]+nFilter,.y=XSCONV_xsnew.matrix[1]+nFilter,.length=XSCONV_xsnew.nl-2*nFilter,.number=1));
           mediateResponseLabelPage(0,pageTitle,"",responseHandle);
          }
 
